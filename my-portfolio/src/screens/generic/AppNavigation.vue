@@ -1,15 +1,80 @@
 <template>
   <ul
-    class=" w-full sm:w-auto items-center text-center text-xs font-medium sm:text-sm"
+    class="
+      flex
+      w-full
+      sm:w-auto
+      items-center
+      text-center
+      sm:text-sm
+      pt-2
+      font-bold
+    "
   >
-    <!-- <li>
+    <li>
       <router-link
-        class="inline-block rounded-md px-3 py-6 outline-none focus-visible:ring-2"
-        active-class="opacity-40"
+        class="
+          text-xl text-neutral-100
+          inline-block
+          px-5
+          outline-none
+          focus-visible:ring-2
+          hover:text-teal-600 hover:transition hover:ease-in-out
+        "
+        active-class="text-teal-800"
+        to="/"
+      >
+        Home</router-link
+      >
+    </li>
+    <li>
+      <router-link
+        class="
+          text-neutral-100
+          inline-block
+          px-5
+          outline-none
+          focus-visible:ring-2
+          text-xl
+          hover:text-teal-600 hover:transition hover:ease-in-out
+        "
+        active-class="text-teal-800"
+        to="/projects"
+      >
+        Projects</router-link
+      >
+    </li>
+    <li>
+      <router-link
+        class="
+          text-xl text-neutral-100
+          inline-block
+          px-5
+          outline-none
+          focus-visible:ring-2
+          hover:text-teal-600 hover:transition hover:ease-in-out
+        "
+        active-class="text-teal-800"
+        to="/about"
+      >
+        About</router-link
+      >
+    </li>
+    <li>
+      <router-link
+        class="
+          text-xl text-neutral-100
+          inline-block
+          px-5
+          outline-none
+          focus-visible:ring-2
+          hover:text-teal-600 hover:transition hover:ease-in-out
+        "
+        active-class="text-teal-800"
         to="/contact"
       >
         Contact</router-link
       >
-    </li> -->
+    </li>
   </ul>
 </template>

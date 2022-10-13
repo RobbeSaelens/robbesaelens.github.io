@@ -1,5 +1,17 @@
 <template>
-<main class="max-w-6xl mx-auto">
-    <h1 class="text-md text-neutral-500">Index</h1>
-</main>
+  <div class="bg-neutral-900 h-screen">
+    <div class="max-w-screen-2xl mx-auto">
+      <Profile />
+    </div>
+  </div>
 </template>
+
+<script>
+import Profile from '../components/Profile.vue'
+
+export default {
+  components: {
+    Profile,
+  },
+}
+</script>

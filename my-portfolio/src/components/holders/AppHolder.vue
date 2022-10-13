@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen h-screen">
+  <div class="min-h-screen h-screen">
     <AppHeader />
     <router-view class="overflow y-auto"></router-view>
     <AppFooter />
