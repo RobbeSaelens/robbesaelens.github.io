@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-neutral-900 h-screen">
+  <div class="bg-neutral-900">
     <div class="max-w-screen-2xl mx-auto">
       <Profile />
     </div>

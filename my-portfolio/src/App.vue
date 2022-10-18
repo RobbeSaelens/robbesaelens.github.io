@@ -1,3 +1,3 @@
 <template>
-  <router-view class="min-h-screen bg-neutral-900"></router-view>
+  <router-view class="bg-neutral-900"></router-view>
 </template>

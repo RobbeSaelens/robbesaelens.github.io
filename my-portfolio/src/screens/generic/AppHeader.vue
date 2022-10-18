@@ -45,9 +45,6 @@
           />
         </a>
       </div>
-      <div class="bg-teal-600 p-2 rounded-3xl animate-pulse  absolute right-25">
-        <p class="font-medium">Contact me here!</p>
-      </div>
     </nav>
   </header>
 </template>

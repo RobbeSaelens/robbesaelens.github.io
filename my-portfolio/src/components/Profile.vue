@@ -1,6 +1,6 @@
 <template>
-  <div class="pt-20 pb-5">
-    <h1 class="font-bold text-5xl text-neutral-100 relative">Profile</h1>
+  <div class="pt-10 pb-5">
+    <h1 class="font-bold text-5xl text-neutral-100">Profile</h1>
     <hr class="bg-teal-600 mt-4 w-45 rounded-md border-1" />
   </div>
   <div class="flex space-x-15">
@@ -17,7 +17,8 @@
           Hi, my name is Robbe Saelens.
         </p>
         <p class="text-neutral-300 text-6xl font-extrabold">
-          I'm a <span class="text-teal-800">next web developer!</span>
+          I'm a
+          <span class="text-teal-800">next web developer!</span>
         </p>
       </div>
       <div class="w-3/5 space-y-3 text-lg mt-5">
@@ -32,23 +33,36 @@
           in the equestrian sport.
         </p>
       </div>
-      <!-- <ul class="text-neutral-300 pt-5 space-y-2">
-        <li>
-          <span class="font-bold text-neutral-100">Email:</span>
-          robbe.saelens@telenet.be
-        </li>
-        <li>
-          <span class="font-bold text-neutral-100">Date of birth:</span>
-          03/10/2000
-        </li>
-        <li>
-          <span class="font-bold text-neutral-100">Phone:</span> 0471 95 81 95
-        </li>
-        <li>
-          <span class="font-bold text-neutral-100">Address:</span> Kortemark,
-          West Flanders
-        </li>
-      </ul> -->
+      <div class="mt-15">
+        <p class="text-neutral-100 font-bold text-3xl mb-5 flex">
+          I love to make projects with
+          <Verified class="ml-2 text-neutral-100" />
+        </p>
+        <div class="flex text-md font-bold space-x-5 text-teal-600">
+          <p>Vue.js</p>
+          <p>CSS</p>
+          <p>React</p>
+          <p>HTML</p>
+          <p>MongoDB</p>
+          <p>NestJS</p>
+          <p>TailwindCSS</p>
+          <p>Javascript</p>
+        </div>
+        <div class="flex text-md font-bold space-x-5 text-teal-600 mt-2">
+          <p>.NET</p>
+          <p>Gatsby</p>
+          <p>Typescript</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
+<script lang="ts">
+import { Verified } from 'lucide-vue-next'
+export default {
+  components: {
+    Verified,
+  },
+}
+</script>
+
