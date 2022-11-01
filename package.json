@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@unocss/reset": "^0.45.21",
+    "animate.css": "^4.1.1",
     "firebase": "^9.10.0",
     "lucide-vue-next": "^0.90.0",
     "vite-plugin-fonts": "^0.6.0",
