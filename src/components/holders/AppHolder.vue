@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppHeader />
-    <router-view class="overflow-hidden"></router-view>
+    <router-view class="overflow-hidden"> </router-view>
     <AppFooter />
   </div>
 </template>

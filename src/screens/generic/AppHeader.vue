@@ -1,8 +1,10 @@
 <template>
   <header class="my-6">
-    <nav class="mx-auto px-6 sm:flex max-w-screen-2xl justify-between items-center">
-      <router-link class="outline-none focus-visible:ring-2xl rounded-md" to="/">
-        <h1 class="text-teal-800 font-bold text-xl">Saelens</h1>
+    <nav class="mx-auto max-w-screen-2xl items-center justify-between px-6 sm:flex">
+      <router-link class="focus-visible:ring-2xl rounded-md outline-none" to="/">
+        <a href="/">
+          <img src="/logo.svg" alt="Logo" class="h-5" />
+        </a>
       </router-link>
       <AppNavigation />
     </nav>
