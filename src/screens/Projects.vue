@@ -1,6 +1,6 @@
 <template>
   <div class="animate__animated animate__backInDown mx-auto my-auto max-w-screen-2xl px-6">
-    <h1 class="mb-6 text-4xl font-bold">My Projects</h1>
+    <h1 class="my-10 text-4xl font-bold">My Projects</h1>
     <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
       <div class="cursor-pointer overflow-hidden">
         <img
@@ -28,3 +28,7 @@
     </div>
   </div>
 </template>
+
+<script></script>
+
+<style></style>
