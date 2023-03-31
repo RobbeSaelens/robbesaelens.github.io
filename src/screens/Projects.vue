@@ -1,5 +1,5 @@
 <template>
-  <h1 class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold">My Projects</h1>
+  <h1 class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold">Projects</h1>
   <div
     class="animate__animated animate__backInDown pb-50 mx-auto my-auto h-screen max-w-screen-2xl overflow-y-scroll px-6"
   >

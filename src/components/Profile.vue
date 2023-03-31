@@ -33,14 +33,16 @@
           <button
             class="relative overflow-hidden rounded-2xl bg-teal-500 py-5 px-6 text-xl font-medium text-teal-900 transition-colors duration-500 ease-in-out hover:border-teal-900 hover:bg-teal-900 hover:text-white hover:shadow-lg md:py-5 md:px-8"
           >
-            <span class="bg-gray absolute top-0 left-0 z-10 h-full w-full opacity-0"></span>
-            <span class="relative z-20 flex items-center"
-              >Say Hello <MessageCircle class="ml-2"
-            /></span>
+            <a target="_blank" href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/message">
+              <span class="bg-gray absolute top-0 left-0 z-10 h-full w-full opacity-0"></span>
+              <span class="relative z-20 flex items-center"
+                >Say Hello <MessageCircle class="ml-2"
+              /></span>
+            </a>
           </button>
 
           <div class="mt-20 flex cursor-pointer items-center space-x-2">
-            <a class="flex items-center" href="/Projects">
+            <a class="flex items-center" href="/projects">
               <ArrowRight class="animate-bouncer mr-2" />
               <p class="text-lg font-medium text-black">Go to my projects</p>
             </a>

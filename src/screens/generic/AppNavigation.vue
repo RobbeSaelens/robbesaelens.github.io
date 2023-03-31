@@ -26,17 +26,17 @@
     <ul
       class="sm:space-x-15 mt-4 flex flex-col rounded-lg border border-teal-800 p-4 font-bold sm:mt-0 sm:flex-row sm:border-0 sm:text-sm"
     >
-      <li class="text-white">
+      <li :class="{ 'active-link text-teal-800': $route.path === '/projects' }">
         <router-link
           class="hover:bg-opacity-35 flex rounded py-2 pr-5 pl-3 text-xl text-teal-800 hover:bg-teal-800 sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-teal-900"
-          active-class="text-teal-900"
+          active-class=""
           to="/projects"
         >
           Projects</router-link
         >
       </li>
 
-      <li class="text-white">
+      <li :class="{ 'active-link text-teal-800': $route.path === '/contact' }">
         <router-link
           class="hover:bg-opacity-35 flex rounded py-2 pr-5 pl-3 text-xl text-teal-800 hover:bg-teal-800 sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-teal-900"
           active-class="text-teal-800"
@@ -62,3 +62,30 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/* Add an underline to the active link */
+li.active-link {
+  position: relative;
+}
+
+li.active-link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: 6;
+  background-color: teal;
+  animation: underline 0.5s forwards;
+}
+
+/* Define the underline animation */
+@keyframes underline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+</style>
