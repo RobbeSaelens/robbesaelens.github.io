@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mx-auto max-w-screen-2xl">
-      <Profile class="animate__animated animate__backInDown" />
+      <Profile class=" animate__backInDown" />
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <h1 class="mx-auto my-auto mb-5 max-w-screen-2xl px-6 text-4xl font-bold">About me</h1>
-  <div class="animate__animated animate__backInDown mx-auto my-auto max-w-screen-2xl px-6">
+  <div class=" mx-auto my-auto max-w-screen-2xl px-6">
     <div class="pb-50 h-screen items-start justify-between overflow-y-auto lg:flex">
       <div class="max-w-150 lg:max-w-1/2 space-y-5">
         <div class="text-lg">
