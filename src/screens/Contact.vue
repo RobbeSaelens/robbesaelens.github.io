@@ -3,11 +3,11 @@
   <div class="animate__animated animate__backInDown mx-auto my-auto max-w-screen-2xl px-6">
     <div class="pb-50 h-screen items-start justify-between overflow-y-auto lg:flex">
       <div class="max-w-150 lg:max-w-1/2 space-y-5">
-        <div class="space-y-5 text-lg">
+        <div class="text-lg">
           <p>
-            <span class="text-xl font-bold text-teal-700">Hi!</span> I'm Robbe Saelens. I am a
-            student at Howest Kortrijk where I am pursuing a Bachelor's degree in Multimedia &
-            Creative Technologies (MCT).
+            <span class="font-bold text-teal-700">Hi!</span> I'm Robbe Saelens. I am a student at
+            Howest Kortrijk where I am pursuing a Bachelor's degree in Multimedia & Creative
+            Technologies (MCT).
           </p>
           <p>
             I like making <span class="italic">"cool stuff"</span> and discovering new things. In
@@ -15,7 +15,7 @@
             <span class="font-medium">instructor in equestrian sports</span>.
           </p>
         </div>
-        <div class="flex items-center pt-8 text-teal-900">
+        <div class="flex items-center text-teal-900">
           <GraduationCap />
           <h1 class="ml-1 text-2xl font-bold">Education</h1>
         </div>
@@ -39,7 +39,7 @@
             >Next Web Developer</a
           >.
         </p>
-        <div class="flex items-center pt-8 text-teal-900">
+        <div class="flex items-center text-teal-900">
           <Briefcase />
           <h1 class="ml-1 text-2xl font-bold">Experience</h1>
         </div>
@@ -68,11 +68,7 @@
           learned a lot.
         </p>
       </div>
-      <img
-        class="animate-breathe w-100 mt-10 object-contain lg:mt-0 lg:block"
-        src="/about.jpg"
-        alt=""
-      />
+      <img class="w-100 my-10 rounded-xl object-contain lg:block" src="/about.jpg" alt="" />
     </div>
   </div>
 </template>
@@ -91,6 +87,8 @@ export default {
 <style>
 .animate-breathe {
   animation: breathe 2s infinite;
+  /* rounded */
+  border-radius: 1rem;
 }
 
 @keyframes breathe {
