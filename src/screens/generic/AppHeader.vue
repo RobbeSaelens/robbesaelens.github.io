@@ -3,7 +3,7 @@
     <nav class="mx-auto max-w-screen-2xl items-center justify-between px-6 sm:flex">
       <router-link class="focus-visible:ring-2xl rounded-md outline-none" to="/">
         <a href="/">
-          <img src="/public/logo.svg" alt="Logo" class="h-5" />
+          <img src="/logo.svg" alt="Logo" class="h-5" />
         </a>
       </router-link>
       <AppNavigation />
