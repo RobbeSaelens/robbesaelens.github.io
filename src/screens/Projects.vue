@@ -5,7 +5,7 @@
       <div style="background-image: url('/mockup.jpg')"></div>
       <div style="background-image: url('/ResearchMockup.jpg')"></div>
       <div style="background-image: url('/Vital.jpg')"></div>
-      <div style="background-image: url('/mockup.jpg')"></div>
+      <div style="background-image: url('/BikeRental.jpg')"></div>
     </div>
     <div class="slider-container mb-10">
       <div class="slider">
@@ -95,7 +95,7 @@ export default {
 <style>
 .galeri {
   display: flex;
-  height: 33rem;
+  height: 35rem;
   width: 100%;
   gap: 1rem;
 }
@@ -126,7 +126,6 @@ export default {
   .galeri > div {
     flex: none;
     width: 100%;
-    height: 20rem;
     background-size: cover;
     margin-bottom: 2rem;
   }
