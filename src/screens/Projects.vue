@@ -2,10 +2,10 @@
   <h1 class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold">Favorite projects</h1>
   <div class="pb-50 mx-auto my-auto h-screen max-w-screen-2xl overflow-y-scroll px-6">
     <div class="galeri mb-10">
-      <div style="background-image: url('/mockup.jpg')"></div>
-      <div style="background-image: url('/ResearchMockup.jpg')"></div>
-      <div style="background-image: url('/Vital.jpg')"></div>
-      <div style="background-image: url('/BikeRental.jpg')"></div>
+      <div class="min-h-50" style="background-image: url('/mockup.jpg')"></div>
+      <div class="min-h-50" style="background-image: url('/ResearchMockup.jpg')"></div>
+      <div class="min-h-50" style="background-image: url('/Vital.jpg')"></div>
+      <div class="min-h-50" style="background-image: url('/BikeRental.jpg')"></div>
     </div>
     <div class="slider-container mb-10">
       <div class="slider">

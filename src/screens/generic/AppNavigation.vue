@@ -35,6 +35,7 @@
           class="flex rounded py-2 pr-5 pl-3 text-xl text-teal-700 sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-teal-700"
           active-class="active-link text-teal-900"
           to="/projects"
+          @click="closeMenu"
         >
           Projects</router-link
         >
@@ -45,6 +46,7 @@
           class="hover:bg-opacity-35 flex rounded py-2 pr-5 pl-3 text-xl text-teal-700 sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-teal-700"
           active-class="active-link text-teal-900"
           to="/contact"
+          @click="closeMenu"
         >
           About me</router-link
         >
@@ -57,11 +59,19 @@
 import { ref } from 'vue'
 export default {
   setup() {
-    let showMenu = ref(false)
-    const toggleNav = () => (showMenu.value = !showMenu.value)
+    // toggleNav and showMenu
+    const showMenu = ref(false)
+    const toggleNav = () => {
+      showMenu.value = !showMenu.value
+    }
+    // close the menu when a link is clicked
+    const closeMenu = () => {
+      showMenu.value = false
+    }
     return {
       showMenu,
       toggleNav,
+      closeMenu,
     }
   },
 }
