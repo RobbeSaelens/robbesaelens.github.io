@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen flex-col items-center justify-center bg-gray-100">
     <div class="mb-5 animate-pulse">
-      <img src="Logo.png" alt="Logo" class="h-10" />
+      <img src="/Logo.png" alt="Logo" class="h-10" />
     </div>
     <div class="mt-5 px-5 text-center text-xl font-medium text-teal-800">
       Loading awesomeness... <br />Please stand by
