@@ -1,5 +1,7 @@
 <template>
-  <h1 class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold">Favorite projects</h1>
+  <h1 class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold text-teal-800">
+    Favorite projects
+  </h1>
   <div class="pb-50 mx-auto my-auto h-screen max-w-screen-2xl overflow-y-scroll px-6">
     <div class="galeri mb-10">
       <div class="min-h-50" style="background-image: url('/mockup.jpg')"></div>
@@ -12,7 +14,7 @@
         <div v-for="(tag, index) in duplicatedHashtags" :key="index">{{ tag }}</div>
       </div>
     </div>
-    <div class="mt-10">
+    <div class="my-10">
       <p class="mb-3 text-center text-xl font-bold text-teal-900">Get in touch!</p>
       <div class="flex justify-center space-x-5 text-teal-800">
         <a target="_blank" href="https://www.instagram.com/robbe.saelens/">

@@ -16,17 +16,15 @@
         /></a>
       </div>
       <div class="typewriter space-y-8">
-        <h1 class="text-dark-500 mb-5 text-5xl font-bold lg:text-7xl">
-          Robbe Saelens<span class="animate-waving-hand hidden md:inline-block"></span>
-        </h1>
-        <div class="flex items-center font-medium text-teal-800">
-          <hr class="h-1px mr-5 hidden w-20 border-0 bg-teal-900 lg:block" />
-          <h2 class="text-3xl">Next Web Developer</h2>
+        <h1 class="mb-5 text-5xl font-bold text-teal-800 lg:text-7xl">Robbe Saelens</h1>
+        <div class="flex items-center font-medium text-teal-600">
+          <hr class="h-2px mr-3 hidden w-10 border-0 bg-teal-600 lg:block" />
+          <h2 class="text-3xl font-medium">Next Web Developer</h2>
         </div>
         <div>
           <p class="max-w-lg text-lg text-teal-800">
-            I'm a full stack web developer based in Kortemark city, and i'm very passionate and
-            dedicated to my work.
+            I'm a full stack web developer based in Kortemark city, I like making
+            <span class="italic">"cool stuff"</span> and discovering new things.
           </p>
         </div>
         <div>

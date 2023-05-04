@@ -2,7 +2,7 @@
   <header class="my-6">
     <nav class="mx-auto max-w-screen-2xl items-center justify-between px-6 sm:flex">
       <router-link class="focus-visible:ring-2xl rounded-md outline-none" to="/">
-        <a href="/">
+        <a href="/" @click="closeMenu">
           <img src="/Logo.jpg" alt="Logo" class="h-5" />
         </a>
       </router-link>

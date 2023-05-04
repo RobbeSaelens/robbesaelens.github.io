@@ -79,7 +79,7 @@ export default {
 
 <style scoped>
 /* Add an underline to the active link */
-.active-link {
+/* .active-link {
   position: relative;
 }
 
@@ -92,7 +92,7 @@ export default {
   background-color: teal;
   font-style: bold;
   animation: underline 0.5s forwards;
-}
+} */
 
 /* Define the underline animation */
 @keyframes underline {
