@@ -5,7 +5,11 @@
   <div class="pb-50 mx-auto my-auto h-screen max-w-screen-2xl overflow-y-scroll px-6">
     <div class="galeri mb-10">
       <div class="min-h-50" style="background-image: url('/mockup.jpg')"></div>
-      <div class="min-h-50" style="background-image: url('/ResearchMockup.jpg')"></div>
+      <div
+        @click="goToAzureDetail"
+        class="min-h-50"
+        style="background-image: url('/ResearchMockup.jpg')"
+      ></div>
       <div class="min-h-50" style="background-image: url('/Vital.jpg')"></div>
       <div class="min-h-50" style="background-image: url('/BikeRental.jpg')"></div>
     </div>
@@ -90,6 +94,14 @@ export default {
     Mouse,
     MessageCircle,
     ArrowRight,
+  },
+
+  // go to azuredetail page
+  methods: {
+    goToAzureDetail() {
+      console.log('go to azure detail')
+      this.$router.push({ name: 'AzureDetail' })
+    },
   },
 }
 </script>
