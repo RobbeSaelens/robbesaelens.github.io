@@ -8,7 +8,7 @@
         >
           <p>Gatsby</p>
           <p>Typescript</p>
-          <p>Netlify (CMwS)</p>
+          <p>Netlify (CMS)</p>
           <p>LottieFiles</p>
           <p>After Effects</p>
         </div>
