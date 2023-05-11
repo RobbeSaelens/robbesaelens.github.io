@@ -24,16 +24,16 @@
   </button>
   <div
     :class="showMenu ? 'block' : 'hidden'"
-    class="w-full border-0 sm:block sm:w-auto"
+    class="w-full items-center border-0 sm:block sm:w-auto"
     id="navbar-default"
   >
     <ul
-      class="sm:space-x-15 mt-4 flex flex-col rounded-lg pt-4 font-medium sm:mt-0 sm:flex-row sm:border-0 sm:text-sm"
+      class="mt-4 flex flex-col items-center space-y-2 rounded-lg pt-4 font-medium sm:mt-0 sm:flex-row sm:space-x-8 sm:space-y-0 sm:border-0 sm:text-sm"
     >
       <li :class="{ 'sm:active-link': $route.path === '/projects' }">
         <router-link
-          class="flex rounded py-2 pr-5 pl-3 text-xl text-teal-700 sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-teal-700"
-          active-class="active-link text-teal-900"
+          class="flex text-lg text-teal-700 hover:text-teal-900 sm:border-0 sm:p-0"
+          active-class="text-teal-900 active-link"
           to="/projects"
           @click="closeMenu"
         >
@@ -43,13 +43,16 @@
 
       <li :class="{ 'sm:active-link ': $route.path === '/contact' }">
         <router-link
-          class="hover:bg-opacity-35 flex rounded py-2 pr-5 pl-3 text-xl text-teal-700 sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-teal-700"
-          active-class="active-link text-teal-900"
+          class="flex text-lg text-teal-700 hover:text-teal-900 sm:border-0 sm:p-0"
+          active-class="text-teal-900 active-link"
           to="/contact"
           @click="closeMenu"
         >
           About me</router-link
         >
+      </li>
+      <li class="hidden cursor-pointer pl-10 text-teal-700 hover:text-teal-900 sm:block">
+        <sunMedium />
       </li>
     </ul>
   </div>
@@ -57,7 +60,11 @@
 
 <script>
 import { ref } from 'vue'
+import { SunMedium } from 'lucide-vue-next'
 export default {
+  components: {
+    SunMedium,
+  },
   setup() {
     // toggleNav and showMenu
     const showMenu = ref(false)
@@ -68,39 +75,20 @@ export default {
     const closeMenu = () => {
       showMenu.value = false
     }
+
     return {
       showMenu,
       toggleNav,
       closeMenu,
+      SunMedium,
     }
   },
 }
 </script>
-
 <style scoped>
-/* Add an underline to the active link */
-/* .active-link {
-  position: relative;
-}
-
-.active-link::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  bottom: -3px;
-  background-color: teal;
-  font-style: bold;
-  animation: underline 0.5s forwards;
-} */
-
-/* Define the underline animation */
-@keyframes underline {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
+.active-link {
+  border-bottom: 2px solid #319795;
+  /* text color */
+  color: #184948;
 }
 </style>

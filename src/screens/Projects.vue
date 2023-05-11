@@ -20,7 +20,11 @@
           class="min-h-50"
           style="background-image: url('/Vital.jpg')"
         ></div>
-        <div class="min-h-50" style="background-image: url('/BikeRental.jpg')"></div>
+        <div
+          @click="goToBikeRental"
+          class="min-h-50"
+          style="background-image: url('/BikeRental.jpg')"
+        ></div>
       </div>
       <div class="slider-container mb-10">
         <div class="slider">
@@ -116,6 +120,9 @@ export default {
     },
     goToBinance() {
       this.$router.push({ name: 'BinanceDetail' })
+    },
+    goToBikeRental() {
+      this.$router.push({ name: 'BikeRentalDetail' })
     },
   },
 }

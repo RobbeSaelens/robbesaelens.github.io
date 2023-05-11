@@ -44,6 +44,14 @@
               <h1 class="text-xl font-bold text-teal-800">Tools</h1>
               <p>Visual Studio Code, Azure Portal, Amazon AWS, Adobe XD</p>
             </div>
+            <div class="mt-10 pt-10 hover:text-teal-600">
+              <router-link class="flex items-center" to="/projects">
+                <ArrowRight class="animate-bouncer mr-2" />
+                <p class="font-medium text-teal-800 hover:text-teal-600 sm:text-lg">
+                  View other projects
+                </p>
+              </router-link>
+            </div>
           </div>
           <div>
             <img class="scale w-150 hidden md:block" src="/AzureIphone.png" alt="Iphone mockup" />
@@ -90,6 +98,6 @@ export default {
 }
 
 .shadow-3xl {
-  box-shadow: 30px 35px 60px -15px rgba(2, 2, 2, 2);
+  box-shadow: 0 0 25px 25px rgba(0, 0, 0, 0.1);
 }
 </style>

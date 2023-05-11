@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Saelens</title>
   </head>
-  <body class="bg-image h-screen overflow-hidden">
+  <body class="bg-image dark:bg-image-dark h-screen overflow-hidden">
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
@@ -16,6 +16,10 @@
 <style>
   .bg-image {
     background-image: url('/bg.svg');
+    background-size: cover;
+  }
+  .bg-image-dark {
+    background-image: url('/bgdark.svg');
     background-size: cover;
   }
 </style>

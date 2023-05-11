@@ -33,6 +33,11 @@ const routes: RouteRecordRaw[] = [
         name: 'BinanceDetail',
         component: () => import('../screens/details/Binance.vue'),
       },
+      {
+        path: 'bikerentaldetail',
+        name: 'BikeRentalDetail',
+        component: () => import('../screens/details/BikeRental.vue'),
+      },
     ],
   },
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <splash-screen class="bg-image h-screen overflow-hidden" v-if="isLoading" />
+    <splash-screen class="bg-image dark:bg-image-dark h-screen overflow-hidden" v-if="isLoading" />
     <div v-else class="fade-out">
       <router-view></router-view>
     </div>
@@ -18,6 +18,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      isDarkMode: false,
     }
   },
   mounted() {
@@ -44,6 +45,10 @@ export default {
 <style>
 .bg-image {
   background-image: url('/bg.svg');
+  background-size: cover;
+}
+.bg-image-dark {
+  background-image: url('/bgdark.svg');
   background-size: cover;
 }
 .fade-out {
