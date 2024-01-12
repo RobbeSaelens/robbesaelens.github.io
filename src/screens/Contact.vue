@@ -2,8 +2,10 @@
   <div class="pb-30 h-screen overflow-y-auto fade-out">
     <div class="mx-auto max-w-screen-xl pt-10">
       <div class="text-center">
-        <h1 class="mx-5 mb-5 text-6xl font-bold text-teal-700 md:text-8xl">About me</h1>
-        <p class="text-lg font-medium text-teal-500">My story</p>
+        <h1 class="mx-5 mb-5 text-6xl font-bold text-teal-700 md:text-8xl dark:text-teal-300">
+          About me
+        </h1>
+        <p class="text-lg font-medium text-teal-500 dark:text-teal-100">My story</p>
       </div>
       <div class="md:space-x-15 mx-5 mt-10 mb-10 md:flex md:justify-around">
         <div class="mb-10 w-full">
@@ -13,12 +15,12 @@
             class="scale w-100% h-80 rounded-xl object-cover"
           />
           <div class="w-full md:max-w-xl">
-            <p class="mt-3 text-xl font-bold text-teal-800">Education</p>
-            <p>
+            <p class="mt-3 text-xl font-bold text-teal-800 dark:text-teal-300">Education</p>
+            <p class="dark:text-gray">
               In 2018 I started the graduate education in Multimedia & Information Technologies.
               There I learned all the basics of programming and web development.
             </p>
-            <p class="mt-2">
+            <p class="mt-2 dark:text-gray">
               After MIT I wanted to learn more about web development, so I started the bachelors
               degree Multimedia & Communication Technologies as
               <a
@@ -37,8 +39,8 @@
             class="scale w-100% h-80 rounded-xl object-cover"
           />
           <div class="w-full md:max-w-xl">
-            <p class="mt-3 text-xl font-bold text-teal-800">Experience</p>
-            <p>
+            <p class="mt-3 text-xl font-bold text-teal-800 dark:text-teal-300">Experience</p>
+            <p class="dark:text-gray">
               I was an intern at
               <a class="font-medium underline" target="_blank" href="https://www.acsystems.be/"
                 >AC Systems</a
@@ -46,15 +48,15 @@
               for a couple of months. There I mainly did automatisations for the internal workflow
               with Google App Script.
             </p>
-            <p class="mt-2">
+            <p class="mt-2 dark:text-gray">
               In February 2023 i started as an intern at
               <a
                 class="font-medium underline"
                 target="_blank"
                 href="https://www.yourmindourwork.be/"
                 >Your Mind Our Work</a
-              >. There I worked a lot with PHP and Magento. This internship was a great experience
-              and I learned a lot.
+              >. After my internship I started working there as a
+              <strong>PHP & Magento developer </strong>.
             </p>
           </div>
         </div>
@@ -67,11 +69,10 @@
             class="w-100% scale h-80 rounded-xl object-cover"
           />
           <div class="w-full md:max-w-xl">
-            <p class="mt-3 text-xl font-bold text-teal-800">Teaching</p>
-            <p>
+            <p class="mt-3 text-xl font-bold text-teal-800 dark:text-teal-300">Teaching</p>
+            <p class="dark:text-gray">
               In 2017 I started as instructor in equestrian sports. Since then I learned a lot about
-              teaching and how to work with people, and also learned a lot about how to manage a
-              team. I currntly work as an instructor at
+              teaching and how to work with people. I currently work as an instructor at
               <a class="font-medium underline" target="_blank" href="https://www.acsystems.be/"
                 >Sport Vlaanderen Woumen</a
               >.
@@ -84,9 +85,9 @@
             alt="Robbe Saelens"
             class="w-100% scale h-80 rounded-xl object-cover"
           />
-          <p class="mt-3 text-xl font-bold text-teal-800">Work together?</p>
-          <p>I'm available for freelance work and collaborations.</p>
-          <p>
+          <p class="mt-3 text-xl font-bold text-teal-800 dark:text-teal-300">Work together?</p>
+          <p class="dark:text-gray">I'm available for freelance work and collaborations.</p>
+          <p class="dark:text-gray">
             Mail me at
             <span class="cursor-pointer font-medium underline" @click="mailto"
               >robbe.saelens@telenet.be</span

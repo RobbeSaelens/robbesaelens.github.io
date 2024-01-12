@@ -2,9 +2,11 @@
   <div class="pb-30 fade-out h-screen overflow-y-auto">
     <div class="mx-auto max-w-screen-xl pt-10">
       <div class="text-center">
-        <h1 class="mx-5 mb-10 text-6xl font-bold text-teal-700 md:text-8xl">Binance app</h1>
+        <h1 class="mx-5 mb-10 text-6xl font-bold text-teal-700 md:text-8xl dark:text-teal-300">
+          Binance app
+        </h1>
         <div
-          class="justify-center space-y-5 pt-5 text-lg font-medium text-teal-500 md:flex md:space-y-0 md:space-x-8"
+          class="justify-center space-y-5 pt-5 text-lg font-medium text-teal-500 md:flex md:space-y-0 md:space-x-8 dark:text-teal-100"
         >
           <p>Adobe XD</p>
           <p>LottieFiles</p>
@@ -26,35 +28,38 @@
         <div class="m-10 flex justify-between pt-10">
           <div class="mr-10 space-y-8">
             <div class="md:w-2/3">
-              <h1 class="mb-10 text-5xl font-bold text-teal-800">Project Overview</h1>
-              <h1 class="text-xl font-bold text-teal-800">About</h1>
-              <p>
+              <h1 class="mb-10 text-5xl font-bold text-teal-800 dark:text-teal-300">
+                Project Overview
+              </h1>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-100">About</h1>
+              <p class="dark:text-gray">
                 This is a schoolproject that i created in Adobe XD. I wanted to create a smartwatch
                 app that could be used to watch your crypto. I used LottieFiles to implement the
                 animations in Adobe XD and Adobe AfterEffects to create them.
               </p>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-teal-800">Languages</h1>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-300">Languages</h1>
               <p class="font-medium text-teal-500">
                 Adobe XD, LottieFiles, Adobe AfterEffects, Adobe Illustrator
               </p>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-teal-800">Tools</h1>
-              <p>Visual Studio Code, Azure Portal, Amazon AWS, Adobe XD</p>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-300">Tools</h1>
+              <p class="dark:text-gray">Visual Studio Code, Azure Portal, Amazon AWS, Adobe XD</p>
             </div>
-            <div class="mt-10 pt-10 hover:text-teal-600">
+            <div
+              class="mt-10 pt-10 hover:text-teal-800 text-teal-600 inline-block dark:hover:text-teal-300"
+            >
               <router-link class="flex items-center" to="/projects">
                 <ArrowRight class="animate-bouncer mr-2" />
-                <p class="font-medium text-teal-800 hover:text-teal-600 sm:text-lg">
+                <p
+                  class="font-medium text-teal-600 hover:text-teal-800 sm:text-lg dark:hover:text-teal-300"
+                >
                   View other projects
                 </p>
               </router-link>
             </div>
-          </div>
-          <div>
-            <img class="scale w-150 hidden md:block" src="/AzureIphone.png" alt="Iphone mockup" />
           </div>
         </div>
       </div>

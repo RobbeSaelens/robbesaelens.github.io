@@ -32,8 +32,8 @@
     >
       <li :class="{ 'sm:active-link': $route.path === '/projects' }">
         <router-link
-          class="flex text-lg text-teal-700 hover:text-teal-900 sm:border-0 sm:p-0"
-          active-class="text-teal-900 active-link"
+          class="flex text-lg text-teal-700 hover:text-teal-900 sm:border-0 sm:p-0 dark:text-teal-300 dark:hover:text-teal-500"
+          active-class="text-teal-900 dark:text-gray"
           to="/projects"
           @click="closeMenu"
         >
@@ -43,27 +43,30 @@
 
       <li :class="{ 'sm:active-link ': $route.path === '/contact' }">
         <router-link
-          class="flex text-lg text-teal-700 hover:text-teal-900 sm:border-0 sm:p-0"
-          active-class="text-teal-900 active-link"
+          class="flex text-lg text-teal-700 hover:text-teal-900 sm:border-0 sm:p-0 dark:text-teal-300 dark:hover:text-teal-500"
+          active-class="text-teal-900 dark:text-gray"
           to="/contact"
           @click="closeMenu"
         >
           About me</router-link
         >
       </li>
-      <!-- <li class="hidden cursor-pointer pl-10 text-teal-700 hover:text-teal-900 sm:block">
-        <sunMedium />
-      </li> -->
+      <li
+        class="hidden cursor-pointer text-teal-700 hover:text-teal-900 sm:border-0 sm:p-0 dark:text-teal-300 dark:hover:text-teal-500 sm:block"
+      >
+        <SunMoon class="h-6 w-6" @click="toggleTheme" />
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import { SunMedium } from 'lucide-vue-next'
+import { SunMoon, Moon } from 'lucide-vue-next'
 export default {
   components: {
-    SunMedium,
+    SunMoon,
+    Moon,
   },
   setup() {
     // toggleNav and showMenu
@@ -76,11 +79,24 @@ export default {
       showMenu.value = false
     }
 
+    const toggleTheme = () => {
+      if (localStorage.theme === 'dark') {
+        localStorage.theme = 'light'
+        document.documentElement.classList.remove('dark')
+      } else {
+        localStorage.theme = 'dark'
+        document.documentElement.classList.add('dark')
+      }
+      console.log(localStorage.theme)
+    }
+
     return {
       showMenu,
       toggleNav,
       closeMenu,
-      SunMedium,
+      SunMoon,
+      toggleTheme,
+      Moon,
     }
   },
 }
@@ -88,7 +104,7 @@ export default {
 <style scoped>
 .active-link {
   border-bottom: 2px solid #319795;
-  /* text color */
   color: #184948;
+  font-weight: bold; /* Additional styling for the active link */
 }
 </style>

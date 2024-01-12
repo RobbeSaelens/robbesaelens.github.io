@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      if (
+        localStorage.theme === 'dark' ||
+        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/Fav.png" />
     <link rel="stylesheet" href="/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Saelens</title>
   </head>
-  <body class="bg-image h-screen overflow-hidden">
+  <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
-
-<style>
-  .bg-image {
-    background-image: url('/bg.svg');
-    background-size: cover;
-  }
-</style>

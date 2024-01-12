@@ -1,6 +1,8 @@
 <template>
   <div class="fade-out">
-    <h1 class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold text-teal-800">
+    <h1
+      class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold text-teal-800 dark:text-teal-300"
+    >
       Favorite projects
     </h1>
     <div class="pb-50 mx-auto my-auto h-screen max-w-screen-2xl overflow-y-scroll px-6">
@@ -28,11 +30,15 @@
       </div>
       <div class="slider-container mb-10">
         <div class="slider">
-          <div v-for="(tag, index) in duplicatedHashtags" :key="index">{{ tag }}</div>
+          <div class="dark:text-teal-300" v-for="(tag, index) in duplicatedHashtags" :key="index">
+            {{ tag }}
+          </div>
         </div>
       </div>
       <div class="my-10">
-        <p class="mb-3 text-center text-xl font-bold text-teal-900">Get in touch!</p>
+        <p class="mb-3 text-center text-xl font-bold text-teal-900 dark:text-teal-300">
+          Get in touch!
+        </p>
         <div class="flex justify-center space-x-5 text-teal-800">
           <a target="_blank" href="https://www.instagram.com/robbe.saelens/">
             <Instagram class="cursor-pointer hover:fill-teal-300" />

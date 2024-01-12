@@ -2,9 +2,11 @@
   <div class="pb-30 fade-out h-screen overflow-y-auto">
     <div class="mx-auto max-w-screen-xl pt-10">
       <div class="text-center">
-        <h1 class="mx-5 mb-10 text-6xl font-bold text-teal-700 md:text-8xl">Vital Cities</h1>
+        <h1 class="mx-5 mb-10 text-6xl font-bold text-teal-700 md:text-8xl dark:text-teal-300">
+          Vital Cities
+        </h1>
         <div
-          class="justify-center space-y-5 pt-5 text-lg font-medium text-teal-500 sm:flex sm:space-y-0 sm:space-x-8"
+          class="justify-center space-y-5 pt-5 text-lg font-medium text-teal-500 sm:flex sm:space-y-0 sm:space-x-8 dark:text-teal-100"
         >
           <p>Gatsby</p>
           <p>Typescript</p>
@@ -25,33 +27,38 @@
         <div class="m-10 flex justify-between">
           <div class="mr-10 space-y-8">
             <div class="md:w-2/3">
-              <h1 class="mb-10 text-5xl font-bold text-teal-800">Project Overview</h1>
-              <h1 class="text-xl font-bold text-teal-800">About</h1>
-              <p>
+              <h1 class="mb-10 text-5xl font-bold text-teal-800 dark:text-teal-300">
+                Project Overview
+              </h1>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-300">About</h1>
+              <p class="dark:text-gray">
                 This is a group project that i created for school. As a group we had to create a
                 website for Vital Cities. Vital Cities is a company that helps cities to become more
                 sustainable. We made the website very interactive and we used a lot of animations.
               </p>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-teal-800">Languages</h1>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-300">Languages</h1>
               <p class="font-medium text-teal-500">Gatsby, Typescript, css</p>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-teal-800">Tools</h1>
-              <p>Visual Studio Code, Gatsby, Adobe After Effects, Adobe XD, LottieFiles</p>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-300">Tools</h1>
+              <p class="dark:text-gray">
+                Visual Studio Code, Gatsby, Adobe After Effects, Adobe XD, LottieFiles
+              </p>
             </div>
-            <div class="mt-10 pt-10 hover:text-teal-600">
+            <div
+              class="mt-10 pt-10 hover:text-teal-800 text-teal-600 inline-block dark:hover:text-teal-300"
+            >
               <router-link class="flex items-center" to="/projects">
                 <ArrowRight class="animate-bouncer mr-2" />
-                <p class="font-medium text-teal-800 hover:text-teal-600 sm:text-lg">
+                <p
+                  class="font-medium text-teal-600 hover:text-teal-800 sm:text-lg dark:hover:text-teal-300"
+                >
                   View other projects
                 </p>
               </router-link>
             </div>
-          </div>
-          <div>
-            <img class="scale w-150 hidden md:block" src="/AzureIphone.png" alt="Iphone mockup" />
           </div>
         </div>
       </div>

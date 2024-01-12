@@ -2,9 +2,11 @@
   <div class="pb-30 fade-out h-screen overflow-y-auto">
     <div class="mx-auto max-w-screen-xl pt-10">
       <div class="text-center">
-        <h1 class="mx-5 mb-10 text-6xl font-bold text-teal-700 md:text-8xl">Netflix</h1>
+        <h1 class="mx-5 mb-10 text-6xl font-bold text-teal-700 md:text-8xl dark:text-teal-300">
+          Netflix
+        </h1>
         <div
-          class="justify-center space-y-5 pt-5 text-lg font-medium text-teal-500 md:flex md:space-y-0 md:space-x-8"
+          class="justify-center space-y-5 pt-5 text-lg font-medium text-teal-500 dark:text-teal-100 md:flex md:space-y-0 md:space-x-8"
         >
           <p>Azure Cognitive Search & Amazon OpenSearch</p>
           <p>Vue.js & TailwindCSS</p>
@@ -23,28 +25,34 @@
         <div class="m-10 flex justify-between">
           <div class="mr-10 space-y-8">
             <div class="md:w-2/3">
-              <h1 class="mb-10 text-5xl font-bold text-teal-800">Project Overview</h1>
-              <h1 class="text-xl font-bold text-teal-800">About</h1>
-              <p>
+              <h1 class="mb-10 text-5xl font-bold text-teal-800 dark:text-teal-300">
+                Project Overview
+              </h1>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-100">About</h1>
+              <p class="dark:text-gray">
                 This is a project that I created as part of my bachelor thesis on integrating Search
                 as a Service with unstructured data. The project was built using Vue.js. For
                 unstructured data I utilized a text file containing over 8000 movies and TV shows.
               </p>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-teal-800">Languages</h1>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-100">Languages</h1>
               <p class="font-medium text-teal-500">
                 Amazon OpenSearch, Azure Cognitive Search, Vue.js, TailwindCSS
               </p>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-teal-800">Tools</h1>
-              <p>Visual Studio Code, Azure Portal, Amazon AWS, Adobe XD</p>
+              <h1 class="text-xl font-bold text-teal-800 dark:text-teal-300">Tools</h1>
+              <p class="dark:text-gray">Visual Studio Code, Azure Portal, Amazon AWS, Adobe XD</p>
             </div>
-            <div class="mt-10 pt-10 hover:text-teal-600">
+            <div
+              class="mt-10 pt-10 hover:text-teal-800 text-teal-600 inline-block dark:hover:text-teal-300"
+            >
               <router-link class="flex items-center" to="/projects">
                 <ArrowRight class="animate-bouncer mr-2" />
-                <p class="font-medium text-teal-800 hover:text-teal-600 sm:text-lg">
+                <p
+                  class="font-medium text-teal-600 hover:text-teal-800 sm:text-lg dark:hover:text-teal-300"
+                >
                   View other projects
                 </p>
               </router-link>
