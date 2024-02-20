@@ -74,11 +74,3 @@ export default {
   },
 }
 </script>
-<style scoped>
-.active-link {
-  border-bottom: 2px solid #319795;
-  color: #184948;
-  font-weight: bold;
-  /* Additional styling for the active link */
-}
-</style>

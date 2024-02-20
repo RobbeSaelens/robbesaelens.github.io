@@ -6,26 +6,30 @@
           Vital Cities
         </h1>
         <div
-          class="justify-center space-y-5 pt-5 text-lg font-medium text-teal-500 sm:flex sm:space-y-0 sm:space-x-8 dark:text-teal-100"
-        >
-          <p>Gatsby</p>
-          <p>Typescript</p>
-          <p>Netlify (CMS)</p>
-          <p>LottieFiles</p>
-          <p>After Effects</p>
+          class="justify-center sm:px-2 pt-5 text-lg font-medium text-teal-500 flex flex-wrap space-y-0 md:space-x-8 dark:text-teal-100 mx-auto">
+          <div class="mr-5">
+            <p>Gatsby</p>
+          </div>
+          <div class="mr-5">
+            <p>Typescript</p>
+          </div>
+          <div class="mr-5">
+            <p>Netlify</p>
+          </div>
+          <div class="mr-5">
+            <p>LottieFiles</p>
+          </div>
+          <div>
+            <p>After Effects</p>
+          </div>
         </div>
       </div>
       <div>
-        <img class="scale mx-auto hidden md:block" src="/VitalCitiesMockup.png" />
-        <img
-          class="scale h-120 my-5 mx-auto block md:hidden"
-          src="/AzureIphone.png"
-          alt="Iphone mockup"
-        />
+        <img class="w-90% scale md:w-300 shadow-3xl mx-auto my-10 rounded-lg md:block" src="/VitalCitiesMockup.png" />
       </div>
       <div>
-        <div class="m-10 flex justify-between">
-          <div class="mr-10 space-y-8">
+        <div class="md:m-10 m-5 flex justify-between">
+          <div class="md:mr-10 space-y-8">
             <div class="md:w-2/3">
               <h1 class="mb-10 text-5xl font-bold text-teal-800 dark:text-teal-300">
                 Project Overview
@@ -47,14 +51,10 @@
                 Visual Studio Code, Gatsby, Adobe After Effects, Adobe XD, LottieFiles
               </p>
             </div>
-            <div
-              class="mt-10 pt-10 hover:text-teal-800 text-teal-600 inline-block dark:hover:text-teal-300"
-            >
+            <div class="mt-10 pt-10 hover:text-teal-800 text-teal-600 inline-block dark:hover:text-teal-300">
               <router-link class="flex items-center" to="/projects">
                 <ArrowRight class="animate-bouncer mr-2" />
-                <p
-                  class="font-medium text-teal-600 hover:text-teal-800 sm:text-lg dark:hover:text-teal-300"
-                >
+                <p class="font-medium text-teal-600 hover:text-teal-800 sm:text-lg dark:hover:text-teal-300">
                   View other projects
                 </p>
               </router-link>
