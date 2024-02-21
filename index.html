@@ -10,12 +10,32 @@
       } else {
         document.documentElement.classList.remove('dark')
       }
+
+      const tooltipOptions = [
+        'Coding Fun',
+        'Dev Jokes',
+        'Frontend!',
+        'Backend Joy',
+        'Bug Hugs',
+        'JS Rocks',
+        'CSS LOL',
+        'API LOL',
+        'HTML <3',
+        'Node Fun',
+      ]
+
+      function updateTitle() {
+        const randomTitle = tooltipOptions[Math.floor(Math.random() * tooltipOptions.length)]
+        document.title = `Saelens - ${randomTitle}`
+      }
+
+      updateTitle()
+      setInterval(updateTitle, 5000)
     </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/Fav.png" />
     <link rel="stylesheet" href="/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Saelens</title>
   </head>
   <body>
     <div id="app"></div>

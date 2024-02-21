@@ -1,7 +1,7 @@
 <template>
-  <splash-screen class="bg-light dark:bg-dark h-screen overflow-hidden" v-if="isLoading" />
+  <splash-screen class="bg-light dark:bg-dark h-screen" v-if="isLoading" />
   <div v-else class="fade-out">
-    <router-view class="bg-light dark:bg-dark h-screen overflow-hidden"> </router-view>
+    <router-view class="bg-light dark:bg-dark h-screen overflow-y-auto"> </router-view>
   </div>
 </template>
 

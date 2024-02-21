@@ -6,7 +6,8 @@
           Vital Cities
         </h1>
         <div
-          class="justify-center sm:px-2 pt-5 text-lg font-medium text-teal-500 flex flex-wrap space-y-0 md:space-x-8 dark:text-teal-100 mx-auto">
+          class="justify-center sm:px-2 pt-5 text-lg font-medium text-teal-500 flex flex-wrap space-y-0 md:space-x-8 dark:text-teal-100 mx-auto"
+        >
           <div class="mr-5">
             <p>Gatsby</p>
           </div>
@@ -25,7 +26,10 @@
         </div>
       </div>
       <div>
-        <img class="w-90% scale md:w-300 shadow-3xl mx-auto my-10 rounded-lg md:block" src="/VitalCitiesMockup.png" />
+        <img
+          class="w-90% scale md:w-full mx-auto my-10 rounded-lg md:block"
+          src="/VitalCitiesMockup.png"
+        />
       </div>
       <div>
         <div class="md:m-10 m-5 flex justify-between">
@@ -51,10 +55,14 @@
                 Visual Studio Code, Gatsby, Adobe After Effects, Adobe XD, LottieFiles
               </p>
             </div>
-            <div class="mt-10 pt-10 hover:text-teal-800 text-teal-600 inline-block dark:hover:text-teal-300">
+            <div
+              class="mt-10 pt-10 hover:text-teal-800 text-teal-600 inline-block dark:hover:text-teal-300"
+            >
               <router-link class="flex items-center" to="/projects">
                 <ArrowRight class="animate-bouncer mr-2" />
-                <p class="font-medium text-teal-600 hover:text-teal-800 sm:text-lg dark:hover:text-teal-300">
+                <p
+                  class="font-medium text-teal-600 hover:text-teal-800 sm:text-lg dark:hover:text-teal-300"
+                >
                   View other projects
                 </p>
               </router-link>
