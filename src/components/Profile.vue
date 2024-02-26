@@ -29,13 +29,26 @@
             I'm a full stack web developer based in Kortemark city, I like making
             <span class="italic">"cool stuff"</span> and discovering new things.
           </p>
-          <strong class="max-w-lg text-lg dark:text-white">
-            <Briefcase class="mr-1 inline-block text-teal-800" />
+          <strong class="max-w-lg text-lg dark:text-white flex items-center">
+            <Briefcase class="mr-1 text-teal-800" />
             Working @
-            <a target="blank" href="https://www.yourmindourwork.be/" class="hover:text-teal-600"
-              >YMOW</a
+            <a
+              target="blank"
+              href="https://www.yourmindourwork.be/"
+              class="hover:text-teal-600 mr-1"
+              >YMOW
+            </a>
+            as PHP developer.
+          </strong>
+          <strong class="max-w-lg text-lg dark:text-white flex items-center">
+            <GraduationCap class="mr-1 text-teal-800" />
+            Bachelor's degree in
+            <a
+              href="https://www.howest.be/nl/opleidingen/bachelor/multimedia-en-creatieve-technologie"
+              target="blank"
+              class="hover:text-teal-600 ml-1"
+              >MCT</a
             >
-            as a PHP developer.
           </strong>
         </div>
 
@@ -89,6 +102,7 @@ import {
   Mouse,
   ArrowRight,
   Briefcase,
+  GraduationCap,
 } from 'lucide-vue-next'
 
 export default {
@@ -103,6 +117,7 @@ export default {
     MessageCircle,
     ArrowRight,
     Briefcase,
+    GraduationCap,
   },
 }
 </script>
