@@ -2,6 +2,11 @@
 <html lang="en">
   <head>
     <script>
+      // add key theme and value light to localStorage
+      if (!localStorage.getItem('theme')) {
+        localStorage.setItem('theme', 'light')
+      }
+
       const tooltipOptions = [
         'Coding Fun',
         'Dev Jokes',
