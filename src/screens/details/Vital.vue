@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-30 fade-out h-screen overflow-y-auto">
+  <div class="pb-10 fade-out">
     <div class="mx-auto max-w-screen-xl pt-10">
       <div class="text-center">
         <h1 class="mx-5 mb-10 text-6xl font-bold text-teal-700 md:text-8xl dark:text-teal-300">
