@@ -42,7 +42,7 @@
   </div>
   <div
     :class="showMenu ? 'inline-block' : 'hidden'"
-    class="w-full items-center border-0 sm:block sm:w-auto absolute top-2 right-15 slide-in"
+    class="w-full items-center border-0 sm:block sm:w-auto slide-in"
     id="navbar-default"
   >
     <ul

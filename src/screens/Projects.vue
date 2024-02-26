@@ -1,5 +1,5 @@
 <template>
-  <div class="fade-out overflow-hidden">
+  <div class="fade-out">
     <h1
       class="mx-auto my-auto mb-10 max-w-screen-2xl px-6 text-4xl font-bold text-teal-800 dark:text-teal-300"
     >
@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="my-10">
+      <div class="mb-10 sm:mb-0">
         <p class="mb-3 text-center text-xl font-bold text-teal-900 dark:text-teal-300">
           Get in touch!
         </p>
