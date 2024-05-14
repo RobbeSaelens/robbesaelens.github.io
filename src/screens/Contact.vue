@@ -50,8 +50,7 @@
               >. After my internship I started working there as a
               <strong>PHP & Magento developer.</strong>
             </p>
-            <br />
-            <p>
+            <p class="mt-2 dark:text-gray">
               I transitioned from my role as a PHP & Magento developer at YMOW to become a
               <strong> Junior Backend Developer </strong> at
               <a class="font-medium underline" target="_blank" href="https://www.dms.be/"> DMS</a>.
