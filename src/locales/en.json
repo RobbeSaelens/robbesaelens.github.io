@@ -76,6 +76,22 @@
     "description": "The page you're looking for doesn't exist or has been moved.",
     "backHome": "Back to home"
   },
+  "chat": {
+    "placeholder": "Ask me anything...",
+    "welcome": "Hey! I'm Robbe's virtual assistant. Ask me about his skills, projects, experience, or how to get in touch!",
+    "greeting": "Hi there! How can I help you? You can ask about my projects, skills, experience, or how to reach me.",
+    "skills": "Robbe works with Vue.js, TypeScript, React, Drupal, PHP, NestJS, GraphQL, TailwindCSS, Node.js, and more. He's a full-stack developer who enjoys building modern web applications.",
+    "projects": "Robbe has built several projects: a Netflix-style search app using Azure Cognitive Search, a Vital Cities interactive website with Gatsby, a crypto smartwatch prototype in Adobe XD, and a full-stack BikeRental PWA with Vue and NestJS. You can check them out on the Projects page!",
+    "contact": "You can reach Robbe via email at robbe.saelens@telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn, GitHub, Instagram, and Facebook — links are on the home page!",
+    "experience": "Robbe currently works at Dynamate as a Drupal backend developer. He previously worked at Your Mind Our Work as a PHP & Magento developer. Before that, he's been teaching equestrian sports since 2017.",
+    "education": "Robbe holds a Bachelor's degree in Multimedia & Communication Technologies (Next Web Developer) from Howest. He also completed a graduate degree in Multimedia & Information Technologies.",
+    "about": "Robbe Saelens is a full-stack web developer based in Geluwe, Belgium. He loves building cool stuff and discovering new technologies. He currently works at Dynamate and has a background in both development and teaching.",
+    "thanks": "You're welcome! Let me know if you have any other questions.",
+    "bye": "Bye! Feel free to reach out anytime. Have a great day!",
+    "help": "Available topics: skills, projects, experience, education, contact, about. Just type what you'd like to know!",
+    "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me!",
+    "quickReplies": ["Skills", "Projects", "Experience", "Contact", "Education"]
+  },
   "aria": {
     "switchToDutch": "Switch to Dutch",
     "switchToEnglish": "Switch to English",

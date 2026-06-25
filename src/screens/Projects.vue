@@ -13,10 +13,29 @@
         </p>
       </header>
 
+      <!-- Tech filter bar -->
+      <div class="filter-bar">
+        <div class="filter-scroll">
+          <button
+            v-for="tag in allTags"
+            :key="tag"
+            class="filter-chip"
+            :class="{ 'is-active': selectedTags.includes(tag) }"
+            @click="toggleTag(tag)"
+          >
+            {{ tag }}
+          </button>
+        </div>
+        <div v-if="selectedTags.length" class="filter-info">
+          <span class="filter-count">{{ filteredProjects.length }} / {{ projects.length }}</span>
+          <button class="filter-clear" @click="clearFilters">clear</button>
+        </div>
+      </div>
+
       <!-- Project cards grid -->
       <div class="projects-grid">
         <button
-          v-for="(project, index) in projects"
+          v-for="(project, index) in filteredProjects"
           :key="project.id"
           :ref="(el) => setCardRef(el, index)"
           class="project-card"
@@ -26,15 +45,20 @@
         >
           <!-- Image container -->
           <div class="card-image-wrapper">
-            <img
-              :src="project.image"
-              :alt="`${project.name} project mockup`"
-              class="card-image"
-              loading="lazy"
-            />
+            <template v-if="project.image">
+              <img
+                :src="project.image"
+                :alt="`${project.name} project mockup`"
+                class="card-image"
+                loading="lazy"
+              />
+            </template>
+            <div v-else class="card-image-placeholder">
+              <span class="placeholder-text">{{ project.name }}</span>
+            </div>
             <div class="card-overlay">
               <span class="overlay-text">
-                {{ $t('projects.viewProject') }}
+                View project
                 <ArrowRight class="overlay-arrow" :size="18" :stroke-width="2" />
               </span>
             </div>
@@ -56,7 +80,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ArrowRight } from 'lucide-vue-next'
 
 export default {
@@ -68,7 +92,32 @@ export default {
 
   data() {
     return {
+      selectedTags: [],
       projects: [
+        {
+          id: 'exulta',
+          name: 'Exulta',
+          description: 'Stretch tent rental & catalog',
+          tags: ['Laravel', 'React', 'Inertia.js', 'Filament'],
+          image: '/exulta.jpg',
+          route: 'ExultaDetail',
+        },
+        {
+          id: 'stal-manager',
+          name: 'Stal Manager',
+          description: 'Horse stable finance dashboard',
+          tags: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL'],
+          image: '/stal-manager.png',
+          route: 'StalManagerDetail',
+        },
+        {
+          id: 'scan2talk',
+          name: 'Scan2Talk',
+          description: 'QR student wellbeing check-in',
+          tags: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA'],
+          image: '',
+          route: 'Scan2TalkDetail',
+        },
         {
           id: 'binance',
           name: 'Binance App',
@@ -103,14 +152,39 @@ export default {
         },
       ],
       observer: null,
-      cardRefs: [],
+      cardRefs: {},
     }
   },
 
+  computed: {
+    allTags() {
+      const excluded = new Set(['Adobe XD', 'After Effects', 'LottieFiles'])
+      const tagSet = new Set()
+      this.projects.forEach((p) =>
+        p.tags.forEach((t) => {
+          if (!excluded.has(t)) tagSet.add(t)
+        }),
+      )
+      return Array.from(tagSet).sort((a, b) => a.localeCompare(b))
+    },
+    filteredProjects() {
+      if (!this.selectedTags.length) return this.projects
+      return this.projects.filter((p) => p.tags.some((t) => this.selectedTags.includes(t)))
+    },
+  },
+
+  watch: {
+    filteredProjects() {
+      this.$nextTick(() => this.reobserve())
+    },
+  },
+
   mounted() {
-    this.$nextTick(() => {
-      this.initObserver()
-    })
+    this.$nextTick(() => this.initObserver())
+  },
+
+  updated() {
+    this.reobserve()
   },
 
   beforeUnmount() {
@@ -122,7 +196,10 @@ export default {
   methods: {
     setCardRef(el, index) {
       if (el) {
-        this.cardRefs[index] = el
+        const project = this.filteredProjects[index]
+        if (project) {
+          this.cardRefs[project.id] = el
+        }
       }
     },
 
@@ -136,21 +213,38 @@ export default {
             }
           })
         },
-        {
-          threshold: 0.1,
-          rootMargin: '0px 0px -40px 0px',
-        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
       )
+      this.reobserve()
+    },
 
-      this.cardRefs.forEach((card) => {
-        if (card) {
-          this.observer.observe(card)
-        }
+    reobserve() {
+      if (!this.observer) return
+      Object.values(this.cardRefs).forEach((card: any) => {
+        if (card) this.observer.observe(card)
       })
     },
 
+    toggleTag(tag) {
+      const idx = this.selectedTags.indexOf(tag)
+      if (idx === -1) {
+        this.selectedTags.push(tag)
+      } else {
+        this.selectedTags.splice(idx, 1)
+      }
+    },
+
+    clearFilters() {
+      this.selectedTags = []
+    },
+
     navigateTo(routeName) {
-      this.$router.push({ name: routeName })
+      if (!routeName) return
+      if (routeName.startsWith('http')) {
+        window.open(routeName, '_blank', 'noopener,noreferrer')
+      } else {
+        this.$router.push({ name: routeName })
+      }
     },
 
     goToBinance() {
@@ -282,6 +376,81 @@ export default {
 }
 
 /* =============================================
+   Filter Bar
+   ============================================= */
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.filter-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.5;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.filter-chip:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.filter-chip.is-active {
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-color: var(--color-border-glow);
+  box-shadow: 0 0 0 1px var(--color-border-glow);
+}
+
+.filter-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.filter-count {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+.filter-clear {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.filter-clear:hover {
+  color: var(--color-text-primary);
+}
+
+/* =============================================
    Project Cards Grid
    ============================================= */
 .projects-grid {
@@ -398,6 +567,23 @@ export default {
   object-fit: cover;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: block;
+}
+
+.card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-accent-soft), transparent);
+}
+
+.placeholder-text {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  opacity: 0.4;
 }
 
 /* =============================================

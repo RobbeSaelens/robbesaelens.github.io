@@ -76,6 +76,22 @@
     "description": "De pagina die je zoekt bestaat niet of is verplaatst.",
     "backHome": "Terug naar home"
   },
+  "chat": {
+    "placeholder": "Stel me een vraag...",
+    "welcome": "Hey! Ik ben Robbe's virtuele assistent. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
+    "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
+    "skills": "Robbe werkt met Vue.js, TypeScript, React, Drupal, PHP, NestJS, GraphQL, TailwindCSS, Node.js en meer. Hij is een full-stack developer die graag moderne webapplicaties bouwt.",
+    "projects": "Robbe heeft verschillende projecten gebouwd: een Netflix-achtige zoekapp met Azure Cognitive Search, een interactieve Vital Cities website met Gatsby, een crypto smartwatch prototype in Adobe XD, en een full-stack BikeRental PWA met Vue en NestJS. Je kan ze bekijken op de Projecten pagina!",
+    "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens@telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn, GitHub, Instagram en Facebook — links staan op de homepagina!",
+    "experience": "Robbe werkt momenteel bij Dynamate als Drupal backend developer. Daarvoor werkte hij bij Your Mind Our Work als PHP & Magento developer. Sinds 2017 geeft hij ook les in de paardensport.",
+    "education": "Robbe heeft een Bachelor diploma in Multimedia & Communicatietechnologieën (Next Web Developer) van Howest. Daarvoor behaalde hij een graduaatsdiploma in Multimedia & Informatietechnologieën.",
+    "about": "Robbe Saelens is een full-stack web developer gevestigd in Geluwe, België. Hij maakt graag coole dingen en ontdekt nieuwe technologieën. Hij werkt momenteel bij Dynamate en heeft een achtergrond in zowel ontwikkeling als lesgeven.",
+    "thanks": "Graag gedaan! Laat maar weten als je nog vragen hebt.",
+    "bye": "Doei! Je mag altijd contact opnemen. Nog een fijne dag!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over. Typ gewoon wat je wil weten!",
+    "fallback": "Daar weet ik niet veel over. Probeer eens te vragen naar vaardigheden, projecten, ervaring, opleiding of contactgegevens!",
+    "quickReplies": ["Vaardigheden", "Projecten", "Ervaring", "Contact", "Opleiding"]
+  },
   "aria": {
     "switchToDutch": "Schakel naar Nederlands",
     "switchToEnglish": "Schakel naar Engels",
