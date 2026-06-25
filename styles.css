@@ -8,4 +8,18 @@
 }
 
 /* Hide scrollbar for Firefox */
-scrollbar-width: none;
+html {
+  scrollbar-width: none;
+}
+
+/* Prevent horizontal overflow globally */
+body {
+  overflow-x: hidden;
+}
+
+/* Custom cursor: hide default */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}

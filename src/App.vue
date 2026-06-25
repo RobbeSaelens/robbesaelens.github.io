@@ -1,46 +1,68 @@
 <template>
   <splash-screen class="bg-light dark:bg-dark h-screen" v-if="isLoading" />
-  <div v-else class="fade-out">
-    <router-view class="bg-light dark:bg-dark sm:h-screen overflow-auto"> </router-view>
+  <div v-else class="bg-light dark:bg-dark sm:h-screen overflow-x-hidden overflow-y-auto">
+    <CustomCursor />
+    <router-view> </router-view>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { useHead } from '@unhead/vue'
+import { useRoute } from 'vue-router'
 import SplashScreen from './components/splashScreen.vue'
+import CustomCursor from './components/CustomCursor.vue'
 
-export default {
+export default defineComponent({
   name: 'App',
   components: {
     SplashScreen,
+    CustomCursor,
   },
   data() {
     return {
       isLoading: true,
     }
   },
-  mounted() {
-    const MIN_LOADING_TIME = 2000 // Minimum loading time in milliseconds
-    const startTime = Date.now()
-
-    // Simulate a 2-second loading delay
-    setTimeout(() => {
-      const elapsedTime = Date.now() - startTime
-      if (elapsedTime < MIN_LOADING_TIME) {
-        // If loading took less than 2 seconds, wait for the remaining time
-        setTimeout(() => {
-          this.isLoading = false
-        }, MIN_LOADING_TIME - elapsedTime)
-      } else {
-        // If loading took longer than 2 seconds, let the splash screen fade out with an animation
-        this.isLoading = false
-      }
-    }, 2000)
+  setup() {
+    const route = useRoute()
+    useHead({
+      titleTemplate: '%s | Robbe Saelens',
+      title: () => (route.meta?.title as string) || 'Robbe Saelens - Portfolio',
+      meta: () => [
+        {
+          name: 'description',
+          content:
+            (route.meta?.description as string) ||
+            'Full-stack web developer portfolio showcasing projects in Vue, TypeScript, and modern web technologies.',
+        },
+        {
+          property: 'og:title',
+          content: (route.meta?.title as string) || 'Robbe Saelens - Portfolio',
+        },
+        {
+          property: 'og:description',
+          content:
+            (route.meta?.description as string) ||
+            'Full-stack web developer portfolio showcasing projects in Vue, TypeScript, and modern web technologies.',
+        },
+        { property: 'og:url', content: `https://robbe-saelens.netlify.app${route.path}` },
+        {
+          name: 'twitter:title',
+          content: (route.meta?.title as string) || 'Robbe Saelens - Portfolio',
+        },
+        {
+          name: 'twitter:description',
+          content:
+            (route.meta?.description as string) ||
+            'Full-stack web developer portfolio showcasing projects in Vue, TypeScript, and modern web technologies.',
+        },
+      ],
+      link: () => [{ rel: 'canonical', href: `https://robbe-saelens.netlify.app${route.path}` }],
+    })
   },
-}
+  mounted() {
+    this.isLoading = false
+  },
+})
 </script>
-
-<style>
-.fade-out {
-  animation: fadeIn 0.5s ease-in-out;
-}
-</style>

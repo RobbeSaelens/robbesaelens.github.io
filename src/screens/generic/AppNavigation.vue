@@ -1,31 +1,58 @@
 <template>
-  <div class="flex items-center justify-between">
-    <router-link class="focus-visible:ring-2xl rounded-md outline-none tooltip" to="/">
-      <a href="/" @click="closeMenu">
-        <img
-          class="hidden sm:block scale h-5 customFill"
-          @mouseover="toggleTooltip"
-          src="/Logo.svg"
-          alt="Logo"
-        />
-        <img
-          @mouseover="toggleTooltip2"
-          src="/Fav.png"
-          alt="Logo"
-          class="scale h-5 customFill block sm:hidden"
-        />
-      </a>
+  <div class="flex w-full items-center justify-between">
+    <router-link class="focus-visible:ring-2xl rounded-md outline-none" to="/" @click="closeMenu">
+      <img
+        class="hidden sm:block scale h-5 customFill"
+        src="/Logo.svg"
+        alt="Robbe Saelens logo"
+        loading="lazy"
+      />
+      <img
+        src="/Fav.png"
+        alt="Robbe Saelens logo"
+        class="scale h-5 customFill block sm:hidden"
+        loading="lazy"
+      />
     </router-link>
 
+    <!-- Desktop nav -->
+    <div class="ml-auto hidden items-center sm:flex">
+      <ul class="flex items-center space-x-8 text-sm font-medium">
+        <li :class="{ 'sm:active-link': $route.path === '/projects' }">
+          <router-link class="active flex text-lg text-teal-700 dark:text-teal-500" to="/projects">
+            Projects
+          </router-link>
+        </li>
+        <li :class="{ 'sm:active-link': $route.path === '/contact' }">
+          <router-link class="active flex text-lg text-teal-700 dark:text-teal-500" to="/contact">
+            About me
+          </router-link>
+        </li>
+        <li>
+          <button
+            @click="toggleTheme"
+            class="h-6 w-6 cursor-pointer text-teal-700 dark:text-teal-300"
+            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            <Sun v-if="isDark" class="h-6 w-6" />
+            <Moon v-else class="h-6 w-6" />
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Mobile hamburger -->
     <button
       @click="toggleNav"
-      data-collapse-toggle="navbar-default"
       type="button"
-      class="hamburger z-5000 rounded-lg p-2 text-sm text-teal-600 focus:outline-none focus:ring-2 focus:ring-gray-600 sm:hidden"
-      aria-controls="navbar-default"
-      aria-expanded="false"
+      class="hamburger relative z-[5001] rounded-lg p-2 text-sm text-teal-600 focus:outline-none focus:ring-2 focus:ring-gray-600 sm:hidden"
+      :aria-controls="'mobile-menu'"
+      :aria-expanded="showMenu"
+      aria-label="Toggle navigation menu"
     >
+      <!-- Hamburger icon -->
       <svg
+        v-if="!showMenu"
         class="h-6 w-6"
         aria-hidden="true"
         fill="currentColor"
@@ -38,122 +65,144 @@
           clip-rule="evenodd"
         ></path>
       </svg>
+      <!-- X icon -->
+      <svg
+        v-else
+        class="h-6 w-6"
+        aria-hidden="true"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
     </button>
   </div>
-  <div
-    :class="showMenu ? 'inline-block' : 'hidden'"
-    class="w-full items-center border-0 sm:block top-2 right-15 absolute sm:relative sm:w-auto slide-in"
-    id="navbar-default"
-  >
-    <ul
-      class="justify-end flex items-center rounded-lg pt-4 font-medium sm:mt-0 sm:flex-row sm:space-x-8 sm:space-y-0 sm:border-0 sm:text-sm"
-    >
-      <li :class="{ 'sm:active-link': $route.path === '/projects' }">
-        <router-link
-          class="active flex text-lg text-teal-700 sm:border-0 sm:p-0 dark:text-teal-500"
-          to="/projects"
-          @click="closeMenu"
-        >
-          Projects
-        </router-link>
-      </li>
 
-      <li :class="{ 'sm:active-link ': $route.path === '/contact' }">
-        <router-link
-          class="active flex text-lg text-teal-700 sm:border-0 sm:p-0 dark:text-teal-500"
-          to="/contact"
-          @click="closeMenu"
-        >
-          About me
-        </router-link>
-      </li>
-      <li
-        class="hidden cursor-pointer text-teal-700 sm:border-0 sm:p-0 dark:text-teal-300 sm:block"
+  <!-- Mobile fullscreen overlay -->
+  <Teleport to="body">
+    <transition name="overlay">
+      <div
+        v-if="showMenu"
+        id="mobile-menu"
+        class="fixed inset-0 z-5000 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm dark:bg-gray-900/95"
+        @click.self="closeMenu"
       >
-        <Moon id="Moon" class="h-6 w-6" @click="toggleTheme" />
-        <Sun id="Sun" class="h-6 w-6 hidden" @click="toggleTheme" />
-      </li>
-    </ul>
-  </div>
+        <nav class="flex flex-col items-center space-y-8 text-center">
+          <router-link
+            class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
+            to="/"
+            @click="closeMenu"
+          >
+            Home
+          </router-link>
+          <router-link
+            class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
+            to="/projects"
+            @click="closeMenu"
+          >
+            Projects
+          </router-link>
+          <router-link
+            class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
+            to="/contact"
+            @click="closeMenu"
+          >
+            About me
+          </router-link>
+
+          <hr class="w-32 border-teal-200 dark:border-teal-800" />
+
+          <div class="space-y-4 text-lg text-teal-600 dark:text-teal-400">
+            <a
+              href="tel:0471958195"
+              class="flex items-center justify-center gap-2 transition-colors hover:text-teal-800 dark:hover:text-teal-200"
+            >
+              <Phone class="h-5 w-5" />
+              0471 95 81 95
+            </a>
+            <a
+              href="mailto:robbe.saelens@telenet.be"
+              class="flex items-center justify-center gap-2 transition-colors hover:text-teal-800 dark:hover:text-teal-200"
+            >
+              <Mail class="h-5 w-5" />
+              robbe.saelens@telenet.be
+            </a>
+          </div>
+
+          <button
+            @click="toggleTheme"
+            class="mt-4 rounded-full border border-teal-300 px-6 py-2 text-teal-700 transition-colors hover:bg-teal-50 dark:border-teal-700 dark:text-teal-300 dark:hover:bg-teal-900"
+            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            <Sun v-if="isDark" class="mx-auto h-6 w-6" />
+            <Moon v-else class="mx-auto h-6 w-6" />
+          </button>
+        </nav>
+      </div>
+    </transition>
+  </Teleport>
 </template>
 
 <script>
-import { ref } from 'vue'
-import { Sun, Moon } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
+import { Sun, Moon, Phone, Mail } from 'lucide-vue-next'
 
 export default {
   components: {
     Sun,
     Moon,
+    Phone,
+    Mail,
   },
   setup() {
     const showMenu = ref(false)
 
+    // Read theme from localStorage, fall back to system preference, default to light
+    const stored = localStorage.getItem('theme')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const initialTheme = stored || (prefersDark ? 'dark' : 'light')
+    const theme = ref(initialTheme)
+
+    const isDark = computed(() => theme.value === 'dark')
+
+    // Sync DOM class on mount and whenever theme changes
+    onMounted(() => {
+      if (isDark.value) {
+        document.documentElement.classList.add('dark')
+      }
+    })
+
     const toggleNav = () => {
       showMenu.value = !showMenu.value
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = showMenu.value ? 'hidden' : ''
     }
 
     const closeMenu = () => {
       showMenu.value = false
+      document.body.style.overflow = ''
     }
 
     const toggleTheme = () => {
-      const Sun = document.getElementById('Sun')
-      const Moon = document.getElementById('Moon')
-
-      if (localStorage.theme === 'light') {
-        localStorage.theme = 'dark'
-        Sun.style.display = 'none'
-        Moon.style.display = 'block'
-        document.documentElement.classList.remove('dark')
-      } else if (localStorage.theme === 'dark') {
-        localStorage.theme = 'light'
-        Moon.style.display = 'none'
-        Sun.style.display = 'block'
+      if (theme.value === 'light') {
+        theme.value = 'dark'
+        localStorage.setItem('theme', 'dark')
         document.documentElement.classList.add('dark')
-      }
-    }
-
-    const tooltipOptions = [
-      'Coding Fun',
-      'Dev Jokes',
-      'Frontend!',
-      'Backend!',
-      'Roberto',
-      'Bug Hugs',
-      'JS Rocks',
-      'CSS LOL',
-      'API LOL',
-      'HTML <3',
-      'Node Fun',
-      'Vue Rocks',
-      'Gatsby Fun',
-      'UI',
-      'UX',
-    ]
-
-    const toggleTooltip = () => {
-      const tooltip = document.querySelector('.tooltip')
-      if (tooltip) {
-        const randomIndex = Math.floor(Math.random() * tooltipOptions.length)
-        const tooltipContent = tooltipOptions[randomIndex]
-        tooltip.style.setProperty('--tooltip-content', `"${tooltipContent}"`)
-      }
-    }
-    const toggleTooltip2 = () => {
-      const tooltip = document.querySelector('.tooltip')
-      if (tooltip) {
-        tooltip.classList.remove('tooltip')
+      } else {
+        theme.value = 'light'
+        localStorage.setItem('theme', 'light')
+        document.documentElement.classList.remove('dark')
       }
     }
 
     return {
       showMenu,
+      isDark,
       toggleNav,
       closeMenu,
       toggleTheme,
-      toggleTooltip,
-      toggleTooltip2,
     }
   },
 }
@@ -164,51 +213,28 @@ export default {
   background-color: rgba(0, 128, 128, 0.1);
 }
 
-@keyframes slideIn {
-  0% {
-    transform: translateX(2%);
-  }
-  50% {
-    transform: translateX(-10%);
-  }
-  100% {
-    transform: translateX(0);
-  }
+/* Overlay transition */
+.overlay-enter-active {
+  transition: opacity 0.3s ease-out;
 }
-
-@media (max-width: 767px) {
-  .slide-in {
-    animation: slideIn 0.5s ease-in-out forwards;
-  }
+.overlay-leave-active {
+  transition: opacity 0.2s ease-in;
 }
-
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip::before {
-  content: var(--tooltip-content, '');
-  position: absolute;
-  width: 80%;
-  top: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 128, 128, 0.35);
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  padding: 0.3rem 0.5rem;
-  border-radius: 0.4rem;
+.overlay-enter-from,
+.overlay-leave-to {
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s ease-in-out, visibility 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-.tooltip:hover::before {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(5px);
+.overlay-enter-active nav,
+.overlay-leave-active nav {
+  transition:
+    transform 0.3s ease-out,
+    opacity 0.3s ease-out;
+}
+.overlay-enter-from nav,
+.overlay-leave-to nav {
+  transform: translateY(20px);
+  opacity: 0;
 }
 
 .scale {
