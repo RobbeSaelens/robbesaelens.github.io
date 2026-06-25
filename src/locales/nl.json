@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "projects": "Projecten",
+    "aboutMe": "Over mij",
+    "home": "Home"
+  },
+  "home": {
+    "role": "Next Web Developer",
+    "bio": "Ik ben een full stack web developer gevestigd in Gilwe (Geluwe). Ik maak graag \"coole dingen\" en ontdek nieuwe technologieën.",
+    "dynamateRole": "als Drupal backend developer.",
+    "educationLabel": "Bachelor diploma in",
+    "sayHello": "Zeg Hallo",
+    "goToProjects": "Bekijk mijn projecten"
+  },
+  "about": {
+    "title": "Over mij",
+    "subtitle": "Mijn verhaal",
+    "teaching": "Lesgeven",
+    "teachingText": "In 2017 begon ik als instructeur in de paardensport. Sindsdien heb ik veel geleerd over lesgeven en werken met mensen. Ik werk momenteel als instructeur bij {link}.",
+    "education": "Opleiding",
+    "educationText1": "In 2018 startte ik de graduaatsopleiding Multimedia & Informatietechnologieën. Daar leerde ik alle basisprincipes van programmeren en webontwikkeling.",
+    "educationText2": "Na MIT begon ik de bacheloropleiding Multimedia & Communicatietechnologieën als {link}.",
+    "experience": "Ervaring",
+    "experienceText1": "In februari 2023 begon ik als stagiair bij {link1}. Na mijn stage begon ik er te werken als {role}.",
+    "experienceText2": "Ik maakte de overstap naar {role} bij {link2}. Enthousiast om mijn ervaring in te zetten voor nieuwe projecten!",
+    "phpMagentoDev": "PHP & Magento developer",
+    "juniorBackendDev": "Junior Backend Developer",
+    "workTogether": "Samenwerken?"
+  },
+  "projects": {
+    "title": "Favoriete projecten",
+    "getInTouch": "Neem contact op!",
+    "viewProject": "Bekijk project",
+    "clear": "wissen",
+    "showingCount": "{count} / {total}"
+  },
+  "azure": {
+    "title": "Netflix",
+    "subtitle1": "Azure Search & Amazon OpenSearch",
+    "subtitle2": "Vue.js & TailwindCSS",
+    "subtitle3": "Ongestructureerde data",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Dit project is ontwikkeld als onderdeel van mijn bachelorthesis, waarbij de integratie van Search as a Service met ongestructureerde data wordt onderzocht. Gebouwd met Vue.js en TailwindCSS, toont het hoe Azure Cognitive Search en Amazon OpenSearch een grote ongestructureerde dataset — een tekstbestand met meer dan 8.000 films en tv-programma's — kunnen indexeren en doorzoeken, met snelle, relevante resultaten via een Netflix-achtige interface.",
+    "languages": "Talen",
+    "tools": "Tools",
+    "viewOther": "Andere projecten bekijken"
+  },
+  "vital": {
+    "title": "Vital Cities",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Vital Cities is een groepsproject dat ik tijdens mijn opleiding heb ontwikkeld, in samenwerking met klasgenoten. De opdracht was om een aantrekkelijke publieke website te ontwerpen en bouwen voor Vital Cities — een organisatie die steden helpt duurzamer en leefbaarder te worden. We hebben gefocust op een zeer interactieve ervaring met rijke animaties, vloeiende overgangen en een strakke, moderne uitstraling om hun missie effectief over te brengen.",
+    "languages": "Talen",
+    "tools": "Tools",
+    "viewOther": "Andere projecten bekijken"
+  },
+  "binance": {
+    "title": "Binance App",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Dit conceptproject is volledig ontworpen en geprototyped in Adobe XD tijdens mijn opleiding. Het idee was om een smartwatch-app te maken voor cryptoliefhebbers, waarmee gebruikers hun portfolio kunnen volgen, realtime prijzen kunnen bekijken en meldingen kunnen ontvangen — allemaal vanaf hun pols. Ik gebruikte Adobe AfterEffects voor vloeiende, gepolijste animaties en integreerde deze in het prototype met LottieFiles.",
+    "languages": "Talen",
+    "tools": "Tools",
+    "viewOther": "Andere projecten bekijken"
+  },
+  "bikeRental": {
+    "title": "Bike Rental",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Deze full-stack Progressive Web App was een schoolproject dat ik samen met Achille Dupont bouwde. Gebruikers kunnen fietsen huren, realtime fietslocaties op een interactieve kaart bekijken en hun verhuringen beheren via een mobile-first interface. Op de backend stelt een adminpaneel beheerders in staat om fietsen toe te voegen en te verwijderen, verhuurstatussen te volgen en de volledige vloot te monitoren.",
+    "languages": "Talen",
+    "tools": "Tools",
+    "viewOther": "Andere projecten bekijken"
+  },
+  "exulta": {
+    "title": "Exulta",
+    "alt": "Exulta stretch tent verhuur website mockup",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Een moderne website voor stretch tent verhuur, vanaf de basis opgebouwd. Met een productcatalogus met gedetailleerde tentspecificaties, een intuïtief contactsysteem en een volledig Filament adminpaneel voor eenvoudig contentbeheer. Inclusief interactieve Leaflet-kaarten voor locatievisualisatie en uitgebreide E2E-testen met Playwright.",
+    "languages": "Talen & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "Andere projecten bekijken",
+    "screenshotSoon": "[screenshot binnenkort]"
+  },
+  "stalManager": {
+    "title": "Stal Manager",
+    "alt": "Stal Manager paardenstal financieel dashboard mockup",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Een uitgebreid financieel beheerdashboard voor eigenaren van paardenstallen. Houd uitgaven en inkomsten per paard bij, genereer financiële rapporten met interactieve grafieken en beheer de stalfinanciën efficiënt. Gebouwd met Next.js App Router, Auth0-authenticatie, Prisma ORM en shadcn/ui-componenten voor een strakke responsieve ervaring.",
+    "languages": "Talen & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "Andere projecten bekijken",
+    "screenshotSoon": "[screenshot binnenkort]"
+  },
+  "scan2talk": {
+    "title": "Scan2Talk",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Een progressive web app voor scholen waarmee leerlingen via QR-codes kunnen inchecken over hun emotioneel welzijn. Leerlingen scannen een code en doorlopen een begeleide wizard — ze beoordelen hun gevoelens op een visuele thermometer, selecteren thema's die hun stemming beïnvloeden en kunnen optioneel hulp van een leerkracht aanvragen. Personeel krijgt een overzichtsdashboard met interactieve grafieken om het welzijn van de klas in de loop van de tijd te volgen.",
+    "languages": "Talen & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "Andere projecten bekijken",
+    "screenshotSoon": "[screenshot binnenkort]"
+  },
+  "error": {
+    "title": "Pagina niet gevonden",
+    "description": "De pagina die je zoekt bestaat niet of is verplaatst.",
+    "backHome": "Terug naar home"
+  },
+  "chat": {
+    "placeholder": "Stel me een vraag...",
+    "welcome": "Hey! Ik ben Robbe's virtuele assistent. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
+    "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
+    "skills": "Robbe is een full-stack web developer die werkt met: Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, TailwindCSS, Node.js en meer. Hij heeft ook ervaring met Adobe XD, After Effects en LottieFiles voor design & prototyping. Zijn huidige focus is Drupal backend ontwikkeling bij Dynamate.",
+    "projects": "Robbe heeft 7 projecten gebouwd:\n\n• Exulta — stretch tent verhuur website (Laravel + React + Inertia.js + Filament) → release.exulta.be\n• Stal Manager — financieel dashboard voor paardenstallen (Next.js + TypeScript + Prisma + PostgreSQL)\n• Scan2Talk — QR-gebaseerde leerling welzijn check-in (Laravel + Vue.js + PWA)\n• Netflix — Azure Cognitive Search app met 8.000+ films (Vue.js + TailwindCSS)\n• Vital Cities — interactieve website voor stadsvitaliteit (Gatsby + TypeScript + Netlify)\n• Binance App — crypto smartwatch prototype (Adobe XD + LottieFiles)\n• BikeRental — full-stack fietsverhuur PWA (Vue.js + NestJS + GraphQL + MongoDB)\n\nBekijk ze op de Projecten pagina!",
+    "project-exulta": "Exulta is een moderne stretch tent verhuur website op release.exulta.be. Gebouwd met Laravel 11 + React + Inertia.js, met een productcatalogus, contactsysteem en een Filament admin paneel. Inclusief Leaflet kaarten, geautomatiseerde CI/CD via GitHub Actions, Playwright E2E tests en Lighthouse audits. Uitgerold met automatische database backups en rollback bij fouten.",
+    "project-stalmanager": "Stal Manager is een financieel dashboard voor paardenstallen. Gebouwd met Next.js 16 (App Router) + React 19 + TypeScript + Prisma 7 + PostgreSQL. Features: kosten/inkomsten tracking per paard, interactieve Recharts grafieken, CRUD beheer, inventaris, Auth0 authenticatie, shadcn/ui componenten en Supabase Storage voor uploads. Gedeployed op Vercel.",
+    "project-scan2talk": "Scan2Talk is een PWA voor scholen — leerlingen scannen een QR-code en doorlopen een begeleide emotionele welzijn check-in wizard (thermometer → thema's → gevoelens → hulpvraag). Leerkrachten krijgen een dashboard met Chart.js visualisaties. Gebouwd met Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Draait lokaal via DDEV.",
+    "project-binance": "De Binance App is een smartwatch companion concept voor crypto liefhebbers — ontworpen en geprototyped in Adobe XD met vloeiende animaties via After Effects en LottieFiles. Gebruikers kunnen hun portfolio volgen, prijzen bekijken en meldingen ontvangen vanaf hun pols.",
+    "project-azure": "Het Netflix project was Robbe's bachelor scriptie — een zoekapp met Azure Cognitive Search en Amazon OpenSearch om een dataset van 8.000+ films & series te indexeren. Gebouwd met Vue.js en TailwindCSS, met Netflix-stijl browsen en snelle, relevante zoekresultaten.",
+    "project-vital": "Vital Cities was een groepsproject bij Howest — een interactieve publieke website voor een organisatie die steden helpt verduurzamen. Features: rijke animaties, vloeiende pagina-overgangen en een moderne uitstraling. Gebouwd met Gatsby + TypeScript + Netlify.",
+    "project-bikerental": "BikeRental is een full-stack PWA gebouwd met Achille Dupont. Gebruikers huren fietsen, bekijken locaties op een interactieve kaart (Mapbox) en beheren verhuringen. Een adminpaneel laat beheerders de vloot beheren. Frontend: Vue.js, Backend: NestJS + GraphQL + MongoDB + Firebase.",
+    "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens@telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens) en Facebook. De portfolio staat op robbe-saelens.netlify.app.",
+    "experience": "Robbe werkt momenteel bij Dynamate als Drupal backend developer. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP & Magento developer — begonnen als stagiair en daarna voltijds aangenomen. Sinds 2017 werkt hij ook als instructeur paardensport bij Sport Vlaanderen in Woumen. Zijn carrière combineert technische ontwikkeling met de mensenkennis uit het lesgeven.",
+    "education": "Robbe heeft een Bachelor diploma in Multimedia & Communicatietechnologieën (Next Web Developer traject) van Howest. Daarvoor behaalde hij een graduaatsdiploma in Multimedia & Informatietechnologieën (2018), waar hij de basisprincipes van programmeren en webontwikkeling leerde. Hij is gevestigd in Geluwe, België.",
+    "about": "Robbe Saelens is een full-stack web developer uit Geluwe, België. Hij maakt graag coole dingen en ontdekt nieuwe technologieën. Werkt momenteel bij Dynamate als Drupal backend developer, met eerdere ervaring in PHP/Magento en een achtergrond als instructeur paardensport sinds 2017. Hij is gepassioneerd door moderne webtechnologie — van Laravel en Next.js tot Vue, React en TypeScript.",
+    "location": "Robbe is gevestigd in Gilwe (Geluwe), België. Hij werkt bij Dynamate en geeft ook les bij Sport Vlaanderen in Woumen.",
+    "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur paardensport bij Sport Vlaanderen Woumen. Hij vindt het leuk om mensen iets bij te brengen en met paarden te werken — hier ontwikkelde hij zijn sociale vaardigheden naast zijn technische carrière.",
+    "thanks": "Graag gedaan! Laat maar weten als je nog vragen hebt.",
+    "bye": "Doei! Je mag altijd contact opnemen. Nog een fijne dag!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Stal Manager, Scan2Talk, Netflix/Azure, Vital Cities, Binance, BikeRental. Typ gewoon wat je wil weten!",
+    "fallback": "Daar weet ik niet veel over. Probeer eens te vragen naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
+    "quickReplies": ["Vaardigheden", "Projecten", "Ervaring", "Contact", "Opleiding"]
+  },
+  "aria": {
+    "switchToDutch": "Schakel naar Nederlands",
+    "switchToEnglish": "Schakel naar Engels",
+    "toggleThemeLight": "Schakel naar lichte modus",
+    "toggleThemeDark": "Schakel naar donkere modus",
+    "toggleNav": "Navigatiemenu openen"
+  }
+}

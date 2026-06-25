@@ -20,19 +20,22 @@
       <ul class="flex items-center space-x-8 text-sm font-medium">
         <li :class="{ 'sm:active-link': $route.path === '/projects' }">
           <router-link class="active flex text-lg text-teal-700 dark:text-teal-500" to="/projects">
-            Projects
+            {{ $t('nav.projects') }}
           </router-link>
         </li>
         <li :class="{ 'sm:active-link': $route.path === '/contact' }">
           <router-link class="active flex text-lg text-teal-700 dark:text-teal-500" to="/contact">
-            About me
+            {{ $t('nav.aboutMe') }}
           </router-link>
+        </li>
+        <li>
+          <LanguageSwitcher />
         </li>
         <li>
           <button
             @click="toggleTheme"
             class="h-6 w-6 cursor-pointer text-teal-700 dark:text-teal-300"
-            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+            :aria-label="isDark ? $t('aria.toggleThemeLight') : $t('aria.toggleThemeDark')"
           >
             <Sun v-if="isDark" class="h-6 w-6" />
             <Moon v-else class="h-6 w-6" />
@@ -48,7 +51,7 @@
       class="hamburger relative z-[5001] rounded-lg p-2 text-sm text-teal-600 focus:outline-none focus:ring-2 focus:ring-gray-600 sm:hidden"
       :aria-controls="'mobile-menu'"
       :aria-expanded="showMenu"
-      aria-label="Toggle navigation menu"
+      :aria-label="$t('aria.toggleNav')"
     >
       <!-- Hamburger icon -->
       <svg
@@ -86,30 +89,36 @@
       <div
         v-if="showMenu"
         id="mobile-menu"
-        class="fixed inset-0 z-5000 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm dark:bg-gray-900/95"
+        class="fixed inset-0 z-5000 flex flex-col items-center justify-center bg-white dark:bg-gray-900"
         @click.self="closeMenu"
       >
+        <img
+          src="/Fav.png"
+          alt="Robbe Saelens logo"
+          class="absolute left-6 top-6 h-8"
+          loading="lazy"
+        />
         <nav class="flex flex-col items-center space-y-8 text-center">
           <router-link
             class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
             to="/"
             @click="closeMenu"
           >
-            Home
+            {{ $t('nav.home') }}
           </router-link>
           <router-link
             class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
             to="/projects"
             @click="closeMenu"
           >
-            Projects
+            {{ $t('nav.projects') }}
           </router-link>
           <router-link
             class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
             to="/contact"
             @click="closeMenu"
           >
-            About me
+            {{ $t('nav.aboutMe') }}
           </router-link>
 
           <hr class="w-32 border-teal-200 dark:border-teal-800" />
@@ -131,10 +140,12 @@
             </a>
           </div>
 
+          <LanguageSwitcher />
+
           <button
             @click="toggleTheme"
             class="mt-4 rounded-full border border-teal-300 px-6 py-2 text-teal-700 transition-colors hover:bg-teal-50 dark:border-teal-700 dark:text-teal-300 dark:hover:bg-teal-900"
-            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+            :aria-label="isDark ? $t('aria.toggleThemeLight') : $t('aria.toggleThemeDark')"
           >
             <Sun v-if="isDark" class="mx-auto h-6 w-6" />
             <Moon v-else class="mx-auto h-6 w-6" />
@@ -145,9 +156,10 @@
   </Teleport>
 </template>
 
-<script>
+<script lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { Sun, Moon, Phone, Mail } from 'lucide-vue-next'
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
 
 export default {
   components: {
@@ -155,6 +167,7 @@ export default {
     Moon,
     Phone,
     Mail,
+    LanguageSwitcher,
   },
   setup() {
     const showMenu = ref(false)
@@ -185,16 +198,23 @@ export default {
       document.body.style.overflow = ''
     }
 
-    const toggleTheme = () => {
-      if (theme.value === 'light') {
-        theme.value = 'dark'
-        localStorage.setItem('theme', 'dark')
+    const applyTheme = (nextTheme: 'light' | 'dark') => {
+      theme.value = nextTheme
+      localStorage.setItem('theme', nextTheme)
+      if (nextTheme === 'dark') {
         document.documentElement.classList.add('dark')
       } else {
-        theme.value = 'light'
-        localStorage.setItem('theme', 'light')
         document.documentElement.classList.remove('dark')
       }
+    }
+
+    const toggleTheme = () => {
+      const nextTheme = theme.value === 'light' ? 'dark' : 'light'
+      if (!document.startViewTransition) {
+        applyTheme(nextTheme)
+        return
+      }
+      document.startViewTransition(() => applyTheme(nextTheme))
     }
 
     return {
@@ -270,5 +290,37 @@ export default {
   border-radius: 5rem;
   background-color: rgba(0, 128, 128, 0.1);
   transition: background-color 0.2s ease-in-out;
+}
+
+/* ── Theme toggle view transition ── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.5s;
+}
+
+::view-transition-old(root) {
+  animation-name: fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: fade-in;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>

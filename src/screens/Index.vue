@@ -8,7 +8,6 @@
 
 <script>
 import Profile from '../components/Profile.vue'
-import 'animate.css'
 
 export default {
   components: {

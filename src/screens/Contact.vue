@@ -1,15 +1,15 @@
 <template>
   <div class="fade-out flex flex-1 flex-col">
-    <h1
-      class="mx-auto mb-2 max-w-screen-2xl px-6 pt-2 text-5xl font-bold text-teal-800 dark:text-teal-300 md:text-7xl"
-    >
-      About me
-    </h1>
-    <p
-      class="mx-auto max-w-screen-2xl px-6 mb-4 text-lg font-medium text-teal-500 dark:text-teal-100"
-    >
-      My story
-    </p>
+    <header class="mx-auto mb-2 max-w-screen-2xl px-6 pt-2 md:pt-4">
+      <h1 class="terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl">
+        <span class="terminal-prompt">&gt;</span>
+        <span class="terminal-text">{{ $t('about.title').toLowerCase() }}</span>
+        <span class="terminal-cursor" aria-hidden="true"></span>
+      </h1>
+      <p class="terminal-subtitle mt-3 text-sm tracking-wide md:text-base">
+        <span class="opacity-50">$</span> cat ./about-me.md
+      </p>
+    </header>
 
     <div class="content-wrapper mx-auto flex min-h-0 max-w-screen-2xl flex-1 flex-col px-6">
       <!-- Horizontal timeline cards -->
@@ -25,19 +25,19 @@
           <div class="card-body">
             <h2 class="card-title">
               <BookOpen class="card-icon" />
-              Teaching
+              {{ $t('about.teaching') }}
             </h2>
-            <p class="card-text">
-              In 2017 I started as instructor in equestrian sports. Since then I learned a lot about
-              teaching and how to work with people. I currently work as an instructor at
-              <a
-                class="card-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.sport.vlaanderen/onze-centra/woumen/"
-                >Sport Vlaanderen Woumen</a
-              >.
-            </p>
+            <i18n-t keypath="about.teachingText" tag="p" class="card-text">
+              <template #link>
+                <a
+                  class="card-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.sport.vlaanderen/onze-centra/woumen/"
+                  >Sport Vlaanderen Woumen</a
+                >
+              </template>
+            </i18n-t>
           </div>
         </div>
 
@@ -60,23 +60,22 @@
           <div class="card-body">
             <h2 class="card-title">
               <GraduationCap class="card-icon" />
-              Education
+              {{ $t('about.education') }}
             </h2>
             <p class="card-text">
-              In 2018 I started the graduate education in Multimedia &amp; Information Technologies.
-              There I learned all the basics of programming and web development.
+              {{ $t('about.educationText1') }}
             </p>
-            <p class="card-text mt-2">
-              After MIT I started the bachelors degree in Multimedia &amp; Communication
-              Technologies as
-              <a
-                class="card-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://mct.be/programma/next-web-developer/"
-                >Next Web Developer</a
-              >.
-            </p>
+            <i18n-t keypath="about.educationText2" tag="p" class="card-text mt-2">
+              <template #link>
+                <a
+                  class="card-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://mct.be/programma/next-web-developer/"
+                  >Next Web Developer</a
+                >
+              </template>
+            </i18n-t>
           </div>
         </div>
 
@@ -99,31 +98,36 @@
           <div class="card-body">
             <h2 class="card-title">
               <Briefcase class="card-icon" />
-              Experience
+              {{ $t('about.experience') }}
             </h2>
-            <p class="card-text">
-              In February 2023 I started as an intern at
-              <a
-                class="card-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.yourmindourwork.be/"
-                >Your Mind Our Work</a
-              >. After my internship I started working there as a
-              <strong>PHP &amp; Magento developer.</strong>
-            </p>
-            <p class="card-text mt-2">
-              I transitioned to become a
-              <strong>Junior Backend Developer</strong> at
-              <a
-                class="card-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://www.dynamate.be/"
-              >
-                Dynamate</a
-              >. Excited to bring my experience to new projects!
-            </p>
+            <i18n-t keypath="about.experienceText1" tag="p" class="card-text">
+              <template #link1>
+                <a
+                  class="card-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.yourmindourwork.be/"
+                  >Your Mind Our Work</a
+                >
+              </template>
+              <template #role>
+                <strong>{{ $t('about.phpMagentoDev') }}</strong>
+              </template>
+            </i18n-t>
+            <i18n-t keypath="about.experienceText2" tag="p" class="card-text mt-2">
+              <template #role>
+                <strong>{{ $t('about.juniorBackendDev') }}</strong>
+              </template>
+              <template #link2>
+                <a
+                  class="card-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.dynamate.be/"
+                  >Dynamate</a
+                >
+              </template>
+            </i18n-t>
           </div>
         </div>
       </div>
@@ -132,7 +136,7 @@
       <div class="cta-bar">
         <div class="cta-inner">
           <MessageCircle class="cta-icon-lg" />
-          <span class="cta-text">Work together?</span>
+          <span class="cta-text">{{ $t('about.workTogether') }}</span>
           <a class="cta-pill" href="mailto:robbe.saelens@telenet.be">
             robbe.saelens@telenet.be
             <ArrowRight class="cta-arrow" />
@@ -189,6 +193,97 @@ export default {
 </script>
 
 <style>
+/* =============================================
+   CSS Custom Properties
+   ============================================= */
+:root {
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f7f6;
+  --color-border: rgba(0, 128, 128, 0.1);
+  --color-border-glow: rgba(0, 128, 128, 0.35);
+  --color-text-primary: #134e4a;
+  --color-text-secondary: #5f8a86;
+  --color-accent: #0d9488;
+  --color-accent-soft: rgba(13, 148, 136, 0.08);
+  --color-tag-bg: rgba(13, 148, 136, 0.08);
+  --color-tag-text: #0f766e;
+  --color-prompt: #0d9488;
+  --color-cursor: #0d9488;
+  --color-subtitle: #5f8a86;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+}
+.dark {
+  --color-surface: rgba(15, 23, 32, 0.8);
+  --color-surface-hover: rgba(20, 32, 44, 0.9);
+  --color-border: rgba(45, 212, 191, 0.1);
+  --color-border-glow: rgba(45, 212, 191, 0.3);
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-accent: #2dd4bf;
+  --color-accent-soft: rgba(45, 212, 191, 0.08);
+  --color-tag-bg: rgba(45, 212, 191, 0.1);
+  --color-tag-text: #5eead4;
+  --color-prompt: #2dd4bf;
+  --color-cursor: #2dd4bf;
+  --color-subtitle: #94a3b8;
+}
+
+/* =============================================
+   Terminal Title
+   ============================================= */
+.terminal-title {
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+  .terminal-title {
+    gap: 0.25rem;
+  }
+
+  .terminal-cursor {
+    width: 0.4em;
+    height: 0.8em;
+  }
+}
+.terminal-prompt {
+  color: var(--color-prompt);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.terminal-text {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-prompt));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.terminal-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  background: var(--color-cursor);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.terminal-subtitle {
+  font-family: var(--font-mono);
+  color: var(--color-subtitle);
+}
+
 /* === Image hover === */
 .scale {
   transition: transform 0.5s ease-in-out;
@@ -210,6 +305,8 @@ export default {
   display: flex;
   gap: 0;
   align-items: stretch;
+  flex: 1;
+  min-height: 0;
 }
 
 .timeline-card {
@@ -218,28 +315,28 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.04), rgba(20, 184, 166, 0.09));
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 0.75rem;
-  transition: box-shadow 0.3s ease;
   opacity: 0;
   transform: translateY(20px);
   transition:
     opacity 0.5s ease-out,
     transform 0.5s ease-out,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
 }
 .timeline-card.animate-in {
   opacity: 1;
   transform: translateY(0);
 }
-.timeline-card:hover {
-  box-shadow: 0 4px 24px rgba(20, 184, 166, 0.08);
-}
-.dark .timeline-card {
-  background: linear-gradient(135deg, rgba(45, 212, 191, 0.05), rgba(45, 212, 191, 0.12));
-}
-.dark .timeline-card:hover {
-  box-shadow: 0 4px 24px rgba(45, 212, 191, 0.1);
+@media (hover: hover) and (pointer: fine) {
+  .timeline-card:hover {
+    border-color: var(--color-border-glow);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.04),
+      0 0 0 1px var(--color-border-glow);
+  }
 }
 
 /* Stagger animation */
@@ -267,35 +364,27 @@ export default {
 .connector-line {
   width: 2px;
   flex: 1;
-  background: linear-gradient(to bottom, rgba(20, 184, 166, 0.2), rgba(20, 184, 166, 0.4));
+  background: linear-gradient(to bottom, var(--color-border), var(--color-border-glow));
   min-height: 2rem;
-}
-.dark .connector-line {
-  background: linear-gradient(to bottom, rgba(45, 212, 191, 0.2), rgba(45, 212, 191, 0.4));
 }
 
 .connector-arrow {
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
-  background: white;
-  border: 2px solid rgba(20, 184, 166, 0.4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-glow);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0d9488;
+  color: var(--color-accent);
   flex-shrink: 0;
-}
-.dark .connector-arrow {
-  background: #0f172a;
-  border-color: rgba(45, 212, 191, 0.4);
-  color: #2dd4bf;
 }
 
 /* Card image */
 .card-img {
   width: 100%;
-  height: 14rem;
+  height: clamp(12rem, 30vh, 22rem);
   object-fit: cover;
   border-radius: 0.75rem 0.75rem 0 0;
   flex-shrink: 0;
@@ -311,51 +400,43 @@ export default {
 
 /* Card typography */
 .card-title {
-  font-size: 1rem;
+  font-family: var(--font-mono), serif;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #115e59;
+  color: var(--color-accent);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   gap: 0.375rem;
 }
-.dark .card-title {
-  color: #5eead4;
-}
 
 .card-icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
   flex-shrink: 0;
   opacity: 0.7;
 }
-.dark .card-icon {
-  opacity: 0.85;
-}
 
 .card-text {
-  font-size: 0.8125rem;
+  font-size: 1rem;
   line-height: 1.55;
-  color: #374151;
-}
-.dark .card-text {
-  color: #d1d5db;
+  color: var(--color-text-secondary);
 }
 
 .card-link {
+  font-family: var(--font-mono);
   font-weight: 500;
-  text-decoration: underline;
-  color: #0d9488;
-  transition: color 0.2s ease;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  color: var(--color-accent);
+  border-bottom: 1px solid var(--color-accent);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 .card-link:hover {
-  color: #115e59;
-}
-.dark .card-link {
-  color: #2dd4bf;
-}
-.dark .card-link:hover {
-  color: #99f6e4;
+  color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
 }
 
 /* === CTA bar === */
@@ -364,6 +445,7 @@ export default {
   justify-content: center;
   flex-shrink: 0;
   margin-top: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .cta-inner {
@@ -372,43 +454,34 @@ export default {
   gap: 1rem;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.06), rgba(20, 184, 166, 0.14));
-  border: 1px solid rgba(20, 184, 166, 0.18);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   transition:
     box-shadow 0.3s ease,
     border-color 0.3s ease;
 }
-.cta-inner:hover {
-  box-shadow: 0 2px 20px rgba(20, 184, 166, 0.12);
-  border-color: rgba(20, 184, 166, 0.3);
-}
-.dark .cta-inner {
-  background: linear-gradient(135deg, rgba(45, 212, 191, 0.08), rgba(45, 212, 191, 0.18));
-  border-color: rgba(45, 212, 191, 0.2);
-}
-.dark .cta-inner:hover {
-  box-shadow: 0 2px 20px rgba(45, 212, 191, 0.12);
-  border-color: rgba(45, 212, 191, 0.35);
+@media (hover: hover) and (pointer: fine) {
+  .cta-inner:hover {
+    border-color: var(--color-border-glow);
+    box-shadow:
+      0 2px 20px rgba(0, 0, 0, 0.04),
+      0 0 0 1px var(--color-border-glow);
+  }
 }
 
 .cta-icon-lg {
   width: 1.125rem;
   height: 1.125rem;
-  color: #0d9488;
+  color: var(--color-accent);
   flex-shrink: 0;
-}
-.dark .cta-icon-lg {
-  color: #2dd4bf;
 }
 
 .cta-text {
+  font-family: var(--font-mono);
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #115e59;
+  color: var(--color-text-primary);
   white-space: nowrap;
-}
-.dark .cta-text {
-  color: #5eead4;
 }
 
 .cta-pill {
@@ -417,26 +490,22 @@ export default {
   gap: 0.375rem;
   padding: 0.375rem 0.875rem;
   border-radius: 9999px;
-  background: #0d9488;
+  background: var(--color-accent);
   color: white;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
   transition:
     background 0.2s ease,
-    transform 0.15s ease;
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 .cta-pill:hover {
-  background: #0f766e;
+  background: var(--color-text-primary);
   transform: translateY(-1px);
-}
-.dark .cta-pill {
-  background: rgba(45, 212, 191, 0.2);
-  color: #5eead4;
-}
-.dark .cta-pill:hover {
-  background: rgba(45, 212, 191, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .cta-arrow {
@@ -451,6 +520,7 @@ export default {
     min-height: auto;
   }
   .cards-row {
+    flex: none;
     flex-direction: column;
     gap: 0.75rem;
   }
@@ -458,16 +528,40 @@ export default {
     display: none;
   }
   .card-img {
-    height: 7rem;
+    height: clamp(7rem, 30vw, 15rem);
     border-radius: 0.75rem 0.75rem 0 0;
   }
   .cta-inner {
     gap: 0.625rem;
     padding: 0.625rem 1.125rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .cta-bar {
     margin-top: 1rem;
     margin-bottom: 1.5rem;
+  }
+}
+
+/* =============================================
+   Reduced Motion
+   ============================================= */
+@media (prefers-reduced-motion: reduce) {
+  .terminal-cursor {
+    animation: none;
+    opacity: 1;
+  }
+
+  .timeline-card {
+    opacity: 1;
+    transform: none;
+    transition:
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .scale {
+    transition: none;
   }
 }
 </style>

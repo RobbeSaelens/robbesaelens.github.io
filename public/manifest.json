@@ -1,0 +1,16 @@
+{
+  "name": "Robbe Saelens - Portfolio",
+  "short_name": "RS Portfolio",
+  "description": "Full-stack web developer portfolio showcasing projects in Vue, TypeScript, and modern web technologies.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d9488",
+  "icons": [
+    {
+      "src": "/Fav.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

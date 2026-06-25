@@ -75,6 +75,36 @@ const routes: RouteRecordRaw[] = [
             'A bike rental management application built with Vue.js, featuring booking, inventory, and customer management.',
         },
       },
+      {
+        path: 'exultadetail',
+        name: 'ExultaDetail',
+        component: () => import('../screens/details/Exulta.vue'),
+        meta: {
+          title: 'Exulta Project | Robbe Saelens',
+          description:
+            'A modern stretch tent rental website with product catalog, built with Laravel, React, and Inertia.js.',
+        },
+      },
+      {
+        path: 'stalmanagerdetail',
+        name: 'StalManagerDetail',
+        component: () => import('../screens/details/StalManager.vue'),
+        meta: {
+          title: 'Stal Manager Project | Robbe Saelens',
+          description:
+            'A horse stable financial management dashboard built with Next.js, TypeScript, and Prisma.',
+        },
+      },
+      {
+        path: 'scan2talkdetail',
+        name: 'Scan2TalkDetail',
+        component: () => import('../screens/details/Scan2Talk.vue'),
+        meta: {
+          title: 'Scan2Talk Project | Robbe Saelens',
+          description:
+            'A QR-code based student emotional wellbeing check-in system built with Laravel and Vue.js.',
+        },
+      },
     ],
   },
   {

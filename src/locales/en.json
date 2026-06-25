@@ -1,0 +1,145 @@
+{
+  "nav": {
+    "projects": "Projects",
+    "aboutMe": "About me",
+    "home": "Home"
+  },
+  "home": {
+    "role": "Next Web Developer",
+    "bio": "I'm a full stack web developer based in Gilwe (Geluwe), I like making \"cool stuff\" and discovering new things.",
+    "dynamateRole": "as Drupal backend developer.",
+    "educationLabel": "Bachelor's degree in",
+    "sayHello": "Say Hello",
+    "goToProjects": "Go to my projects"
+  },
+  "about": {
+    "title": "About me",
+    "subtitle": "My story",
+    "teaching": "Teaching",
+    "teachingText": "In 2017 I started as instructor in equestrian sports. Since then I learned a lot about teaching and how to work with people. I currently work as an instructor at {link}.",
+    "education": "Education",
+    "educationText1": "In 2018 I started the graduate education in Multimedia & Information Technologies. There I learned all the basics of programming and web development.",
+    "educationText2": "After MIT I started the bachelors degree in Multimedia & Communication Technologies as {link}.",
+    "experience": "Experience",
+    "experienceText1": "In February 2023 I started as an intern at {link1}. After my internship I started working there as a {role}.",
+    "experienceText2": "I transitioned to become a {role} at {link2}. Excited to bring my experience to new projects!",
+    "phpMagentoDev": "PHP & Magento developer",
+    "juniorBackendDev": "Junior Backend Developer",
+    "workTogether": "Work together?"
+  },
+  "projects": {
+    "title": "Favorite projects",
+    "getInTouch": "Get in touch!",
+    "viewProject": "View project",
+    "clear": "clear",
+    "showingCount": "{count} / {total}"
+  },
+  "azure": {
+    "title": "Netflix",
+    "subtitle1": "Azure Search & Amazon OpenSearch",
+    "subtitle2": "Vue.js & TailwindCSS",
+    "subtitle3": "Unstructured data",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "This project was developed as part of my bachelor thesis, exploring the integration of Search as a Service with unstructured data. Built with Vue.js and TailwindCSS, it demonstrates how Azure Cognitive Search and Amazon OpenSearch can index and query a large unstructured dataset — a text file containing over 8,000 movies and TV shows — delivering fast, relevant search results through a Netflix-style browsing experience.",
+    "languages": "Languages",
+    "tools": "Tools",
+    "viewOther": "View other projects"
+  },
+  "vital": {
+    "title": "Vital Cities",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "Vital Cities is a group project I developed during my studies, in collaboration with classmates. The assignment was to design and build an engaging public-facing website for Vital Cities — an organization dedicated to helping cities become more sustainable and livable. We focused on crafting a highly interactive experience with rich animations, smooth page transitions, and a clean, modern aesthetic to effectively communicate their mission and inspire civic engagement.",
+    "languages": "Languages",
+    "tools": "Tools",
+    "viewOther": "View other projects"
+  },
+  "binance": {
+    "title": "Binance App",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "This concept project was designed and prototyped entirely in Adobe XD during my studies. The idea was to create a companion smartwatch app for cryptocurrency enthusiasts, letting users monitor their portfolio, track real-time prices, and receive alerts — all from their wrist. I used Adobe AfterEffects to craft fluid, polished animations and integrated them into the prototype with LottieFiles for a seamless, interactive demo experience.",
+    "languages": "Languages",
+    "tools": "Tools",
+    "viewOther": "View other projects"
+  },
+  "bikeRental": {
+    "title": "Bike Rental",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "This full-stack Progressive Web App was a school project built together with Achille Dupont. It enables users to rent bikes, view real-time bike locations on an interactive map, and manage their rentals through a mobile-first interface. On the backend, an admin panel lets operators add and remove bikes, track rental statuses, and monitor the entire fleet. The app combines Vue.js on the frontend with a NestJS and GraphQL API on the backend.",
+    "languages": "Languages",
+    "tools": "Tools",
+    "viewOther": "View other projects"
+  },
+  "exulta": {
+    "title": "Exulta",
+    "alt": "Exulta stretch tent rental website mockup",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "A modern stretch tent rental website built from the ground up. Features a product catalog with detailed tent specifications, an intuitive contact system, and a full Filament admin panel for easy content management. Includes interactive Leaflet maps for location visualization and comprehensive E2E testing with Playwright.",
+    "languages": "Languages & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "View other projects",
+    "screenshotSoon": "[screenshot coming soon]"
+  },
+  "stalManager": {
+    "title": "Stal Manager",
+    "alt": "Stal Manager horse stable finance dashboard mockup",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "A comprehensive financial management dashboard for horse stable owners. Track expenses and income per horse, generate financial reports with interactive charts, and manage stable finances efficiently. Built with Next.js App Router, Auth0 authentication, Prisma ORM, and shadcn/ui components for a clean responsive experience.",
+    "languages": "Languages & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "View other projects",
+    "screenshotSoon": "[screenshot coming soon]"
+  },
+  "scan2talk": {
+    "title": "Scan2Talk",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "A progressive web app for schools that enables students to check in about their emotional wellbeing via QR codes. Students scan a code and walk through a guided wizard — rating their feelings on a visual thermometer, selecting themes affecting their mood, and optionally requesting teacher help. Staff get an overview dashboard with interactive charts to monitor class wellbeing trends over time.",
+    "languages": "Languages & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "View other projects",
+    "screenshotSoon": "[screenshot coming soon]"
+  },
+  "error": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Back to home"
+  },
+  "chat": {
+    "placeholder": "Ask me anything...",
+    "welcome": "Hey! I'm Robbe's virtual assistant. Ask me about his skills, projects, experience, or how to get in touch!",
+    "greeting": "Hi there! How can I help you? You can ask about my projects, skills, experience, or how to reach me.",
+    "skills": "Robbe is a full-stack web developer working with: Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, TailwindCSS, Node.js, and more. He also has experience with Adobe XD, After Effects, and LottieFiles for design & prototyping. His current focus is Drupal backend development at Dynamate.",
+    "projects": "Robbe has built 7 featured projects:\n\n• Exulta — stretch tent rental website (Laravel + React + Inertia.js + Filament) → https://release.exulta.be\n• Stal Manager — horse stable finance dashboard (Next.js + TypeScript + Prisma + PostgreSQL)\n• Scan2Talk — QR-based student wellbeing check-in (Laravel + Vue.js + PWA)\n• Netflix — Azure Cognitive Search app with 8,000+ movies (Vue.js + TailwindCSS)\n• Vital Cities — interactive city vitality website (Gatsby + TypeScript + Netlify)\n• Binance App — crypto smartwatch prototype (Adobe XD + LottieFiles)\n• BikeRental — full-stack bike rental PWA (Vue.js + NestJS + GraphQL + MongoDB)\n\nCheck them out on the Projects page!",
+    "project-exulta": "Exulta is a modern stretch tent rental website at release.exulta.be. Built with Laravel 11 + React + Inertia.js, featuring a product catalog, contact system, and a Filament admin panel. Includes Leaflet maps, automated CI/CD via GitHub Actions, Playwright E2E testing, and Lighthouse audits. Deployed with automated database backups and rollback on failure.",
+    "project-stalmanager": "Stal Manager is a horse stable financial dashboard. Built with Next.js 16 (App Router) + React 19 + TypeScript + Prisma 7 + PostgreSQL. Features expense/income tracking per horse, interactive Recharts charts, CRUD management, inventory, Auth0 authentication, shadcn/ui components, and Supabase Storage for uploads. Deployed on Vercel.",
+    "project-scan2talk": "Scan2Talk is a PWA for schools — students scan a QR code and walk through a guided emotional wellbeing check-in wizard (thermometer → themes → feelings → help request). Teachers get an overview dashboard with Chart.js visualizations. Built with Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Runs locally via DDEV.",
+    "project-binance": "The Binance App is a smartwatch companion concept for crypto enthusiasts — designed and prototyped in Adobe XD with fluid animations via After Effects and LottieFiles. Users can monitor their portfolio, track prices, and get alerts from their wrist.",
+    "project-azure": "The Netflix project was Robbe's bachelor thesis — a search app using Azure Cognitive Search and Amazon OpenSearch to index a dataset of 8,000+ movies & TV shows. Built with Vue.js and TailwindCSS, delivering Netflix-style browsing with fast, relevant search.",
+    "project-vital": "Vital Cities was a group project at Howest — an interactive public website for an organization helping cities become more sustainable. Features rich animations, smooth page transitions, and a modern aesthetic. Built with Gatsby + TypeScript + Netlify.",
+    "project-bikerental": "BikeRental is a full-stack PWA built with Achille Dupont. Users rent bikes, view locations on an interactive map (Mapbox), and manage rentals. An admin panel lets operators manage the fleet. Frontend: Vue.js, Backend: NestJS + GraphQL + MongoDB + Firebase.",
+    "contact": "You can reach Robbe via email at robbe.saelens@telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens), and Facebook. The portfolio is hosted at robbe-saelens.netlify.app.",
+    "experience": "Robbe currently works at Dynamate as a Drupal backend developer. Previously at Your Mind Our Work (2023) as a PHP & Magento developer — started as an intern and was hired full-time. Since 2017, he also works as an equestrian sports instructor at Sport Vlaanderen in Woumen. His journey combines technical development with people skills from teaching.",
+    "education": "Robbe holds a Bachelor's degree in Multimedia & Communication Technologies (Next Web Developer track) from Howest. Before that, he completed a graduate degree in Multimedia & Information Technologies (2018), where he learned the fundamentals of programming and web development. He's based in Geluwe, Belgium.",
+    "about": "Robbe Saelens is a full-stack web developer from Geluwe, Belgium. He loves building cool stuff and discovering new technologies. Currently working at Dynamate as a Drupal backend developer, with previous experience in PHP/Magento and a background as an equestrian instructor since 2017. He's passionate about modern web tech — from Laravel and Next.js to Vue, React, and TypeScript.",
+    "location": "Robbe is based in Gilwe (Geluwe), Belgium. He works at Dynamate and also teaches at Sport Vlaanderen in Woumen.",
+    "hobbies": "Besides coding, Robbe has been an equestrian sports instructor since 2017 at Sport Vlaanderen Woumen. He enjoys teaching people and working with horses — it's where he developed his people skills alongside his technical career.",
+    "thanks": "You're welcome! Let me know if you have any other questions.",
+    "bye": "Bye! Feel free to reach out anytime. Have a great day!",
+    "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Stal Manager, Scan2Talk, Netflix/Azure, Vital Cities, Binance, BikeRental. Just type what you'd like to know!",
+    "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me! Type 'help' for a list of topics.",
+    "quickReplies": ["Skills", "Projects", "Experience", "Contact", "Education"]
+  },
+  "aria": {
+    "switchToDutch": "Switch to Dutch",
+    "switchToEnglish": "Switch to English",
+    "toggleThemeLight": "Switch to light mode",
+    "toggleThemeDark": "Switch to dark mode",
+    "toggleNav": "Toggle navigation menu"
+  }
+}
