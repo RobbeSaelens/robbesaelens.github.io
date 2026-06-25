@@ -3,8 +3,8 @@ import vue from '@vitejs/plugin-vue'
 import Unocss from 'unocss/vite'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/portfolio/' : '/',
+export default defineConfig({
+  base: '/',
   plugins: [
     vue(),
     Unocss({
@@ -30,4 +30,4 @@ export default defineConfig(({ command }) => ({
       },
     }),
   ],
-}))
+})
