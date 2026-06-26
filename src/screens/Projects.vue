@@ -46,12 +46,19 @@
           @click="project.comingSoon ? null : navigateTo(project.route)"
         >
           <!-- Image container -->
-          <div class="card-image-wrapper">
+          <div
+            :class="['card-image-wrapper', { 'card-image-wrapper-framed': project.browserFrame }]"
+          >
+            <div v-if="project.browserFrame" class="card-mac-bar">
+              <span class="card-mac-dot bg-red-400"></span>
+              <span class="card-mac-dot bg-yellow-400"></span>
+              <span class="card-mac-dot bg-green-400"></span>
+            </div>
             <template v-if="project.image">
               <img
                 :src="project.image"
                 :alt="`${project.name} project mockup`"
-                class="card-image"
+                :class="['card-image', { 'card-image-framed': project.browserFrame }]"
                 loading="lazy"
               />
             </template>
@@ -112,7 +119,7 @@ export default {
           name: 'Exulta',
           description: 'Stretch tent rental & catalog',
           tags: ['Laravel', 'React', 'Inertia.js', 'Filament'],
-          image: '/exulta.jpg',
+          image: '/ExultaTeaser.png',
           route: 'ExultaDetail',
           date: '2025',
         },
@@ -121,7 +128,8 @@ export default {
           name: 'Stal Manager',
           description: 'Horse stable finance dashboard',
           tags: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL'],
-          image: '/stal-manager.png',
+          image: '/stalDashboard.png',
+          browserFrame: true,
           route: 'StalManagerDetail',
           date: '2025',
         },
@@ -613,6 +621,8 @@ export default {
   overflow: hidden;
   aspect-ratio: 4 / 3;
   background: var(--color-accent-soft);
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 641px) {
@@ -623,15 +633,61 @@ export default {
 
 .card-image {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   object-fit: cover;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: block;
 }
 
+/* Mac browser bar for card mockups */
+.card-mac-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
+  background: #f1f3f5;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.dark .card-mac-bar {
+  background: #1a1a1e;
+  border-bottom-color: rgba(20, 184, 166, 0.1);
+}
+.card-mac-dot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.card-image-wrapper-framed {
+  padding: 0.75rem;
+  background: #f1f3f5;
+  aspect-ratio: 16 / 11;
+}
+.dark .card-image-wrapper-framed {
+  background: #1a1a1e;
+}
+.card-image-framed {
+  object-fit: contain;
+  border-radius: 0.25rem;
+  background: #ffffff;
+  transition: none;
+}
+.dark .card-image-framed {
+  background: #0c0c0d;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .project-card:hover .card-image-framed {
+    transform: none !important;
+  }
+}
+
 .card-image-placeholder {
-  width: 100%;
-  height: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -655,7 +711,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-overlay);
+  background: linear-gradient(to top, rgba(13, 22, 28, 0.88), rgba(13, 22, 28, 0.3));
   opacity: 0;
   transition: opacity 0.3s ease;
 }

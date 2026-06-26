@@ -19,13 +19,27 @@
           <span class="tag-pill">Tailwind CSS</span>
         </div>
       </header>
-      <div>
-        <img
-          class="mx-auto my-10 w-full max-w-3xl rounded-lg"
-          src="/stal-manager.png"
-          :alt="$t('stalManager.alt')"
-          loading="lazy"
-        />
+      <!-- Hero screenshot -->
+      <div class="my-10">
+        <div class="mac-mockup">
+          <div class="mac-titlebar">
+            <div class="mac-dots">
+              <span class="mac-dot bg-red-400"></span>
+              <span class="mac-dot bg-yellow-400"></span>
+              <span class="mac-dot bg-green-400"></span>
+            </div>
+            <span class="mac-url">stal-manager.vercel.app</span>
+          </div>
+          <transition name="hero-fade" mode="out-in">
+            <img
+              :key="heroImage"
+              class="mac-content"
+              :src="heroImage"
+              :alt="heroAlt"
+              loading="lazy"
+            />
+          </transition>
+        </div>
       </div>
       <div class="mx-5 pt-10 md:mx-10">
         <div class="mb-10">
@@ -40,12 +54,7 @@
             <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
               {{ $t('stalManager.aboutText') }}
             </p>
-          </div>
-        </div>
-
-        <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div class="overview-card px-6 py-8">
-            <h3 class="overview-label">{{ $t('stalManager.languages') }}</h3>
+            <h3 class="overview-label mt-6">{{ $t('stalManager.languages') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span class="tag-pill">Next.js 16</span>
               <span class="tag-pill">React 19</span>
@@ -54,9 +63,7 @@
               <span class="tag-pill">PostgreSQL</span>
               <span class="tag-pill">Tailwind CSS 4</span>
             </div>
-          </div>
-          <div class="overview-card px-6 py-8">
-            <h3 class="overview-label">{{ $t('stalManager.tools') }}</h3>
+            <h3 class="overview-label mt-6">{{ $t('stalManager.tools') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span class="tag-pill">Visual Studio Code</span>
               <span class="tag-pill">Auth0 (Auth.js)</span>
@@ -64,6 +71,19 @@
               <span class="tag-pill">Recharts</span>
               <span class="tag-pill">Supabase Storage</span>
               <span class="tag-pill">Vercel</span>
+            </div>
+          </div>
+          <div class="hidden items-center justify-center md:flex shrink-0">
+            <div class="mac-mockup max-w-64">
+              <div class="mac-titlebar mac-titlebar-mobile">
+                <span class="mac-url">Mobile</span>
+              </div>
+              <img
+                class="mac-content"
+                src="/stalMobile.png"
+                alt="Stal Manager mobile view"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
@@ -89,8 +109,38 @@
 
 <script lang="ts">
 import { ArrowRight } from 'lucide-vue-next'
+
+const heroSlides = [
+  { src: '/stalLogin.png', alt: 'Stal Manager login page' },
+  { src: '/stalDashboard.png', alt: 'Stal Manager dashboard' },
+]
+
 export default {
   components: { ArrowRight },
+  data() {
+    return {
+      heroIndex: 0,
+      heroTimer: null as ReturnType<typeof setInterval> | null,
+    }
+  },
+  computed: {
+    heroImage(): string {
+      return heroSlides[this.heroIndex].src
+    },
+    heroAlt(): string {
+      return heroSlides[this.heroIndex].alt
+    },
+  },
+  mounted() {
+    this.heroTimer = setInterval(() => {
+      this.heroIndex = (this.heroIndex + 1) % heroSlides.length
+    }, 4000)
+  },
+  beforeUnmount() {
+    if (this.heroTimer) {
+      clearInterval(this.heroTimer)
+    }
+  },
 }
 </script>
 
@@ -211,6 +261,83 @@ export default {
   color: var(--color-tag-text);
   background: var(--color-tag-bg);
   white-space: nowrap;
+}
+
+/* ── Mac Browser Mockup ── */
+.mac-mockup {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+.mac-mockup:hover {
+  border-color: var(--color-border-glow);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px var(--color-border-glow);
+}
+.mac-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  background: #f1f3f5;
+  border-bottom: 1px solid #e5e7eb;
+  user-select: none;
+}
+.dark .mac-titlebar {
+  background: #1a1a1e;
+  border-bottom: 1px solid rgba(20, 184, 166, 0.1);
+}
+.mac-dots {
+  display: flex;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+.mac-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mac-url {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: #9ca3af;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dark .mac-url {
+  color: #6b7280;
+}
+.mac-titlebar-mobile {
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+}
+.mac-content {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Hero slideshow transition */
+.hero-fade-enter-active,
+.hero-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.hero-fade-enter-from,
+.hero-fade-leave-to {
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

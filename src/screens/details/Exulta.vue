@@ -21,8 +21,8 @@
       </header>
       <div>
         <img
-          class="mx-auto my-10 w-full max-w-3xl rounded-lg"
-          src="/exulta-detail.jpg"
+          class="w-90% mx-auto my-10 rounded-lg md:block md:w-full"
+          src="/ExultaDetail.png"
           :alt="$t('exulta.alt')"
           loading="lazy"
         />
