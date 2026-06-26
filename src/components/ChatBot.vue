@@ -630,7 +630,7 @@ export default {
   outline: none;
   background: transparent;
   color: #e2e8f0;
-  font-size: 0.8125rem;
+  font-size: 16px;
   font-family: inherit;
   caret-color: #14b8a6;
 }
@@ -649,11 +649,23 @@ export default {
   .chatbot-window {
     width: calc(100vw - 1rem);
     max-width: calc(100vw - 1rem);
+    height: 22rem;
+    max-height: 55vh;
+    bottom: 3.5rem;
     right: 0;
     border-radius: 0.375rem;
   }
   .banner-ascii {
-    font-size: 0.34rem;
+    font-size: 0.32rem;
+  }
+  .terminal-input-area {
+    padding: 0.5rem 0.75rem;
+  }
+  .terminal-body {
+    padding: 0.625rem 0.75rem;
+  }
+  .terminal-titlebar {
+    padding: 0.375rem 0.625rem;
   }
 }
 </style>

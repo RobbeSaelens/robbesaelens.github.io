@@ -1,5 +1,5 @@
 <template>
-  <div class="fade-out mx-auto my-auto max-w-screen-2xl px-6 pb-48 sm:pb-16">
+  <div class="fade-out mx-auto my-auto max-w-screen-2xl px-6 pb-8 sm:pb-16">
     <div class="sm:space-x-15 mr-5% mt-10% flex items-center justify-between">
       <!-- Left: Social icons -->
       <div class="hidden flex-col gap-1 sm:flex">
