@@ -1,5 +1,5 @@
 <template>
-  <div class="error-page">
+  <main class="error-page">
     <div class="terminal-window">
       <!-- Title bar -->
       <div class="terminal-chrome">
@@ -74,7 +74,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <div class="detail-page pb-10 fade-out">
+  <article class="detail-page pb-10 fade-out">
     <div class="mx-auto max-w-screen-xl px-4 pt-10 sm:px-6">
       <header class="text-center">
         <h1 class="terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl">
@@ -89,7 +89,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </article>
 </template>
 
 <script lang="ts">

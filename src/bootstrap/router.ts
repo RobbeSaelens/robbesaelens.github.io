@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
         name: 'Home',
         component: () => import('../screens/Index.vue'),
         meta: {
-          title: 'Robbe Saelens - Full-Stack Web Developer',
+          title: 'Full-Stack Web Developer',
           description:
             'Full-stack web developer portfolio showcasing projects in Vue, TypeScript, React, and modern web technologies.',
         },
@@ -20,7 +20,7 @@ const routes: RouteRecordRaw[] = [
         name: 'Contact',
         component: () => import('../screens/Contact.vue'),
         meta: {
-          title: 'About Me | Robbe Saelens',
+          title: 'About Me',
           description:
             'Learn about Robbe Saelens: education, work experience, and background in full-stack web development.',
         },
@@ -30,7 +30,7 @@ const routes: RouteRecordRaw[] = [
         name: 'Projects',
         component: () => import('../screens/Projects.vue'),
         meta: {
-          title: 'Projects | Robbe Saelens',
+          title: 'Projects',
           description:
             'Browse projects by Robbe Saelens including Azure search, Vital Cities, Binance clone, and BikeRental app.',
         },
@@ -40,7 +40,7 @@ const routes: RouteRecordRaw[] = [
         name: 'AzureDetail',
         component: () => import('../screens/details/Azure.vue'),
         meta: {
-          title: 'Azure Search Project | Robbe Saelens',
+          title: 'Azure Search Project',
           description:
             'A Netflix-style search application built with Azure Cognitive Search, Vue.js, and modern web technologies.',
         },
@@ -50,7 +50,7 @@ const routes: RouteRecordRaw[] = [
         name: 'VitalDetail',
         component: () => import('../screens/details/Vital.vue'),
         meta: {
-          title: 'Vital Cities Project | Robbe Saelens',
+          title: 'Vital Cities Project',
           description:
             'A city vitality dashboard built with React and data visualization for urban planning insights.',
         },
@@ -60,7 +60,7 @@ const routes: RouteRecordRaw[] = [
         name: 'BinanceDetail',
         component: () => import('../screens/details/Binance.vue'),
         meta: {
-          title: 'Binance Clone Project | Robbe Saelens',
+          title: 'Binance Clone Project',
           description:
             'A Binance cryptocurrency exchange clone built with React, featuring real-time market data and trading UI.',
         },
@@ -70,7 +70,7 @@ const routes: RouteRecordRaw[] = [
         name: 'BikeRentalDetail',
         component: () => import('../screens/details/BikeRental.vue'),
         meta: {
-          title: 'BikeRental Project | Robbe Saelens',
+          title: 'BikeRental Project',
           description:
             'A bike rental management application built with Vue.js, featuring booking, inventory, and customer management.',
         },
@@ -80,7 +80,7 @@ const routes: RouteRecordRaw[] = [
         name: 'ExultaDetail',
         component: () => import('../screens/details/Exulta.vue'),
         meta: {
-          title: 'Exulta Project | Robbe Saelens',
+          title: 'Exulta Project',
           description:
             'A modern stretch tent rental website with product catalog, built with Laravel, React, and Inertia.js.',
         },
@@ -90,7 +90,7 @@ const routes: RouteRecordRaw[] = [
         name: 'StalManagerDetail',
         component: () => import('../screens/details/StalManager.vue'),
         meta: {
-          title: 'Stal Manager Project | Robbe Saelens',
+          title: 'Stal Manager Project',
           description:
             'A horse stable financial management dashboard built with Next.js, TypeScript, and Prisma.',
         },
@@ -100,7 +100,7 @@ const routes: RouteRecordRaw[] = [
         name: 'Scan2TalkDetail',
         component: () => import('../screens/details/Scan2Talk.vue'),
         meta: {
-          title: 'Scan2Talk Project | Robbe Saelens',
+          title: 'Scan2Talk Project',
           description:
             'A QR-code based student emotional wellbeing check-in system built with Laravel and Vue.js.',
         },
@@ -112,7 +112,7 @@ const routes: RouteRecordRaw[] = [
     name: 'ClientError',
     component: () => import('../screens/generic/ClientError.vue'),
     meta: {
-      title: 'Page Not Found | Robbe Saelens',
+      title: 'Page Not Found',
       description: 'The page you are looking for does not exist.',
       errorCode: '404',
     },

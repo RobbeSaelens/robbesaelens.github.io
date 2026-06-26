@@ -74,7 +74,13 @@
         <!-- Input line -->
         <div class="terminal-input-area">
           <span class="prompt-symbol input-prompt">❯</span>
+          <label
+            for="chat-input"
+            class="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0"
+            >{{ $t('chat.placeholder') }}</label
+          >
           <input
+            id="chat-input"
             ref="inputRef"
             v-model="input"
             type="text"

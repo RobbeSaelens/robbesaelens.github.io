@@ -126,7 +126,7 @@
             {{ $t('nav.aboutMe') }}
           </router-link>
 
-          <hr class="w-32 border-teal-200 dark:border-teal-800" />
+          <hr class="w-32 border-teal-200 dark:border-teal-800" aria-hidden="true" />
 
           <div class="space-y-4 text-lg text-teal-600 dark:text-teal-400">
             <a

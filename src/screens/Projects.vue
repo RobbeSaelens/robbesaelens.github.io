@@ -1,17 +1,10 @@
 <template>
   <div class="projects-page flex flex-1 flex-col">
     <div class="mx-auto w-full max-w-screen-2xl px-4 pb-8 sm:px-6">
-      <!-- Terminal-style title -->
-      <header class="mb-10 mt-8 md:mb-14 md:mt-12">
-        <h1 class="terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl">
-          <span class="terminal-prompt">&gt;</span>
-          <span class="terminal-text">{{ $t('projects.title').toLowerCase() }}</span>
-          <span class="terminal-cursor" aria-hidden="true"></span>
-        </h1>
-        <p class="terminal-subtitle mt-3 text-sm tracking-wide md:text-base">
-          <span class="opacity-50">$</span> ls -la ./selected-work
-        </p>
-      </header>
+      <TerminalHeader
+        :title="$t('projects.title').toLowerCase()"
+        subtitle="ls -la ./selected-work"
+      />
 
       <!-- Tech filter bar -->
       <div class="filter-bar">
@@ -102,12 +95,14 @@
 
 <script lang="ts">
 import { ArrowRight } from 'lucide-vue-next'
+import TerminalHeader from '../components/TerminalHeader.vue'
 
 export default {
   name: 'Projects',
 
   components: {
     ArrowRight,
+    TerminalHeader,
   },
 
   data() {
@@ -338,68 +333,6 @@ export default {
    ============================================= */
 .projects-page {
   color: var(--color-text-primary);
-}
-
-/* =============================================
-   Terminal Title
-   ============================================= */
-.terminal-title {
-  font-family: var(--font-mono);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  line-height: 1.2;
-}
-
-@media (max-width: 640px) {
-  .terminal-title {
-    gap: 0.25rem;
-  }
-
-  .terminal-cursor {
-    width: 0.4em;
-    height: 0.8em;
-  }
-}
-
-.terminal-prompt {
-  color: var(--color-prompt);
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.terminal-text {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-prompt));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.terminal-cursor {
-  display: inline-block;
-  width: 0.55em;
-  height: 1.1em;
-  background: var(--color-cursor);
-  animation: blink 1s step-end infinite;
-  vertical-align: text-bottom;
-  border-radius: 1px;
-  flex-shrink: 0;
-}
-
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-.terminal-subtitle {
-  font-family: var(--font-mono);
-  color: var(--color-subtitle);
-  font-size: 0.8rem;
 }
 
 /* =============================================
@@ -850,11 +783,6 @@ export default {
    Reduced Motion
    ============================================= */
 @media (prefers-reduced-motion: reduce) {
-  .terminal-cursor {
-    animation: none;
-    opacity: 1;
-  }
-
   .project-card {
     opacity: 1;
     transform: none;

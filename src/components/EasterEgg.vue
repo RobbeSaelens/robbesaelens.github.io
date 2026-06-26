@@ -56,9 +56,9 @@
 
         <!-- Title + badge -->
         <div class="ee-title-block">
-          <h1 class="ee-title glitch" :data-text="$t('easter.title')">
+          <h2 class="ee-title glitch" :data-text="$t('easter.title')">
             {{ $t('easter.title') }}
-          </h1>
+          </h2>
           <span class="ee-badge">{{ $t('easter.activated') }}</span>
         </div>
 

@@ -31,7 +31,7 @@ export default defineComponent({
     const route = useRoute()
     useHead({
       titleTemplate: '%s | Robbe Saelens',
-      title: () => (route.meta?.title as string) || 'Robbe Saelens - Portfolio',
+      title: () => (route.meta?.title as string) || 'Portfolio',
       meta: () => [
         {
           name: 'description',
@@ -41,7 +41,7 @@ export default defineComponent({
         },
         {
           property: 'og:title',
-          content: (route.meta?.title as string) || 'Robbe Saelens - Portfolio',
+          content: `${(route.meta?.title as string) || 'Portfolio'} | Robbe Saelens`,
         },
         {
           property: 'og:description',
@@ -52,7 +52,7 @@ export default defineComponent({
         { property: 'og:url', content: `https://robbe-saelens.netlify.app${route.path}` },
         {
           name: 'twitter:title',
-          content: (route.meta?.title as string) || 'Robbe Saelens - Portfolio',
+          content: `${(route.meta?.title as string) || 'Portfolio'} | Robbe Saelens`,
         },
         {
           name: 'twitter:description',

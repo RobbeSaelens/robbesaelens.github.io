@@ -1,21 +1,14 @@
 <template>
   <div class="fade-out flex flex-1 flex-col">
-    <header class="mx-auto mb-2 max-w-screen-2xl px-6 pt-2 md:pt-4">
-      <h1 class="terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl">
-        <span class="terminal-prompt">&gt;</span>
-        <span class="terminal-text">{{ $t('about.title').toLowerCase() }}</span>
-        <span class="terminal-cursor" aria-hidden="true"></span>
-      </h1>
-      <p class="terminal-subtitle mt-3 text-sm tracking-wide md:text-base">
-        <span class="opacity-50">$</span> cat ./about-me.md
-      </p>
-    </header>
+    <div class="mx-auto w-full max-w-screen-2xl px-6">
+      <TerminalHeader :title="$t('about.title').toLowerCase()" subtitle="cat ./about-me.md" />
+    </div>
 
     <div class="content-wrapper mx-auto flex min-h-0 max-w-screen-2xl flex-1 flex-col px-6">
       <!-- Horizontal timeline cards -->
       <div class="cards-row mb-3">
         <!-- Teaching -->
-        <div ref="teachingRef" :class="['timeline-card', teachingVisible ? 'animate-in' : '']">
+        <article ref="teachingRef" :class="['timeline-card', teachingVisible ? 'animate-in' : '']">
           <img
             src="/about.jpg"
             alt="Robbe Saelens teaching equestrian sports"
@@ -39,7 +32,7 @@
               </template>
             </i18n-t>
           </div>
-        </div>
+        </article>
 
         <!-- Connector -->
         <div class="timeline-connector">
@@ -50,7 +43,10 @@
         </div>
 
         <!-- Education -->
-        <div ref="educationRef" :class="['timeline-card', educationVisible ? 'animate-in' : '']">
+        <article
+          ref="educationRef"
+          :class="['timeline-card', educationVisible ? 'animate-in' : '']"
+        >
           <img
             src="/education.jpg"
             alt="Graduation ceremony photo of Robbe Saelens"
@@ -77,7 +73,7 @@
               </template>
             </i18n-t>
           </div>
-        </div>
+        </article>
 
         <!-- Connector -->
         <div class="timeline-connector">
@@ -88,7 +84,10 @@
         </div>
 
         <!-- Experience -->
-        <div ref="experienceRef" :class="['timeline-card', experienceVisible ? 'animate-in' : '']">
+        <article
+          ref="experienceRef"
+          :class="['timeline-card', experienceVisible ? 'animate-in' : '']"
+        >
           <img
             src="/coding.jpg"
             alt="Robbe Saelens coding at his development workspace"
@@ -129,7 +128,7 @@
               </template>
             </i18n-t>
           </div>
-        </div>
+        </article>
       </div>
 
       <!-- CTA -->
@@ -149,6 +148,7 @@
 
 <script lang="ts">
 import { Briefcase, GraduationCap, ArrowRight, BookOpen, MessageCircle } from 'lucide-vue-next'
+import TerminalHeader from '../components/TerminalHeader.vue'
 
 export default {
   components: {
@@ -157,6 +157,7 @@ export default {
     ArrowRight,
     BookOpen,
     MessageCircle,
+    TerminalHeader,
   },
   data() {
     return {
@@ -226,62 +227,6 @@ export default {
   --color-prompt: #2dd4bf;
   --color-cursor: #2dd4bf;
   --color-subtitle: #94a3b8;
-}
-
-/* =============================================
-   Terminal Title
-   ============================================= */
-.terminal-title {
-  font-family: var(--font-mono);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  line-height: 1.2;
-}
-
-@media (max-width: 640px) {
-  .terminal-title {
-    gap: 0.25rem;
-  }
-
-  .terminal-cursor {
-    width: 0.4em;
-    height: 0.8em;
-  }
-}
-.terminal-prompt {
-  color: var(--color-prompt);
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.terminal-text {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-prompt));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.terminal-cursor {
-  display: inline-block;
-  width: 0.55em;
-  height: 1.1em;
-  background: var(--color-cursor);
-  animation: blink 1s step-end infinite;
-  vertical-align: text-bottom;
-  border-radius: 1px;
-  flex-shrink: 0;
-}
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-.terminal-subtitle {
-  font-family: var(--font-mono);
-  color: var(--color-subtitle);
 }
 
 /* === Image hover === */
@@ -550,11 +495,6 @@ export default {
    Reduced Motion
    ============================================= */
 @media (prefers-reduced-motion: reduce) {
-  .terminal-cursor {
-    animation: none;
-    opacity: 1;
-  }
-
   .timeline-card {
     opacity: 1;
     transform: none;

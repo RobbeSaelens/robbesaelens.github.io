@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <header class="fade-out">
     <div class="mx-auto max-w-screen-2xl">
       <Profile />
     </div>
-  </div>
+  </header>
 </template>
 
 <script>
