@@ -1,5 +1,5 @@
 <template>
-  <div class="fade-out mx-auto my-auto max-w-screen-2xl px-6 pb-8 sm:pb-16">
+  <div class="fade-out mx-auto my-auto max-w-screen-2xl px-6 pb-48 sm:pb-16">
     <div class="sm:space-x-15 mr-5% mt-10% flex items-center justify-between">
       <!-- Left: Social icons -->
       <div class="hidden flex-col gap-1 sm:flex">
@@ -66,7 +66,7 @@
 
         <!-- Mobile profile photo -->
         <img
-          class="rounded-full object-cover shadow sm:hidden"
+          class="h-56 w-full rounded-3xl object-cover shadow sm:hidden"
           src="/pf2.jpg"
           alt="Robbe Saelens"
           loading="lazy"
@@ -165,7 +165,7 @@
           </div>
 
           <img
-            class="photo-img relative h-80 w-80 rounded-full border-2 border-teal-400/30 object-cover shadow-lg transition-all duration-500 group-hover:scale-[1.03] group-hover:border-teal-500 group-hover:shadow-xl lg:h-96 lg:w-96 dark:border-teal-500/30 dark:group-hover:border-teal-400"
+            class="photo-img relative h-56 w-full rounded-3xl border-2 border-teal-400/30 object-cover shadow-lg transition-all duration-500 group-hover:scale-[1.03] group-hover:border-teal-500 group-hover:shadow-xl lg:h-96 lg:w-96 lg:rounded-full dark:border-teal-500/30 dark:group-hover:border-teal-400"
             src="/pf2.jpg"
             alt="Robbe Saelens"
             loading="lazy"

@@ -302,7 +302,10 @@ export default {
           addMessage('bot', 'chat.welcome')
         }, 600)
       }
-      nextTick(() => inputRef.value?.focus())
+      // On touch devices, defer focus to avoid auto-opening the keyboard
+      if (!('ontouchstart' in window)) {
+        nextTick(() => inputRef.value?.focus())
+      }
     }
 
     const close = () => {
