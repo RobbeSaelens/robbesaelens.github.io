@@ -1,6 +1,6 @@
 <template>
   <div class="flex w-full items-center justify-between">
-    <router-link class="focus-visible:ring-2xl rounded-md outline-none" to="/" @click="closeMenu">
+    <router-link class="focus-visible:ring-2xl rounded-md outline-none" to="/" @click="onLogoClick">
       <img
         class="hidden sm:block scale h-5 customFill"
         src="/Logo.svg"
@@ -14,6 +14,10 @@
         loading="lazy"
       />
     </router-link>
+    <!-- Secret code revealed via triple-click -->
+    <transition name="code-reveal">
+      <span v-if="showSecretCode" class="secret-code-badge">{{ secretCode }}</span>
+    </transition>
 
     <!-- Desktop nav -->
     <div class="ml-auto hidden items-center sm:flex">
@@ -97,6 +101,7 @@
           alt="Robbe Saelens logo"
           class="absolute left-6 top-6 h-8"
           loading="lazy"
+          @click="onLogoClick"
         />
         <nav class="flex flex-col items-center space-y-8 text-center">
           <router-link
@@ -160,6 +165,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Sun, Moon, Phone, Mail } from 'lucide-vue-next'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
+import { useEasterEgg } from '../../composables/useEasterEgg'
 
 export default {
   components: {
@@ -171,6 +177,12 @@ export default {
   },
   setup() {
     const showMenu = ref(false)
+    const { handleLogoClick, secretCode, showSecretCode } = useEasterEgg()
+
+    const onLogoClick = () => {
+      handleLogoClick()
+      closeMenu()
+    }
 
     // Read theme from localStorage, fall back to system preference, default to light
     const stored = localStorage.getItem('theme')
@@ -223,6 +235,9 @@ export default {
       toggleNav,
       closeMenu,
       toggleTheme,
+      onLogoClick,
+      secretCode,
+      showSecretCode,
     }
   },
 }
@@ -322,5 +337,49 @@ export default {
   to {
     opacity: 1;
   }
+}
+
+/* ── Secret code badge (easter egg) ── */
+.secret-code-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #14b8a6;
+  background: rgba(20, 184, 166, 0.1);
+  border: 1px solid rgba(20, 184, 166, 0.35);
+  border-radius: 0.375rem;
+  letter-spacing: 0.2em;
+  animation: code-pulse 0.6s ease-in-out 2;
+}
+
+@keyframes code-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.3);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px 2px rgba(20, 184, 166, 0.4);
+  }
+}
+
+.code-reveal-enter-active {
+  transition: all 0.3s ease-out;
+}
+.code-reveal-leave-active {
+  transition: all 0.5s ease-in;
+}
+.code-reveal-enter-from {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.8);
+}
+.code-reveal-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>

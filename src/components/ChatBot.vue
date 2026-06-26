@@ -7,7 +7,7 @@
 
     <!-- Terminal window -->
     <transition name="chat-slide">
-      <div v-if="isOpen" class="chatbot-window">
+      <div v-if="isOpen" class="chatbot-window" :class="{ 'riddle-active': riddleStep > 0 }">
         <!-- Title bar -->
         <div class="terminal-titlebar">
           <div class="titlebar-dots">
@@ -15,7 +15,9 @@
             <span class="dot dot-yellow"></span>
             <span class="dot dot-green"></span>
           </div>
-          <span class="titlebar-label">robbe@portfolio ~ chatbot</span>
+          <span class="titlebar-label">{{
+            riddleStep > 0 ? '⚠ ROOT KIT DETECTED — CAUTION ⚠' : 'robbe@portfolio ~ chatbot'
+          }}</span>
           <button @click="close" class="titlebar-close" aria-label="Close terminal">
             <X class="h-3.5 w-3.5" />
           </button>
@@ -91,6 +93,7 @@
 import { ref, nextTick, computed, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { X } from 'lucide-vue-next'
+import { useEasterEgg } from '../composables/useEasterEgg'
 
 interface Message {
   actor: 'bot' | 'user'
@@ -215,11 +218,34 @@ function findResponse(input: string): string | null {
   return null
 }
 
+// Easter egg riddle constants
+const RIDDLE_TRIGGERS = [
+  'sudo',
+  'root',
+  'admin',
+  'secret',
+  'geheim',
+  'easter egg',
+  'hidden',
+  'hack',
+]
+const RIDDLE_ANSWERS: Record<number, string[]> = {
+  1: ['hypertext markup language', 'hyper text markup language'],
+  3: ['playwright'],
+}
+
 export default {
   name: 'ChatBot',
   components: { X },
   setup() {
     const { t } = useI18n({ useScope: 'global' })
+    const {
+      unlock,
+      secretCode,
+      clearSecretCode,
+      close: closeEasterEgg,
+      shouldResetChatbot,
+    } = useEasterEgg()
     const isOpen = ref(false)
     const input = ref('')
     const isTyping = ref(false)
@@ -227,6 +253,7 @@ export default {
     const messagesContainer = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
+    const riddleStep = ref(0) // 0 = not started, 1-3 = riddles
 
     const inputPlaceholder = computed(() => t('chat.placeholder'))
 
@@ -248,6 +275,72 @@ export default {
     }
 
     const processMessage = (userText: string) => {
+      const lower = userText.toLowerCase().trim()
+
+      // ── Terminal reset / clear ──
+      const RESET_COMMANDS = [
+        'exit',
+        'clear',
+        'cls',
+        'reset',
+        'start over',
+        'ctrl c',
+        'cmd c',
+        'ctrl+c',
+        'cmd+c',
+      ]
+      if (RESET_COMMANDS.some((cmd) => lower === cmd)) {
+        messages.value = []
+        riddleStep.value = 0
+        clearSecretCode()
+        closeEasterEgg()
+        addMessage('bot', 'chat.reset')
+        return
+      }
+
+      // ── Easter egg riddle logic ──
+      // Step 0: check if user typed a trigger word
+      if (riddleStep.value === 0 && RIDDLE_TRIGGERS.some((k) => lower.includes(k))) {
+        riddleStep.value = 1
+        addMessage('bot', 'chat.easter.riddle1')
+        return
+      }
+
+      // Steps 1 & 3: check against static answers
+      if (riddleStep.value === 1 || riddleStep.value === 3) {
+        const answers = RIDDLE_ANSWERS[riddleStep.value]
+        if (answers && answers.some((a) => lower.replace(/\s/g, '') === a.replace(/\s/g, ''))) {
+          riddleStep.value++
+          if (riddleStep.value > 3) {
+            addMessage('bot', 'chat.easter.unlock')
+            setTimeout(() => unlock(), 1200)
+          } else {
+            const nextKey = `chat.easter.riddle${riddleStep.value}`
+            addMessage('bot', nextKey)
+          }
+          return
+        }
+        addMessage('bot', 'chat.easter.wrong')
+        return
+      }
+
+      // Step 2: check against the dynamic secret code from logo triple-click
+      if (riddleStep.value === 2) {
+        if (secretCode.value && lower === secretCode.value) {
+          riddleStep.value = 3
+          clearSecretCode()
+          addMessage('bot', 'chat.easter.riddle3')
+          return
+        }
+        if (!secretCode.value) {
+          addMessage('bot', 'chat.easter.no_code')
+        } else {
+          addMessage('bot', 'chat.easter.wrong_code')
+        }
+        return
+      }
+
+      // ── Normal message processing ──
       const responseKey = findResponse(userText)
       if (responseKey) {
         addMessage('bot', responseKey)
@@ -329,6 +422,15 @@ export default {
       }
     })
 
+    watch(shouldResetChatbot, (val) => {
+      if (val) {
+        messages.value = []
+        riddleStep.value = 0
+        clearSecretCode()
+        shouldResetChatbot.value = false
+      }
+    })
+
     onUnmounted(() => document.removeEventListener('click', onClickOutside))
 
     return {
@@ -345,6 +447,8 @@ export default {
       sendQuickReply,
       toggle,
       open,
+      close,
+      riddleStep,
       close,
     }
   },
@@ -418,6 +522,52 @@ export default {
   flex-direction: column;
   overflow: hidden;
   font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ── Riddle-active easter egg mode ── */
+.chatbot-window.riddle-active {
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(251, 191, 36, 0.3),
+    0 0 24px 4px rgba(251, 191, 36, 0.15);
+  animation: riddle-glow 2s ease-in-out infinite alternate;
+}
+.chatbot-window.riddle-active .terminal-titlebar {
+  background: #1e1a0f;
+  border-bottom-color: rgba(251, 191, 36, 0.2);
+}
+.chatbot-window.riddle-active .titlebar-label {
+  color: #fbbf24;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.chatbot-window.riddle-active .terminal-input-area {
+  border-top-color: rgba(251, 191, 36, 0.2);
+}
+.chatbot-window.riddle-active .input-prompt {
+  color: #fbbf24;
+}
+.chatbot-window.riddle-active .bot-prompt {
+  color: #f59e0b;
+}
+.chatbot-window.riddle-active .bot-line .line-text {
+  color: #fef3c7;
+}
+
+@keyframes riddle-glow {
+  from {
+    box-shadow:
+      0 12px 48px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(251, 191, 36, 0.3),
+      0 0 24px 4px rgba(251, 191, 36, 0.12);
+  }
+  to {
+    box-shadow:
+      0 12px 48px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(251, 191, 36, 0.45),
+      0 0 32px 8px rgba(251, 191, 36, 0.22);
+  }
 }
 
 /* ── Slide transition ── */

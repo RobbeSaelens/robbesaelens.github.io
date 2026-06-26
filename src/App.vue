@@ -3,6 +3,7 @@
   <div v-else class="bg-light dark:bg-dark sm:h-screen overflow-x-hidden overflow-y-auto">
     <CustomCursor />
     <router-view> </router-view>
+    <EasterEgg />
   </div>
 </template>
 
@@ -12,12 +13,14 @@ import { useHead } from '@unhead/vue'
 import { useRoute } from 'vue-router'
 import SplashScreen from './components/splashScreen.vue'
 import CustomCursor from './components/CustomCursor.vue'
+import EasterEgg from './components/EasterEgg.vue'
 
 export default defineComponent({
   name: 'App',
   components: {
     SplashScreen,
     CustomCursor,
+    EasterEgg,
   },
   data() {
     return {

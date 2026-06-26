@@ -24,7 +24,7 @@ export default defineComponent({
 .custom-cursor {
   position: fixed;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 99999;
   transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.15s ease;

@@ -106,9 +106,19 @@
     "screenshotSoon": "[screenshot binnenkort]"
   },
   "error": {
-    "title": "Pagina niet gevonden",
-    "description": "De pagina die je zoekt bestaat niet of is verplaatst.",
-    "backHome": "Terug naar home"
+    "defaultTitle": "Er is iets fout gegaan",
+    "defaultDescription": "Er is een onverwachte fout opgetreden. Probeer het later opnieuw.",
+    "backHome": "Terug naar home",
+    "404": {
+      "statusCode": "Niet Gevonden",
+      "title": "Pagina niet gevonden",
+      "description": "De pagina die je zoekt bestaat niet of is verplaatst."
+    },
+    "500": {
+      "statusCode": "Server Fout",
+      "title": "Interne serverfout",
+      "description": "Er is iets misgegaan aan onze kant. We werken eraan."
+    }
   },
   "chat": {
     "placeholder": "Stel me een vraag...",
@@ -133,7 +143,18 @@
     "bye": "Doei! Je mag altijd contact opnemen. Nog een fijne dag!",
     "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Stal Manager, Scan2Talk, Netflix/Azure, Vital Cities, Binance, BikeRental. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Probeer eens te vragen naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
-    "quickReplies": ["Vaardigheden", "Projecten", "Ervaring", "Contact", "Opleiding"]
+    "reset": "Sessie beëindigd. Alle systemen hersteld naar standaard.\n\nTyp 'help' als je hulp nodig hebt.",
+    "quickReplies": ["Vaardigheden", "Projecten", "Ervaring", "Contact", "Opleiding"],
+    "easter": {
+      "trigger": "🔐 Je hebt een verborgen pad gevonden. Drie raadsels bewaken wat erachter ligt. Klaar?\n\nRaadsel 1/3: Waar staat HTML voor?",
+      "riddle1": "🔐 Je hebt een verborgen pad gevonden. Drie raadsels bewaken wat erachter ligt. Klaar?\n\nRaadsel 1/3: Waar staat HTML voor?",
+      "riddle2": "✅ Juist!\n\nRaadsel 2/3: Ik sta bij de ingang van elke pagina. Je bent me talloze keren gepasseerd. Tik me drie keer snel achter elkaar aan en ik onthul een verborgen nummer. Wat is het?",
+      "riddle3": "✅ Juist!\n\nRaadsel 3/3: Ergens op deze site praat Robbe over een tool die hij gebruikt voor end-to-end testing. Vind de naam en typ het hier.",
+      "wrong": "❌ Niet helemaal. Blijf graven — de antwoorden zijn verborgen in deze portfolio.",
+      "no_code": "🔒 Nog niets. Het geheim ligt waar elke reis op deze site begint. Probeer de ingang te bezoeken.",
+      "wrong_code": "❌ Dat is niet het juiste nummer. Zorg dat je het duidelijk zag en typ het precies zoals het verscheen.",
+      "unlock": "🎉 TOEGANG VERLEEND\n\nJe hebt alle drie raadsels opgelost. Welkom bij de verborgen laag...\n\nDeveloper mode initialiseren..."
+    }
   },
   "aria": {
     "switchToDutch": "Schakel naar Nederlands",
@@ -141,5 +162,18 @@
     "toggleThemeLight": "Schakel naar lichte modus",
     "toggleThemeDark": "Schakel naar donkere modus",
     "toggleNav": "Navigatiemenu openen"
+  },
+  "easter": {
+    "title": "DEVELOPER MODE",
+    "activated": "GEACTIVEERD",
+    "subtitle": "Je hebt de verborgen terminal gevonden. Niet veel mensen komen zo ver.",
+    "message": "Je hebt je dev-credentials bewezen. De console verwelkomt je.",
+    "fact1": "De eerste computerbug was een echte mot gevonden in een relais in 1947.",
+    "fact2": "De term 'cookie' komt van 'magic cookie' — een datapakket dat een programma ontvangt en ongewijzigd terugstuurt.",
+    "fact3": "Er zijn meer dan 700 programmeertalen. Robbe werkt met ongeveer 12 ervan.",
+    "fact4": "De allereerste website staat nog steeds online op info.cern.ch.",
+    "fact5": "Stack Overflow werd opgericht in 2008. Sindsdien copy-pasten developers erop los.",
+    "close": "dev mode afsluiten",
+    "hint": "Tip: vraag me naar 'sudo' of 'geheim' om opnieuw te beginnen"
   }
 }

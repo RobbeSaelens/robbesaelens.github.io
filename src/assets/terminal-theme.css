@@ -1,0 +1,210 @@
+/* =============================================
+   Terminal Theme — shared CSS custom properties
+   Imported globally in main.ts
+   ============================================= */
+
+:root {
+  --color-bg: #f8fafb;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f7f6;
+  --color-border: rgba(0, 128, 128, 0.1);
+  --color-border-glow: rgba(0, 128, 128, 0.35);
+  --color-text-primary: #134e4a;
+  --color-text-secondary: #5f8a86;
+  --color-text-muted: #8fb3b0;
+  --color-accent: #0d9488;
+  --color-accent-soft: rgba(13, 148, 136, 0.08);
+  --color-tag-bg: rgba(13, 148, 136, 0.08);
+  --color-tag-text: #0f766e;
+  --color-overlay: rgba(13, 22, 28, 0.82);
+  --color-prompt: #0d9488;
+  --color-cursor: #0d9488;
+  --color-subtitle: #5f8a86;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+}
+
+.dark {
+  --color-bg: #0a0f14;
+  --color-surface: rgba(15, 23, 32, 0.8);
+  --color-surface-hover: rgba(30, 41, 53, 0.8);
+  --color-border: rgba(45, 212, 191, 0.12);
+  --color-border-glow: rgba(45, 212, 191, 0.25);
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-accent: #2dd4bf;
+  --color-accent-soft: rgba(45, 212, 191, 0.08);
+  --color-tag-bg: rgba(45, 212, 191, 0.12);
+  --color-tag-text: #5eead4;
+  --color-overlay: rgba(10, 15, 20, 0.9);
+  --color-prompt: #2dd4bf;
+  --color-cursor: #2dd4bf;
+  --color-subtitle: #5eead4;
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+}
+
+/* =============================================
+   Terminal Title Component
+   ============================================= */
+
+.terminal-title {
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+  .terminal-title {
+    gap: 0.25rem;
+  }
+
+  .terminal-cursor {
+    width: 0.4em;
+    height: 0.8em;
+  }
+}
+
+.terminal-prompt {
+  color: var(--color-prompt);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.terminal-text {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-prompt));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  background: var(--color-cursor);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.terminal-subtitle {
+  font-family: var(--font-mono);
+  color: var(--color-subtitle);
+}
+
+/* =============================================
+   Keyframe Animations
+   ============================================= */
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanlines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 8px;
+  }
+}
+
+@keyframes glitch-shift {
+  0%,
+  100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 1px);
+  }
+  40% {
+    transform: translate(2px, -1px);
+  }
+  60% {
+    transform: translate(-1px, 0);
+  }
+  80% {
+    transform: translate(1px, 1px);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px var(--color-accent-soft);
+  }
+  50% {
+    box-shadow:
+      0 0 24px var(--color-border-glow),
+      0 0 48px var(--color-accent-soft);
+  }
+}
+
+/* =============================================
+   Shared Utility Classes
+   ============================================= */
+
+.font-mono-terminal {
+  font-family: var(--font-mono);
+}
+
+/* =============================================
+   Reduced Motion
+   ============================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-cursor {
+    animation: none;
+    opacity: 1;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
