@@ -8,7 +8,6 @@ export default defineConfig(({ command }) => ({
   plugins: [
     vue(),
     Unocss({
-      rules: [['font-theme', { 'font-family': 'anisette-petite, sans-serif' }]],
       theme: {
         extend: {
           keyframes: {

@@ -285,49 +285,7 @@ export default {
 }
 </script>
 
-<style>
-/* =============================================
-   CSS Custom Properties
-   ============================================= */
-:root {
-  --color-bg: #f8fafb;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f0f7f6;
-  --color-border: rgba(0, 128, 128, 0.1);
-  --color-border-glow: rgba(0, 128, 128, 0.35);
-  --color-text-primary: #134e4a;
-  --color-text-secondary: #5f8a86;
-  --color-text-muted: #8fb3b0;
-  --color-accent: #0d9488;
-  --color-accent-soft: rgba(13, 148, 136, 0.08);
-  --color-tag-bg: rgba(13, 148, 136, 0.08);
-  --color-tag-text: #0f766e;
-  --color-overlay: rgba(13, 22, 28, 0.82);
-  --color-prompt: #0d9488;
-  --color-cursor: #0d9488;
-  --color-subtitle: #5f8a86;
-  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
-}
-
-.dark {
-  --color-bg: #0a0f14;
-  --color-surface: rgba(15, 23, 32, 0.8);
-  --color-surface-hover: rgba(20, 32, 44, 0.9);
-  --color-border: rgba(45, 212, 191, 0.1);
-  --color-border-glow: rgba(45, 212, 191, 0.3);
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-  --color-accent: #2dd4bf;
-  --color-accent-soft: rgba(45, 212, 191, 0.08);
-  --color-tag-bg: rgba(45, 212, 191, 0.1);
-  --color-tag-text: #5eead4;
-  --color-overlay: rgba(0, 0, 0, 0.85);
-  --color-prompt: #2dd4bf;
-  --color-cursor: #2dd4bf;
-  --color-subtitle: #94a3b8;
-}
-
+<style scoped>
 /* =============================================
    Page Layout
    ============================================= */
@@ -595,10 +553,11 @@ export default {
   border-radius: 50%;
   flex-shrink: 0;
 }
+/* Keeps the same aspect-ratio as every other card so all media boxes
+   are exactly the same height; only the inner treatment differs. */
 .card-image-wrapper-framed {
   padding: 0.75rem;
   background: #f1f3f5;
-  aspect-ratio: 16 / 11;
 }
 .dark .card-image-wrapper-framed {
   background: #1a1a1e;
@@ -733,24 +692,6 @@ export default {
   padding-top: 0.5rem;
 }
 
-.tag-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.625rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--color-tag-text);
-  background: var(--color-tag-bg);
-  border-radius: 100px;
-  white-space: nowrap;
-  line-height: 1.6;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .project-card:hover .tag-pill {
     background: var(--color-accent-soft);
@@ -771,11 +712,6 @@ export default {
 
   .card-title {
     font-size: 1rem;
-  }
-
-  .tag-pill {
-    font-size: 0.65rem;
-    padding: 0.175rem 0.5rem;
   }
 }
 
