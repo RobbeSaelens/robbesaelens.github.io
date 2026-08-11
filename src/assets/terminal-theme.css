@@ -28,20 +28,20 @@
 .dark {
   --color-bg: #0a0f14;
   --color-surface: rgba(15, 23, 32, 0.8);
-  --color-surface-hover: rgba(30, 41, 53, 0.8);
-  --color-border: rgba(45, 212, 191, 0.12);
-  --color-border-glow: rgba(45, 212, 191, 0.25);
+  --color-surface-hover: rgba(20, 32, 44, 0.9);
+  --color-border: rgba(45, 212, 191, 0.1);
+  --color-border-glow: rgba(45, 212, 191, 0.3);
   --color-text-primary: #e2e8f0;
   --color-text-secondary: #94a3b8;
   --color-text-muted: #64748b;
   --color-accent: #2dd4bf;
   --color-accent-soft: rgba(45, 212, 191, 0.08);
-  --color-tag-bg: rgba(45, 212, 191, 0.12);
+  --color-tag-bg: rgba(45, 212, 191, 0.1);
   --color-tag-text: #5eead4;
-  --color-overlay: rgba(10, 15, 20, 0.9);
+  --color-overlay: rgba(0, 0, 0, 0.85);
   --color-prompt: #2dd4bf;
   --color-cursor: #2dd4bf;
-  --color-subtitle: #5eead4;
+  --color-subtitle: #94a3b8;
   --color-danger: #f87171;
   --color-warning: #fbbf24;
 }
@@ -188,6 +188,34 @@
 
 .font-mono-terminal {
   font-family: var(--font-mono);
+}
+
+/* Single source of truth — this used to be redefined in Projects.vue and every
+   detail screen with slightly different metrics, so whichever route chunk
+   loaded last silently changed pill size and reflowed the page. */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.625rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  color: var(--color-tag-text);
+  background: var(--color-tag-bg);
+  border-radius: 100px;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  .tag-pill {
+    font-size: 0.65rem;
+    padding: 0.175rem 0.5rem;
+  }
 }
 
 /* =============================================

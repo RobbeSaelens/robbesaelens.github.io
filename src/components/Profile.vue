@@ -219,17 +219,6 @@ export default {
 
 <style>
 /* CSS Custom Properties — unscoped so :root and .dark apply globally */
-:root {
-  --color-accent: #0d9488;
-  --color-prompt: #0d9488;
-  --color-cursor: #0d9488;
-  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
-}
-.dark {
-  --color-accent: #2dd4bf;
-  --color-prompt: #2dd4bf;
-  --color-cursor: #2dd4bf;
-}
 </style>
 
 <style scoped>
