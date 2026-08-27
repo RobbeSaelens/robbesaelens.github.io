@@ -34,52 +34,8 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Projects',
           description:
-            'Projects by Robbe Saelens: Exulta, Stal Manager, Scan2Talk, Azure Search, Vital Cities and BikeRental. Filterable by technology.',
+            'Projects by Robbe Saelens: Exulta, a stretch tent rental website; Stal Manager, a horse stable finance dashboard; and Scan2Talk, a student wellbeing PWA.',
           image: '/ExultaTeaser.png',
-        },
-      },
-      {
-        path: 'azuredetail',
-        name: 'AzureDetail',
-        component: () => import('../screens/details/Azure.vue'),
-        meta: {
-          title: 'Azure Search - Netflix-style search engine',
-          description:
-            'Bachelor thesis by Robbe Saelens: Netflix-style search over 8,000+ movies and shows with Azure Cognitive Search and Amazon OpenSearch. Vue.js.',
-          image: '/ResearchMockup.jpg',
-        },
-      },
-      {
-        path: 'vitaldetail',
-        name: 'VitalDetail',
-        component: () => import('../screens/details/Vital.vue'),
-        meta: {
-          title: 'Vital Cities - Urban liveability website',
-          description:
-            'Group project by Robbe Saelens: an animated website for Vital Cities, helping cities become more sustainable and liveable. Gatsby and TypeScript.',
-          image: '/VitalCitiesMockup.png',
-        },
-      },
-      {
-        path: 'binancedetail',
-        name: 'BinanceDetail',
-        component: () => import('../screens/details/Binance.vue'),
-        meta: {
-          title: 'Binance App - Smartwatch crypto concept',
-          description:
-            'Concept by Robbe Saelens: a smartwatch companion for crypto portfolio tracking and price alerts, prototyped in Adobe XD with LottieFiles.',
-          image: '/Mockup.jpg',
-        },
-      },
-      {
-        path: 'bikerentaldetail',
-        name: 'BikeRentalDetail',
-        component: () => import('../screens/details/BikeRental.vue'),
-        meta: {
-          title: 'BikeRental - Bike sharing PWA',
-          description:
-            'Full-stack PWA by Robbe Saelens for renting bikes, with live locations on a map and an operator admin panel. Vue.js, NestJS, GraphQL, MongoDB.',
-          image: '/BikeRental.jpg',
         },
       },
       {

@@ -37,42 +37,6 @@ export const PROJECTS: SeoProject[] = [
     tech: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PHP'],
     image: '/Fav.png',
   },
-  {
-    path: '/binancedetail',
-    name: 'Binance App',
-    headline: 'Smartwatch crypto companion concept',
-    description:
-      'A concept for a companion smartwatch app that lets cryptocurrency users monitor their portfolio, track live prices and receive alerts from their wrist. Prototyped in Adobe XD with After Effects animations delivered through LottieFiles.',
-    tech: ['Adobe XD', 'LottieFiles', 'After Effects', 'UI Design', 'Motion Design'],
-    image: '/Mockup.jpg',
-  },
-  {
-    path: '/azuredetail',
-    name: 'Azure Search',
-    headline: 'Netflix-style search over unstructured data',
-    description:
-      'A bachelor thesis project exploring Search as a Service on unstructured data: a Netflix-style browsing and search experience over a dataset of more than 8,000 movies and TV shows, indexed with Azure Cognitive Search and Amazon OpenSearch. Built with Vue.js and TailwindCSS.',
-    tech: ['Vue.js', 'TailwindCSS', 'Azure', 'OpenSearch', 'TypeScript'],
-    image: '/ResearchMockup.jpg',
-  },
-  {
-    path: '/vitaldetail',
-    name: 'Vital Cities',
-    headline: 'Website for a city liveability organization',
-    description:
-      'A group project building a highly interactive public website for Vital Cities, an organization helping cities become more sustainable and liveable, with rich animations and smooth page transitions. Built with Gatsby and TypeScript, deployed on Netlify.',
-    tech: ['Gatsby', 'TypeScript', 'Netlify', 'React'],
-    image: '/VitalCitiesMockup.png',
-  },
-  {
-    path: '/bikerentaldetail',
-    name: 'BikeRental',
-    headline: 'Bike sharing progressive web app',
-    description:
-      'A full-stack progressive web app for renting bikes, with real-time bike locations on an interactive map, a mobile-first rental flow and an operator admin panel for managing the fleet. Built with Vue.js and a NestJS GraphQL API.',
-    tech: ['Vue.js', 'NestJS', 'GraphQL', 'MongoDB', 'TypeScript', 'PWA'],
-    image: '/BikeRental.jpg',
-  },
 ]
 
 export const SKILLS: string[] = [

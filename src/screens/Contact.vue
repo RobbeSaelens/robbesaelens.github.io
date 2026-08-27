@@ -132,31 +132,12 @@
           </div>
         </article>
       </div>
-
-      <!-- CTA -->
-      <div class="cta-bar">
-        <div class="cta-inner">
-          <MessageCircle class="cta-icon-lg" />
-          <span class="cta-text">{{ $t('about.workTogether') }}</span>
-          <a class="cta-pill" href="mailto:robbe.saelens@telenet.be">
-            robbe.saelens@telenet.be
-            <ArrowRight class="cta-arrow" />
-          </a>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  Briefcase,
-  GraduationCap,
-  ArrowRight,
-  BookOpen,
-  MessageCircle,
-  Trophy,
-} from 'lucide-vue-next'
+import { Briefcase, GraduationCap, BookOpen, Trophy } from 'lucide-vue-next'
 import TerminalHeader from '../components/TerminalHeader.vue'
 
 export default {
@@ -165,9 +146,7 @@ export default {
   components: {
     Briefcase,
     GraduationCap,
-    ArrowRight,
     BookOpen,
-    MessageCircle,
     Trophy,
     TerminalHeader,
   },
@@ -378,81 +357,6 @@ export default {
   font-weight: 600;
 }
 
-/* =============================================
-   CTA
-   ============================================= */
-.cta-bar {
-  display: flex;
-  justify-content: center;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.cta-inner {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  transition:
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  .cta-inner:hover {
-    border-color: var(--color-border-glow);
-    box-shadow:
-      0 2px 20px rgba(0, 0, 0, 0.04),
-      0 0 0 1px var(--color-border-glow);
-  }
-}
-
-.cta-icon-lg {
-  width: 1.125rem;
-  height: 1.125rem;
-  color: var(--color-accent);
-  flex-shrink: 0;
-}
-
-.cta-text {
-  font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-}
-
-.cta-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.875rem;
-  border-radius: 9999px;
-  background: var(--color-accent);
-  color: white;
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-  transition:
-    background 0.2s ease,
-    transform 0.15s ease,
-    box-shadow 0.2s ease;
-}
-.cta-pill:hover {
-  background: var(--color-text-primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.cta-arrow {
-  width: 0.875rem;
-  height: 0.875rem;
-}
-
 @media (min-width: 1200px) {
   .card-media {
     aspect-ratio: 16 / 9;
@@ -472,11 +376,7 @@ export default {
   }
   .card-body {
     padding: 1.125rem 1.25rem 1.375rem;
-  }
-  .cta-bar {
-    margin-top: 1.75rem;
-  }
-}
+  }}
 
 @media (max-width: 640px) {
   .card-media {
@@ -488,23 +388,7 @@ export default {
   .card-slug {
     left: 0.75rem;
     bottom: 0.625rem;
-  }
-  .cta-inner {
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .cta-text {
-    white-space: normal;
-    text-align: center;
-  }
-  .cta-pill {
-    max-width: 100%;
-    white-space: normal;
-    text-align: center;
-  }
-}
+  }}
 
 /* =============================================
    Reduced Motion

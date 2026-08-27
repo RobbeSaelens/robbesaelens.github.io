@@ -35,10 +35,6 @@ CMS & cloud: Drupal, Azure, Netlify, Vercel
 - [Exulta](https://robbesaelens.github.io/exultadetail): Stretch tent rental website with product catalog and admin back office. Laravel, React, Inertia.js, Filament.
 - [Stal Manager](https://robbesaelens.github.io/stalmanagerdetail): Horse stable financial management dashboard with invoicing and reporting. Next.js, TypeScript, Prisma, PostgreSQL.
 - [Scan2Talk](https://robbesaelens.github.io/scan2talkdetail): QR-code based student emotional wellbeing check-in system, built as a PWA. Laravel, Vue.js, Inertia.js.
-- [Azure Search](https://robbesaelens.github.io/azuredetail): Netflix-style search application over a research catalog. Vue.js, TailwindCSS, Azure Cognitive Search, OpenSearch.
-- [Vital Cities](https://robbesaelens.github.io/vitaldetail): Urban vitality data platform presenting city liveability insights. Gatsby, TypeScript, Netlify.
-- [BikeRental](https://robbesaelens.github.io/bikerentaldetail): Bike rental management application covering bookings, inventory and customers. Vue.js, NestJS, MongoDB.
-- [Binance Concept](https://robbesaelens.github.io/binancedetail): Cryptocurrency exchange interface concept with motion design. Adobe XD, LottieFiles, After Effects.
 
 ## Optional
 
