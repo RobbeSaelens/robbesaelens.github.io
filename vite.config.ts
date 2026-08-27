@@ -3,8 +3,10 @@ import vue from '@vitejs/plugin-vue'
 import Unocss from 'unocss/vite'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/portfolio/' : '/',
+export default defineConfig({
+  // robbesaelens.github.io is a GitHub *user* page, so it is always served from
+  // the domain root. A '/portfolio/' base would 404 every asset.
+  base: '/',
   plugins: [
     vue(),
     Unocss({
@@ -29,4 +31,4 @@ export default defineConfig(({ command }) => ({
       },
     }),
   ],
-}))
+})

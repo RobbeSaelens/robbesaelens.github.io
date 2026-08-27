@@ -129,13 +129,6 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
   { keys: ['exulta'], responseKey: 'chat.project-exulta' },
   { keys: ['stal manager', 'stalmanager'], responseKey: 'chat.project-stalmanager' },
   { keys: ['scan2talk', 'scan', 'qr'], responseKey: 'chat.project-scan2talk' },
-  { keys: ['binance', 'crypto', 'smartwatch'], responseKey: 'chat.project-binance' },
-  {
-    keys: ['azure', 'netflix', 'opensearch', 'search app', 'thesis'],
-    responseKey: 'chat.project-azure',
-  },
-  { keys: ['vital', 'vital cities', 'gatsby'], responseKey: 'chat.project-vital' },
-  { keys: ['bikerental', 'bike rental', 'bike', 'nestjs'], responseKey: 'chat.project-bikerental' },
   // General projects
   {
     keys: ['project', 'projects', 'projecten', 'built', 'made', 'gemaakt', 'portfolio'],
