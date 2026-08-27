@@ -184,9 +184,11 @@ export default {
       closeMenu()
     }
 
-    // Read theme from localStorage, fall back to system preference, default to light
-    const stored = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    // Read theme from localStorage, fall back to system preference, default to
+    // light. Guarded because setup() also runs during prerendering.
+    const isBrowser = typeof window !== 'undefined'
+    const stored = isBrowser ? localStorage.getItem('theme') : null
+    const prefersDark = isBrowser && window.matchMedia('(prefers-color-scheme: dark)').matches
     const initialTheme = stored || (prefersDark ? 'dark' : 'light')
     const theme = ref(initialTheme)
 

@@ -1,0 +1,45 @@
+# Robbe Saelens
+
+> Robbe Saelens is a full-stack web developer based in Geluwe, West Flanders,
+> Belgium. He works at Dynamate and builds web applications with Vue.js,
+> Nuxt, TypeScript, React, Next.js, Laravel, NestJS and Drupal. This site is his
+> personal portfolio.
+
+Canonical site: https://robbesaelens.github.io/
+
+## Identity
+
+- Name: Robbe Saelens
+- Role: Full-Stack Web Developer
+- Employer: Dynamate
+- Location: Geluwe, West Flanders, Belgium
+- Languages: Dutch (native), English
+- GitHub: https://github.com/RobbeSaelens
+- LinkedIn: https://linkedin.com/in/robbe-saelens-1a14511b8
+
+## Core technologies
+
+Frontend: Vue.js, Nuxt, React, Next.js, TypeScript, JavaScript, TailwindCSS, UnoCSS
+Backend: Laravel, PHP, NestJS, Node.js, GraphQL, Prisma
+Data: PostgreSQL, MongoDB
+CMS & cloud: Drupal, Azure, Netlify, Vercel
+
+## Pages
+
+- [Home](https://robbesaelens.github.io/): Introduction and profile of Robbe Saelens.
+- [Projects](https://robbesaelens.github.io/projects): Overview of selected work, filterable by technology.
+- [About & contact](https://robbesaelens.github.io/contact): Education, work experience and contact details.
+
+## Projects
+
+- [Exulta](https://robbesaelens.github.io/exultadetail): Stretch tent rental website with product catalog and admin back office. Laravel, React, Inertia.js, Filament.
+- [Stal Manager](https://robbesaelens.github.io/stalmanagerdetail): Horse stable financial management dashboard with invoicing and reporting. Next.js, TypeScript, Prisma, PostgreSQL.
+- [Scan2Talk](https://robbesaelens.github.io/scan2talkdetail): QR-code based student emotional wellbeing check-in system, built as a PWA. Laravel, Vue.js, Inertia.js.
+- [Azure Search](https://robbesaelens.github.io/azuredetail): Netflix-style search application over a research catalog. Vue.js, TailwindCSS, Azure Cognitive Search, OpenSearch.
+- [Vital Cities](https://robbesaelens.github.io/vitaldetail): Urban vitality data platform presenting city liveability insights. Gatsby, TypeScript, Netlify.
+- [BikeRental](https://robbesaelens.github.io/bikerentaldetail): Bike rental management application covering bookings, inventory and customers. Vue.js, NestJS, MongoDB.
+- [Binance Concept](https://robbesaelens.github.io/binancedetail): Cryptocurrency exchange interface concept with motion design. Adobe XD, LottieFiles, After Effects.
+
+## Optional
+
+- [Sitemap](https://robbesaelens.github.io/sitemap.xml): Machine-readable list of all pages.

@@ -5,11 +5,13 @@ import App from './App.vue'
 import '@unocss/reset/tailwind.css'
 import 'uno.css'
 import './assets/terminal-theme.css'
-import router from './bootstrap/router'
+import { createWebHistory } from 'vue-router'
+import { createAppRouter } from './bootstrap/router'
 import i18n from './i18n'
 
 const app: VueApp = createApp(App)
 const head = createHead()
+const router = createAppRouter(createWebHistory())
 
 app.use(head)
 app.use(i18n)

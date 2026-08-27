@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory, Router, RouteRecordRaw } from 'vue-router'
+import { createRouter, Router, RouterHistory, RouteRecordRaw } from 'vue-router'
 
-const routes: RouteRecordRaw[] = [
+export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('../components/holders/AppHolder.vue'),
@@ -12,7 +12,8 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Full-Stack Web Developer',
           description:
-            'Full-stack web developer portfolio showcasing projects in Vue, TypeScript, React, and modern web technologies.',
+            'Robbe Saelens is a full-stack web developer from Geluwe, Belgium, working at Dynamate. Portfolio of work in Vue, TypeScript, React, Next.js, Laravel and Drupal.',
+          image: '/pf2.jpg',
         },
       },
       {
@@ -20,9 +21,10 @@ const routes: RouteRecordRaw[] = [
         name: 'Contact',
         component: () => import('../screens/Contact.vue'),
         meta: {
-          title: 'About Me',
+          title: 'About me',
           description:
-            'Learn about Robbe Saelens: education, work experience, and background in full-stack web development.',
+            'About Robbe Saelens: education in Multimedia & Communication Technologies, experience as PHP, Magento and Drupal backend developer, and how to get in touch.',
+          image: '/pf2.jpg',
         },
       },
       {
@@ -32,7 +34,8 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Projects',
           description:
-            'Browse projects by Robbe Saelens including Azure search, Vital Cities, Binance clone, and BikeRental app.',
+            'Projects by Robbe Saelens: Exulta, Stal Manager, Scan2Talk, Azure Search, Vital Cities and BikeRental. Filterable by technology.',
+          image: '/ExultaTeaser.png',
         },
       },
       {
@@ -40,9 +43,10 @@ const routes: RouteRecordRaw[] = [
         name: 'AzureDetail',
         component: () => import('../screens/details/Azure.vue'),
         meta: {
-          title: 'Azure Search Project',
+          title: 'Azure Search - Netflix-style search engine',
           description:
-            'A Netflix-style search application built with Azure Cognitive Search, Vue.js, and modern web technologies.',
+            'Bachelor thesis by Robbe Saelens: Netflix-style search over 8,000+ movies and shows with Azure Cognitive Search and Amazon OpenSearch. Vue.js.',
+          image: '/ResearchMockup.jpg',
         },
       },
       {
@@ -50,9 +54,10 @@ const routes: RouteRecordRaw[] = [
         name: 'VitalDetail',
         component: () => import('../screens/details/Vital.vue'),
         meta: {
-          title: 'Vital Cities Project',
+          title: 'Vital Cities - Urban liveability website',
           description:
-            'A city vitality dashboard built with React and data visualization for urban planning insights.',
+            'Group project by Robbe Saelens: an animated website for Vital Cities, helping cities become more sustainable and liveable. Gatsby and TypeScript.',
+          image: '/VitalCitiesMockup.png',
         },
       },
       {
@@ -60,9 +65,10 @@ const routes: RouteRecordRaw[] = [
         name: 'BinanceDetail',
         component: () => import('../screens/details/Binance.vue'),
         meta: {
-          title: 'Binance Clone Project',
+          title: 'Binance App - Smartwatch crypto concept',
           description:
-            'A Binance cryptocurrency exchange clone built with React, featuring real-time market data and trading UI.',
+            'Concept by Robbe Saelens: a smartwatch companion for crypto portfolio tracking and price alerts, prototyped in Adobe XD with LottieFiles.',
+          image: '/Mockup.jpg',
         },
       },
       {
@@ -70,9 +76,10 @@ const routes: RouteRecordRaw[] = [
         name: 'BikeRentalDetail',
         component: () => import('../screens/details/BikeRental.vue'),
         meta: {
-          title: 'BikeRental Project',
+          title: 'BikeRental - Bike sharing PWA',
           description:
-            'A bike rental management application built with Vue.js, featuring booking, inventory, and customer management.',
+            'Full-stack PWA by Robbe Saelens for renting bikes, with live locations on a map and an operator admin panel. Vue.js, NestJS, GraphQL, MongoDB.',
+          image: '/BikeRental.jpg',
         },
       },
       {
@@ -80,9 +87,10 @@ const routes: RouteRecordRaw[] = [
         name: 'ExultaDetail',
         component: () => import('../screens/details/Exulta.vue'),
         meta: {
-          title: 'Exulta Project',
+          title: 'Exulta - Stretch tent rental website',
           description:
-            'A modern stretch tent rental website with product catalog, built with Laravel, React, and Inertia.js.',
+            'Stretch tent rental site by Robbe Saelens: product catalog, Filament admin panel, Leaflet maps, Playwright E2E tests. Laravel, React, Inertia.js.',
+          image: '/ExultaTeaser.png',
         },
       },
       {
@@ -90,9 +98,10 @@ const routes: RouteRecordRaw[] = [
         name: 'StalManagerDetail',
         component: () => import('../screens/details/StalManager.vue'),
         meta: {
-          title: 'Stal Manager Project',
+          title: 'Stal Manager - Stable finance dashboard',
           description:
-            'A horse stable financial management dashboard built with Next.js, TypeScript, and Prisma.',
+            'Horse stable finance dashboard by Robbe Saelens: per-horse income, expenses and interactive reports. Next.js App Router, TypeScript, Prisma, Auth0.',
+          image: '/stalDashboard.png',
         },
       },
       {
@@ -100,9 +109,10 @@ const routes: RouteRecordRaw[] = [
         name: 'Scan2TalkDetail',
         component: () => import('../screens/details/Scan2Talk.vue'),
         meta: {
-          title: 'Scan2Talk Project',
+          title: 'Scan2Talk - Student wellbeing check-in PWA',
           description:
-            'A QR-code based student emotional wellbeing check-in system built with Laravel and Vue.js.',
+            'PWA by Robbe Saelens where students check in on their wellbeing via QR codes, plus a staff dashboard of class trends. Laravel, Vue.js, Inertia.js.',
+          image: '/Fav.png',
         },
       },
     ],
@@ -115,16 +125,21 @@ const routes: RouteRecordRaw[] = [
       title: 'Page Not Found',
       description: 'The page you are looking for does not exist.',
       errorCode: '404',
+      noindex: true,
     },
   },
 ]
 
-const router: Router = createRouter({
-  history: createWebHistory(),
-  routes,
-  scrollBehavior() {
-    return { top: 0 }
-  },
-})
-
-export default router
+/**
+ * Shared factory so the client entry and the prerenderer stay in sync. The
+ * history is injected because the prerenderer must not touch `window`.
+ */
+export function createAppRouter(history: RouterHistory): Router {
+  return createRouter({
+    history,
+    routes,
+    scrollBehavior() {
+      return { top: 0 }
+    },
+  })
+}

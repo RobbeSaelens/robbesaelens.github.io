@@ -10,6 +10,8 @@ export const SUPPORTED_LOCALES: SupportedLocale[] = ['en', 'nl']
 const LOCALE_STORAGE_KEY = 'app-locale'
 
 function getInitialLocale(): SupportedLocale {
+  // Runs during prerendering too, where there is no browser environment.
+  if (typeof window === 'undefined') return 'en'
   const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
   if (stored && SUPPORTED_LOCALES.includes(stored as SupportedLocale)) {
     return stored as SupportedLocale
@@ -39,6 +41,7 @@ export function getLocale(): SupportedLocale {
 
 export function setLocale(locale: SupportedLocale): void {
   composer.locale.value = locale
+  if (typeof window === 'undefined') return
   localStorage.setItem(LOCALE_STORAGE_KEY, locale)
   document.querySelector('html')?.setAttribute('lang', locale)
 }
