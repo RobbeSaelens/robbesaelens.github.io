@@ -1,16 +1,62 @@
-# Vue 3 + TypeScript + Vite
+# robbesaelens.github.io
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Personal portfolio of Robbe Saelens. Vue 3 + TypeScript + Vite, deployed to GitHub Pages
+at <https://robbesaelens.github.io>.
 
-## Recommended IDE Setup
+## Scripts
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+| Command                | What it does                                                     |
+| ---------------------- | ---------------------------------------------------------------- |
+| `npm run dev`          | Vite dev server                                                  |
+| `npm run build`        | Full production build: client → SSR → prerender → sitemap         |
+| `npm run build:client` | Client bundle only (`dist/`)                                      |
+| `npm run build:ssr`    | Prerender bundle only (`dist-ssr/`)                               |
+| `npm run prerender`    | Writes static HTML per route into `dist/`                          |
+| `npm run sitemap`      | Regenerates `dist/sitemap.xml` from the router                     |
+| `npm run preview`      | Serves the built `dist/`                                          |
 
-## Type Support For `.vue` Imports in TS
+## How SEO works here
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+The site is a client-rendered SPA, which on its own is invisible to crawlers that do not
+execute JavaScript — including most AI crawlers (GPTBot, ClaudeBot, PerplexityBot). The
+build therefore prerenders every route to real HTML:
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+1. `vite build` produces the normal client bundle.
+2. `vite build --ssr src/entry-server.ts` produces a render function.
+3. `scripts/prerender.mjs` renders each route with `renderToString`, injects the
+   unhead-generated `<head>` into `index.html`, and writes the result to `dist/`.
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+Each route is written twice — `slug/index.html` and `slug.html` — so GitHub Pages can
+serve both `/slug` and `/slug/` without a redirect. The catch-all route is rendered
+separately to `404.html` as a real, `noindex` 404 page.
+
+The client does **not** hydrate; it mounts a fresh app over the prerendered markup. That
+sidesteps hydration mismatches entirely at the cost of a re-render on load.
+
+### Where to change what
+
+| Concern                                       | File                          |
+| --------------------------------------------- | ----------------------------- |
+| Canonical origin (single source of truth)     | `src/site.ts`                 |
+| Per-route title, description, OG image        | `src/bootstrap/router.ts` (`meta`) |
+| Head tag assembly (title, OG, Twitter, canonical) | `src/App.vue`             |
+| JSON-LD graph (Person, WebSite, projects)     | `src/seo/jsonld.ts`           |
+| Machine-readable project facts                | `src/seo/projects.ts`         |
+| Crawler policy, incl. AI crawlers             | `public/robots.txt`           |
+| LLM-readable site summary                     | `public/llms.txt`             |
+
+Changing the domain means editing `src/site.ts`, `public/robots.txt` and `public/llms.txt`.
+The sitemap picks the origin up from `src/site.ts` automatically.
+
+### Known limitations
+
+- **One URL per page for both languages.** English and Dutch are a client-side toggle, so
+  there are no `/nl/` URLs and no `hreflang` alternates. Proper multilingual SEO would
+  need localized routes.
+- **`_redirects` and `public/_headers` are Netlify-only.** GitHub Pages ignores both, so
+  the security headers in `_headers` are not applied on `robbesaelens.github.io`.
+
+## Deployment
+
+`.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
+`main`.

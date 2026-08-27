@@ -1,6 +1,39 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Title, description, canonical, Open Graph, Twitter and JSON-LD are all
+         managed centrally in src/App.vue (via unhead) so that the prerendered
+         HTML and the running SPA can never disagree. -->
+    <title>Robbe Saelens - Full-Stack Web Developer</title>
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)" />
+
+    <link rel="icon" type="image/png" href="/Fav.png" />
+    <link rel="apple-touch-icon" href="/Fav.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="/styles.css" />
+
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+
+    <script>
+      // Apply theme before first paint to prevent flash
+      ;(function () {
+        try {
+          const theme = localStorage.getItem('theme')
+          if (
+            theme === 'dark' ||
+            (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          ) {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (e) {}
+      })()
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-KTMQFBG1N2"></script>
     <script>
@@ -11,130 +44,20 @@
       gtag('js', new Date())
       gtag('config', 'G-KTMQFBG1N2')
     </script>
-    <script>
-      // Apply theme before first paint to prevent flash
-      ;(function () {
-        const theme = localStorage.getItem('theme')
-        if (
-          theme === 'dark' ||
-          (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-        ) {
-          document.documentElement.classList.add('dark')
-        }
-      })()
-    </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Full-stack web developer portfolio of Robbe Saelens. Showcasing projects in Vue, TypeScript, React, and modern web technologies."
-    />
-    <meta name="author" content="Robbe Saelens" />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Robbe Saelens - Portfolio" />
-    <meta
-      property="og:description"
-      content="Full-stack web developer portfolio showcasing projects in Vue, TypeScript, and modern web technologies."
-    />
-    <meta property="og:url" content="https://robbe-saelens.netlify.app/" />
-    <meta property="og:image" content="https://robbe-saelens.netlify.app/pf2.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Robbe Saelens - Portfolio" />
-    <meta
-      name="twitter:description"
-      content="Full-stack web developer portfolio showcasing projects in Vue, TypeScript, and modern web technologies."
-    />
-    <meta name="twitter:image" content="https://robbe-saelens.netlify.app/pf2.jpg" />
-
-    <link rel="canonical" href="https://robbe-saelens.netlify.app/" />
-    <link rel="manifest" href="/manifest.json" />
-
-    <link rel="icon" type="image/png" href="/Fav.png" />
-    <link rel="stylesheet" href="/styles.css" />
-
-    <title>Robbe Saelens - Full-Stack Web Developer</title>
-
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "Person",
-            "@id": "https://robbe-saelens.netlify.app/#person",
-            "name": "Robbe Saelens",
-            "givenName": "Robbe",
-            "familyName": "Saelens",
-            "jobTitle": "Full-Stack Web Developer",
-            "description": "Full-stack web developer based in Geluwe, Belgium. Specializing in Vue.js, TypeScript, React, Laravel, Next.js, and modern web technologies.",
-            "url": "https://robbe-saelens.netlify.app/",
-            "image": "https://robbe-saelens.netlify.app/pf2.jpg",
-            "sameAs": [
-              "https://github.com/RobbeSaelens",
-              "https://linkedin.com/in/robbe-saelens-1a14511b8",
-              "https://instagram.com/robbe.saelens",
-              "https://facebook.com/robbe.saelens"
-            ],
-            "knowsAbout": [
-              "Vue.js",
-              "TypeScript",
-              "React",
-              "Laravel",
-              "Next.js",
-              "Drupal",
-              "PHP",
-              "NestJS",
-              "GraphQL",
-              "Prisma",
-              "PostgreSQL"
-            ],
-            "worksFor": {
-              "@type": "Organization",
-              "name": "Dynamate"
-            },
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Geluwe",
-              "addressCountry": "BE"
-            }
-          },
-          {
-            "@type": "WebSite",
-            "@id": "https://robbe-saelens.netlify.app/#website",
-            "url": "https://robbe-saelens.netlify.app/",
-            "name": "Robbe Saelens - Portfolio",
-            "description": "Full-stack web developer portfolio showcasing projects in Vue, TypeScript, and modern web technologies.",
-            "author": { "@id": "https://robbe-saelens.netlify.app/#person" },
-            "inLanguage": ["en", "nl"]
-          }
-        ]
-      }
-    </script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app"><!--app-html--></div>
 
     <noscript>
       <div style="padding: 2rem; font-family: system-ui, sans-serif; text-align: center">
         <h1>Robbe Saelens — Full-Stack Web Developer</h1>
         <p>
-          Full-stack web developer portfolio showcasing projects in Vue, TypeScript, React, Laravel,
-          Next.js, and modern web technologies.
-        </p>
-        <p>
-          JavaScript is required to view the interactive portfolio. Please enable JavaScript or
-          visit:
+          Full-stack web developer from Geluwe, Belgium, building with Vue, TypeScript, React,
+          Laravel and Next.js.
         </p>
         <ul style="list-style: none; padding: 0">
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/contact">About &amp; contact</a></li>
           <li><a href="https://github.com/RobbeSaelens">GitHub</a></li>
           <li><a href="https://linkedin.com/in/robbe-saelens-1a14511b8">LinkedIn</a></li>
         </ul>
