@@ -10,7 +10,8 @@
     "dynamateRole": "als Drupal backend developer.",
     "educationLabel": "Bachelor diploma in",
     "sayHello": "Zeg Hallo",
-    "goToProjects": "Bekijk mijn projecten"
+    "goToProjects": "Bekijk mijn projecten",
+    "photoTooltip": "full-stack developer gedetecteerd"
   },
   "about": {
     "title": "Over mij",
@@ -23,8 +24,8 @@
     "experience": "Ervaring",
     "experienceText1": "In februari 2023 begon ik als stagiair bij {link1}. Na mijn stage begon ik er te werken als {role}.",
     "experienceText2": "Ik maakte de overstap naar {role} bij {link2}. Enthousiast om mijn ervaring in te zetten voor nieuwe projecten!",
-    "phpMagentoDev": "PHP & Magento developer",
-    "juniorBackendDev": "Junior Backend Developer",
+    "phpMagentoDev": "PHP- en Magento-ontwikkelaar",
+    "juniorBackendDev": "junior backend developer",
     "competing": "Paardrijden",
     "competingText": "Naast mijn job beoefen ik de paardensport op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Ik heb een grote passie voor de sport en focus me voornamelijk op jumping en alles wat daarbij komt kijken."
   },
@@ -32,40 +33,103 @@
     "title": "Favoriete projecten",
     "getInTouch": "Neem contact op!",
     "viewProject": "Bekijk project",
+    "live": "live",
+    "rebranding": "rebranding",
     "clear": "wissen",
-    "showingCount": "{count} / {total}"
+    "showingCount": "{count} / {total}",
+    "items": {
+      "exulta": {
+        "description": "De tweede versie van de Exulta stretchtent verhuursite: catalogus, realisaties, blog en FAQ op Laravel 13 met een React 19 front-end, plus een Filament 5 adminpaneel dat de klant zelf beheert."
+      },
+      "scan2talk": {
+        "description": "Een welbevinden check-in tool voor scholen, live op scan2talk.be. Leerlingen scannen een geprinte QR-poster en delen hoe ze zich voelen; leerkrachten krijgen trends en een anonieme chat."
+      },
+      "vhs": {
+        "description": "Een drietalige site voor een aannemer van paardenpistes in Geluwe, met GSAP scroll-animatie, een WebGL hero en lokale SEO. Gebouwd op Next.js 16."
+      }
+    }
   },
   "exulta": {
     "title": "Exulta",
-    "alt": "Exulta stretch tent verhuur website mockup",
+    "alt": "Exulta stretchtent verhuur website",
     "overview": "Projectoverzicht",
     "about": "Over",
-    "aboutText": "Een moderne website voor stretch tent verhuur, vanaf de basis opgebouwd. Met een productcatalogus met gedetailleerde tentspecificaties, een intuïtief contactsysteem en een volledig Filament adminpaneel voor eenvoudig contentbeheer. Inclusief interactieve Leaflet-kaarten voor locatievisualisatie en uitgebreide E2E-testen met Playwright.",
+    "aboutText": "Exulta verhuurt stretchtenten voor evenementen. Dit is de tweede versie van hun website: een Laravel 13 back-end met een React 19 front-end via Inertia, en een Filament 5 adminpaneel dat de klant zelf beheert. Het omvat de volledige publieke site — productcatalogus, realisaties, blog, FAQ en contact — plus de operationele kant: mediabibliotheek, rollen, back-ups, cookie consent en een geautomatiseerde deploypijplijn.",
+    "featuresTitle": "Wat er in zit",
+    "featureCatalog": "Productcatalogus",
+    "featureCatalogText": "Tenten per categorie met detailpagina's, afbeeldingen via Spatie Media Library, en realisaties die echte evenementen tonen.",
+    "featureAdmin": "Zelfstandig beheer",
+    "featureAdminText": "Een Filament 5 paneel met Shield-rollen, quick create, Apex-grafieken, impersonatie en een log viewer, zodat de klant content aanpast zonder mij.",
+    "featureContent": "Content & vertalingen",
+    "featureContentText": "Blog, FAQ, partners, levering en juridische pagina's, allemaal vertaalbaar en in het Nederlands geserveerd.",
+    "featureSeo": "SEO & AI-vindbaarheid",
+    "featureSeoText": "Server-side rendering, een gegenereerde sitemap en robots.txt, gestructureerde SEO-metadata, plus een llms.txt en een AI-productfeed zodat assistenten de catalogus kunnen lezen.",
+    "featurePerf": "Gemeten performance",
+    "featurePerfText": "Response caching en Lighthouse-rapporten per pagina, bewaard in de repo zodat regressies als een diff zichtbaar worden.",
+    "featureOps": "Geautomatiseerde deploys",
+    "featureOpsText": "GitHub Actions draait tests en Pint bij elke push naar release, maakt een databaseback-up, deployt, doet een health check en rolt terug bij falen.",
     "languages": "Talen & Frameworks",
     "tools": "Tools & Services",
-    "viewOther": "Andere projecten bekijken",
-    "screenshotSoon": "[screenshot binnenkort]"
+    "viewOther": "Bekijk andere projecten",
+    "rebrandingBadge": "Rebranding",
+    "notLiveYet": "Nog niet live"
   },
-  "stalManager": {
-    "title": "Stal Manager",
-    "alt": "Stal Manager paardenstal financieel dashboard mockup",
+  "vhs": {
+    "title": "VHS Service",
+    "alt": "VHS Service website voor de aanleg van paardenpistes",
     "overview": "Projectoverzicht",
     "about": "Over",
-    "aboutText": "Een uitgebreid financieel beheerdashboard voor eigenaren van paardenstallen. Houd uitgaven en inkomsten per paard bij, genereer financiële rapporten met interactieve grafieken en beheer de stalfinanciën efficiënt. Gebouwd met Next.js App Router, Auth0-authenticatie, Prisma ORM en shadcn/ui-componenten voor een strakke responsieve ervaring.",
+    "aboutText": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen, samen met de bijhorende nivelleer- en omgevingswerken. Ik bouwde hun site van nul op Next.js 16: een zwart-wit, redactioneel design met WebGL en scroll-gestuurde animatie, in het Nederlands, Frans en Engels, en stevig afgestemd op lokale zoekresultaten.",
+    "featuresTitle": "Wat er in zit",
+    "featureMotion": "Animatie-gedreven design",
+    "featureMotionText": "GSAP en Motion sturen scroll-gekoppelde animatie, met Lenis voor vloeiend scrollen en een OGL WebGL-laag in de hero.",
+    "featureI18n": "Drie talen",
+    "featureI18nText": "Nederlands, Frans en Engels op locale-routes, met taaldetectie, een voorkeur in een cookie en metadata per taal.",
+    "featureServices": "Gestructureerde diensten",
+    "featureServicesText": "Zeven bodemtypes — van eb en vloed bodems tot GEOPAT, geofibres en cofibres — elk met een eigen pagina, plus nivelleer- en omgevingswerken.",
+    "featureSeo": "Lokale SEO",
+    "featureSeoText": "Gegenereerde sitemap en robots, JSON-LD voor de zaak en haar locatie, en canonical-afhandeling zodat enkel de productiehost indexeerbaar is.",
+    "featureForms": "Contact & toestemming",
+    "featureFormsText": "Een offerteformulier via Resend, plus een cookie consent-flow waarbij analytics pas laden na toestemming.",
+    "featureGallery": "Realisatiegalerij",
+    "featureGalleryText": "Een realisatiegalerij met coverflow-showcase, carousel en een lightbox die met het toetsenbord te bedienen is.",
     "languages": "Talen & Frameworks",
     "tools": "Tools & Services",
-    "viewOther": "Andere projecten bekijken",
-    "screenshotSoon": "[screenshot binnenkort]"
+    "viewOther": "Bekijk andere projecten",
+    "rebrandingBadge": "Rebranding",
+    "notLiveYet": "Nog niet live"
   },
   "scan2talk": {
     "title": "Scan2Talk",
+    "alt": "Scan2Talk check-in flow op een telefoon",
+    "liveBadge": "Live",
+    "visitSite": "Open scan2talk.be",
     "overview": "Projectoverzicht",
     "about": "Over",
-    "aboutText": "Een progressive web app voor scholen waarmee leerlingen via QR-codes kunnen inchecken over hun emotioneel welzijn. Leerlingen scannen een code en doorlopen een begeleide wizard — ze beoordelen hun gevoelens op een visuele thermometer, selecteren thema's die hun stemming beïnvloeden en kunnen optioneel hulp van een leerkracht aanvragen. Personeel krijgt een overzichtsdashboard met interactieve grafieken om het welzijn van de klas in de loop van de tijd te volgen.",
+    "aboutText": "Scan2Talk is een welbevinden check-in tool voor scholen, live op scan2talk.be. Leerlingen scannen een geprinte QR-poster in de gang en delen in minder dan een minuut hoe ze zich voelen — zonder account, zonder app. Leerkrachten krijgen een dashboard met trends over tijd en kunnen een privégesprek starten met een leerling die om hulp vraagt.",
+    "flowTitle": "De check-in flow",
+    "flowStep1": "Scan de QR-code",
+    "flowStep1Text": "Zoek een Scan2Talk poster op school en scan hem met je telefoon. De ondertekende link is de enige weg naar de flow.",
+    "flowStep2": "Deel hoe je je voelt",
+    "flowStep2Text": "Schuif de emoji-barometer van 'Slecht' naar 'Super', kies een thema en selecteer de gevoelens die passen. Minder dan een minuut, niets typen.",
+    "flowStep3": "Krijg ondersteuning",
+    "flowStep3Text": "Als je wil, neemt iemand contact op — en de leerling beslist hoe en wanneer.",
+    "featuresTitle": "Wat er in zit",
+    "featureQr": "Ondertekende QR-posters",
+    "featureQrText": "Fysieke posters bevatten een ondertekende URL die nooit vervalt. De check-in flow is onbereikbaar zonder scan, dus links kunnen niet gedeeld of geraden worden.",
+    "featureChat": "Live chat met leerkracht",
+    "featureChatText": "Anonieme chatsessies op token, met wachtrij, join- en afsluitacties, presence-pings en rate limiting.",
+    "featureDashboard": "Trends dashboard",
+    "featureDashboardText": "Overzicht, check-ins, leerlingen en statistieken met Chart.js-grafieken van het klaswelbevinden over tijd.",
+    "featureRoles": "Rollen en 2FA",
+    "featureRolesText": "Leerkracht- en adminrollen via Spatie Permissions, tweestapsverificatie, uitnodigingen, masquerade en een opgeschoonde activiteitenlog.",
+    "featurePwa": "Installeerbare PWA",
+    "featurePwaText": "Installeert op het startscherm en is mobile-first gebouwd — ingelogde medewerkers op gsm gaan meteen naar hun dashboard.",
+    "featurePrivacy": "Privacy by design",
+    "featurePrivacyText": "Geen leerlingaccounts, een aparte privacypagina, en de dashboard- en check-in routes uitgesloten van zoekmachines.",
     "languages": "Talen & Frameworks",
     "tools": "Tools & Services",
-    "viewOther": "Andere projecten bekijken",
-    "screenshotSoon": "[screenshot binnenkort]"
+    "viewOther": "Bekijk andere projecten"
   },
   "error": {
     "defaultTitle": "Er is iets fout gegaan",
@@ -87,10 +151,10 @@
     "welcome": "Hey! Ik ben Robbe's virtuele assistent. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
     "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
     "skills": "Robbe is een full-stack web developer die werkt met: Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, TailwindCSS, Node.js en meer. Hij heeft ook ervaring met Adobe XD, After Effects en LottieFiles voor design & prototyping. Zijn huidige focus is Drupal backend ontwikkeling bij Dynamate.",
-    "projects": "Robbe heeft 3 projecten gebouwd:\n\n• Exulta — stretch tent verhuur website (Laravel + React + Inertia.js + Filament) → release.exulta.be\n• Stal Manager — financieel dashboard voor paardenstallen (Next.js + TypeScript + Prisma + PostgreSQL)\n• Scan2Talk — QR-gebaseerde leerling welzijn check-in (Laravel + Vue.js + PWA)\n\nBekijk ze op de Projecten pagina!",
-    "project-exulta": "Exulta is een moderne stretch tent verhuur website op release.exulta.be. Gebouwd met Laravel 11 + React + Inertia.js, met een productcatalogus, contactsysteem en een Filament admin paneel. Inclusief Leaflet kaarten, geautomatiseerde CI/CD via GitHub Actions, Playwright E2E tests en Lighthouse audits. Uitgerold met automatische database backups en rollback bij fouten.",
-    "project-stalmanager": "Stal Manager is een financieel dashboard voor paardenstallen. Gebouwd met Next.js 16 (App Router) + React 19 + TypeScript + Prisma 7 + PostgreSQL. Features: kosten/inkomsten tracking per paard, interactieve Recharts grafieken, CRUD beheer, inventaris, Auth0 authenticatie, shadcn/ui componenten en Supabase Storage voor uploads. Gedeployed op Vercel.",
+    "projects": "Robbe heeft 3 projecten gebouwd:\n\n• Exulta — stretchtent verhuur website, momenteel in rebranding (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-gebaseerde leerling welzijn check-in, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nBekijk ze op de Projecten pagina!",
+    "project-exulta": "Exulta is de tweede versie van de Exulta stretchtent verhuur website, momenteel in rebranding en nog niet publiek. Gebouwd met Laravel 13 en React 19 via Inertia, met een Filament 5 adminpaneel, een productcatalogus, realisaties, blog en FAQ. Geautomatiseerde CI/CD via GitHub Actions met databaseback-ups en rollback bij fouten, plus Playwright- en Lighthouse-checks.",
     "project-scan2talk": "Scan2Talk is een PWA voor scholen — leerlingen scannen een QR-code en doorlopen een begeleide emotionele welzijn check-in wizard (thermometer → thema's → gevoelens → hulpvraag). Leerkrachten krijgen een dashboard met Chart.js visualisaties. Gebouwd met Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Draait lokaal via DDEV.",
+    "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun site op Next.js 16 en React 19: een zwart-wit redactioneel design met GSAP scroll-animatie, een WebGL hero en Lenis smooth scrolling, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. Momenteel in rebranding en nog niet publiek.",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens@telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens) en Facebook. De portfolio staat op robbe-saelens.netlify.app.",
     "experience": "Robbe werkt momenteel bij Dynamate als Drupal backend developer. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP & Magento developer — begonnen als stagiair en daarna voltijds aangenomen. Sinds 2017 werkt hij ook als instructeur paardensport bij Sport Vlaanderen in Woumen. Zijn carrière combineert technische ontwikkeling met de mensenkennis uit het lesgeven.",
     "education": "Robbe heeft een Bachelor diploma in Multimedia & Communicatietechnologieën (Next Web Developer traject) van Howest. Daarvoor behaalde hij een graduaatsdiploma in Multimedia & Informatietechnologieën (2018), waar hij de basisprincipes van programmeren en webontwikkeling leerde. Hij is gevestigd in Geluwe, België.",
@@ -99,7 +163,7 @@
     "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur paardensport bij Sport Vlaanderen Woumen. Hij vindt het leuk om mensen iets bij te brengen en met paarden te werken — hier ontwikkelde hij zijn sociale vaardigheden naast zijn technische carrière.",
     "thanks": "Graag gedaan! Laat maar weten als je nog vragen hebt.",
     "bye": "Doei! Je mag altijd contact opnemen. Nog een fijne dag!",
-    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Stal Manager, Scan2Talk. Typ gewoon wat je wil weten!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, VHS Service. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Probeer eens te vragen naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen hersteld naar standaard.\n\nTyp 'help' als je hulp nodig hebt.",
     "quickReplies": [
@@ -125,7 +189,8 @@
     "switchToEnglish": "Schakel naar Engels",
     "toggleThemeLight": "Schakel naar lichte modus",
     "toggleThemeDark": "Schakel naar donkere modus",
-    "toggleNav": "Navigatiemenu openen"
+    "toggleNav": "Navigatiemenu openen",
+    "skipToContent": "Ga naar hoofdinhoud"
   },
   "easter": {
     "title": "DEVELOPER MODE",

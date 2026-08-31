@@ -127,8 +127,8 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
   },
   // Specific project names → dedicated responses
   { keys: ['exulta'], responseKey: 'chat.project-exulta' },
-  { keys: ['stal manager', 'stalmanager'], responseKey: 'chat.project-stalmanager' },
   { keys: ['scan2talk', 'scan', 'qr'], responseKey: 'chat.project-scan2talk' },
+  { keys: ['vhs', 'vhs service', 'paardenpistes', 'manegebodems'], responseKey: 'chat.project-vhs' },
   // General projects
   {
     keys: ['project', 'projects', 'projecten', 'built', 'made', 'gemaakt', 'portfolio'],

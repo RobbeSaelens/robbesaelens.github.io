@@ -160,7 +160,7 @@
               >$ file ./robbe.jpg</span
             >
             <span class="mt-0.5 block font-mono text-[0.65rem] text-teal-500 dark:text-teal-300"
-              >→ full-stack developer detected</span
+              >→ {{ $t('home.photoTooltip') }}</span
             >
           </div>
 

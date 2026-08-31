@@ -5,27 +5,16 @@
       <header class="text-center">
         <h1 class="terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl">
           <span class="terminal-prompt">&gt;</span>
-          <span class="terminal-text">{{ $t('scan2talk.title') }}</span>
+          <span class="terminal-text">{{ $t('vhs.title') }}</span>
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
         <p class="terminal-subtitle mt-3 text-sm tracking-wide md:text-base">
-          <span class="opacity-50">$</span> cat ./scan2talk-project.md
+          <span class="opacity-50">$</span> cat ./vhs-project.md
         </p>
 
         <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
-          <span class="live-badge">
-            <span class="live-dot" aria-hidden="true"></span>
-            {{ $t('scan2talk.liveBadge') }}
-          </span>
-          <a
-            class="live-link"
-            href="https://scan2talk.be"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {{ $t('scan2talk.visitSite') }}
-            <ExternalLink class="h-3.5 w-3.5" />
-          </a>
+          <span class="status-badge">{{ $t('vhs.rebrandingBadge') }}</span>
+          <span class="status-note">{{ $t('vhs.notLiveYet') }}</span>
         </div>
 
         <div class="mt-5 flex flex-wrap justify-center gap-2">
@@ -33,7 +22,7 @@
         </div>
       </header>
 
-      <!-- Real screenshots of the live site at scan2talk.be -->
+      <!-- Real screenshots of the running site -->
       <div class="shots">
         <button
           type="button"
@@ -44,11 +33,11 @@
             <span class="shot-dot"></span>
             <span class="shot-dot"></span>
             <span class="shot-dot"></span>
-            <span class="shot-url">scan2talk.be</span>
+            <span class="shot-url">VHS Service</span>
           </span>
           <img
-            src="/scan2talk-home.jpg"
-            :alt="$t('scan2talk.alt')"
+            src="/vhs-home.jpg"
+            :alt="$t('vhs.alt')"
             width="1600"
             height="1000"
             loading="lazy"
@@ -62,9 +51,9 @@
           @click="lightboxIndex = 1">
           <span class="shot-notch" aria-hidden="true"></span>
           <img
-            src="/scan2talk-mobile.jpg"
-            :alt="$t('scan2talk.alt')"
-            width="369"
+            src="/vhs-mobile.jpg"
+            :alt="$t('vhs.alt')"
+            width="400"
             height="800"
             loading="lazy"
           />
@@ -73,29 +62,16 @@
 
       <div class="mx-5 pt-4 md:mx-10">
         <!-- Overview -->
-        <h2 class="section-heading">{{ $t('scan2talk.overview') }}</h2>
+        <h2 class="section-heading">{{ $t('vhs.overview') }}</h2>
         <div class="overview-card mb-14 px-6 py-8 md:px-8">
-          <h3 class="overview-label">{{ $t('scan2talk.about') }}</h3>
+          <h3 class="overview-label">{{ $t('vhs.about') }}</h3>
           <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
-            {{ $t('scan2talk.aboutText') }}
+            {{ $t('vhs.aboutText') }}
           </p>
         </div>
 
-        <!-- Flow -->
-        <h2 class="section-heading">{{ $t('scan2talk.flowTitle') }}</h2>
-        <ol class="flow-list mb-14">
-          <li v-for="(s, i) in flowSteps" :key="s.title" class="flow-item reveal">
-            <span class="flow-index">{{ String(i + 1).padStart(2, '0') }}</span>
-            <div>
-              <h3 class="flow-title">{{ s.title }}</h3>
-              <p class="flow-text">{{ s.text }}</p>
-            </div>
-          </li>
-        </ol>
-
-
         <!-- Features -->
-        <h2 class="section-heading">{{ $t('scan2talk.featuresTitle') }}</h2>
+        <h2 class="section-heading">{{ $t('vhs.featuresTitle') }}</h2>
         <div class="feature-grid mb-14">
           <article v-for="f in features" :key="f.title" class="feature-card reveal">
             <component :is="f.icon" class="feature-icon" />
@@ -104,16 +80,18 @@
           </article>
         </div>
 
+
+
         <!-- Stack -->
         <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div class="overview-card px-6 py-8">
-            <h3 class="overview-label">{{ $t('scan2talk.languages') }}</h3>
+            <h3 class="overview-label">{{ $t('vhs.languages') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackLanguages" :key="t" class="tag-pill">{{ t }}</span>
             </div>
           </div>
           <div class="overview-card px-6 py-8">
-            <h3 class="overview-label">{{ $t('scan2talk.tools') }}</h3>
+            <h3 class="overview-label">{{ $t('vhs.tools') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackTools" :key="t" class="tag-pill">{{ t }}</span>
             </div>
@@ -126,7 +104,7 @@
             <span
               class="font-medium transition-colors"
               style="color: var(--color-accent); font-family: var(--font-mono)"
-              >{{ $t('scan2talk.viewOther') }}</span
+              >{{ $t('vhs.viewOther') }}</span
             >
             <ArrowRight
               class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
@@ -146,43 +124,33 @@ import { defineComponent, markRaw } from 'vue'
 import ImageLightbox from '../../components/ImageLightbox.vue'
 import {
   ArrowRight,
-  ExternalLink,
-  QrCode,
-  MessageSquare,
-  BarChart3,
-  ShieldCheck,
-  Smartphone,
-  Lock,
+  Wand,
+  Languages,
+  Layers,
+  Search,
+  Mail,
+  Image,
 } from 'lucide-vue-next'
 
 export default defineComponent({
-  components: { ArrowRight, ExternalLink, ImageLightbox },
+  components: { ArrowRight, ImageLightbox },
 
   data() {
     return {
       lightboxIndex: null as number | null,
       observer: null as IntersectionObserver | null,
       revealFallback: 0 as unknown as ReturnType<typeof setTimeout>,
-      heroTags: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PostgreSQL', 'Chart.js'],
-      stackLanguages: [
-        'PHP 8.3',
-        'Laravel 13',
-        'Vue.js 3',
-        'Inertia.js 2',
-        'PostgreSQL',
-        'Tailwind CSS 3',
-        'Chart.js',
-      ],
+      heroTags: ['Next.js 16', 'React 19', 'TypeScript', 'GSAP', 'WebGL', 'i18n'],
+      stackLanguages: ['TypeScript', 'Next.js 16', 'React 19', 'CSS', 'GSAP', 'Motion', 'OGL (WebGL)'],
       stackTools: [
-        'Laravel Cloud',
-        'Vite 8',
-        'Laravel Breeze',
-        'Spatie Permissions',
-        'Google2FA',
-        'Simple QR Code',
-        'Ziggy',
-        'Larastan',
-        'Pint',
+        'Vercel',
+        'Turbopack',
+        'Lenis',
+        'Resend',
+        'Vercel Analytics',
+        'Speed Insights',
+        'Playwright',
+        'ESLint',
       ],
     }
   },
@@ -190,30 +158,24 @@ export default defineComponent({
   computed: {
     shotList(): { src: string; alt: string; caption: string }[] {
       return [
-        { src: '/scan2talk-home.jpg', alt: this.$t('scan2talk.alt') as string, caption: 'scan2talk.be' },
-        { src: '/scan2talk-mobile.jpg', alt: this.$t('scan2talk.alt') as string, caption: 'scan2talk.be — mobile' },
+        { src: '/vhs-home.jpg', alt: this.$t('vhs.alt') as string, caption: 'VHS Service — desktop' },
+        { src: '/vhs-mobile.jpg', alt: this.$t('vhs.alt') as string, caption: 'VHS Service — mobile' },
       ]
     },
 
-    flowSteps(): { title: string; text: string }[] {
-      return [1, 2, 3].map((n) => ({
-        title: this.$t(`scan2talk.flowStep${n}`) as string,
-        text: this.$t(`scan2talk.flowStep${n}Text`) as string,
-      }))
-    },
     features(): { icon: unknown; title: string; text: string }[] {
       const map = [
-        ['Qr', QrCode],
-        ['Chat', MessageSquare],
-        ['Dashboard', BarChart3],
-        ['Roles', ShieldCheck],
-        ['Pwa', Smartphone],
-        ['Privacy', Lock],
+        ['Motion', Wand],
+        ['I18n', Languages],
+        ['Services', Layers],
+        ['Seo', Search],
+        ['Forms', Mail],
+        ['Gallery', Image],
       ] as const
       return map.map(([key, icon]) => ({
         icon: markRaw(icon),
-        title: this.$t(`scan2talk.feature${key}`) as string,
-        text: this.$t(`scan2talk.feature${key}Text`) as string,
+        title: this.$t(`vhs.feature${key}`) as string,
+        text: this.$t(`vhs.feature${key}Text`) as string,
       }))
     },
   },
@@ -313,11 +275,10 @@ export default defineComponent({
   overflow-x: auto;
 }
 
-/* Live badge + link */
-.live-badge {
+/* Status badge */
+.status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
   padding: 0.25rem 0.7rem;
   border-radius: 9999px;
   font-family: var(--font-mono);
@@ -329,44 +290,10 @@ export default defineComponent({
   background: var(--color-accent-soft);
   border: 1px solid var(--color-border-glow);
 }
-.live-dot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 9999px;
-  background: var(--color-accent);
-  animation: pulse-dot 1.8s ease-in-out infinite;
-}
-@keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.35;
-    transform: scale(0.75);
-  }
-}
-.live-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+.status-note {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-accent);
-  border: 1px solid var(--color-border);
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    transform 0.2s ease;
-}
-.live-link:hover {
-  border-color: var(--color-border-glow);
-  background: var(--color-surface-hover);
-  transform: translateY(-1px);
+  color: var(--color-text-muted);
 }
 
 /* =============================================
@@ -567,53 +494,6 @@ button.shot-phone {
   margin-bottom: 0.875rem;
 }
 
-/* Flow */
-.flow-list {
-  display: grid;
-  gap: 1rem;
-  padding: 0;
-  list-style: none;
-}
-@media (min-width: 900px) {
-  .flow-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-.flow-item {
-  display: flex;
-  gap: 0.85rem;
-  padding: 1.25rem;
-  border-radius: 1rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  transition:
-    transform 0.5s ease,
-    opacity 0.5s ease,
-    border-color 0.3s ease;
-}
-.flow-item:hover {
-  border-color: var(--color-border-glow);
-}
-.flow-index {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-accent);
-  opacity: 0.65;
-}
-.flow-title {
-  font-family: var(--font-mono);
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  margin-bottom: 0.3rem;
-}
-.flow-text {
-  font-size: 0.875rem;
-  line-height: 1.55;
-  color: var(--color-text-secondary);
-}
-
 /* Features */
 .feature-grid {
   display: grid;
@@ -679,8 +559,7 @@ button.shot-phone {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .terminal-cursor,
-  .live-dot {
+  .terminal-cursor {
     animation: none;
   }
   .reveal,

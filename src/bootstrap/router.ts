@@ -34,8 +34,8 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Projects',
           description:
-            'Projects by Robbe Saelens: Exulta, a stretch tent rental website; Stal Manager, a horse stable finance dashboard; and Scan2Talk, a student wellbeing PWA.',
-          image: '/ExultaTeaser.png',
+            'Projects by Robbe Saelens: Exulta stretch tent rental, Scan2Talk student wellbeing check-in and VHS Service arena construction. Laravel, React, Vue, Next.js.',
+          image: '/exulta-home.jpg',
         },
       },
       {
@@ -45,19 +45,19 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Exulta - Stretch tent rental website',
           description:
-            'Stretch tent rental site by Robbe Saelens: product catalog, Filament admin panel, Leaflet maps, Playwright E2E tests. Laravel, React, Inertia.js.',
-          image: '/ExultaTeaser.png',
+            'Exulta v2 by Robbe Saelens: stretch tent rental site with catalog, realisations and blog, on Laravel 13 + React 19 via Inertia, with a Filament 5 admin panel.',
+          image: '/exulta-home.jpg',
         },
       },
       {
-        path: 'stalmanagerdetail',
-        name: 'StalManagerDetail',
-        component: () => import('../screens/details/StalManager.vue'),
+        path: 'vhsdetail',
+        name: 'VHSDetail',
+        component: () => import('../screens/details/VHS.vue'),
         meta: {
-          title: 'Stal Manager - Stable finance dashboard',
+          title: 'VHS Service - Equestrian arena website',
           description:
-            'Horse stable finance dashboard by Robbe Saelens: per-horse income, expenses and interactive reports. Next.js App Router, TypeScript, Prisma, Auth0.',
-          image: '/stalDashboard.png',
+            'VHS Service by Robbe Saelens: trilingual Next.js 16 site for a riding-arena builder in Geluwe, with GSAP motion, a WebGL hero and local SEO. In rebranding.',
+          image: '/vhs-home.jpg',
         },
       },
       {
@@ -67,8 +67,8 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Scan2Talk - Student wellbeing check-in PWA',
           description:
-            'PWA by Robbe Saelens where students check in on their wellbeing via QR codes, plus a staff dashboard of class trends. Laravel, Vue.js, Inertia.js.',
-          image: '/Fav.png',
+            'Scan2Talk by Robbe Saelens, live at scan2talk.be: students scan a QR poster to share how they feel; educators get trends and an anonymous chat.',
+          image: '/scan2talk-home.jpg',
         },
       },
     ],
