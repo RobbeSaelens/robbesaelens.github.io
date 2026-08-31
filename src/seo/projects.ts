@@ -15,27 +15,27 @@ export const PROJECTS: SeoProject[] = [
     name: 'Exulta',
     headline: 'Stretch tent rental website',
     description:
-      'A stretch tent rental website with a product catalog of tent specifications, a Filament admin panel, interactive Leaflet maps and Playwright end-to-end tests. Built with Laravel, React and Inertia.js.',
-    tech: ['Laravel', 'React', 'Inertia.js', 'Filament', 'PHP', 'Playwright', 'Leaflet'],
-    image: '/ExultaTeaser.png',
+      'The second version of the Exulta stretch tent rental website, currently in rebranding: a product catalog, realisations, blog and FAQ on a Laravel 13 back end with a React 19 front end over Inertia, plus a Filament 5 admin panel the client runs themselves.',
+    tech: ['Laravel', 'React', 'Inertia.js', 'Filament', 'PHP', 'Tailwind CSS', 'MySQL'],
+    image: '/exulta-home.jpg',
   },
   {
-    path: '/stalmanagerdetail',
-    name: 'Stal Manager',
-    headline: 'Horse stable financial dashboard',
+    path: '/vhsdetail',
+    name: 'VHS Service',
+    headline: 'Website for an equestrian arena builder',
     description:
-      'A financial management dashboard for horse stable owners: income and expenses per horse, plus interactive financial reports. Built with the Next.js App Router, TypeScript, Prisma, Auth0 and shadcn/ui.',
-    tech: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL', 'React', 'Auth0', 'shadcn/ui'],
-    image: '/stalDashboard.png',
+      'A trilingual marketing site for VHS Service, who build and renovate riding arenas in Geluwe, Belgium. The site is in rebranding and not public yet. Built with Next.js 16 and React 19, with GSAP and Motion for scroll-driven animation, an OGL WebGL hero, Resend-backed quote forms and local SEO.',
+    tech: ['Next.js', 'React', 'TypeScript', 'GSAP', 'WebGL', 'Vercel'],
+    image: '/vhs-home.jpg',
   },
   {
     path: '/scan2talkdetail',
     name: 'Scan2Talk',
     headline: 'QR-code student wellbeing check-in',
     description:
-      'A progressive web app for schools where students check in on their emotional wellbeing by scanning a QR code, rating their feelings and optionally requesting help, with a staff dashboard of class wellbeing trends. Built with Laravel, Vue.js and Inertia.js.',
-    tech: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PHP'],
-    image: '/Fav.png',
+      'A wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster and share how they feel in under a minute; educators get trends over time and an anonymous chat with students who ask for help. Built with Laravel, Vue.js and Inertia.js.',
+    tech: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PHP', 'PostgreSQL', 'Chart.js'],
+    image: '/scan2talk-home.jpg',
   },
 ]
 

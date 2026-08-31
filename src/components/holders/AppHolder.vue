@@ -1,5 +1,5 @@
 <template>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <a href="#main-content" class="skip-link">{{ $t('aria.skipToContent') }}</a>
   <div class="flex min-h-screen flex-col">
     <AppHeader />
     <main id="main-content" tabindex="-1" class="flex flex-1 flex-col min-h-0">

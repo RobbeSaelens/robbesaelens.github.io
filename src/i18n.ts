@@ -35,6 +35,13 @@ const i18n = createI18n<[MessageSchema], SupportedLocale>({
 
 const composer = i18n.global as unknown as Composer
 
+// setLocale() keeps <html lang> in sync on every switch, but the *initial*
+// locale can also come from storage or the browser, so sync it once on load.
+// Without this the document claims lang="en" while showing Dutch content.
+if (typeof document !== 'undefined') {
+  document.documentElement.setAttribute('lang', composer.locale.value as string)
+}
+
 export function getLocale(): SupportedLocale {
   return composer.locale.value as SupportedLocale
 }
