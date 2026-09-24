@@ -17,7 +17,7 @@ if (!existsSync(ssrEntry)) {
   process.exit(1)
 }
 
-const { render, prerenderRoutes } = await import(ssrEntry)
+const { render, prerenderRoutes, noAnalyticsRoutes = [] } = await import(ssrEntry)
 
 const template = readFileSync(join(distDir, 'index.html'), 'utf-8')
 
@@ -41,6 +41,24 @@ function injectApp(html, appHtml, bodyTags) {
   return out
 }
 
+// Removes the Google tag (and its preconnect) from pages that must not load third-party
+// scripts, e.g. /status, which keeps a session token in sessionStorage. Fails the build
+// if anything analytics-related survives, so a template change can never silently
+// re-expose the token.
+function stripAnalytics(html, route) {
+  const out = html
+    .replace(/\s*<link rel="preconnect" href="https:\/\/www\.googletagmanager\.com"[^>]*>/g, '')
+    .replace(
+      /\s*<!-- Google tag \(gtag\.js\) -->\s*<script[^>]*googletagmanager[^>]*><\/script>\s*<script>[\s\S]*?<\/script>/g,
+      '',
+    )
+  if (/googletagmanager|gtag\(/.test(out)) {
+    console.error(`[prerender] could not strip analytics from ${route}; refusing to build`)
+    process.exit(1)
+  }
+  return out
+}
+
 const written = []
 
 for (const route of prerenderRoutes) {
@@ -52,7 +70,8 @@ for (const route of prerenderRoutes) {
     process.exit(1)
   }
 
-  const html = injectApp(injectHead(baseTemplate, rendered.head), rendered.html, rendered.bodyTags)
+  let html = injectApp(injectHead(baseTemplate, rendered.head), rendered.html, rendered.bodyTags)
+  if (noAnalyticsRoutes.includes(route)) html = stripAnalytics(html, route)
 
   if (route === '/') {
     writeFileSync(join(distDir, 'index.html'), html)

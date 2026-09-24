@@ -204,5 +204,139 @@
     "fact5": "Stack Overflow werd opgericht in 2008. Sindsdien copy-pasten developers erop los.",
     "close": "dev mode afsluiten",
     "hint": "Tip: vraag me naar 'sudo' of 'geheim' om opnieuw te beginnen"
+  },
+  "status": {
+    "title": "Status",
+    "booting": "Dashboard wordt geladen… (JavaScript vereist)",
+    "notConfigured": {
+      "title": "Niet geconfigureerd",
+      "text": "Voor deze build van de site is geen status-API ingesteld, dus er valt hier niets te tonen.",
+      "hint": "Stel VITE_STATUS_API_URL in bij het builden om het dashboard te activeren."
+    },
+    "login": {
+      "title": "Aanmelden vereist",
+      "intro": "Dit dashboard is privé. Voer de wachtzin in om verder te gaan.",
+      "label": "Wachtzin",
+      "submit": "Ontgrendelen",
+      "submitting": "Controleren…",
+      "empty": "Voer de wachtzin in.",
+      "wrongPassphrase": "Verkeerde wachtzin. Probeer het opnieuw.",
+      "tooManyAttempts": "Te veel mislukte pogingen. Probeer het opnieuw over {time} (om {clock}).",
+      "unlocked": "Je kunt het nu opnieuw proberen.",
+      "badRequest": "De statusdienst heeft het verzoek geweigerd. Probeer het opnieuw.",
+      "sessionExpired": "Je sessie is verlopen. Meld je opnieuw aan.",
+      "loggedOut": "Je bent afgemeld."
+    },
+    "failure": {
+      "network": "De statusdienst is niet bereikbaar (netwerk- of CORS-fout).",
+      "http": "De statusdienst gaf een fout terug (HTTP {status}).",
+      "invalidResponse": "De statusdienst stuurde een onverwacht antwoord."
+    },
+    "dashboard": {
+      "title": "Projecten",
+      "lastUpdated": "Laatst bijgewerkt",
+      "never": "nog niet",
+      "autoRefresh": "wordt elke {seconds} s vernieuwd",
+      "refresh": "Vernieuwen",
+      "refreshing": "Bezig met vernieuwen…",
+      "logout": "Afmelden",
+      "loading": "Status wordt geladen…",
+      "loaded": "Status geladen: geen projecten. | Status geladen: {n} project. | Status geladen: {n} projecten.",
+      "updated": "Status bijgewerkt om {time}.",
+      "refreshFailed": "Vernieuwen mislukt. {reason} De gegevens van {time} worden getoond.",
+      "loadFailed": "De status kon niet geladen worden. {reason}",
+      "noProjects": "Er zijn geen projecten ingesteld in de statusworker.",
+      "overview": "Overzicht"
+    },
+    "overall": {
+      "ok": "Operationeel",
+      "degraded": "Verstoord",
+      "down": "Onbereikbaar",
+      "unknown": "Onbekend"
+    },
+    "card": {
+      "overall": "Algemene status",
+      "newTab": "opent in een nieuw tabblad",
+      "problems": "Waarschuwingen",
+      "warning": "Waarschuwing",
+      "notConfigured": "Niet geconfigureerd.",
+      "unavailable": "Momenteel niet beschikbaar, zie de waarschuwingen hierboven.",
+      "attention": "vraagt aandacht"
+    },
+    "live": {
+      "title": "Livecontrole",
+      "status": "Status",
+      "http": "HTTP-status",
+      "responseTime": "Responstijd",
+      "checkedAt": "Gecontroleerd",
+      "checks": "Controles",
+      "noChecks": "Geen details over de controles ontvangen.",
+      "reasons": "Redenen",
+      "pass": "in orde",
+      "fail": "mislukt",
+      "statusValue": {
+        "ok": "OK",
+        "degraded": "Verstoord",
+        "down": "Onbereikbaar",
+        "unknown": "Onbekend"
+      },
+      "checkNames": {
+        "database": "Database",
+        "queue": "Wachtrij",
+        "scheduler": "Planner"
+      }
+    },
+    "reasons": {
+      "database_unreachable": "Database onbereikbaar",
+      "queue_stuck": "Wachtrij vastgelopen: taken wachten te lang",
+      "scheduler_stale": "Planner inactief: geen recente hartslag"
+    },
+    "uptime": {
+      "title": "Uptime",
+      "monitor": "Monitor",
+      "last24h": "Laatste 24 u",
+      "last7d": "Laatste 7 dagen",
+      "last30d": "Laatste 30 dagen",
+      "avgResponse": "Gem. responstijd",
+      "statusValue": {
+        "up": "Online",
+        "down": "Offline",
+        "paused": "Gepauzeerd",
+        "unknown": "Onbekend"
+      }
+    },
+    "errors": {
+      "title": "Fouten",
+      "unresolved": "Onopgeloste issues",
+      "new24h": "Nieuw in de laatste 24 u",
+      "topIssues": "Belangrijkste issues",
+      "none": "Geen onopgeloste issues.",
+      "events": "{n} gebeurtenis | {n} gebeurtenissen",
+      "users": "{n} gebruiker | {n} gebruikers",
+      "lastSeen": "laatst gezien {time}"
+    },
+    "stats": {
+      "title": "Check-ins",
+      "today": "Check-ins vandaag",
+      "yesterday": "Gisteren",
+      "last7Days": "Laatste 7 dagen",
+      "byColor": "Vandaag per kleur",
+      "colors": {
+        "green": "Groen",
+        "yellow": "Geel",
+        "orange": "Oranje",
+        "red": "Rood"
+      },
+      "urgentToday": "Dringend vandaag",
+      "open": "Open (niet afgehandeld)",
+      "queuePending": "Wachtrij: wachtende taken",
+      "oldestPending": "Wachtrij: oudste wachtende",
+      "failed24h": "Wachtrij: mislukt (24 u)",
+      "schedulerLastRun": "Planner: laatste run",
+      "schedulerNever": "nooit",
+      "minutes": "{n} min",
+      "minutesAgo": "{n} min geleden",
+      "timezone": "Dagen zijn kalenderdagen in {tz}."
+    }
   }
 }

@@ -134,8 +134,22 @@ function projectListNode(site: string) {
   }
 }
 
-/** Full @graph for a route, ready to be JSON.stringify'd into a script tag. */
+/**
+ * Private, noindex pages that must never describe themselves in structured
+ * data (no Person, WebPage, breadcrumb or project claims). App.vue already
+ * skips JSON-LD for every noindex route; this is the second line of defence in
+ * case that meta flag is ever dropped.
+ */
+const NO_JSONLD_PATHS = new Set(['/status'])
+
+/**
+ * Full @graph for a route, ready to be JSON.stringify'd into a script tag, or
+ * null for a route that must not carry structured data.
+ */
 export function routeJsonLd(path: string, title: string, description: string, site: string) {
+  const normalizedPath = path.replace(/\/+$/, '') || '/'
+  if (NO_JSONLD_PATHS.has(normalizedPath)) return null
+
   const graph: unknown[] = [personNode(site), websiteNode(site)]
 
   graph.push(pageNode(site, path, title, description))
