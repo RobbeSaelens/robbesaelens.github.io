@@ -135,17 +135,42 @@
             {{ t('status.dashboard.noProjects') }}
           </p>
 
+          <div v-if="projectViews.length > 1" class="list-controls">
+            <button type="button" class="btn btn--ghost btn--sm" @click="toggleAll">
+              <component
+                :is="anyExpanded ? ChevronsDownUp : ChevronsUpDown"
+                class="btn-icon"
+                aria-hidden="true"
+              />
+              {{ anyExpanded ? t('status.card.collapseAll') : t('status.card.expandAll') }}
+            </button>
+          </div>
+
           <div v-if="summary" class="project-list" :aria-busy="loading ? 'true' : 'false'">
             <article
               v-for="p in projectViews"
               :key="p.domId"
               class="project-card"
-              :class="`project-card--${p.overall}`"
+              :class="[`project-card--${p.overall}`, { 'project-card--collapsed': p.collapsed }]"
               :aria-labelledby="`${p.domId}-title`"
             >
               <header class="project-header">
                 <div class="project-heading">
-                  <h3 :id="`${p.domId}-title`" class="project-name">{{ p.name }}</h3>
+                  <h3 :id="`${p.domId}-title`" class="project-name">
+                    <button
+                      type="button"
+                      class="project-toggle"
+                      :aria-expanded="p.collapsed ? 'false' : 'true'"
+                      :aria-controls="`${p.domId}-body`"
+                      @click="toggleProject(p.id)"
+                    >
+                      <ChevronDown class="toggle-icon" aria-hidden="true" />
+                      {{ p.name }}
+                      <span class="sr-only">
+                        ({{ p.collapsed ? t('status.card.expand') : t('status.card.collapse') }})
+                      </span>
+                    </button>
+                  </h3>
                   <a
                     v-if="p.url"
                     :href="p.url"
@@ -165,366 +190,393 @@
                 </p>
               </header>
 
-              <ul v-if="p.problems.length" class="problems" :aria-label="t('status.card.problems')">
-                <li v-for="(problem, index) in p.problems" :key="index" class="problem">
-                  <AlertTriangle class="problem-icon" aria-hidden="true" />
-                  <span
-                    ><span class="sr-only">{{ t('status.card.warning') }}:</span>
-                    {{ problem }}</span
-                  >
-                </li>
-              </ul>
+              <p v-if="p.collapsed" class="collapsed-summary">
+                <template v-if="p.stats">
+                  {{ t('status.stats.today') }}:
+                  <strong>{{ formatNumber(p.stats.checkins.today) }}</strong>
+                  <span aria-hidden="true"> · </span>
+                </template>
+                <span :class="{ 'collapsed-warnings': p.problems.length }">
+                  {{ t('status.card.warningCount', p.problems.length) }}
+                </span>
+              </p>
 
-              <div class="sections">
-                <!-- Check-ins (aggregate counts only) -->
-                <section
-                  v-if="p.stats"
-                  class="section section--wide"
-                  :aria-labelledby="`${p.domId}-stats`"
+              <div v-show="!p.collapsed" :id="`${p.domId}-body`" class="project-body">
+                <ul
+                  v-if="p.problems.length"
+                  class="problems"
+                  :aria-label="t('status.card.problems')"
                 >
-                  <h4 :id="`${p.domId}-stats`" class="section-title">
-                    <span class="hash" aria-hidden="true">#</span> {{ t('status.stats.title') }}
-                  </h4>
-
-                  <div class="stats-hero">
-                    <div>
-                      <p class="hero-label">{{ t('status.stats.today') }}</p>
-                      <p class="hero-value">{{ formatNumber(p.stats.checkins.today) }}</p>
-                    </div>
-                    <div class="hero-colors">
-                      <p :id="`${p.domId}-colors`" class="hero-label">
-                        {{ t('status.stats.byColor') }}
-                      </p>
-                      <ul class="chips" :aria-labelledby="`${p.domId}-colors`">
-                        <li
-                          v-for="color in CHECKIN_COLORS"
-                          :key="color"
-                          class="chip"
-                          :class="`chip--${color}`"
-                        >
-                          <span
-                            class="chip-dot"
-                            :class="`chip-dot--${color}`"
-                            aria-hidden="true"
-                          ></span>
-                          {{ t(`status.stats.colors.${color}`) }}
-                          <strong>{{
-                            formatNumber(p.stats.checkins.today_by_color[color])
-                          }}</strong>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <dl class="metrics">
-                    <div class="metric">
-                      <dt>{{ t('status.stats.yesterday') }}</dt>
-                      <dd>{{ formatNumber(p.stats.checkins.yesterday) }}</dd>
-                    </div>
-                    <div class="metric">
-                      <dt>{{ t('status.stats.last7Days') }}</dt>
-                      <dd>{{ formatNumber(p.stats.checkins.last_7_days) }}</dd>
-                    </div>
-                    <div
-                      class="metric"
-                      :class="{
-                        'metric--danger':
-                          p.stats.checkins.urgent_today !== null &&
-                          p.stats.checkins.urgent_today > 0,
-                      }"
+                  <li v-for="(problem, index) in p.problems" :key="index" class="problem">
+                    <AlertTriangle class="problem-icon" aria-hidden="true" />
+                    <span
+                      ><span class="sr-only">{{ t('status.card.warning') }}:</span>
+                      {{ problem }}</span
                     >
-                      <dt>{{ t('status.stats.urgentToday') }}</dt>
-                      <dd>
-                        <AlertTriangle
+                  </li>
+                </ul>
+
+                <div class="sections">
+                  <!-- Check-ins (aggregate counts only) -->
+                  <section
+                    v-if="p.stats"
+                    class="section section--wide"
+                    :aria-labelledby="`${p.domId}-stats`"
+                  >
+                    <h4 :id="`${p.domId}-stats`" class="section-title">
+                      <span class="hash" aria-hidden="true">#</span> {{ t('status.stats.title') }}
+                    </h4>
+
+                    <div class="stats-hero">
+                      <div>
+                        <p class="hero-label">{{ t('status.stats.today') }}</p>
+                        <p class="hero-value">{{ formatNumber(p.stats.checkins.today) }}</p>
+                      </div>
+                      <div class="hero-colors">
+                        <p :id="`${p.domId}-colors`" class="hero-label">
+                          {{ t('status.stats.byColor') }}
+                        </p>
+                        <ul class="chips" :aria-labelledby="`${p.domId}-colors`">
+                          <li
+                            v-for="color in CHECKIN_COLORS"
+                            :key="color"
+                            class="chip"
+                            :class="`chip--${color}`"
+                          >
+                            <span
+                              class="chip-dot"
+                              :class="`chip-dot--${color}`"
+                              aria-hidden="true"
+                            ></span>
+                            {{ t(`status.stats.colors.${color}`) }}
+                            <strong>{{
+                              formatNumber(p.stats.checkins.today_by_color[color])
+                            }}</strong>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <dl class="metrics">
+                      <div class="metric">
+                        <dt>{{ t('status.stats.yesterday') }}</dt>
+                        <dd>{{ formatNumber(p.stats.checkins.yesterday) }}</dd>
+                      </div>
+                      <div class="metric">
+                        <dt>{{ t('status.stats.last7Days') }}</dt>
+                        <dd>{{ formatNumber(p.stats.checkins.last_7_days) }}</dd>
+                      </div>
+                      <div
+                        class="metric"
+                        :class="{
+                          'metric--danger':
+                            p.stats.checkins.urgent_today !== null &&
+                            p.stats.checkins.urgent_today > 0,
+                        }"
+                      >
+                        <dt>{{ t('status.stats.urgentToday') }}</dt>
+                        <dd>
+                          <AlertTriangle
+                            v-if="
+                              p.stats.checkins.urgent_today !== null &&
+                              p.stats.checkins.urgent_today > 0
+                            "
+                            class="metric-icon"
+                            aria-hidden="true"
+                          />
+                          {{ formatNumber(p.stats.checkins.urgent_today) }}
+                        </dd>
+                        <dd
                           v-if="
                             p.stats.checkins.urgent_today !== null &&
                             p.stats.checkins.urgent_today > 0
                           "
-                          class="metric-icon"
-                          aria-hidden="true"
-                        />
-                        {{ formatNumber(p.stats.checkins.urgent_today) }}
-                      </dd>
-                      <dd
-                        v-if="
-                          p.stats.checkins.urgent_today !== null &&
-                          p.stats.checkins.urgent_today > 0
-                        "
-                        class="metric-note"
+                          class="metric-note"
+                        >
+                          {{ t('status.card.attention') }}
+                        </dd>
+                      </div>
+                      <div class="metric">
+                        <dt>{{ t('status.stats.open') }}</dt>
+                        <dd>{{ formatNumber(p.stats.checkins.open) }}</dd>
+                      </div>
+                      <div class="metric">
+                        <dt>{{ t('status.stats.queuePending') }}</dt>
+                        <dd>{{ formatNumber(p.stats.queue.pending) }}</dd>
+                      </div>
+                      <div class="metric">
+                        <dt>{{ t('status.stats.oldestPending') }}</dt>
+                        <dd>
+                          {{
+                            p.stats.queue.oldest_pending_minutes === null
+                              ? DASH
+                              : t('status.stats.minutes', {
+                                  n: formatNumber(p.stats.queue.oldest_pending_minutes),
+                                })
+                          }}
+                        </dd>
+                      </div>
+                      <div
+                        class="metric"
+                        :class="{
+                          'metric--warning':
+                            p.stats.queue.failed_last_24h !== null &&
+                            p.stats.queue.failed_last_24h > 0,
+                        }"
                       >
-                        {{ t('status.card.attention') }}
-                      </dd>
-                    </div>
-                    <div class="metric">
-                      <dt>{{ t('status.stats.open') }}</dt>
-                      <dd>{{ formatNumber(p.stats.checkins.open) }}</dd>
-                    </div>
-                    <div class="metric">
-                      <dt>{{ t('status.stats.queuePending') }}</dt>
-                      <dd>{{ formatNumber(p.stats.queue.pending) }}</dd>
-                    </div>
-                    <div class="metric">
-                      <dt>{{ t('status.stats.oldestPending') }}</dt>
-                      <dd>
-                        {{
-                          p.stats.queue.oldest_pending_minutes === null
-                            ? DASH
-                            : t('status.stats.minutes', {
-                                n: formatNumber(p.stats.queue.oldest_pending_minutes),
-                              })
-                        }}
-                      </dd>
-                    </div>
-                    <div
-                      class="metric"
-                      :class="{
-                        'metric--warning':
-                          p.stats.queue.failed_last_24h !== null &&
-                          p.stats.queue.failed_last_24h > 0,
-                      }"
-                    >
-                      <dt>{{ t('status.stats.failed24h') }}</dt>
-                      <dd>
-                        <AlertTriangle
+                        <dt>{{ t('status.stats.failed24h') }}</dt>
+                        <dd>
+                          <AlertTriangle
+                            v-if="
+                              p.stats.queue.failed_last_24h !== null &&
+                              p.stats.queue.failed_last_24h > 0
+                            "
+                            class="metric-icon"
+                            aria-hidden="true"
+                          />
+                          {{ formatNumber(p.stats.queue.failed_last_24h) }}
+                        </dd>
+                        <dd
                           v-if="
                             p.stats.queue.failed_last_24h !== null &&
                             p.stats.queue.failed_last_24h > 0
                           "
-                          class="metric-icon"
-                          aria-hidden="true"
-                        />
-                        {{ formatNumber(p.stats.queue.failed_last_24h) }}
-                      </dd>
-                      <dd
-                        v-if="
-                          p.stats.queue.failed_last_24h !== null &&
-                          p.stats.queue.failed_last_24h > 0
-                        "
-                        class="metric-note"
-                      >
-                        {{ t('status.card.attention') }}
-                      </dd>
-                    </div>
-                    <div class="metric" :class="{ 'metric--warning': p.schedulerStale }">
-                      <dt>{{ t('status.stats.schedulerLastRun') }}</dt>
-                      <dd>
-                        <AlertTriangle
-                          v-if="p.schedulerStale"
-                          class="metric-icon"
-                          aria-hidden="true"
-                        />
-                        {{
-                          p.stats.scheduler.minutes_ago === null
-                            ? t('status.stats.schedulerNever')
-                            : t('status.stats.minutesAgo', {
-                                n: formatNumber(p.stats.scheduler.minutes_ago),
-                              })
-                        }}
-                      </dd>
-                      <dd v-if="p.schedulerStale" class="metric-note">
-                        {{ t('status.card.attention') }}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <p class="footnote">{{ t('status.stats.timezone', { tz: p.stats.timezone }) }}</p>
-                </section>
-
-                <!-- Live health check, fetched by the worker -->
-                <section class="section" :aria-labelledby="`${p.domId}-live`">
-                  <h4 :id="`${p.domId}-live`" class="section-title">
-                    <span class="hash" aria-hidden="true">#</span> {{ t('status.live.title') }}
-                  </h4>
-                  <dl class="kv">
-                    <div>
-                      <dt>{{ t('status.live.status') }}</dt>
-                      <dd :class="`tone--${LIVE_TONE[p.live.status]}`">
-                        <span aria-hidden="true">{{ STATUS_GLYPH[p.live.status] }}</span>
-                        {{ t(`status.live.statusValue.${p.live.status}`) }}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('status.live.http') }}</dt>
-                      <dd>{{ p.live.httpStatus ?? DASH }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('status.live.responseTime') }}</dt>
-                      <dd>{{ formatMs(p.live.responseTimeMs) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('status.live.checkedAt') }}</dt>
-                      <dd>
-                        <time v-if="p.live.checkedAt" :datetime="p.live.checkedAt">
-                          {{ formatRelative(p.live.checkedAt) }}
-                        </time>
-                        <template v-else>{{ DASH }}</template>
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <h5 class="subsection-title">{{ t('status.live.checks') }}</h5>
-                  <ul v-if="p.live.checks" class="checks">
-                    <li
-                      v-for="name in CHECK_NAMES"
-                      :key="name"
-                      class="check"
-                      :class="p.live.checks[name] ? 'check--pass' : 'check--fail'"
-                    >
-                      <span aria-hidden="true">{{ p.live.checks[name] ? '✓' : '✗' }}</span>
-                      {{ t(`status.live.checkNames.${name}`) }}
-                      <span class="sr-only">
-                        ({{ p.live.checks[name] ? t('status.live.pass') : t('status.live.fail') }})
-                      </span>
-                    </li>
-                  </ul>
-                  <p v-else class="muted">{{ t('status.live.noChecks') }}</p>
-
-                  <template v-if="p.live.reasons.length">
-                    <h5 class="subsection-title">{{ t('status.live.reasons') }}</h5>
-                    <ul class="reasons">
-                      <li v-for="reason in p.live.reasons" :key="reason" class="reason">
-                        <AlertTriangle class="problem-icon" aria-hidden="true" />
-                        {{ reasonLabel(reason) }}
-                      </li>
-                    </ul>
-                  </template>
-                </section>
-
-                <!-- Uptime monitor -->
-                <section class="section" :aria-labelledby="`${p.domId}-uptime`">
-                  <h4 :id="`${p.domId}-uptime`" class="section-title">
-                    <span class="hash" aria-hidden="true">#</span> {{ t('status.uptime.title') }}
-                  </h4>
-                  <dl v-if="p.uptime" class="kv">
-                    <div>
-                      <dt>{{ t('status.uptime.monitor') }}</dt>
-                      <dd :class="`tone--${UPTIME_TONE[p.uptime.status]}`">
-                        <span aria-hidden="true">{{ UPTIME_GLYPH[p.uptime.status] }}</span>
-                        {{ t(`status.uptime.statusValue.${p.uptime.status}`) }}
-                        <span v-if="p.uptime.provider" class="provider">
-                          ({{ providerLabel(p.uptime.provider) }})
-                        </span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('status.uptime.last24h') }}</dt>
-                      <dd>{{ formatPercent(p.uptime.uptime24h) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('status.uptime.last7d') }}</dt>
-                      <dd>{{ formatPercent(p.uptime.uptime7d) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('status.uptime.last30d') }}</dt>
-                      <dd>{{ formatPercent(p.uptime.uptime30d) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('status.uptime.avgResponse') }}</dt>
-                      <dd>{{ formatMs(p.uptime.avgResponseMs) }}</dd>
-                    </div>
-                  </dl>
-                  <p v-else class="muted">
-                    {{
-                      p.uptimeFailed ? t('status.card.unavailable') : t('status.card.notConfigured')
-                    }}
-                  </p>
-                </section>
-
-                <!-- Errors (Sentry) -->
-                <section
-                  class="section"
-                  :class="{ 'section--wide': p.errors && p.errors.topIssues.length > 0 }"
-                  :aria-labelledby="`${p.domId}-errors`"
-                >
-                  <h4 :id="`${p.domId}-errors`" class="section-title">
-                    <span class="hash" aria-hidden="true">#</span> {{ t('status.errors.title') }}
-                    <span class="section-title__muted">(Sentry)</span>
-                  </h4>
-                  <template v-if="p.errors">
-                    <dl class="kv">
-                      <div>
-                        <dt>{{ t('status.errors.unresolved') }}</dt>
-                        <dd :class="{ 'tone--warning': p.errors.unresolvedCount > 0 }">
-                          {{ formatNumber(p.errors.unresolvedCount)
-                          }}{{ p.errors.countIsCapped ? '+' : '' }}
+                          class="metric-note"
+                        >
+                          {{ t('status.card.attention') }}
                         </dd>
                       </div>
-                      <div>
-                        <dt>{{ t('status.errors.new24h') }}</dt>
+                      <div class="metric" :class="{ 'metric--warning': p.schedulerStale }">
+                        <dt>{{ t('status.stats.schedulerLastRun') }}</dt>
                         <dd>
+                          <AlertTriangle
+                            v-if="p.schedulerStale"
+                            class="metric-icon"
+                            aria-hidden="true"
+                          />
                           {{
-                            p.errors.newLast24h === null ? DASH : formatNumber(p.errors.newLast24h)
+                            p.stats.scheduler.minutes_ago === null
+                              ? t('status.stats.schedulerNever')
+                              : t('status.stats.minutesAgo', {
+                                  n: formatNumber(p.stats.scheduler.minutes_ago),
+                                })
                           }}
+                        </dd>
+                        <dd v-if="p.schedulerStale" class="metric-note">
+                          {{ t('status.card.attention') }}
                         </dd>
                       </div>
                     </dl>
 
-                    <template v-if="p.errors.topIssues.length">
-                      <h5 class="subsection-title">{{ t('status.errors.topIssues') }}</h5>
-                      <ol class="issues">
-                        <li v-for="issue in p.errors.topIssues" :key="issue.id" class="issue">
-                          <span class="level" :class="`level--${levelTone(issue.level)}`">{{
-                            issue.level
-                          }}</span>
-                          <div class="issue-main">
-                            <a
-                              v-if="issue.permalink"
-                              :href="issue.permalink"
-                              class="issue-title"
-                              :title="issue.title"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {{ issue.title }}
-                              <span class="sr-only">({{ t('status.card.newTab') }})</span>
-                            </a>
-                            <span v-else class="issue-title" :title="issue.title">{{
-                              issue.title
+                    <p class="footnote">
+                      {{ t('status.stats.timezone', { tz: p.stats.timezone }) }}
+                    </p>
+                  </section>
+
+                  <!-- Live health check, fetched by the worker -->
+                  <section class="section" :aria-labelledby="`${p.domId}-live`">
+                    <h4 :id="`${p.domId}-live`" class="section-title">
+                      <span class="hash" aria-hidden="true">#</span> {{ t('status.live.title') }}
+                    </h4>
+                    <dl class="kv">
+                      <div>
+                        <dt>{{ t('status.live.status') }}</dt>
+                        <dd :class="`tone--${LIVE_TONE[p.live.status]}`">
+                          <span aria-hidden="true">{{ STATUS_GLYPH[p.live.status] }}</span>
+                          {{ t(`status.live.statusValue.${p.live.status}`) }}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('status.live.http') }}</dt>
+                        <dd>{{ p.live.httpStatus ?? DASH }}</dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('status.live.responseTime') }}</dt>
+                        <dd>{{ formatMs(p.live.responseTimeMs) }}</dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('status.live.checkedAt') }}</dt>
+                        <dd>
+                          <time v-if="p.live.checkedAt" :datetime="p.live.checkedAt">
+                            {{ formatRelative(p.live.checkedAt) }}
+                          </time>
+                          <template v-else>{{ DASH }}</template>
+                        </dd>
+                      </div>
+                    </dl>
+
+                    <h5 class="subsection-title">{{ t('status.live.checks') }}</h5>
+                    <ul v-if="p.live.checks" class="checks">
+                      <li
+                        v-for="name in CHECK_NAMES"
+                        :key="name"
+                        class="check"
+                        :class="p.live.checks[name] ? 'check--pass' : 'check--fail'"
+                      >
+                        <span aria-hidden="true">{{ p.live.checks[name] ? '✓' : '✗' }}</span>
+                        {{ t(`status.live.checkNames.${name}`) }}
+                        <span class="sr-only">
+                          ({{
+                            p.live.checks[name] ? t('status.live.pass') : t('status.live.fail')
+                          }})
+                        </span>
+                      </li>
+                    </ul>
+                    <p v-else class="muted">{{ t('status.live.noChecks') }}</p>
+
+                    <template v-if="p.live.reasons.length">
+                      <h5 class="subsection-title">{{ t('status.live.reasons') }}</h5>
+                      <ul class="reasons">
+                        <li v-for="reason in p.live.reasons" :key="reason" class="reason">
+                          <AlertTriangle class="problem-icon" aria-hidden="true" />
+                          {{ reasonLabel(reason) }}
+                        </li>
+                      </ul>
+                    </template>
+                  </section>
+
+                  <!-- Uptime monitor -->
+                  <section class="section" :aria-labelledby="`${p.domId}-uptime`">
+                    <h4 :id="`${p.domId}-uptime`" class="section-title">
+                      <span class="hash" aria-hidden="true">#</span> {{ t('status.uptime.title') }}
+                    </h4>
+                    <dl v-if="p.uptime" class="kv">
+                      <div>
+                        <dt>{{ t('status.uptime.monitor') }}</dt>
+                        <dd :class="`tone--${UPTIME_TONE[p.uptime.status]}`">
+                          <span aria-hidden="true">{{ UPTIME_GLYPH[p.uptime.status] }}</span>
+                          {{ t(`status.uptime.statusValue.${p.uptime.status}`) }}
+                          <span v-if="p.uptime.provider" class="provider">
+                            ({{ providerLabel(p.uptime.provider) }})
+                          </span>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('status.uptime.last24h') }}</dt>
+                        <dd>{{ formatPercent(p.uptime.uptime24h) }}</dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('status.uptime.last7d') }}</dt>
+                        <dd>{{ formatPercent(p.uptime.uptime7d) }}</dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('status.uptime.last30d') }}</dt>
+                        <dd>{{ formatPercent(p.uptime.uptime30d) }}</dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('status.uptime.avgResponse') }}</dt>
+                        <dd>{{ formatMs(p.uptime.avgResponseMs) }}</dd>
+                      </div>
+                    </dl>
+                    <p v-else class="muted">
+                      {{
+                        p.uptimeFailed
+                          ? t('status.card.unavailable')
+                          : t('status.card.notConfigured')
+                      }}
+                    </p>
+                  </section>
+
+                  <!-- Errors (Sentry) -->
+                  <section
+                    class="section"
+                    :class="{ 'section--wide': p.errors && p.errors.topIssues.length > 0 }"
+                    :aria-labelledby="`${p.domId}-errors`"
+                  >
+                    <h4 :id="`${p.domId}-errors`" class="section-title">
+                      <span class="hash" aria-hidden="true">#</span> {{ t('status.errors.title') }}
+                      <span class="section-title__muted">(Sentry)</span>
+                    </h4>
+                    <template v-if="p.errors">
+                      <dl class="kv">
+                        <div>
+                          <dt>{{ t('status.errors.unresolved') }}</dt>
+                          <dd :class="{ 'tone--warning': p.errors.unresolvedCount > 0 }">
+                            {{ formatNumber(p.errors.unresolvedCount)
+                            }}{{ p.errors.countIsCapped ? '+' : '' }}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>{{ t('status.errors.new24h') }}</dt>
+                          <dd>
+                            {{
+                              p.errors.newLast24h === null
+                                ? DASH
+                                : formatNumber(p.errors.newLast24h)
+                            }}
+                          </dd>
+                        </div>
+                      </dl>
+
+                      <template v-if="p.errors.topIssues.length">
+                        <h5 class="subsection-title">{{ t('status.errors.topIssues') }}</h5>
+                        <ol class="issues">
+                          <li v-for="issue in p.errors.topIssues" :key="issue.id" class="issue">
+                            <span class="level" :class="`level--${levelTone(issue.level)}`">{{
+                              issue.level
                             }}</span>
-                            <span v-if="issue.culprit" class="issue-culprit">{{
-                              issue.culprit
-                            }}</span>
-                            <!-- Separators are plain text on purpose: whitespace
+                            <div class="issue-main">
+                              <a
+                                v-if="issue.permalink"
+                                :href="issue.permalink"
+                                class="issue-title"
+                                :title="issue.title"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {{ issue.title }}
+                                <span class="sr-only">({{ t('status.card.newTab') }})</span>
+                              </a>
+                              <span v-else class="issue-title" :title="issue.title">{{
+                                issue.title
+                              }}</span>
+                              <span v-if="issue.culprit" class="issue-culprit">{{
+                                issue.culprit
+                              }}</span>
+                              <!-- Separators are plain text on purpose: whitespace
                                  around elements next to a <template> gets condensed
                                  away, which would glue words together. -->
-                            <span class="issue-meta"
-                              >{{
-                                t(
-                                  'status.errors.events',
-                                  { n: formatNumber(issue.count) },
-                                  issue.count,
-                                )
-                              }}
-                              ·
-                              {{
-                                t(
-                                  'status.errors.users',
-                                  { n: formatNumber(issue.userCount) },
-                                  issue.userCount,
-                                )
-                              }}<template v-if="issue.lastSeen">
+                              <span class="issue-meta"
+                                >{{
+                                  t(
+                                    'status.errors.events',
+                                    { n: formatNumber(issue.count) },
+                                    issue.count,
+                                  )
+                                }}
                                 ·
-                                <time :datetime="issue.lastSeen">{{
-                                  t('status.errors.lastSeen', {
-                                    time: formatRelative(issue.lastSeen),
-                                  })
-                                }}</time></template
-                              ></span
-                            >
-                          </div>
-                        </li>
-                      </ol>
+                                {{
+                                  t(
+                                    'status.errors.users',
+                                    { n: formatNumber(issue.userCount) },
+                                    issue.userCount,
+                                  )
+                                }}<template v-if="issue.lastSeen">
+                                  ·
+                                  <time :datetime="issue.lastSeen">{{
+                                    t('status.errors.lastSeen', {
+                                      time: formatRelative(issue.lastSeen),
+                                    })
+                                  }}</time></template
+                                ></span
+                              >
+                            </div>
+                          </li>
+                        </ol>
+                      </template>
+                      <p v-else-if="p.errors.unresolvedCount === 0" class="muted">
+                        {{ t('status.errors.none') }}
+                      </p>
                     </template>
-                    <p v-else-if="p.errors.unresolvedCount === 0" class="muted">
-                      {{ t('status.errors.none') }}
+                    <p v-else class="muted">
+                      {{
+                        p.errorsFailed
+                          ? t('status.card.unavailable')
+                          : t('status.card.notConfigured')
+                      }}
                     </p>
-                  </template>
-                  <p v-else class="muted">
-                    {{
-                      p.errorsFailed ? t('status.card.unavailable') : t('status.card.notConfigured')
-                    }}
-                  </p>
-                </section>
+                  </section>
+                </div>
               </div>
             </article>
           </div>
@@ -546,6 +598,9 @@ import { useHead } from '@unhead/vue'
 import { useI18n } from 'vue-i18n'
 import {
   AlertTriangle,
+  ChevronDown,
+  ChevronsDownUp,
+  ChevronsUpDown,
   ExternalLink,
   Loader2,
   Lock,
@@ -595,6 +650,7 @@ interface ProjectView extends ProjectSummary {
   uptimeFailed: boolean
   errorsFailed: boolean
   schedulerStale: boolean
+  collapsed: boolean
 }
 
 const AUTO_REFRESH_MS = 60_000
@@ -604,6 +660,8 @@ const MIN_RESUME_AGE_MS = 10_000
 // Mirrors MONITOR_SCHEDULER_STALE_MINUTES' default on the scan2talk side.
 const SCHEDULER_STALE_MINUTES = 3
 const DASH = '—'
+// Per-browser UI preference only (which project cards are folded); no data.
+const COLLAPSED_STORAGE_KEY = 'status-collapsed'
 
 const TONE_GLYPH: Record<Tone, string> = { info: '>', success: '✓', warning: '!', error: '✗' }
 const STATUS_GLYPH: Record<OverallStatus, string> = {
@@ -765,6 +823,43 @@ function failureText(failure: Failure): string {
 // Derived view data
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Collapse / expand (remembered per browser in localStorage)
+// ---------------------------------------------------------------------------
+
+const collapsedIds = ref<Set<string>>(new Set())
+
+function readCollapsed(): Set<string> {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(COLLAPSED_STORAGE_KEY) ?? '[]')
+    return new Set(Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string') : [])
+  } catch {
+    return new Set()
+  }
+}
+
+function setCollapsed(ids: Set<string>): void {
+  collapsedIds.value = ids
+  try {
+    if (ids.size) localStorage.setItem(COLLAPSED_STORAGE_KEY, JSON.stringify([...ids]))
+    else localStorage.removeItem(COLLAPSED_STORAGE_KEY)
+  } catch {
+    // Storage blocked (private mode, disabled site data): keep it in memory only.
+  }
+}
+
+function toggleProject(id: string): void {
+  const ids = new Set(collapsedIds.value)
+  if (!ids.delete(id)) ids.add(id)
+  setCollapsed(ids)
+}
+
+const anyExpanded = computed(() => projectViews.value.some((p) => !p.collapsed))
+
+function toggleAll(): void {
+  setCollapsed(anyExpanded.value ? new Set(projectViews.value.map((p) => p.id)) : new Set())
+}
+
 const projectViews = computed<ProjectView[]>(() =>
   (summary.value?.projects ?? []).map((project, index) => {
     const minutesAgo = project.stats?.scheduler.minutes_ago ?? null
@@ -777,6 +872,7 @@ const projectViews = computed<ProjectView[]>(() =>
       errorsFailed: sectionHasProblem(project.problems, 'errors'),
       schedulerStale:
         project.stats !== null && (minutesAgo === null || minutesAgo > SCHEDULER_STALE_MINUTES),
+      collapsed: collapsedIds.value.has(project.id),
     }
   }),
 )
@@ -1016,6 +1112,7 @@ function onVisibilityChange(): void {
 
 onMounted(() => {
   if (phase.value === 'unconfigured') return
+  collapsedIds.value = readCollapsed()
   document.addEventListener('visibilitychange', onVisibilityChange)
   const stored = readStoredSession()
   if (stored) startDashboard(stored)
@@ -1457,6 +1554,70 @@ onBeforeUnmount(() => {
 
 .project-card--unknown {
   border-left-color: var(--color-border-glow);
+}
+
+.list-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.btn--sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.project-card--collapsed .project-header {
+  margin-bottom: 0.5rem;
+}
+
+.project-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.project-toggle:hover {
+  color: var(--color-accent);
+}
+
+.project-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.toggle-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.project-card--collapsed .toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.collapsed-summary {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--status-label);
+}
+
+.collapsed-summary strong {
+  color: var(--color-text-primary);
+}
+
+.collapsed-warnings {
+  color: var(--status-warn);
+  font-weight: 600;
 }
 
 .project-header {
@@ -1956,6 +2117,10 @@ a.issue-title:hover {
 @media (prefers-reduced-motion: reduce) {
   .spin {
     animation: none;
+  }
+
+  .toggle-icon {
+    transition: none;
   }
 }
 </style>
