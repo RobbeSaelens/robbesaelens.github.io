@@ -166,13 +166,7 @@
     "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, VHS Service. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Probeer eens te vragen naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen hersteld naar standaard.\n\nTyp 'help' als je hulp nodig hebt.",
-    "quickReplies": [
-      "Vaardigheden",
-      "Projecten",
-      "Ervaring",
-      "Contact",
-      "Opleiding"
-    ],
+    "quickReplies": ["Vaardigheden", "Projecten", "Ervaring", "Contact", "Opleiding"],
     "easter": {
       "trigger": "🔐 Je hebt een verborgen pad gevonden. Drie raadsels bewaken wat erachter ligt. Klaar?\n\nRaadsel 1/3: Waar staat HTML voor?",
       "riddle1": "🔐 Je hebt een verborgen pad gevonden. Drie raadsels bewaken wat erachter ligt. Klaar?\n\nRaadsel 1/3: Waar staat HTML voor?",
@@ -261,7 +255,12 @@
       "warning": "Waarschuwing",
       "notConfigured": "Niet geconfigureerd.",
       "unavailable": "Momenteel niet beschikbaar, zie de waarschuwingen hierboven.",
-      "attention": "vraagt aandacht"
+      "attention": "vraagt aandacht",
+      "collapse": "inklappen",
+      "expand": "uitklappen",
+      "collapseAll": "Alles inklappen",
+      "expandAll": "Alles uitklappen",
+      "warningCount": "geen waarschuwingen | {n} waarschuwing | {n} waarschuwingen"
     },
     "live": {
       "title": "Livecontrole",

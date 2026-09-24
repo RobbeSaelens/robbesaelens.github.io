@@ -166,13 +166,7 @@
     "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, VHS Service. Just type what you'd like to know!",
     "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me! Type 'help' for a list of topics.",
     "reset": "Session terminated. All systems restored to default.\n\nType 'help' if you need guidance.",
-    "quickReplies": [
-      "Skills",
-      "Projects",
-      "Experience",
-      "Contact",
-      "Education"
-    ],
+    "quickReplies": ["Skills", "Projects", "Experience", "Contact", "Education"],
     "easter": {
       "trigger": "🔐 You've found a hidden path. Three riddles guard what lies beyond. Ready?\n\nRiddle 1/3: What does HTML stand for?",
       "riddle1": "🔐 You've found a hidden path. Three riddles guard what lies beyond. Ready?\n\nRiddle 1/3: What does HTML stand for?",
@@ -261,7 +255,12 @@
       "warning": "Warning",
       "notConfigured": "Not configured.",
       "unavailable": "Unavailable right now, see the warnings above.",
-      "attention": "needs attention"
+      "attention": "needs attention",
+      "collapse": "collapse",
+      "expand": "expand",
+      "collapseAll": "Collapse all",
+      "expandAll": "Expand all",
+      "warningCount": "no warnings | {n} warning | {n} warnings"
     },
     "live": {
       "title": "Live check",
