@@ -33,6 +33,12 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Base URL of the status worker behind /status. A repository
+          # *variable* (Settings > Secrets and variables > Actions > Variables),
+          # not a secret: it ends up in the public bundle, and every request to
+          # it is authenticated. Unset means /status shows "not configured".
+          VITE_STATUS_API_URL: ${{ vars.STATUS_API_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

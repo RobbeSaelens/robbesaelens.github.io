@@ -204,5 +204,139 @@
     "fact5": "Stack Overflow was founded in 2008. Developers have been copy-pasting ever since.",
     "close": "exit dev mode",
     "hint": "Tip: ask me about 'sudo' or 'secret' to start again"
+  },
+  "status": {
+    "title": "Status",
+    "booting": "Loading the dashboard… (requires JavaScript)",
+    "notConfigured": {
+      "title": "Not configured",
+      "text": "This build of the site has no status API configured, so there is nothing to show here.",
+      "hint": "Set VITE_STATUS_API_URL at build time to enable the dashboard."
+    },
+    "login": {
+      "title": "Sign-in required",
+      "intro": "This dashboard is private. Enter the passphrase to continue.",
+      "label": "Passphrase",
+      "submit": "Unlock",
+      "submitting": "Checking…",
+      "empty": "Please enter the passphrase.",
+      "wrongPassphrase": "Wrong passphrase. Please try again.",
+      "tooManyAttempts": "Too many failed attempts. Try again in {time} (at {clock}).",
+      "unlocked": "You can try again now.",
+      "badRequest": "The status service rejected the request. Please try again.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "loggedOut": "You have been logged out."
+    },
+    "failure": {
+      "network": "Could not reach the status service (network or CORS error).",
+      "http": "The status service returned an error (HTTP {status}).",
+      "invalidResponse": "The status service sent an unexpected response."
+    },
+    "dashboard": {
+      "title": "Projects",
+      "lastUpdated": "Last updated",
+      "never": "not yet",
+      "autoRefresh": "auto-refresh every {seconds} s",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing…",
+      "logout": "Log out",
+      "loading": "Loading status…",
+      "loaded": "Status loaded: no projects. | Status loaded: {n} project. | Status loaded: {n} projects.",
+      "updated": "Status updated at {time}.",
+      "refreshFailed": "Refresh failed. {reason} Showing the data from {time}.",
+      "loadFailed": "Could not load the status. {reason}",
+      "noProjects": "No projects are configured on the status worker.",
+      "overview": "Overview"
+    },
+    "overall": {
+      "ok": "Operational",
+      "degraded": "Degraded",
+      "down": "Down",
+      "unknown": "Unknown"
+    },
+    "card": {
+      "overall": "Overall status",
+      "newTab": "opens in a new tab",
+      "problems": "Warnings",
+      "warning": "Warning",
+      "notConfigured": "Not configured.",
+      "unavailable": "Unavailable right now, see the warnings above.",
+      "attention": "needs attention"
+    },
+    "live": {
+      "title": "Live check",
+      "status": "Status",
+      "http": "HTTP status",
+      "responseTime": "Response time",
+      "checkedAt": "Checked",
+      "checks": "Checks",
+      "noChecks": "No check details reported.",
+      "reasons": "Reasons",
+      "pass": "passing",
+      "fail": "failing",
+      "statusValue": {
+        "ok": "OK",
+        "degraded": "Degraded",
+        "down": "Down",
+        "unknown": "Unknown"
+      },
+      "checkNames": {
+        "database": "Database",
+        "queue": "Queue",
+        "scheduler": "Scheduler"
+      }
+    },
+    "reasons": {
+      "database_unreachable": "Database unreachable",
+      "queue_stuck": "Queue stuck: jobs are waiting too long",
+      "scheduler_stale": "Scheduler stale: no recent heartbeat"
+    },
+    "uptime": {
+      "title": "Uptime",
+      "monitor": "Monitor",
+      "last24h": "Last 24 h",
+      "last7d": "Last 7 days",
+      "last30d": "Last 30 days",
+      "avgResponse": "Avg. response",
+      "statusValue": {
+        "up": "Up",
+        "down": "Down",
+        "paused": "Paused",
+        "unknown": "Unknown"
+      }
+    },
+    "errors": {
+      "title": "Errors",
+      "unresolved": "Unresolved issues",
+      "new24h": "New in last 24 h",
+      "topIssues": "Top issues",
+      "none": "No unresolved issues.",
+      "events": "{n} event | {n} events",
+      "users": "{n} user | {n} users",
+      "lastSeen": "last seen {time}"
+    },
+    "stats": {
+      "title": "Check-ins",
+      "today": "Check-ins today",
+      "yesterday": "Yesterday",
+      "last7Days": "Last 7 days",
+      "byColor": "Today by colour",
+      "colors": {
+        "green": "Green",
+        "yellow": "Yellow",
+        "orange": "Orange",
+        "red": "Red"
+      },
+      "urgentToday": "Urgent today",
+      "open": "Open (not resolved)",
+      "queuePending": "Queue: pending jobs",
+      "oldestPending": "Queue: oldest pending",
+      "failed24h": "Queue: failed (24 h)",
+      "schedulerLastRun": "Scheduler: last run",
+      "schedulerNever": "never",
+      "minutes": "{n} min",
+      "minutesAgo": "{n} min ago",
+      "timezone": "Days are calendar days in {tz}."
+    }
   }
 }

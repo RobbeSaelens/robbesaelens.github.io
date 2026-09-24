@@ -78,18 +78,13 @@ export default defineComponent({
       // to point at. Pointing en and nl at one URL would be a conflicting
       // signal. Adding /nl/ routes later is what would make hreflang correct.
       link: () => (route.meta?.noindex ? [] : [{ rel: 'canonical', href: url() }]),
-      script: () =>
-        route.meta?.noindex
-          ? []
-          : [
-              {
-                type: 'application/ld+json',
-                key: 'route-jsonld',
-                innerHTML: JSON.stringify(
-                  routeJsonLd(route.path, title(), description(), SITE_URL),
-                ),
-              },
-            ],
+      script: () => {
+        if (route.meta?.noindex) return []
+        const graph = routeJsonLd(route.path, title(), description(), SITE_URL)
+        return graph
+          ? [{ type: 'application/ld+json', key: 'route-jsonld', innerHTML: JSON.stringify(graph) }]
+          : []
+      },
     })
   },
   mounted() {
