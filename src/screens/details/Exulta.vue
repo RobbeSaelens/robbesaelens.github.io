@@ -11,8 +11,14 @@
           <span class="opacity-50">$</span> cat ./exulta-project.md
         </p>
         <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
-          <span class="status-badge">{{ $t('exulta.rebrandingBadge') }}</span>
-          <span class="status-note">{{ $t('exulta.notLiveYet') }}</span>
+          <span class="live-badge">
+            <span class="live-dot" aria-hidden="true"></span>
+            {{ $t('exulta.liveBadge') }}
+          </span>
+          <a class="live-link" href="https://exulta.be" target="_blank" rel="noopener noreferrer">
+            {{ $t('exulta.visitSite') }}
+            <ExternalLink class="h-3.5 w-3.5" />
+          </a>
         </div>
 
         <div class="mt-5 flex flex-wrap justify-center gap-2">
@@ -30,7 +36,7 @@
             <span class="shot-dot"></span>
             <span class="shot-dot"></span>
             <span class="shot-dot"></span>
-            <span class="shot-url">Exulta</span>
+            <span class="shot-url">exulta.be</span>
           </span>
           <img
             src="/exulta-home.jpg"
@@ -84,6 +90,47 @@
 
 
 
+        <button
+          type="button"
+          class="shot shot-wide shot-video reveal"
+          :aria-label="`Open ${shotList[2].caption} video full screen`"
+          @click="lightboxIndex = 2"
+        >
+          <span class="shot-bar" aria-hidden="true">
+            <span class="shot-dot"></span>
+            <span class="shot-dot"></span>
+            <span class="shot-dot"></span>
+            <span class="shot-url">exulta.be/tentcalculator</span>
+          </span>
+          <!-- Real screen recording of the live calculator. Played only while on
+               screen, and never automatically for reduced-motion users. -->
+          <video
+            ref="calcVideo"
+            :aria-label="$t('exulta.featureCalculator')"
+            poster="/exulta-calc-poster.jpg"
+            width="1192"
+            height="486"
+            muted
+            loop
+            playsinline
+            preload="none"
+          >
+            <source src="/exulta-calc.webm" type="video/webm" />
+            <source src="/exulta-calc.mp4" type="video/mp4" />
+          </video>
+        </button>
+        <div class="mt-4 mb-14 flex justify-center">
+          <a
+            class="live-link"
+            href="https://exulta.be/tentcalculator"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ $t('exulta.tryCalculator') }}
+            <ExternalLink class="h-3.5 w-3.5" />
+          </a>
+        </div>
+
         <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div class="overview-card px-6 py-8">
             <h3 class="overview-label">{{ $t('exulta.languages') }}</h3>
@@ -122,25 +169,27 @@
 
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue'
-import ImageLightbox from '../../components/ImageLightbox.vue'
+import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbox.vue'
 import {
   ArrowRight,
+  ExternalLink,
   Package,
+  Calculator,
   LayoutDashboard,
   Languages,
   Search,
   Gauge,
-  GitBranch,
 } from 'lucide-vue-next'
 
 export default defineComponent({
-  components: { ArrowRight, ImageLightbox },
+  components: { ArrowRight, ExternalLink, ImageLightbox },
 
   data() {
     return {
       lightboxIndex: null as number | null,
       observer: null as IntersectionObserver | null,
       revealFallback: 0 as unknown as ReturnType<typeof setTimeout>,
+      videoObserver: null as IntersectionObserver | null,
       heroTags: ['Laravel 13', 'React 19', 'Inertia.js', 'Filament 5', 'Tailwind CSS 4', 'MySQL'],
       stackLanguages: [
         'PHP 8.4',
@@ -167,21 +216,27 @@ export default defineComponent({
   },
 
   computed: {
-    shotList(): { src: string; alt: string; caption: string }[] {
+    shotList(): LightboxImage[] {
       return [
-        { src: '/exulta-home.jpg', alt: this.$t('exulta.alt') as string, caption: 'Exulta — desktop' },
-        { src: '/exulta-mobile.jpg', alt: this.$t('exulta.alt') as string, caption: 'Exulta — mobile' },
+        { src: '/exulta-home.jpg', alt: this.$t('exulta.alt') as string, caption: 'exulta.be' },
+        { src: '/exulta-mobile.jpg', alt: this.$t('exulta.alt') as string, caption: 'exulta.be — mobile' },
+        {
+          src: '/exulta-calc-poster.jpg',
+          alt: this.$t('exulta.featureCalculator') as string,
+          caption: 'exulta.be/tentcalculator',
+          video: { webm: '/exulta-calc.webm', mp4: '/exulta-calc.mp4' },
+        },
       ]
     },
 
     features(): { icon: unknown; title: string; text: string }[] {
       const map = [
         ['Catalog', Package],
+        ['Calculator', Calculator],
         ['Admin', LayoutDashboard],
         ['Content', Languages],
         ['Seo', Search],
         ['Perf', Gauge],
-        ['Ops', GitBranch],
       ] as const
       return map.map(([key, icon]) => ({
         icon: markRaw(icon),
@@ -192,6 +247,8 @@ export default defineComponent({
   },
 
   mounted() {
+    this.watchCalcVideo()
+
     const targets = [...this.$el.querySelectorAll('.reveal')] as Element[]
     if (!targets.length) return
 
@@ -227,6 +284,24 @@ export default defineComponent({
   beforeUnmount() {
     clearTimeout(this.revealFallback)
     this.observer?.disconnect()
+    this.videoObserver?.disconnect()
+  },
+
+  methods: {
+    watchCalcVideo() {
+      const video = this.$refs.calcVideo as HTMLVideoElement | undefined
+      if (!video || typeof IntersectionObserver === 'undefined') return
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+      this.videoObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) video.play().catch(() => {})
+          else video.pause()
+        },
+        { threshold: 0.35 },
+      )
+      this.videoObserver.observe(video)
+    },
   },
 })
 </script>
@@ -308,7 +383,8 @@ export default defineComponent({
   margin-bottom: 0.875rem;
 }
 @media (prefers-reduced-motion: reduce) {
-  .terminal-cursor {
+  .terminal-cursor,
+  .live-dot {
     animation: none;
     opacity: 1;
   }
@@ -317,9 +393,10 @@ export default defineComponent({
 /* =============================================
    Status badge
    ============================================= */
-.status-badge {
+.live-badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
   padding: 0.25rem 0.7rem;
   border-radius: 9999px;
   font-family: var(--font-mono);
@@ -331,10 +408,45 @@ export default defineComponent({
   background: var(--color-accent-soft);
   border: 1px solid var(--color-border-glow);
 }
-.status-note {
+.live-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+}
+.live-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  font-weight: 600;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.live-link:hover {
+  border-color: var(--color-border-glow);
+  background: var(--color-surface-hover);
+  transform: translateY(-1px);
 }
 
 /* =============================================
@@ -482,7 +594,8 @@ button.shot:focus-visible {
   outline-offset: 3px;
 }
 
-.shot img {
+.shot img,
+.shot video {
   display: block;
   width: 100%;
   height: auto;
@@ -516,6 +629,12 @@ button.shot:focus-visible {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   color: var(--color-text-muted);
+}
+
+.shot-wide {
+  display: block;
+  width: 100%;
+  max-width: 100%;
 }
 
 .shot-desktop {

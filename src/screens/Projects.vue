@@ -129,7 +129,7 @@ export default {
           name: 'Exulta',
           tags: ['Laravel', 'React', 'Inertia.js', 'Filament'],
           image: '/exulta-home.jpg',
-          rebranding: true,
+          live: true,
           route: 'ExultaDetail',
           date: '2026',
         },

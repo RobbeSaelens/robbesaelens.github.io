@@ -28,7 +28,22 @@
         </button>
 
         <figure class="lightbox-figure" @click.stop>
-          <img :src="current.src" :alt="current.alt" class="lightbox-img" />
+          <video
+            v-if="current.video"
+            :key="current.src"
+            class="lightbox-img"
+            :poster="current.src"
+            :aria-label="current.alt"
+            autoplay
+            muted
+            loop
+            playsinline
+            controls
+          >
+            <source v-if="current.video.webm" :src="current.video.webm" type="video/webm" />
+            <source :src="current.video.mp4" type="video/mp4" />
+          </video>
+          <img v-else :src="current.src" :alt="current.alt" class="lightbox-img" />
           <figcaption v-if="current.caption" class="lightbox-caption">
             {{ current.caption }}
             <span v-if="images.length > 1" class="lightbox-count">
@@ -55,9 +70,11 @@ import { defineComponent, type PropType } from 'vue'
 import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 export interface LightboxImage {
+  /** Image URL, or the poster frame when `video` is set. */
   src: string
   alt: string
   caption?: string
+  video?: { mp4: string; webm?: string }
 }
 
 export default defineComponent({

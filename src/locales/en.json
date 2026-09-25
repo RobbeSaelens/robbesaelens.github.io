@@ -17,7 +17,7 @@
     "title": "About me",
     "subtitle": "My story",
     "teaching": "Teaching",
-    "teachingText": "In 2017 I started as instructor in equestrian sports. Since then I learned a lot about teaching and how to work with people. I currently work as an instructor at {link}.",
+    "teachingText": "In 2017 I started as instructor in equestrian sports. Since then I learned a lot about teaching and how to work with people.",
     "education": "Education",
     "educationText1": "In 2018 I started the graduate education in Multimedia & Information Technologies. There I learned all the basics of programming and web development.",
     "educationText2": "After MIT I started the bachelors degree in Multimedia & Communication Technologies as {link}.",
@@ -39,7 +39,7 @@
     "showingCount": "{count} / {total}",
     "items": {
       "exulta": {
-        "description": "The second version of the Exulta stretch tent rental site: catalog, realisations, blog and FAQ on Laravel 13 with a React 19 front end, plus a Filament 5 admin panel the client runs themselves."
+        "description": "The second version of the Exulta stretch tent rental site, live at exulta.be: catalog, tent calculator, realisations and blog on Laravel 13 with a React 19 front end, plus a Filament 5 admin panel the client runs themselves."
       },
       "scan2talk": {
         "description": "A wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster and share how they feel; educators get trends and an anonymous chat."
@@ -52,12 +52,17 @@
   "exulta": {
     "title": "Exulta",
     "alt": "Exulta stretch tent rental website",
+    "liveBadge": "Live",
+    "visitSite": "Open exulta.be",
     "overview": "Project Overview",
     "about": "About",
-    "aboutText": "Exulta rents stretch tents for events. This is the second version of their website: a Laravel 13 back end with a React 19 front end over Inertia, and a Filament 5 admin panel the client runs themselves. It covers the full public site — product catalog, realisations, blog, FAQ and contact — plus the operational side: media library, roles, backups, cookie consent and an automated deployment pipeline.",
+    "aboutText": "Exulta rents stretch tents for events, and this is the second version of their website, now live at exulta.be. A Laravel 13 back end with a React 19 front end over Inertia, and a Filament 5 admin panel the client runs themselves. It covers the full public site — product catalog, tent calculator, realisations, blog and contact — plus the operational side: media library, roles, backups, cookie consent and an automated deployment pipeline.",
     "featuresTitle": "What's in it",
     "featureCatalog": "Product catalog",
     "featureCatalogText": "Tents by category with detail pages, images through Spatie Media Library, and case studies under 'realisaties' showing real events.",
+    "featureCalculator": "Tent calculator",
+    "featureCalculatorText": "An interactive tool where visitors set a guest count and seating layout, and get the right tent back with its capacity, diameter and starting price.",
+    "tryCalculator": "Try the calculator on exulta.be",
     "featureAdmin": "Self-service admin",
     "featureAdminText": "A Filament 5 panel with Shield roles, quick create, Apex charts, impersonation and a log viewer, so the client edits content without me.",
     "featureContent": "Content & translations",
@@ -66,13 +71,9 @@
     "featureSeoText": "Server-side rendering, a generated sitemap and robots.txt, structured SEO metadata, plus an llms.txt and an AI product feed so assistants can read the catalog.",
     "featurePerf": "Measured performance",
     "featurePerfText": "Response caching and Lighthouse reports generated per page, kept in the repo so regressions show up as a diff.",
-    "featureOps": "Automated deploys",
-    "featureOpsText": "GitHub Actions runs tests and Pint on every push to release, backs up the database, deploys, health-checks and rolls back on failure.",
     "languages": "Languages & Frameworks",
     "tools": "Tools & Services",
-    "viewOther": "View other projects",
-    "rebrandingBadge": "Rebranding",
-    "notLiveYet": "Not live yet"
+    "viewOther": "View other projects"
   },
   "vhs": {
     "title": "VHS Service",
@@ -151,8 +152,8 @@
     "welcome": "Hey! I'm Robbe's virtual assistant. Ask me about his skills, projects, experience, or how to get in touch!",
     "greeting": "Hi there! How can I help you? You can ask about my projects, skills, experience, or how to reach me.",
     "skills": "Robbe is a full-stack web developer working with: Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, TailwindCSS, Node.js, and more. He also has experience with Adobe XD, After Effects, and LottieFiles for design & prototyping. His current focus is Drupal backend development at Dynamate.",
-    "projects": "Robbe has built 3 featured projects:\n\n• Exulta — stretch tent rental website, currently in rebranding (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based student wellbeing check-in, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• VHS Service — trilingual site for an equestrian arena builder, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nCheck them out on the Projects page!",
-    "project-exulta": "Exulta is the second version of the Exulta stretch tent rental website, currently in rebranding and not public yet. Built with Laravel 13 and React 19 over Inertia, with a Filament 5 admin panel, a product catalog, realisations, blog and FAQ. Automated CI/CD via GitHub Actions with database backups and rollback on failure, plus Playwright and Lighthouse checks.",
+    "projects": "Robbe has built 3 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based student wellbeing check-in, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• VHS Service — trilingual site for an equestrian arena builder, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nCheck them out on the Projects page!",
+    "project-exulta": "Exulta is the second version of the Exulta stretch tent rental website, live at exulta.be. Built with Laravel 13 and React 19 over Inertia, with a Filament 5 admin panel, a product catalog, an interactive tent calculator, realisations and a blog. Automated CI/CD via GitHub Actions with database backups and rollback on failure, plus Playwright and Lighthouse checks.",
     "project-scan2talk": "Scan2Talk is a PWA for schools — students scan a QR code and walk through a guided emotional wellbeing check-in wizard (thermometer → themes → feelings → help request). Teachers get an overview dashboard with Chart.js visualizations. Built with Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Runs locally via DDEV.",
     "project-vhs": "VHS Service builds and renovates riding arenas in Geluwe, West Flanders. I built their site on Next.js 16 and React 19: a black-and-white editorial design with GSAP scroll animation, a WebGL hero and Lenis smooth scrolling, in Dutch, French and English. Quote forms go through Resend, and it is tuned for local SEO. Currently in rebranding and not public yet.",
     "contact": "You can reach Robbe via email at robbe.saelens@telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens), and Facebook. The portfolio is hosted at robbe-saelens.netlify.app.",
@@ -166,7 +167,13 @@
     "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, VHS Service. Just type what you'd like to know!",
     "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me! Type 'help' for a list of topics.",
     "reset": "Session terminated. All systems restored to default.\n\nType 'help' if you need guidance.",
-    "quickReplies": ["Skills", "Projects", "Experience", "Contact", "Education"],
+    "quickReplies": [
+      "Skills",
+      "Projects",
+      "Experience",
+      "Contact",
+      "Education"
+    ],
     "easter": {
       "trigger": "🔐 You've found a hidden path. Three riddles guard what lies beyond. Ready?\n\nRiddle 1/3: What does HTML stand for?",
       "riddle1": "🔐 You've found a hidden path. Three riddles guard what lies beyond. Ready?\n\nRiddle 1/3: What does HTML stand for?",

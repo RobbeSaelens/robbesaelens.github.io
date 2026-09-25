@@ -17,7 +17,7 @@
     "title": "Over mij",
     "subtitle": "Mijn verhaal",
     "teaching": "Lesgeven",
-    "teachingText": "In 2017 begon ik als instructeur in de paardensport. Sindsdien heb ik veel geleerd over lesgeven en werken met mensen. Ik werk momenteel als instructeur bij {link}.",
+    "teachingText": "In 2017 begon ik als instructeur in de paardensport. Sindsdien heb ik veel geleerd over lesgeven en werken met mensen.",
     "education": "Opleiding",
     "educationText1": "In 2018 startte ik de graduaatsopleiding Multimedia & Informatietechnologieën. Daar leerde ik alle basisprincipes van programmeren en webontwikkeling.",
     "educationText2": "Na MIT begon ik de bacheloropleiding Multimedia & Communicatietechnologieën als {link}.",
@@ -39,7 +39,7 @@
     "showingCount": "{count} / {total}",
     "items": {
       "exulta": {
-        "description": "De tweede versie van de Exulta stretchtent verhuursite: catalogus, realisaties, blog en FAQ op Laravel 13 met een React 19 front-end, plus een Filament 5 adminpaneel dat de klant zelf beheert."
+        "description": "De tweede versie van de Exulta stretchtent verhuursite, live op exulta.be: catalogus, tentcalculator, realisaties en blog op Laravel 13 met een React 19 front-end, plus een Filament 5 adminpaneel dat de klant zelf beheert."
       },
       "scan2talk": {
         "description": "Een welbevinden check-in tool voor scholen, live op scan2talk.be. Leerlingen scannen een geprinte QR-poster en delen hoe ze zich voelen; leerkrachten krijgen trends en een anonieme chat."
@@ -52,12 +52,17 @@
   "exulta": {
     "title": "Exulta",
     "alt": "Exulta stretchtent verhuur website",
+    "liveBadge": "Live",
+    "visitSite": "Open exulta.be",
     "overview": "Projectoverzicht",
     "about": "Over",
-    "aboutText": "Exulta verhuurt stretchtenten voor evenementen. Dit is de tweede versie van hun website: een Laravel 13 back-end met een React 19 front-end via Inertia, en een Filament 5 adminpaneel dat de klant zelf beheert. Het omvat de volledige publieke site — productcatalogus, realisaties, blog, FAQ en contact — plus de operationele kant: mediabibliotheek, rollen, back-ups, cookie consent en een geautomatiseerde deploypijplijn.",
+    "aboutText": "Exulta verhuurt stretchtenten voor evenementen, en dit is de tweede versie van hun website, nu live op exulta.be. Een Laravel 13 back-end met een React 19 front-end via Inertia, en een Filament 5 adminpaneel dat de klant zelf beheert. Het omvat de volledige publieke site — productcatalogus, tentcalculator, realisaties, blog en contact — plus de operationele kant: mediabibliotheek, rollen, back-ups, cookie consent en een geautomatiseerde deploypijplijn.",
     "featuresTitle": "Wat er in zit",
     "featureCatalog": "Productcatalogus",
     "featureCatalogText": "Tenten per categorie met detailpagina's, afbeeldingen via Spatie Media Library, en realisaties die echte evenementen tonen.",
+    "featureCalculator": "Tentcalculator",
+    "featureCalculatorText": "Een interactieve tool waarin bezoekers het aantal gasten en de opstelling kiezen, en meteen de juiste tent terugkrijgen met capaciteit, diameter en vanafprijs.",
+    "tryCalculator": "Probeer de calculator op exulta.be",
     "featureAdmin": "Zelfstandig beheer",
     "featureAdminText": "Een Filament 5 paneel met Shield-rollen, quick create, Apex-grafieken, impersonatie en een log viewer, zodat de klant content aanpast zonder mij.",
     "featureContent": "Content & vertalingen",
@@ -66,13 +71,9 @@
     "featureSeoText": "Server-side rendering, een gegenereerde sitemap en robots.txt, gestructureerde SEO-metadata, plus een llms.txt en een AI-productfeed zodat assistenten de catalogus kunnen lezen.",
     "featurePerf": "Gemeten performance",
     "featurePerfText": "Response caching en Lighthouse-rapporten per pagina, bewaard in de repo zodat regressies als een diff zichtbaar worden.",
-    "featureOps": "Geautomatiseerde deploys",
-    "featureOpsText": "GitHub Actions draait tests en Pint bij elke push naar release, maakt een databaseback-up, deployt, doet een health check en rolt terug bij falen.",
     "languages": "Talen & Frameworks",
     "tools": "Tools & Services",
-    "viewOther": "Bekijk andere projecten",
-    "rebrandingBadge": "Rebranding",
-    "notLiveYet": "Nog niet live"
+    "viewOther": "Bekijk andere projecten"
   },
   "vhs": {
     "title": "VHS Service",
@@ -151,8 +152,8 @@
     "welcome": "Hey! Ik ben Robbe's virtuele assistent. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
     "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
     "skills": "Robbe is een full-stack web developer die werkt met: Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, TailwindCSS, Node.js en meer. Hij heeft ook ervaring met Adobe XD, After Effects en LottieFiles voor design & prototyping. Zijn huidige focus is Drupal backend ontwikkeling bij Dynamate.",
-    "projects": "Robbe heeft 3 projecten gebouwd:\n\n• Exulta — stretchtent verhuur website, momenteel in rebranding (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-gebaseerde leerling welzijn check-in, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nBekijk ze op de Projecten pagina!",
-    "project-exulta": "Exulta is de tweede versie van de Exulta stretchtent verhuur website, momenteel in rebranding en nog niet publiek. Gebouwd met Laravel 13 en React 19 via Inertia, met een Filament 5 adminpaneel, een productcatalogus, realisaties, blog en FAQ. Geautomatiseerde CI/CD via GitHub Actions met databaseback-ups en rollback bij fouten, plus Playwright- en Lighthouse-checks.",
+    "projects": "Robbe heeft 3 projecten gebouwd:\n\n• Exulta — stretchtent verhuur website, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-gebaseerde leerling welzijn check-in, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nBekijk ze op de Projecten pagina!",
+    "project-exulta": "Exulta is de tweede versie van de Exulta stretchtent verhuur website, live op exulta.be. Gebouwd met Laravel 13 en React 19 via Inertia, met een Filament 5 adminpaneel, een productcatalogus, een interactieve tentcalculator, realisaties en een blog. Geautomatiseerde CI/CD via GitHub Actions met databaseback-ups en rollback bij fouten, plus Playwright- en Lighthouse-checks.",
     "project-scan2talk": "Scan2Talk is een PWA voor scholen — leerlingen scannen een QR-code en doorlopen een begeleide emotionele welzijn check-in wizard (thermometer → thema's → gevoelens → hulpvraag). Leerkrachten krijgen een dashboard met Chart.js visualisaties. Gebouwd met Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Draait lokaal via DDEV.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun site op Next.js 16 en React 19: een zwart-wit redactioneel design met GSAP scroll-animatie, een WebGL hero en Lenis smooth scrolling, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. Momenteel in rebranding en nog niet publiek.",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens@telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens) en Facebook. De portfolio staat op robbe-saelens.netlify.app.",
@@ -166,7 +167,13 @@
     "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, VHS Service. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Probeer eens te vragen naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen hersteld naar standaard.\n\nTyp 'help' als je hulp nodig hebt.",
-    "quickReplies": ["Vaardigheden", "Projecten", "Ervaring", "Contact", "Opleiding"],
+    "quickReplies": [
+      "Vaardigheden",
+      "Projecten",
+      "Ervaring",
+      "Contact",
+      "Opleiding"
+    ],
     "easter": {
       "trigger": "🔐 Je hebt een verborgen pad gevonden. Drie raadsels bewaken wat erachter ligt. Klaar?\n\nRaadsel 1/3: Waar staat HTML voor?",
       "riddle1": "🔐 Je hebt een verborgen pad gevonden. Drie raadsels bewaken wat erachter ligt. Klaar?\n\nRaadsel 1/3: Waar staat HTML voor?",
