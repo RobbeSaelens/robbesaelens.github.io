@@ -45,7 +45,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Exulta - Stretch tent rental website',
           description:
-            'Exulta v2 by Robbe Saelens: stretch tent rental site with catalog, realisations and blog, on Laravel 13 + React 19 via Inertia, with a Filament 5 admin panel.',
+            'Exulta v2 by Robbe Saelens, live at exulta.be: stretch tent rental site with catalog, tent calculator and blog. Laravel 13, React 19, Filament 5.',
           image: '/exulta-home.jpg',
         },
       },

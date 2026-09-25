@@ -20,17 +20,7 @@
               <BookOpen class="card-icon" :size="18" :stroke-width="2" />
               {{ $t('about.teaching') }}
             </h2>
-            <i18n-t keypath="about.teachingText" tag="p" class="card-text">
-              <template #link>
-                <a
-                  class="card-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.sport.vlaanderen/onze-centra/woumen/"
-                  >Sport Vlaanderen Woumen</a
-                >
-              </template>
-            </i18n-t>
+            <p class="card-text">{{ $t('about.teachingText') }}</p>
           </div>
         </article>
 

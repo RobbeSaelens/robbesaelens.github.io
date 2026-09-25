@@ -32,7 +32,7 @@ CMS & cloud: Drupal, Azure, Netlify, Vercel
 
 ## Projects
 
-- [Exulta](https://robbesaelens.github.io/exultadetail): Second version of the Exulta stretch tent rental website, currently in rebranding and not public yet. Catalog, realisations, blog and FAQ on Laravel 13 + React 19 via Inertia, with a Filament 5 admin panel. 
+- [Exulta](https://robbesaelens.github.io/exultadetail): Second version of the Exulta stretch tent rental website, live at exulta.be. Catalog, tent calculator, realisations, blog and FAQ on Laravel 13 + React 19 via Inertia, with a Filament 5 admin panel. 
 - [VHS Service](https://robbesaelens.github.io/vhsdetail): Trilingual website for VHS Service, an equestrian arena builder in Geluwe, currently in rebranding and not public yet. Next.js 16, React 19, GSAP, WebGL, Vercel.
 - [Scan2Talk](https://robbesaelens.github.io/scan2talkdetail): Wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster to share how they feel; educators get trends and an anonymous chat. Laravel, Vue.js, Inertia.js, PostgreSQL.
 

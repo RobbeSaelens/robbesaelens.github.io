@@ -15,7 +15,7 @@ export const PROJECTS: SeoProject[] = [
     name: 'Exulta',
     headline: 'Stretch tent rental website',
     description:
-      'The second version of the Exulta stretch tent rental website, currently in rebranding: a product catalog, realisations, blog and FAQ on a Laravel 13 back end with a React 19 front end over Inertia, plus a Filament 5 admin panel the client runs themselves.',
+      'The second version of the Exulta stretch tent rental website, live at exulta.be: a product catalog, an interactive tent calculator, realisations, blog and FAQ on a Laravel 13 back end with a React 19 front end over Inertia, plus a Filament 5 admin panel the client runs themselves.',
     tech: ['Laravel', 'React', 'Inertia.js', 'Filament', 'PHP', 'Tailwind CSS', 'MySQL'],
     image: '/exulta-home.jpg',
   },
