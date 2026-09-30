@@ -658,7 +658,7 @@ const AUTO_REFRESH_MS = 60_000
 // than this. Keeps quick tab switching from hammering upstream API limits.
 const MIN_RESUME_AGE_MS = 10_000
 // Mirrors MONITOR_SCHEDULER_STALE_MINUTES' default on the scan2talk side.
-const SCHEDULER_STALE_MINUTES = 90
+const SCHEDULER_STALE_MINUTES = 1560
 const DASH = '—'
 // Per-browser UI preference only (which project cards are folded); no data.
 const COLLAPSED_STORAGE_KEY = 'status-collapsed'
