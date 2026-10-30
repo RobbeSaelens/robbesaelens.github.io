@@ -84,7 +84,9 @@
               >
                 {{ cancelling ? t('run.cancelling') : t('run.cancel') }}
               </button>
-              <button v-else type="button" class="btn btn--ghost btn--sm" @click="closeRun">{{ t('run.close') }}</button>
+              <button v-else-if="!runActive" type="button" class="btn btn--ghost btn--sm" @click="closeRun">
+                {{ t('run.close') }}
+              </button>
             </div>
           </header>
 
@@ -167,12 +169,47 @@
               </ul>
             </section>
 
-            <p v-if="run.status === 'ready' && run.branch" class="muted">
-              {{ t('run.review', { branch: run.branch }) }}
+            <section v-if="canPublish" class="detail-section">
+              <h4 class="detail-title">{{ t('run.files') }} ({{ run.files.length }})</h4>
+              <ul class="version-list">
+                <li v-for="f in run.files" :key="f"><span class="pkg">{{ f }}</span></li>
+              </ul>
+              <p class="muted review-hint">
+                {{ t('run.review', { branch: run.branch, base: run.baseBranch }) }}
+              </p>
+            </section>
+
+            <section v-if="canPublish" class="detail-section">
+              <label for="upd-message" class="detail-title">{{ t('run.message') }}</label>
+              <textarea
+                id="upd-message"
+                v-model="message"
+                class="input message"
+                rows="8"
+                spellcheck="false"
+                :disabled="run.status === 'committed' || runActive"
+              ></textarea>
+              <p v-if="run.status === 'committed'" class="why">{{ t('run.retryHint') }}</p>
+            </section>
+
+            <p v-if="run.status === 'pushed'" class="summary outcome outcome--ok">
+              {{ t('run.pushed', { commit: run.commit?.slice(0, 7), base: run.baseBranch, branch: run.originalBranch ?? run.baseBranch }) }}
             </p>
+            <p v-if="run.status === 'discarded'" class="summary outcome">
+              {{ t('run.discarded', { branch: run.originalBranch ?? run.baseBranch }) }}
+            </p>
+
+            <div v-if="canPublish || canDiscard" class="card-actions">
+              <button v-if="canPublish" type="button" class="btn btn--sm" :disabled="runActive || !message.trim()" @click="publishRun">
+                {{ run.status === 'committed' ? t('run.retryPush', { base: run.baseBranch }) : t('run.publish', { base: run.baseBranch }) }}
+              </button>
+              <button v-if="canDiscard" type="button" class="btn btn--ghost btn--sm btn--danger" :disabled="runActive" @click="discardRun">
+                {{ t('run.discard', { branch: run.originalBranch ?? run.baseBranch }) }}
+              </button>
+            </div>
           </div>
 
-          <details class="log" :open="run.status === 'running'">
+          <details class="log" :open="runActive">
             <summary>{{ t('run.log', { count: events.length }) }}</summary>
             <ol class="log-lines">
               <li v-for="e in visibleEvents" :key="e.seq" :class="`log--${e.kind}`">
@@ -368,7 +405,17 @@ interface LatestScan {
 }
 
 type RunStep = 'prepare' | 'baseline' | 'update' | 'verify'
-type RunStatus = 'running' | 'ready' | 'no-changes' | 'failed' | 'cancelled'
+type RunStatus =
+  | 'running'
+  | 'ready'
+  | 'no-changes'
+  | 'failed'
+  | 'cancelled'
+  | 'publishing'
+  | 'committed'
+  | 'pushed'
+  | 'discarding'
+  | 'discarded'
 type StepState = 'pending' | 'active' | 'done' | 'failed'
 type RunEvent = { seq: number; at: string } & (
   | { kind: 'step'; step: RunStep; state: 'started' | 'done' }
@@ -402,6 +449,12 @@ interface RunRecord {
     denials: { tool: string; detail: string }[]
   } | null
   problems: string[]
+  files: string[]
+  commitMessage: string
+  commit: string | null
+  baseBranch: string
+  baseCommit: string | null
+  originalBranch: string | null
 }
 type BlockReason = 'token' | 'busy' | 'scanning' | 'dirty' | 'error'
 
@@ -466,7 +519,18 @@ const en = {
     cancel: 'Cancel',
     cancelling: 'Cancelling…',
     close: 'Close',
-    status: { running: 'Running', ready: 'Ready for review', noChanges: 'Nothing changed', failed: 'Failed', cancelled: 'Cancelled' },
+    status: {
+      running: 'Running',
+      ready: 'Ready for review',
+      noChanges: 'Nothing changed',
+      failed: 'Failed',
+      cancelled: 'Cancelled',
+      publishing: 'Committing and pushing…',
+      committed: 'Committed, not pushed',
+      pushed: 'Pushed',
+      discarding: 'Discarding…',
+      discarded: 'Discarded',
+    },
     step: { prepare: 'Prepare branch', baseline: 'Checks before', update: 'Claude updates', verify: 'Checks after' },
     stepState: { pending: 'waiting', active: 'running', done: 'done', failed: 'stopped' },
     summary: 'Summary',
@@ -484,7 +548,17 @@ const en = {
     downgrade: 'downgrade',
     skipped: 'Skipped by Claude',
     denials: 'Refused actions',
-    review: 'The changes are uncommitted on {branch}. Review them with git diff; committing and pushing from here comes next.',
+    review: 'Uncommitted on {branch}. Review them in your editor or with git diff before you push to {base}.',
+    files: 'Files to commit',
+    message: 'Commit message',
+    publish: 'Commit & push to {base}',
+    retryPush: 'Retry push to {base}',
+    retryHint: 'The commit exists on the update branch; only the push is retried.',
+    discard: 'Discard, back to {branch}',
+    pushed: 'Pushed {commit} to origin/{base}. Back on {branch}.',
+    discarded: 'Thrown away. Back on {branch}.',
+    confirmPublish: 'Commit these {count} file(s) and push to origin/{base}?\n\nThe push is never forced: if someone pushed to {base} meanwhile, it stops and keeps the commit.',
+    confirmDiscard: 'Throw this update away?\n\nThis resets {branch} (uncommitted edits on it are lost), goes back to {original}, deletes the branch and reinstalls the dependencies.',
     log: 'Log ({count})',
   },
 }
@@ -551,7 +625,18 @@ const nl: typeof en = {
     cancel: 'Annuleren',
     cancelling: 'Bezig met annuleren…',
     close: 'Sluiten',
-    status: { running: 'Bezig', ready: 'Klaar voor review', noChanges: 'Niets gewijzigd', failed: 'Mislukt', cancelled: 'Geannuleerd' },
+    status: {
+      running: 'Bezig',
+      ready: 'Klaar voor review',
+      noChanges: 'Niets gewijzigd',
+      failed: 'Mislukt',
+      cancelled: 'Geannuleerd',
+      publishing: 'Bezig met committen en pushen…',
+      committed: 'Gecommit, niet gepusht',
+      pushed: 'Gepusht',
+      discarding: 'Bezig met verwerpen…',
+      discarded: 'Verworpen',
+    },
     step: { prepare: 'Branch voorbereiden', baseline: 'Checks vooraf', update: 'Claude update', verify: 'Checks achteraf' },
     stepState: { pending: 'wacht', active: 'bezig', done: 'klaar', failed: 'gestopt' },
     summary: 'Samenvatting',
@@ -569,7 +654,17 @@ const nl: typeof en = {
     downgrade: 'downgrade',
     skipped: 'Overgeslagen door Claude',
     denials: 'Geweigerde acties',
-    review: 'De wijzigingen staan niet-gecommit op {branch}. Bekijk ze met git diff; committen en pushen vanaf hier volgt nog.',
+    review: 'Niet-gecommit op {branch}. Bekijk ze in je editor of met git diff voor je naar {base} pusht.',
+    files: 'Te committen bestanden',
+    message: 'Commitbericht',
+    publish: 'Commit & push naar {base}',
+    retryPush: 'Push naar {base} opnieuw proberen',
+    retryHint: 'De commit staat al op de update-branch; enkel de push wordt opnieuw geprobeerd.',
+    discard: 'Verwerpen, terug naar {branch}',
+    pushed: '{commit} gepusht naar origin/{base}. Terug op {branch}.',
+    discarded: 'Weggegooid. Terug op {branch}.',
+    confirmPublish: 'Deze {count} bestand(en) committen en naar origin/{base} pushen?\n\nEr wordt nooit geforceerd: heeft iemand intussen naar {base} gepusht, dan stopt het en blijft de commit bewaard.',
+    confirmDiscard: 'Deze update weggooien?\n\nDit reset {branch} (niet-gecommitte aanpassingen erop gaan verloren), gaat terug naar {original}, verwijdert de branch en herinstalleert de dependencies.',
     log: 'Log ({count})',
   },
 }
@@ -597,6 +692,11 @@ const RUN_STATUS_KEY: Record<RunStatus, string> = {
   'no-changes': 'noChanges',
   failed: 'failed',
   cancelled: 'cancelled',
+  publishing: 'publishing',
+  committed: 'committed',
+  pushed: 'pushed',
+  discarding: 'discarding',
+  discarded: 'discarded',
 }
 const RUN_TONE: Record<RunStatus, string> = {
   running: 'info',
@@ -604,8 +704,28 @@ const RUN_TONE: Record<RunStatus, string> = {
   'no-changes': 'ok',
   failed: 'down',
   cancelled: 'degraded',
+  publishing: 'info',
+  committed: 'degraded',
+  pushed: 'ok',
+  discarding: 'info',
+  discarded: 'info',
 }
-const RUN_GLYPH: Record<RunStatus, string> = { running: '▸', ready: '✓', 'no-changes': '✓', failed: '✗', cancelled: '!' }
+const RUN_GLYPH: Record<RunStatus, string> = {
+  running: '▸',
+  ready: '✓',
+  'no-changes': '✓',
+  failed: '✗',
+  cancelled: '!',
+  publishing: '▸',
+  committed: '!',
+  pushed: '✓',
+  discarding: '▸',
+  discarded: '·',
+}
+// Mirrors the updater: while these last, the run holds the one-at-a-time slot.
+const BUSY: RunStatus[] = ['running', 'publishing', 'discarding']
+const PUBLISHABLE: RunStatus[] = ['ready', 'committed']
+const DISCARDABLE: RunStatus[] = ['ready', 'committed', 'no-changes', 'failed', 'cancelled']
 
 const phase = ref<'connecting' | 'ready' | 'offline'>('connecting')
 const scanning = ref(false)
@@ -707,7 +827,10 @@ function forgetToken() {
   }
 }
 
-const runActive = computed(() => run.value?.status === 'running')
+const runActive = computed(() => !!run.value && BUSY.includes(run.value.status))
+const canPublish = computed(() => !!run.value && PUBLISHABLE.includes(run.value.status))
+const canDiscard = computed(() => !!run.value && DISCARDABLE.includes(run.value.status))
+const message = ref('')
 
 function updateBlock(p: ProjectScan): BlockReason | '' {
   if (!token.value) return 'token'
@@ -768,7 +891,10 @@ async function poll() {
     const after = events.value.at(-1)?.seq ?? 0
     const data = await runApi<{ run: RunRecord; events: RunEvent[] }>(`/api/runs/${id}?after=${after}`)
     if (runId.value !== id) return // closed or replaced meanwhile
-    const finished = run.value?.status === 'running' && data.run.status !== 'running'
+    const wasBusy = !!run.value && BUSY.includes(run.value.status)
+    const finished = wasBusy && !BUSY.includes(data.run.status)
+    // Prefill once per run; never overwrite what you typed.
+    if (run.value?.id !== data.run.id) message.value = data.run.commitMessage
     run.value = data.run
     events.value = [...events.value, ...data.events]
     // The run moved the project to its update branch: show that in the cards.
@@ -776,7 +902,7 @@ async function poll() {
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   }
-  if (runId.value === id && run.value?.status === 'running' && token.value) pollTimer = setTimeout(poll, POLL_MS)
+  if (runId.value === id && runActive.value && token.value) pollTimer = setTimeout(poll, POLL_MS)
 }
 
 async function showRun(id: string) {
@@ -811,6 +937,34 @@ async function cancelRun() {
     error.value = e instanceof Error ? e.message : String(e)
     cancelling.value = false
   }
+}
+
+async function runAction(action: 'publish' | 'discard', body: object) {
+  if (!runId.value) return
+  error.value = ''
+  try {
+    await runApi(`/api/runs/${runId.value}/${action}`, { method: 'POST', body: JSON.stringify(body) })
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e)
+    return
+  }
+  clearTimeout(pollTimer)
+  await poll() // picks up the busy status and keeps polling until it settles
+  if (!runActive.value) scan() // it was done before the first poll
+}
+
+function publishRun() {
+  const r = run.value
+  if (!r || !window.confirm(t('run.confirmPublish', { count: r.files.length, base: r.baseBranch }))) return
+  runAction('publish', r.status === 'ready' ? { message: message.value } : {})
+}
+
+function discardRun() {
+  const r = run.value
+  if (!r) return
+  const original = r.originalBranch ?? r.baseBranch
+  if (!window.confirm(t('run.confirmDiscard', { branch: r.branch ?? original, original }))) return
+  runAction('discard', {})
 }
 
 function closeRun() {
@@ -982,6 +1136,12 @@ onBeforeUnmount(() => clearTimeout(pollTimer))
 .btn--sm {
   padding: 0.375rem 0.75rem;
   font-size: 0.8125rem;
+}
+.btn--danger {
+  color: var(--status-down);
+}
+.btn--danger:hover:not(:disabled) {
+  border-color: var(--status-down);
 }
 .btn-icon {
   width: 1rem;
@@ -1359,6 +1519,32 @@ onBeforeUnmount(() => clearTimeout(pollTimer))
 }
 .checks .is-regression {
   background: var(--status-down-bg);
+}
+.message {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.5;
+  resize: vertical;
+}
+.message:disabled {
+  opacity: 0.7;
+}
+label.detail-title {
+  display: block;
+}
+.review-hint {
+  margin-top: 0.5rem;
+}
+.outcome {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+.outcome--ok {
+  color: var(--status-ok);
+  border-color: currentColor;
+  background: var(--status-ok-bg);
 }
 .log {
   margin-top: 1rem;
