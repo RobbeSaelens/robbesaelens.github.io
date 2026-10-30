@@ -191,7 +191,9 @@
     "toggleThemeLight": "Switch to light mode",
     "toggleThemeDark": "Switch to dark mode",
     "toggleNav": "Toggle navigation menu",
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "mainNav": "Main navigation",
+    "closeNav": "Close navigation menu"
   },
   "easter": {
     "title": "DEVELOPER MODE",

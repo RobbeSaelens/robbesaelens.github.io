@@ -25,3 +25,7 @@ dist-ssr
 
 .nvmrc
 tailwind.config.cjs
+
+# Playwright
+test-results/
+playwright-report/

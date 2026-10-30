@@ -1,225 +1,238 @@
 <template>
-  <div class="flex w-full items-center justify-between">
-    <router-link class="focus-visible:ring-2xl rounded-md outline-none" to="/" @click="onLogoClick">
+  <div class="nav-bar">
+    <router-link class="nav-logo" to="/" @click="onLogoClick">
       <img
-        class="hidden sm:block scale h-5 customFill"
+        class="nav-logo-full customFill"
         src="/Logo.svg"
         alt="Robbe Saelens logo"
-        loading="lazy"
+        width="132"
+        height="20"
+        fetchpriority="high"
       />
       <img
+        class="nav-logo-mark customFill"
         src="/Fav.png"
         alt="Robbe Saelens logo"
-        class="scale h-5 customFill block sm:hidden"
-        loading="lazy"
+        width="17"
+        height="20"
+        fetchpriority="high"
       />
     </router-link>
+
     <!-- Secret code revealed via triple-click -->
     <transition name="code-reveal">
       <span v-if="showSecretCode" class="secret-code-badge">{{ secretCode }}</span>
     </transition>
 
-    <!-- Desktop nav -->
-    <div class="ml-auto hidden items-center sm:flex">
-      <ul class="flex items-center space-x-8 text-sm font-medium">
-        <li :class="{ 'sm:active-link': $route.path === '/projects' }">
-          <router-link class="active flex text-lg text-teal-700 dark:text-teal-500" to="/projects">
-            {{ $t('nav.projects') }}
-          </router-link>
-        </li>
-        <li :class="{ 'sm:active-link': $route.path === '/contact' }">
-          <router-link class="active flex text-lg text-teal-700 dark:text-teal-500" to="/contact">
-            {{ $t('nav.aboutMe') }}
-          </router-link>
-        </li>
-        <li>
-          <LanguageSwitcher />
-        </li>
-        <li>
-          <button
-            @click="toggleTheme"
-            class="h-6 w-6 cursor-pointer text-teal-700 dark:text-teal-300"
-            :aria-label="isDark ? $t('aria.toggleThemeLight') : $t('aria.toggleThemeDark')"
-          >
-            <Sun v-if="isDark" class="h-6 w-6" />
-            <Moon v-else class="h-6 w-6" />
-          </button>
-        </li>
-      </ul>
+    <!-- Desktop -->
+    <div class="nav-desktop">
+      <div ref="linkList" class="nav-links">
+        <span class="nav-indicator" :style="indicatorStyle" aria-hidden="true"></span>
+        <ul class="nav-links-list">
+          <li v-for="link in links" :key="link.to">
+            <router-link
+              :ref="(el) => setLinkRef(link.to, el)"
+              :to="link.to"
+              class="nav-link"
+              :class="{ 'is-current': isCurrent(link) }"
+            >
+              <span class="nav-link-prompt" aria-hidden="true">&gt;</span>
+              {{ $t(link.label) }}
+            </router-link>
+          </li>
+        </ul>
+      </div>
+
+      <span class="nav-divider" aria-hidden="true"></span>
+
+      <div class="nav-tools">
+        <LanguageSwitcher />
+        <button
+          type="button"
+          class="nav-icon-btn"
+          :aria-label="isDark ? $t('aria.toggleThemeLight') : $t('aria.toggleThemeDark')"
+          @click="toggleTheme"
+        >
+          <Sun v-if="isDark" class="h-[1.15rem] w-[1.15rem]" />
+          <Moon v-else class="h-[1.15rem] w-[1.15rem]" />
+        </button>
+      </div>
     </div>
 
-    <!-- Mobile hamburger -->
+    <!-- Mobile -->
     <button
-      @click="toggleNav"
+      ref="menuButton"
       type="button"
-      class="hamburger relative z-[5001] rounded-lg p-2 text-sm text-teal-600 focus:outline-none focus:ring-2 focus:ring-gray-600 sm:hidden"
-      :aria-controls="'mobile-menu'"
+      class="nav-icon-btn nav-menu-btn"
+      aria-controls="mobile-menu"
       :aria-expanded="showMenu"
       :aria-label="$t('aria.toggleNav')"
+      @click="openMenu"
     >
-      <!-- Hamburger icon -->
-      <svg
-        v-if="!showMenu"
-        class="h-6 w-6"
-        aria-hidden="true"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-          clip-rule="evenodd"
-        ></path>
-      </svg>
-      <!-- X icon -->
-      <svg
-        v-else
-        class="h-6 w-6"
-        aria-hidden="true"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        viewBox="0 0 24 24"
-      >
-        <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
+      <span class="burger" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
   </div>
 
-  <!-- Mobile fullscreen overlay -->
+  <!-- Mobile fullscreen menu -->
   <Teleport to="body">
-    <transition name="overlay">
+    <transition name="menu">
       <div
         v-if="showMenu"
         id="mobile-menu"
-        class="fixed inset-0 z-5000 flex flex-col items-center justify-center bg-white dark:bg-gray-900"
-        @click.self="closeMenu"
+        ref="menuPanel"
+        class="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="$t('aria.mainNav')"
+        @keydown.esc="closeMenu"
+        @keydown.tab="trapFocus"
       >
-        <img
-          src="/Fav.png"
-          alt="Robbe Saelens logo"
-          class="absolute left-6 top-6 h-8"
-          loading="lazy"
-          @click="onLogoClick"
-        />
-        <nav class="flex flex-col items-center space-y-8 text-center">
-          <router-link
-            class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
-            to="/"
-            @click="closeMenu"
-          >
-            {{ $t('nav.home') }}
+        <div class="mobile-top">
+          <router-link class="nav-logo" to="/" @click="onLogoClick">
+            <img src="/Fav.png" alt="Robbe Saelens logo" class="h-7 customFill" width="24" height="28" />
           </router-link>
-          <router-link
-            class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
-            to="/projects"
-            @click="closeMenu"
-          >
-            {{ $t('nav.projects') }}
-          </router-link>
-          <router-link
-            class="text-4xl font-bold text-teal-700 transition-colors hover:text-teal-500 dark:text-teal-300 dark:hover:text-teal-400"
-            to="/contact"
-            @click="closeMenu"
-          >
-            {{ $t('nav.aboutMe') }}
-          </router-link>
-
-          <hr class="w-32 border-teal-200 dark:border-teal-800" aria-hidden="true" />
-
-          <div class="space-y-4 text-lg text-teal-600 dark:text-teal-400">
-            <a
-              href="tel:0471958195"
-              class="flex items-center justify-center gap-2 transition-colors hover:text-teal-800 dark:hover:text-teal-200"
-            >
-              <Phone class="h-5 w-5" />
-              0471 95 81 95
-            </a>
-            <a
-              href="mailto:robbe.saelens@telenet.be"
-              class="flex items-center justify-center gap-2 transition-colors hover:text-teal-800 dark:hover:text-teal-200"
-            >
-              <Mail class="h-5 w-5" />
-              robbe.saelens@telenet.be
-            </a>
-          </div>
-
-          <LanguageSwitcher />
-
           <button
-            @click="toggleTheme"
-            class="mt-4 rounded-full border border-teal-300 px-6 py-2 text-teal-700 transition-colors hover:bg-teal-50 dark:border-teal-700 dark:text-teal-300 dark:hover:bg-teal-900"
-            :aria-label="isDark ? $t('aria.toggleThemeLight') : $t('aria.toggleThemeDark')"
+            type="button"
+            class="nav-icon-btn"
+            :aria-label="$t('aria.closeNav')"
+            @click="closeMenu"
           >
-            <Sun v-if="isDark" class="mx-auto h-6 w-6" />
-            <Moon v-else class="mx-auto h-6 w-6" />
+            <X class="h-5 w-5" />
           </button>
+        </div>
+
+        <nav class="mobile-links" :aria-label="$t('aria.mainNav')">
+          <p class="mobile-path" aria-hidden="true">~/robbe-saelens <span>$ ls</span></p>
+          <router-link
+            v-for="(link, i) in mobileLinks"
+            :key="link.to"
+            :to="link.to"
+            class="mobile-link"
+            :class="{ 'is-current': isCurrent(link) }"
+            :style="{ '--i': i }"
+            @click="closeMenu"
+          >
+            <span class="mobile-index" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</span>
+            <span class="mobile-label">{{ $t(link.label) }}</span>
+            <ArrowRight class="mobile-arrow" aria-hidden="true" />
+          </router-link>
         </nav>
+
+        <div class="mobile-bottom" :style="{ '--i': mobileLinks.length }">
+          <a href="tel:0471958195" class="mobile-contact">
+            <Phone class="h-4 w-4" aria-hidden="true" />
+            0471 95 81 95
+          </a>
+          <a href="mailto:robbe.saelens@telenet.be" class="mobile-contact">
+            <Mail class="h-4 w-4" aria-hidden="true" />
+            robbe.saelens@telenet.be
+          </a>
+          <div class="mobile-tools">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              class="nav-icon-btn"
+              :aria-label="isDark ? $t('aria.toggleThemeLight') : $t('aria.toggleThemeDark')"
+              @click="toggleTheme"
+            >
+              <Sun v-if="isDark" class="h-5 w-5" />
+              <Moon v-else class="h-5 w-5" />
+            </button>
+          </div>
+        </div>
       </div>
     </transition>
   </Teleport>
 </template>
 
 <script lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { Sun, Moon, Phone, Mail } from 'lucide-vue-next'
+import {
+  ref,
+  computed,
+  watch,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
+  type ComponentPublicInstance,
+} from 'vue'
+import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { Sun, Moon, Phone, Mail, X, ArrowRight } from 'lucide-vue-next'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
 import { useEasterEgg } from '../../composables/useEasterEgg'
 
+interface NavLink {
+  to: string
+  label: string
+  /** Extra paths that count as this section (project detail pages). */
+  matches?: (path: string) => boolean
+}
+
+const LINKS: NavLink[] = [
+  { to: '/projects', label: 'nav.projects', matches: (p) => p.endsWith('detail') },
+  { to: '/contact', label: 'nav.aboutMe' },
+]
+
 export default {
-  components: {
-    Sun,
-    Moon,
-    Phone,
-    Mail,
-    LanguageSwitcher,
-  },
+  components: { Sun, Moon, Phone, Mail, X, ArrowRight, LanguageSwitcher },
+
   setup() {
+    const route = useRoute()
+    const { locale } = useI18n({ useScope: 'global' })
     const showMenu = ref(false)
     const { handleLogoClick, secretCode, showSecretCode } = useEasterEgg()
 
-    const onLogoClick = () => {
-      handleLogoClick()
-      closeMenu()
+    const links = LINKS
+    const mobileLinks: NavLink[] = [{ to: '/', label: 'nav.home' }, ...LINKS]
+
+    const isCurrent = (link: NavLink) =>
+      route.path === link.to || (link.matches?.(route.path) ?? false)
+
+    // ── Sliding indicator behind the current desktop link ──
+    const linkList = ref<HTMLElement | null>(null)
+    const linkEls = new Map<string, HTMLElement>()
+    const indicator = ref({ x: 0, w: 0, visible: false })
+
+    const setLinkRef = (to: string, el: Element | ComponentPublicInstance | null) => {
+      const node = el && '$el' in el ? (el.$el as HTMLElement) : (el as HTMLElement | null)
+      if (node) linkEls.set(to, node)
+      else linkEls.delete(to)
     }
 
-    // Read theme from localStorage, fall back to system preference, default to
-    // light. Guarded because setup() also runs during prerendering.
+    const placeIndicator = () => {
+      const current = links.find(isCurrent)
+      const el = current && linkEls.get(current.to)
+      if (!el) {
+        indicator.value = { ...indicator.value, visible: false }
+        return
+      }
+      indicator.value = { x: el.offsetLeft, w: el.offsetWidth, visible: true }
+    }
+
+    const indicatorStyle = computed(() => ({
+      transform: `translateX(${indicator.value.x}px)`,
+      width: `${indicator.value.w}px`,
+      opacity: indicator.value.visible ? 1 : 0,
+    }))
+
+    // Labels change width with the language and the current page, so measure again.
+    let resizeObserver: ResizeObserver | null = null
+    watch(
+      () => [route.path, locale.value],
+      () => nextTick(placeIndicator),
+    )
+
+    // ── Theme (read guarded: setup() also runs during prerendering) ──
     const isBrowser = typeof window !== 'undefined'
     const stored = isBrowser ? localStorage.getItem('theme') : null
     const prefersDark = isBrowser && window.matchMedia('(prefers-color-scheme: dark)').matches
-    const initialTheme = stored || (prefersDark ? 'dark' : 'light')
-    const theme = ref(initialTheme)
-
+    const theme = ref(stored || (prefersDark ? 'dark' : 'light'))
     const isDark = computed(() => theme.value === 'dark')
-
-    // Sync DOM class on mount and whenever theme changes
-    onMounted(() => {
-      if (isDark.value) {
-        document.documentElement.classList.add('dark')
-      }
-    })
-
-    const toggleNav = () => {
-      showMenu.value = !showMenu.value
-      // Prevent body scroll when menu is open
-      document.body.style.overflow = showMenu.value ? 'hidden' : ''
-    }
-
-    const closeMenu = () => {
-      showMenu.value = false
-      document.body.style.overflow = ''
-    }
 
     const applyTheme = (nextTheme: 'light' | 'dark') => {
       theme.value = nextTheme
       localStorage.setItem('theme', nextTheme)
-      if (nextTheme === 'dark') {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
+      document.documentElement.classList.toggle('dark', nextTheme === 'dark')
     }
 
     const toggleTheme = () => {
@@ -231,11 +244,77 @@ export default {
       document.startViewTransition(() => applyTheme(nextTheme))
     }
 
+    // ── Mobile menu ──
+    const menuButton = ref<HTMLElement | null>(null)
+    const menuPanel = ref<HTMLElement | null>(null)
+
+    const openMenu = () => {
+      showMenu.value = true
+      document.body.style.overflow = 'hidden'
+      nextTick(() => menuPanel.value?.querySelector<HTMLElement>('.mobile-link')?.focus())
+    }
+
+    const closeMenu = () => {
+      if (!showMenu.value) return
+      showMenu.value = false
+      document.body.style.overflow = ''
+      nextTick(() => menuButton.value?.focus())
+    }
+
+    /** Keep Tab inside the open menu. */
+    const trapFocus = (e: KeyboardEvent) => {
+      const focusable = menuPanel.value?.querySelectorAll<HTMLElement>('a[href], button')
+      if (!focusable?.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    // Back/forward navigation must not leave the menu open over a new page.
+    watch(() => route.path, closeMenu)
+
+    const onLogoClick = () => {
+      handleLogoClick()
+      closeMenu()
+    }
+
+    onMounted(() => {
+      if (isDark.value) document.documentElement.classList.add('dark')
+      placeIndicator()
+      // Each link, not just the bar: the ">" prompt animates a link wider when it
+      // becomes current, and the indicator has to follow that growth.
+      if (typeof ResizeObserver !== 'undefined' && linkList.value) {
+        resizeObserver = new ResizeObserver(placeIndicator)
+        resizeObserver.observe(linkList.value)
+        linkEls.forEach((el) => resizeObserver?.observe(el))
+      }
+    })
+
+    onBeforeUnmount(() => {
+      resizeObserver?.disconnect()
+      document.body.style.overflow = ''
+    })
+
     return {
+      links,
+      mobileLinks,
+      isCurrent,
+      linkList,
+      setLinkRef,
+      indicatorStyle,
       showMenu,
       isDark,
-      toggleNav,
+      menuButton,
+      menuPanel,
+      openMenu,
       closeMenu,
+      trapFocus,
       toggleTheme,
       onLogoClick,
       secretCode,
@@ -246,67 +325,341 @@ export default {
 </script>
 
 <style>
-.hamburger {
-  background-color: rgba(0, 128, 128, 0.1);
+/* ── Bar ── */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
 }
 
-/* Overlay transition */
-.overlay-enter-active {
-  transition: opacity 0.3s ease-out;
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+  /* Generous hit area without moving the logo. */
+  padding: 0.6rem;
+  margin: -0.6rem;
+  border-radius: 0.6rem;
+  outline: none;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.overlay-leave-active {
-  transition: opacity 0.2s ease-in;
+.nav-logo:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-accent);
 }
-.overlay-enter-from,
-.overlay-leave-to {
-  opacity: 0;
+@media (hover: hover) and (pointer: fine) {
+  .nav-logo:hover {
+    transform: scale(1.04);
+  }
+}
+.nav-logo-full {
+  display: none;
+  height: 1.25rem;
+  width: auto;
+}
+.nav-logo-mark {
+  display: block;
+  height: 1.25rem;
+  width: auto;
+}
+@media (min-width: 640px) {
+  .nav-logo-full {
+    display: block;
+  }
+  .nav-logo-mark {
+    display: none;
+  }
 }
 
-.overlay-enter-active nav,
-.overlay-leave-active nav {
+/* ── Desktop links ── */
+.nav-desktop {
+  display: none;
+  align-items: center;
+  gap: 0.9rem;
+  margin-left: auto;
+}
+@media (min-width: 640px) {
+  .nav-desktop {
+    display: flex;
+  }
+}
+
+.nav-links {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.3rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.nav-links-list {
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.nav-indicator {
+  position: absolute;
+  top: 0.3rem;
+  bottom: 0.3rem;
+  left: 0;
+  border-radius: 9999px;
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 1px var(--color-border-glow);
   transition:
-    transform 0.3s ease-out,
-    opacity 0.3s ease-out;
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.25s ease;
+  pointer-events: none;
 }
-.overlay-enter-from nav,
-.overlay-leave-to nav {
-  transform: translateY(20px);
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+  outline: none;
+  transition: color 0.2s ease;
+}
+.nav-link:hover,
+.nav-link.is-current {
+  color: var(--color-accent);
+}
+.nav-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+.nav-link-prompt {
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    width 0.3s ease,
+    opacity 0.3s ease;
+}
+.nav-link.is-current .nav-link-prompt {
+  width: 0.6em;
+  opacity: 1;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 1.4rem;
+  background: var(--color-border-glow);
+  opacity: 0.6;
+}
+
+.nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Icon buttons (theme, menu, close) ── */
+.nav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.nav-icon-btn:hover {
+  border-color: var(--color-border-glow);
+  background: var(--color-surface-hover);
+}
+.nav-icon-btn:active {
+  transform: scale(0.94);
+}
+.nav-icon-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.nav-menu-btn {
+  margin-left: auto;
+}
+@media (min-width: 640px) {
+  .nav-menu-btn {
+    display: none;
+  }
+}
+
+.burger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 1.1rem;
+}
+.burger span {
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+.burger span:nth-child(2) {
+  width: 70%;
+  margin-left: auto;
+}
+
+/* ── Mobile menu ── */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background: #f6f6f6;
+  overflow-y: auto;
+}
+.dark .mobile-menu {
+  background: #222222;
+}
+
+.mobile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-links {
+  display: flex;
+  flex-direction: column;
+  margin: auto 0;
+  padding: 2rem 0;
+}
+
+.mobile-path {
+  margin-bottom: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+}
+.mobile-path span {
+  color: var(--color-accent);
+}
+
+.mobile-link {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
+  outline: none;
+}
+.mobile-link:first-of-type {
+  border-top: 1px solid var(--color-border);
+}
+.mobile-link:focus-visible .mobile-label {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+.mobile-index {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  opacity: 0.7;
+}
+.mobile-label {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.mobile-arrow {
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-left: auto;
+  align-self: center;
+  color: var(--color-accent);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+.mobile-link.is-current {
+  color: var(--color-accent);
+}
+.mobile-link.is-current .mobile-arrow,
+.mobile-link:active .mobile-arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.mobile-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+.mobile-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #475569);
+}
+.mobile-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+}
+
+/* Menu open/close: panel fades, links and footer rise in one after another. */
+.menu-enter-active,
+.menu-leave-active {
+  transition: opacity 0.3s ease;
+}
+.menu-enter-from,
+.menu-leave-to {
   opacity: 0;
 }
-
-.scale {
-  transform: scale(1);
+.menu-enter-active .mobile-link,
+.menu-enter-active .mobile-bottom {
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 60ms + 80ms);
+}
+.menu-enter-from .mobile-link,
+.menu-enter-from .mobile-bottom {
+  opacity: 0;
+  transform: translateY(16px);
 }
 
-.scale:hover {
-  transform: scale(1.1);
-}
-
-@media (min-width: 768px) {
-  .scale {
-    transition: transform 0.5s ease-in-out;
+@media (prefers-reduced-motion: reduce) {
+  .nav-indicator,
+  .nav-link-prompt,
+  .menu-enter-active,
+  .menu-leave-active,
+  .menu-enter-active .mobile-link,
+  .menu-enter-active .mobile-bottom {
+    transition: none;
   }
-
-  .scale:hover {
-    transform: scale(1.05);
-  }
-}
-
-.active {
-  padding: 0.3rem 0.8rem;
-}
-
-.active:focus,
-.active:active {
-  border-radius: 5rem;
-  background-color: rgba(0, 128, 128, 0.15);
-  transition: background-color 0.5s ease-in-out;
-}
-
-.active:hover {
-  border-radius: 5rem;
-  background-color: rgba(0, 128, 128, 0.1);
-  transition: background-color 0.2s ease-in-out;
 }
 
 /* ── Theme toggle view transition ── */
@@ -314,15 +667,12 @@ export default {
 ::view-transition-new(root) {
   animation-duration: 0.5s;
 }
-
 ::view-transition-old(root) {
   animation-name: fade-out;
 }
-
 ::view-transition-new(root) {
   animation-name: fade-in;
 }
-
 @keyframes fade-out {
   from {
     opacity: 1;
@@ -331,7 +681,6 @@ export default {
     opacity: 0;
   }
 }
-
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -357,7 +706,6 @@ export default {
   letter-spacing: 0.2em;
   animation: code-pulse 0.6s ease-in-out 2;
 }
-
 @keyframes code-pulse {
   0%,
   100% {
@@ -369,7 +717,6 @@ export default {
     box-shadow: 0 0 12px 2px rgba(20, 184, 166, 0.4);
   }
 }
-
 .code-reveal-enter-active {
   transition: all 0.3s ease-out;
 }

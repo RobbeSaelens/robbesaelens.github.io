@@ -1,6 +1,9 @@
 <template>
-  <splash-screen class="bg-light dark:bg-dark h-screen" v-if="isLoading" />
-  <div v-else class="bg-light dark:bg-dark sm:h-screen overflow-x-hidden overflow-y-auto">
+  <!-- Mobile scrolls the document; overflow-x-clip stops sideways overflow without
+       turning this div into a scroll container, which would break the sticky header. -->
+  <div
+    class="bg-light dark:bg-dark overflow-x-clip sm:h-screen sm:overflow-x-hidden sm:overflow-y-auto"
+  >
     <CustomCursor />
     <router-view> </router-view>
     <EasterEgg />
@@ -11,7 +14,6 @@
 import { defineComponent } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRoute } from 'vue-router'
-import SplashScreen from './components/splashScreen.vue'
 import CustomCursor from './components/CustomCursor.vue'
 import EasterEgg from './components/EasterEgg.vue'
 import { SITE_NAME, SITE_TAGLINE, SITE_URL, absoluteUrl } from './site'
@@ -23,16 +25,8 @@ const DEFAULT_DESCRIPTION =
 export default defineComponent({
   name: 'App',
   components: {
-    SplashScreen,
     CustomCursor,
     EasterEgg,
-  },
-  data() {
-    return {
-      // During prerendering there is no browser, so render the real content
-      // straight away instead of the splash screen.
-      isLoading: typeof window !== 'undefined',
-    }
   },
   setup() {
     const route = useRoute()
@@ -86,9 +80,6 @@ export default defineComponent({
           : []
       },
     })
-  },
-  mounted() {
-    this.isLoading = false
   },
 })
 </script>

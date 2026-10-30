@@ -191,7 +191,9 @@
     "toggleThemeLight": "Schakel naar lichte modus",
     "toggleThemeDark": "Schakel naar donkere modus",
     "toggleNav": "Navigatiemenu openen",
-    "skipToContent": "Ga naar hoofdinhoud"
+    "skipToContent": "Ga naar hoofdinhoud",
+    "mainNav": "Hoofdnavigatie",
+    "closeNav": "Navigatiemenu sluiten"
   },
   "easter": {
     "title": "DEVELOPER MODE",

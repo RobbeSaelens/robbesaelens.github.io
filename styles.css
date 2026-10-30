@@ -12,6 +12,16 @@ html {
   scrollbar-width: none;
 }
 
+/* Same colours as the page wrapper, so overscroll and rubber-banding on mobile
+   never reveal a different background behind the page. */
+html {
+  background: #f6f6f6;
+}
+html.dark {
+  background: #222222;
+  color-scheme: dark;
+}
+
 /* Prevent horizontal overflow globally */
 body {
   overflow-x: hidden;
