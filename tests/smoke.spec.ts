@@ -9,7 +9,15 @@ import { expect, test, type Page } from '@playwright/test'
  * Keep ROUTES in sync with the router; the sitemap test fails when a public
  * page is added without being listed here.
  */
-const ROUTES = ['/', '/projects', '/contact', '/exultadetail', '/scan2talkdetail', '/vhsdetail']
+const ROUTES = [
+  '/',
+  '/projects',
+  '/contact',
+  '/exultadetail',
+  '/scan2talkdetail',
+  '/stalmanagerdetail',
+  '/vhsdetail',
+]
 
 // Untranslated vue-i18n keys leak through as "namespace.someKey". Domains such
 // as "scan2talk.be" look similar, so known TLDs are excluded.
@@ -152,12 +160,12 @@ test('language switch updates the page and remembers the choice', async ({ page 
   // No setLocale() here: an init script runs again on reload and would reset the choice.
   await open(page, '/projects')
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-  await expect(page.locator('h1')).toContainText('favorite projects')
+  await expect(page.locator('h1')).toContainText('projects')
 
   await openMenuIfCollapsed(page)
   await page.getByRole('button', { name: 'Switch to Dutch' }).filter({ visible: true }).first().click()
   await expect(page.locator('html')).toHaveAttribute('lang', 'nl')
-  await expect(page.locator('h1')).toContainText('favoriete projecten')
+  await expect(page.locator('h1')).toContainText('projecten')
 
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('lang', 'nl')
@@ -185,10 +193,13 @@ test('projects page links to each project', async ({ page }) => {
   for (const [name, path] of [
     ['Exulta', '/exultadetail'],
     ['Scan2Talk', '/scan2talkdetail'],
+    ['Stal Manager', '/stalmanagerdetail'],
     ['VHS Service', '/vhsdetail'],
   ]) {
     await open(page, '/projects')
-    await page.getByRole('button', { name: `View ${name} project details` }).click()
+    // Bring the slide to the middle with its page dot, then follow its (real, crawlable) link.
+    await page.getByRole('button', { name, exact: true }).click()
+    await page.getByRole('link', { name: `View ${name} project details` }).click()
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await expect(page.locator('h1')).toContainText(name)
   }
