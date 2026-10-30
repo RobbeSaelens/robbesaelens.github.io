@@ -74,16 +74,17 @@ export default defineComponent({
   transform: translate(-50%, -50%) scale(0.5);
 }
 
-/* Dark mode */
-:global(.dark) .cursor-dot {
+/* Dark mode. Not :global(.dark) .x: in scoped CSS Vue drops everything after
+   :global(), which compiled to a bare .dark rule that painted <html> teal. */
+.dark .cursor-dot {
   background: #2dd4bf;
 }
 
-:global(.dark) .cursor-ring {
+.dark .cursor-ring {
   border-color: rgba(45, 212, 191, 0.5);
 }
 
-:global(.dark) .custom-cursor.is-hover .cursor-ring {
+.dark .custom-cursor.is-hover .cursor-ring {
   border-color: rgba(45, 212, 191, 0.8);
 }
 

@@ -2,7 +2,7 @@
   <div class="fade-out mx-auto my-auto max-w-screen-2xl px-6 pb-8 sm:pb-16">
     <div class="sm:space-x-15 mr-5% mt-10% flex items-center justify-between">
       <!-- Left: Social icons -->
-      <div class="hidden flex-col gap-1 sm:flex">
+      <div class="hero-in hidden flex-col gap-1 sm:flex" style="--i: 5">
         <a
           target="_blank"
           rel="noopener noreferrer"
@@ -44,14 +44,14 @@
       <!-- Center: Content -->
       <div class="typewriter space-y-8">
         <!-- Terminal title -->
-        <h1 class="terminal-title text-3xl font-bold sm:text-4xl lg:text-6xl">
+        <h1 class="hero-in terminal-title text-3xl font-bold sm:text-4xl lg:text-6xl" style="--i: 0">
           <span class="terminal-prompt">&gt;</span>
           <span class="terminal-text">robbe saelens</span>
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
 
         <!-- Role subtitle -->
-        <div class="flex items-center font-medium">
+        <div class="hero-in flex items-center font-medium" style="--i: 1">
           <hr class="mr-3 hidden h-0.5 w-10 border-0 bg-teal-500 lg:block" />
           <h2
             class="text-lg font-medium text-teal-600 dark:text-teal-400 md:text-xl"
@@ -66,14 +66,15 @@
 
         <!-- Mobile profile photo -->
         <img
-          class="h-56 w-full rounded-3xl object-cover shadow sm:hidden"
+          class="hero-in h-56 w-full rounded-3xl object-cover shadow sm:hidden"
+          style="--i: 2"
           src="/pf2.jpg"
           alt="Robbe Saelens"
           loading="lazy"
         />
 
         <!-- Bio & details -->
-        <div class="max-w-lg space-y-5">
+        <div class="hero-in max-w-lg space-y-5" style="--i: 2">
           <p class="text-lg leading-relaxed text-teal-800 dark:text-gray-200">
             {{ $t('home.bio') }}
           </p>
@@ -108,7 +109,7 @@
         </div>
 
         <!-- CTA & navigation -->
-        <div class="flex flex-col items-start">
+        <div class="hero-in flex flex-col items-start" style="--i: 3">
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -137,7 +138,7 @@
       </div>
 
       <!-- Right: Profile photo (desktop) -->
-      <div class="hidden md:block">
+      <div class="hero-in hero-photo hidden md:block" style="--i: 2">
         <div
           class="photo-wrapper group relative"
           @mousemove="onPhotoMove"
@@ -354,10 +355,58 @@ export default {
   }
 }
 
+
+/* =============================================
+   Entrance
+   Hidden only when JavaScript runs (html.js, set in index.html) and until the
+   intro has finished (html.intro-done), so the hero is never stuck invisible.
+   ============================================= */
+html.js .hero-in {
+  opacity: 0;
+}
+html.js.intro-done .hero-in {
+  animation: hero-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+}
+html.js.intro-done .hero-photo {
+  animation-name: hero-photo-in;
+  animation-duration: 1s;
+}
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes hero-photo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) rotate(-2deg);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
 /* =============================================
    Reduced Motion
    ============================================= */
 @media (prefers-reduced-motion: reduce) {
+  html.js .hero-in,
+  html.js.intro-done .hero-in {
+    opacity: 1;
+    animation: none;
+  }
+
   .terminal-cursor {
     animation: none;
     opacity: 1;

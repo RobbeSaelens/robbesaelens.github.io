@@ -34,6 +34,171 @@
       })()
     </script>
 
+    <script>
+      // Intro animation: decided before first paint so it never flashes.
+      // Plays only on the homepage, once per session, never for reduced
+      // motion or crawlers. `js` gates the hero's hidden start state, so the
+      // page stays fully visible without JavaScript.
+      ;(function () {
+        var root = document.documentElement
+        root.classList.add('js')
+        var play = false
+        try {
+          var path = location.pathname
+          play =
+            (path === '/' || path === '/index.html') &&
+            !sessionStorage.getItem('intro-seen') &&
+            !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+            !/bot|crawl|spider|slurp|lighthouse|headlesschrome/i.test(navigator.userAgent)
+          if (play) sessionStorage.setItem('intro-seen', '1')
+        } catch (e) {}
+        if (!play) {
+          root.classList.add('intro-done')
+          return
+        }
+        root.classList.add('intro-play')
+        window.__introTimer = setTimeout(function () {
+          root.classList.add('intro-done')
+        }, 1700)
+      })()
+    </script>
+    <style>
+      #intro {
+        display: none;
+      }
+      html.intro-play #intro {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        background: #f6f6f6;
+        color: #134e4a;
+        font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', ui-monospace, monospace;
+        transition:
+          opacity 0.5s ease,
+          transform 0.6s cubic-bezier(0.7, 0, 0.3, 1),
+          visibility 0s linear 0.6s;
+      }
+      html.dark.intro-play #intro {
+        background: #222222;
+        color: #e2e8f0;
+      }
+      html.intro-play.intro-done #intro {
+        opacity: 0;
+        transform: translateY(-3%);
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .intro-box {
+        width: min(22rem, 100%);
+      }
+      .intro-mark {
+        display: block;
+        height: 2.25rem;
+        width: auto;
+        margin-bottom: 1.5rem;
+        filter: brightness(1.8);
+        animation: intro-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      }
+      .intro-line {
+        margin: 0 0 0.45rem;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        white-space: nowrap;
+        overflow: hidden;
+        opacity: 0;
+        animation: intro-line 0.35s ease forwards;
+      }
+      .intro-line:nth-of-type(1) {
+        animation-delay: 0.15s;
+      }
+      .intro-line:nth-of-type(2) {
+        animation-delay: 0.5s;
+      }
+      .intro-line:nth-of-type(3) {
+        animation-delay: 0.85s;
+        white-space: normal;
+        opacity: 0;
+      }
+      .intro-prompt,
+      .intro-ok {
+        color: #0d9488;
+        font-weight: 700;
+      }
+      html.dark .intro-prompt,
+      html.dark .intro-ok {
+        color: #2dd4bf;
+      }
+      .intro-muted {
+        opacity: 0.6;
+      }
+      .intro-bar {
+        height: 2px;
+        margin-top: 1.25rem;
+        border-radius: 2px;
+        background: rgba(13, 148, 136, 0.15);
+        overflow: hidden;
+      }
+      .intro-bar span {
+        display: block;
+        height: 100%;
+        background: #0d9488;
+        transform-origin: left;
+        animation: intro-bar 1.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+      }
+      html.dark .intro-bar span {
+        background: #2dd4bf;
+      }
+      @media (min-width: 768px) {
+        .intro-box {
+          width: 26rem;
+        }
+        .intro-mark {
+          height: 2.75rem;
+          margin-bottom: 1.75rem;
+        }
+        .intro-line {
+          font-size: 1rem;
+          margin-bottom: 0.55rem;
+        }
+        .intro-bar {
+          height: 3px;
+          margin-top: 1.5rem;
+        }
+      }
+      @keyframes intro-pop {
+        from {
+          opacity: 0;
+          transform: scale(0.6) rotate(-8deg);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes intro-line {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes intro-bar {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+    </style>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-KTMQFBG1N2"></script>
     <script>
@@ -46,11 +211,60 @@
     </script>
   </head>
   <body>
+    <div id="intro" aria-hidden="true">
+      <div class="intro-box">
+        <img class="intro-mark" src="/Fav.png" alt="" width="31" height="36" />
+        <p class="intro-line"><span class="intro-prompt">$</span> boot robbe-saelens</p>
+        <p class="intro-line"><span class="intro-ok">&#10003;</span> <span id="intro-step">loading projects</span></p>
+        <p class="intro-line intro-muted" id="intro-slogan"></p>
+        <div class="intro-bar"><span></span></div>
+      </div>
+    </div>
+    <script>
+      ;(function () {
+        var root = document.documentElement
+        if (!root.classList.contains('intro-play') || root.classList.contains('intro-done')) return
+        var nl = false
+        try {
+          var saved = localStorage.getItem('app-locale')
+          nl = saved ? saved === 'nl' : /^nl\b/i.test(navigator.language)
+        } catch (e) {}
+        var slogans = nl
+          ? [
+              'Briljantie laden, één regel code tegelijk.',
+              'De magie van code, speciaal voor jou.',
+              'Gordel om, code in uitvoering.',
+              'Codedelicatessen in de maak.',
+              'Achter elke pixel zit een developer.',
+              'Pure codevreugde wordt geïnjecteerd.',
+            ]
+          : [
+              'Loading brilliance, one line of code at a time.',
+              'Unleashing the magic of code, just for you.',
+              'Buckle up, code in progress.',
+              'Cooking up code delicacies.',
+              "Behind every pixel, there's a coder's touch.",
+              'Injecting pure code joy into your experience.',
+            ]
+        document.getElementById('intro-slogan').textContent =
+          slogans[Math.floor(Math.random() * slogans.length)]
+        if (nl) document.getElementById('intro-step').textContent = 'projecten laden'
+        // Any click, tap or key skips the intro.
+        var skip = function () {
+          clearTimeout(window.__introTimer)
+          root.classList.add('intro-done')
+          removeEventListener('pointerdown', skip)
+          removeEventListener('keydown', skip)
+        }
+        addEventListener('pointerdown', skip)
+        addEventListener('keydown', skip)
+      })()
+    </script>
     <div id="app"><!--app-html--></div>
 
     <noscript>
       <div style="padding: 2rem; font-family: system-ui, sans-serif; text-align: center">
-        <h1>Robbe Saelens — Full-Stack Web Developer</h1>
+        <p><strong>Robbe Saelens — Full-Stack Web Developer</strong></p>
         <p>
           Full-stack web developer from Geluwe, Belgium, building with Vue, TypeScript, React,
           Laravel and Next.js.
