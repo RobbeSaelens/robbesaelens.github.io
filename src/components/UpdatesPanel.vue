@@ -143,16 +143,26 @@
             </section>
 
             <section class="detail-section">
-              <h4 class="detail-title">{{ t('run.changes') }} ({{ run.changes.length }})</h4>
+              <h4 class="detail-title">{{ t('run.changes') }} ({{ changeGroups.listed.length }})</h4>
               <p v-if="!run.changes.length" class="muted">{{ t('none') }}</p>
               <ul v-else class="version-list">
-                <li v-for="c in run.changes" :key="`${c.ecosystem}:${c.package}`">
+                <li v-for="c in changeGroups.listed" :key="`${c.ecosystem}:${c.package}`">
                   <span class="pkg">{{ c.package }}</span>
                   <span class="ver">{{ c.from ?? t('run.added') }} → {{ c.to ?? t('run.removed') }}</span>
                   <span v-if="c.type" class="type">{{ c.type }}</span>
                   <span v-if="c.downgrade" class="type is-dirty">{{ t('run.downgrade') }}</span>
                 </li>
               </ul>
+              <details v-if="changeGroups.folded.length" class="indirect">
+                <summary>{{ t('run.indirect', { count: changeGroups.folded.length }) }}</summary>
+                <ul class="version-list">
+                  <li v-for="c in changeGroups.folded" :key="`${c.ecosystem}:${c.package}`">
+                    <span class="pkg">{{ c.package }}</span>
+                    <span class="ver">{{ c.from ?? t('run.added') }} → {{ c.to ?? t('run.removed') }}</span>
+                    <span v-if="c.downgrade" class="type is-dirty">{{ t('run.downgrade') }}</span>
+                  </li>
+                </ul>
+              </details>
             </section>
 
             <section v-if="run.claude?.skipped.length" class="detail-section">
@@ -284,14 +294,27 @@
                 type="button"
                 class="btn btn--sm"
                 :disabled="!!updateBlock(p)"
-                :aria-describedby="updateBlock(p) ? `upd-${p.id}-why` : undefined"
+                :aria-describedby="updateBlock(p) && !pendingFor(p.id) ? `upd-${p.id}-why` : undefined"
                 @click="startRun(p)"
               >
                 <Wand class="btn-icon" aria-hidden="true" />
                 {{ t('update') }}
               </button>
             </div>
-            <p v-if="runsEnabled && p.status !== 'up-to-date' && updateBlock(p)" :id="`upd-${p.id}-why`" class="why">
+            <p v-if="pendingFor(p.id)" class="pending">
+              {{
+                t('pending', {
+                  commit: pendingFor(p.id)!.commit.slice(0, 7),
+                  base: pendingFor(p.id)!.baseBranch,
+                  branch: pendingFor(p.id)!.branch ?? 'HEAD',
+                })
+              }}
+            </p>
+            <p
+              v-else-if="runsEnabled && p.status !== 'up-to-date' && updateBlock(p)"
+              :id="`upd-${p.id}-why`"
+              class="why"
+            >
               {{ t(`blocked.${updateBlock(p)}`) }}
             </p>
 
@@ -441,7 +464,16 @@ interface RunRecord {
   after: { checks: CheckResult[]; counts: ProjectScan['counts'] | null }
   regressions: string[]
   newAdvisories: string[]
-  changes: { ecosystem: string; package: string; from: string | null; to: string | null; type: string | null; downgrade: boolean }[]
+  changes: {
+    ecosystem: string
+    package: string
+    from: string | null
+    to: string | null
+    type: string | null
+    downgrade: boolean
+    /** Named in package.json / composer.json; older runs may lack it. */
+    direct?: boolean
+  }[]
   claude: {
     summary: string
     skipped: { package: string; reason: string }[]
@@ -456,7 +488,13 @@ interface RunRecord {
   baseCommit: string | null
   originalBranch: string | null
 }
-type BlockReason = 'token' | 'busy' | 'scanning' | 'dirty' | 'error'
+type BlockReason = 'token' | 'busy' | 'scanning' | 'dirty' | 'error' | 'pending'
+interface PendingMerge {
+  projectId: string
+  commit: string
+  baseBranch: string
+  branch: string | null
+}
 
 const en = {
   title: 'Updates',
@@ -505,7 +543,10 @@ const en = {
     scanning: 'Wait for the check to finish.',
     dirty: 'Commit or stash the uncommitted changes first.',
     error: 'The last check of this project failed.',
+    pending: 'Merge the pushed update first.',
   },
+  pending:
+    'Update {commit} is on {base}, but {branch} is checked out and doesn\'t have it yet: the numbers above are {branch}\'s. Merge {base} into {branch} (or switch to {base}) and check again.',
   token: {
     title: 'Updater token',
     hint: 'Starting updates needs the token the updater created. Copy it with:',
@@ -546,6 +587,7 @@ const en = {
     added: 'added',
     removed: 'removed',
     downgrade: 'downgrade',
+    indirect: '{count} indirect package(s) changed in the lockfile',
     skipped: 'Skipped by Claude',
     denials: 'Refused actions',
     review: 'Uncommitted on {branch}. Review them in your editor or with git diff before you push to {base}.',
@@ -611,7 +653,10 @@ const nl: typeof en = {
     scanning: 'Wacht tot de controle klaar is.',
     dirty: 'Commit of stash eerst de niet-gecommitte wijzigingen.',
     error: 'De laatste controle van dit project is mislukt.',
+    pending: 'Merge eerst de gepushte update.',
   },
+  pending:
+    'Update {commit} staat op {base}, maar {branch} is uitgecheckt en heeft hem nog niet: de cijfers hierboven zijn die van {branch}. Merge {base} in {branch} (of wissel naar {base}) en controleer opnieuw.',
   token: {
     title: 'Updater-token',
     hint: 'Om updates te starten is het token nodig dat de updater aanmaakte. Kopieer het met:',
@@ -652,6 +697,7 @@ const nl: typeof en = {
     added: 'toegevoegd',
     removed: 'verwijderd',
     downgrade: 'downgrade',
+    indirect: '{count} indirecte package(s) gewijzigd in de lockfile',
     skipped: 'Overgeslagen door Claude',
     denials: 'Geweigerde acties',
     review: 'Niet-gecommit op {branch}. Bekijk ze in je editor of met git diff voor je naar {base} pusht.',
@@ -742,6 +788,8 @@ const run = ref<RunRecord | null>(null)
 const events = ref<RunEvent[]>([])
 const cancelling = ref(false)
 const budgetUsd = ref(3)
+const pending = ref<PendingMerge[]>([])
+const CLOSED_KEY = 'project-updater-closed-run'
 let pollTimer: ReturnType<typeof setTimeout> | undefined
 
 const statusKey = (p: ProjectScan): StatusKey => STATUS_KEY[p.status]
@@ -832,8 +880,18 @@ const canPublish = computed(() => !!run.value && PUBLISHABLE.includes(run.value.
 const canDiscard = computed(() => !!run.value && DISCARDABLE.includes(run.value.status))
 const message = ref('')
 
+const pendingFor = (id: string) => pending.value.find((m) => m.projectId === id)
+
+/** Direct packages are listed; what they pulled along is folded away. Older runs list everything. */
+const changeGroups = computed(() => {
+  const changes = run.value?.changes ?? []
+  if (!changes.some((c) => c.direct)) return { listed: changes, folded: [] }
+  return { listed: changes.filter((c) => c.direct), folded: changes.filter((c) => !c.direct) }
+})
+
 function updateBlock(p: ProjectScan): BlockReason | '' {
   if (!token.value) return 'token'
+  if (pendingFor(p.id)) return 'pending' // another run would find nothing new
   if (runActive.value) return 'busy'
   if (scanning.value) return 'scanning'
   if (p.git && p.git.dirty > 0) return 'dirty'
@@ -968,20 +1026,41 @@ function discardRun() {
 }
 
 function closeRun() {
+  // Stays closed after a reload; a newer or busy run still opens.
+  try {
+    if (runId.value) localStorage.setItem(CLOSED_KEY, runId.value)
+  } catch {
+    // only this visit then
+  }
   clearTimeout(pollTimer)
   runId.value = null
   run.value = null
   events.value = []
 }
 
+function closedRunId(): string | null {
+  try {
+    return localStorage.getItem(CLOSED_KEY)
+  } catch {
+    return null
+  }
+}
+
+/** The run list plus what it says about the projects (budget, unmerged updates). */
+async function fetchRuns(): Promise<RunRecord[]> {
+  const data = await runApi<{ runs: RunRecord[]; maxBudgetUsd: number; pending: PendingMerge[] }>('/api/runs')
+  budgetUsd.value = data.maxBudgetUsd
+  pending.value = data.pending ?? []
+  return data.runs
+}
+
 /** Picks up a run that is still going (or just ended) after a page reload. */
 async function loadRuns() {
   if (!token.value) return
   try {
-    const { runs, maxBudgetUsd } = await runApi<{ runs: RunRecord[]; maxBudgetUsd: number }>('/api/runs')
-    budgetUsd.value = maxBudgetUsd
-    const newest = runs[0]
+    const newest = (await fetchRuns())[0]
     if (!newest) return
+    if (!BUSY.includes(newest.status) && newest.id === closedRunId()) return
     await showRun(newest.id)
     // A run that ended after the last check changed branches and files.
     if (newest.finishedAt && latest.value && newest.finishedAt > latest.value.finishedAt) scan()
@@ -999,6 +1078,8 @@ async function scan() {
       headers: { 'Content-Type': 'application/json' },
       body: '{}',
     })
+    // Branches may have moved (merged, switched): refresh which updates are still unmerged.
+    if (runsEnabled.value && token.value) await fetchRuns()
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   } finally {
@@ -1532,6 +1613,26 @@ onBeforeUnmount(() => clearTimeout(pollTimer))
 }
 label.detail-title {
   display: block;
+}
+.pending {
+  margin: 0.6rem 0 0;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--status-info);
+  background: var(--status-muted-bg);
+  border-radius: 8px;
+}
+.indirect {
+  margin-top: 0.6rem;
+  font-size: 0.8125rem;
+}
+.indirect summary {
+  cursor: pointer;
+  color: var(--status-label);
+}
+.indirect .version-list {
+  margin-top: 0.4rem;
 }
 .review-hint {
   margin-top: 0.5rem;
