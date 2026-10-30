@@ -9,11 +9,14 @@
          HTML and the running SPA can never disagree. -->
     <title>Robbe Saelens - Full-Stack Web Developer</title>
 
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)" />
+    <!-- Browser UI colour = page background. Defaults follow the OS; the theme
+         script below overrides both with the site's own light/dark choice. -->
+    <meta name="theme-color" content="#f6f6f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#222222" media="(prefers-color-scheme: dark)" />
 
-    <link rel="icon" type="image/png" href="/Fav.png" />
-    <link rel="apple-touch-icon" href="/Fav.png" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="stylesheet" href="/styles.css" />
 
@@ -24,12 +27,15 @@
       ;(function () {
         try {
           const theme = localStorage.getItem('theme')
-          if (
+          const dark =
             theme === 'dark' ||
             (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-          ) {
-            document.documentElement.classList.add('dark')
-          }
+          if (dark) document.documentElement.classList.add('dark')
+          // The site theme can differ from the OS one, so both tags get the
+          // colour of the theme actually shown.
+          document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+            m.setAttribute('content', dark ? '#222222' : '#f6f6f6')
+          })
         } catch (e) {}
       })()
     </script>
@@ -100,8 +106,18 @@
         height: 2.25rem;
         width: auto;
         margin-bottom: 1.5rem;
-        filter: brightness(1.8);
         animation: intro-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      }
+      .intro-mark .i {
+        fill: currentColor;
+      }
+      /* The full stop doubles as a cursor while the intro runs. */
+      .intro-mark .d {
+        fill: #0d9488;
+        animation: intro-blink 0.9s steps(1) 0.6s infinite;
+      }
+      html.dark .intro-mark .d {
+        fill: #2dd4bf;
       }
       .intro-line {
         margin: 0 0 0.45rem;
@@ -157,7 +173,7 @@
           width: 26rem;
         }
         .intro-mark {
-          height: 2.75rem;
+          height: 2.5rem;
           margin-bottom: 1.75rem;
         }
         .intro-line {
@@ -177,6 +193,11 @@
         to {
           opacity: 1;
           transform: none;
+        }
+      }
+      @keyframes intro-blink {
+        50% {
+          opacity: 0;
         }
       }
       @keyframes intro-line {
@@ -213,7 +234,10 @@
   <body>
     <div id="intro" aria-hidden="true">
       <div class="intro-box">
-        <img class="intro-mark" src="/Fav.png" alt="" width="31" height="36" />
+        <svg class="intro-mark" viewBox="0 0 10.22 5.26" width="70" height="36">
+          <path class="i" d="M0.01 5.11L0.01 0.15L1.25 0.15L1.25 0.71L1.43 0.71C1.5 0.51 1.63 0.36 1.79 0.27C1.97 0.18 2.16 0.13 2.39 0.13L2.99 0.13L2.99 1.25L2.37 1.25C2.05 1.25 1.79 1.34 1.58 1.51C1.37 1.68 1.27 1.94 1.27 2.29L1.27 5.11L0.01 5.11ZM5.59 5.25C4.94 5.25 4.41 5.11 4 4.83C3.59 4.55 3.34 4.15 3.25 3.63L4.41 3.33C4.46 3.56 4.54 3.75 4.65 3.88C4.75 4.01 4.89 4.11 5.05 4.17C5.22 4.22 5.4 4.25 5.59 4.25C5.88 4.25 6.1 4.2 6.24 4.1C6.38 3.99 6.45 3.86 6.45 3.71C6.45 3.56 6.38 3.44 6.25 3.36C6.12 3.27 5.9 3.2 5.61 3.15L5.33 3.1C4.98 3.03 4.67 2.94 4.38 2.83C4.09 2.71 3.86 2.55 3.69 2.34C3.52 2.13 3.43 1.87 3.43 1.54C3.43 1.05 3.61 0.67 3.97 0.41C4.33 0.14 4.8 0.01 5.39 0.01C5.94 0.01 6.4 0.13 6.77 0.38C7.14 0.63 7.38 0.95 7.49 1.35L6.32 1.71C6.27 1.46 6.16 1.28 6 1.17C5.83 1.06 5.63 1.01 5.39 1.01C5.15 1.01 4.97 1.05 4.84 1.14C4.71 1.22 4.65 1.33 4.65 1.48C4.65 1.64 4.72 1.76 4.85 1.84C4.98 1.91 5.16 1.97 5.39 2.01L5.67 2.06C6.04 2.13 6.38 2.22 6.69 2.33C6.99 2.44 7.23 2.59 7.41 2.8C7.58 3 7.67 3.27 7.67 3.62C7.67 4.14 7.48 4.54 7.11 4.83C6.73 5.11 6.22 5.25 5.59 5.25Z" />
+          <rect class="d" x="8.38" y="3.27" width="1.84" height="1.84" rx="0.3" />
+        </svg>
         <p class="intro-line"><span class="intro-prompt">$</span> boot robbe-saelens</p>
         <p class="intro-line"><span class="intro-ok">&#10003;</span> <span id="intro-step">loading projects</span></p>
         <p class="intro-line intro-muted" id="intro-slogan"></p>

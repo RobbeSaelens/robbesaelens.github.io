@@ -34,8 +34,9 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: 'Projects',
           description:
-            'Projects by Robbe Saelens: Exulta stretch tent rental, Scan2Talk student wellbeing check-in and VHS Service arena construction. Laravel, React, Vue, Next.js.',
+            'Projects by Robbe Saelens: Exulta tent rental, Scan2Talk student check-ins, Stal Manager horse costs and VHS Service arenas. Laravel, React, Vue, Next.js.',
           image: '/exulta-home.jpg',
+          fit: true,
         },
       },
       {
@@ -47,6 +48,17 @@ export const routes: RouteRecordRaw[] = [
           description:
             'Exulta v2 by Robbe Saelens, live at exulta.be: stretch tent rental site with catalog, tent calculator and blog. Laravel 13, React 19, Filament 5.',
           image: '/exulta-home.jpg',
+        },
+      },
+      {
+        path: 'stalmanagerdetail',
+        name: 'StalManagerDetail',
+        component: () => import('../screens/details/StalManager.vue'),
+        meta: {
+          title: 'Stal Manager - Horse cost tracker',
+          description:
+            'Stal Manager by Robbe Saelens: private app tracking horse costs, split per horse, with a dashboard and an offline mobile app. Next.js 16, Prisma, PostgreSQL.',
+          image: '/stal-manager-home.jpg',
         },
       },
       {

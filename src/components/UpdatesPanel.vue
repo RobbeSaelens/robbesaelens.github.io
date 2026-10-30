@@ -42,6 +42,147 @@
 
         <p v-if="error" class="error-line" role="alert">{{ t('failed', { error }) }}</p>
 
+        <form v-if="phase === 'ready' && runsEnabled && !token" class="notice token-form" @submit.prevent="saveToken">
+          <label for="upd-token" class="notice-title">{{ t('token.title') }}</label>
+          <p class="muted">{{ t('token.hint') }}</p>
+          <code class="command">pbcopy &lt; ~/.config/project-updater/token</code>
+          <div class="token-row">
+            <input
+              id="upd-token"
+              v-model.trim="tokenInput"
+              class="input"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              :placeholder="t('token.placeholder')"
+            />
+            <button type="submit" class="btn btn--sm" :disabled="!tokenLooksValid">{{ t('token.save') }}</button>
+          </div>
+        </form>
+
+        <section v-if="run" class="run" :class="`run--${RUN_TONE[run.status]}`" aria-labelledby="upd-run-title">
+          <header class="project-header">
+            <div class="project-heading">
+              <h3 id="upd-run-title" class="project-name">{{ t('run.title', { name: run.projectName }) }}</h3>
+              <p class="project-meta">
+                <template v-if="run.branch">{{ run.branch }}<span aria-hidden="true"> · </span></template>
+                {{ t('run.started', { time: formatTime(run.startedAt) }) }}
+                <template v-if="run.claude?.costUsd != null"> · ${{ run.claude.costUsd.toFixed(2) }}</template>
+              </p>
+            </div>
+            <div class="run-actions">
+              <p class="badge" :class="`badge--${RUN_TONE[run.status]}`">
+                <span aria-hidden="true">{{ RUN_GLYPH[run.status] }}</span>
+                {{ t(`run.status.${RUN_STATUS_KEY[run.status]}`) }}
+              </p>
+              <button
+                v-if="run.status === 'running'"
+                type="button"
+                class="btn btn--ghost btn--sm"
+                :disabled="cancelling"
+                @click="cancelRun"
+              >
+                {{ cancelling ? t('run.cancelling') : t('run.cancel') }}
+              </button>
+              <button v-else type="button" class="btn btn--ghost btn--sm" @click="closeRun">{{ t('run.close') }}</button>
+            </div>
+          </header>
+
+          <p class="sr-only" aria-live="polite">{{ t(`run.status.${RUN_STATUS_KEY[run.status]}`) }}</p>
+
+          <ol class="steps">
+            <li v-for="s in STEPS" :key="s" class="step" :class="`step--${stepState(s)}`">
+              <span aria-hidden="true">{{ STEP_GLYPH[stepState(s)] }}</span>
+              {{ t(`run.step.${s}`) }}
+              <span class="sr-only">({{ t(`run.stepState.${stepState(s)}`) }})</span>
+            </li>
+          </ol>
+
+          <ul v-if="run.problems.length" class="plain-list problems">
+            <li v-for="(problem, i) in run.problems" :key="i" class="error-text">{{ problem }}</li>
+          </ul>
+
+          <div v-if="run.status !== 'running'" class="details">
+            <section v-if="run.claude?.summary" class="detail-section">
+              <h4 class="detail-title">{{ t('run.summary') }}</h4>
+              <p class="summary">{{ run.claude.summary }}</p>
+            </section>
+
+            <section v-if="checkRows.length" class="detail-section">
+              <h4 class="detail-title">{{ t('run.checks') }}</h4>
+              <table class="checks">
+                <thead>
+                  <tr>
+                    <th scope="col">{{ t('run.check') }}</th>
+                    <th scope="col">{{ t('run.before') }}</th>
+                    <th scope="col">{{ t('run.after') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="row in checkRows" :key="row.name" :class="{ 'is-regression': run.regressions.includes(row.name) }">
+                    <th scope="row">{{ row.name }}</th>
+                    <td v-for="(c, i) in [row.before, row.after]" :key="i" :class="c ? (c.passed ? 'pass' : 'fail') : ''">
+                      <template v-if="c">{{ c.passed ? t('run.passed') : t('run.failed') }}</template>
+                      <template v-else>–</template>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section v-if="run.before.counts" class="detail-section">
+              <h4 class="detail-title">{{ t('section.security') }}</h4>
+              <p class="summary">
+                {{ t('run.findings', { before: findingTotal(run.before.counts), after: run.after.counts ? findingTotal(run.after.counts) : '–' }) }}
+              </p>
+              <p v-if="run.newAdvisories.length" class="error-text">
+                {{ t('run.newAdvisories', { packages: run.newAdvisories.join(', ') }) }}
+              </p>
+            </section>
+
+            <section class="detail-section">
+              <h4 class="detail-title">{{ t('run.changes') }} ({{ run.changes.length }})</h4>
+              <p v-if="!run.changes.length" class="muted">{{ t('none') }}</p>
+              <ul v-else class="version-list">
+                <li v-for="c in run.changes" :key="`${c.ecosystem}:${c.package}`">
+                  <span class="pkg">{{ c.package }}</span>
+                  <span class="ver">{{ c.from ?? t('run.added') }} → {{ c.to ?? t('run.removed') }}</span>
+                  <span v-if="c.type" class="type">{{ c.type }}</span>
+                  <span v-if="c.downgrade" class="type is-dirty">{{ t('run.downgrade') }}</span>
+                </li>
+              </ul>
+            </section>
+
+            <section v-if="run.claude?.skipped.length" class="detail-section">
+              <h4 class="detail-title">{{ t('run.skipped') }}</h4>
+              <ul class="plain-list">
+                <li v-for="s in run.claude.skipped" :key="s.package"><span class="pkg">{{ s.package }}</span> · {{ s.reason }}</li>
+              </ul>
+            </section>
+
+            <section v-if="run.claude?.denials.length" class="detail-section">
+              <h4 class="detail-title">{{ t('run.denials') }}</h4>
+              <ul class="plain-list">
+                <li v-for="(d, i) in run.claude.denials" :key="i"><span class="pkg">{{ d.tool }}</span> · {{ d.detail }}</li>
+              </ul>
+            </section>
+
+            <p v-if="run.status === 'ready' && run.branch" class="muted">
+              {{ t('run.review', { branch: run.branch }) }}
+            </p>
+          </div>
+
+          <details class="log" :open="run.status === 'running'">
+            <summary>{{ t('run.log', { count: events.length }) }}</summary>
+            <ol class="log-lines">
+              <li v-for="e in visibleEvents" :key="e.seq" :class="`log--${e.kind}`">
+                <span class="log-time">{{ clock(e.at) }}</span>
+                {{ describe(e) }}
+              </li>
+            </ol>
+          </details>
+        </section>
+
         <p v-if="phase === 'ready' && !latest && !scanning" class="muted">{{ t('neverChecked') }}</p>
 
         <ul v-if="latest" class="overview" :aria-label="t('projects')">
@@ -90,16 +231,32 @@
               </li>
             </ul>
 
-            <button
-              type="button"
-              class="btn btn--ghost btn--sm details-toggle"
-              :aria-expanded="isOpen(p.id) ? 'true' : 'false'"
-              :aria-controls="`upd-${p.id}-details`"
-              @click="toggle(p.id)"
-            >
-              <ChevronDown class="btn-icon toggle-icon" :class="{ open: isOpen(p.id) }" aria-hidden="true" />
-              {{ isOpen(p.id) ? t('hideDetails') : t('showDetails') }}
-            </button>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn btn--ghost btn--sm details-toggle"
+                :aria-expanded="isOpen(p.id) ? 'true' : 'false'"
+                :aria-controls="`upd-${p.id}-details`"
+                @click="toggle(p.id)"
+              >
+                <ChevronDown class="btn-icon toggle-icon" :class="{ open: isOpen(p.id) }" aria-hidden="true" />
+                {{ isOpen(p.id) ? t('hideDetails') : t('showDetails') }}
+              </button>
+              <button
+                v-if="runsEnabled && p.status !== 'up-to-date'"
+                type="button"
+                class="btn btn--sm"
+                :disabled="!!updateBlock(p)"
+                :aria-describedby="updateBlock(p) ? `upd-${p.id}-why` : undefined"
+                @click="startRun(p)"
+              >
+                <Wand class="btn-icon" aria-hidden="true" />
+                {{ t('update') }}
+              </button>
+            </div>
+            <p v-if="runsEnabled && p.status !== 'up-to-date' && updateBlock(p)" :id="`upd-${p.id}-why`" class="why">
+              {{ t(`blocked.${updateBlock(p)}`) }}
+            </p>
 
             <div v-if="isOpen(p.id)" :id="`upd-${p.id}-details`" class="details">
               <section v-if="p.errors.length" class="detail-section">
@@ -169,9 +326,9 @@
 // Status.vue only loads it when import.meta.env.DEV is true, so production
 // builds never include it. Its strings live here, not in the shared locale
 // files, for the same reason.
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ChevronDown, RefreshCw } from 'lucide-vue-next'
+import { ChevronDown, RefreshCw, Wand } from 'lucide-vue-next'
 
 type Severity = 'critical' | 'high' | 'moderate' | 'low' | 'info' | 'unknown'
 type ProjectStatus = 'security' | 'updates' | 'up-to-date' | 'error'
@@ -210,6 +367,44 @@ interface LatestScan {
   results: ProjectScan[]
 }
 
+type RunStep = 'prepare' | 'baseline' | 'update' | 'verify'
+type RunStatus = 'running' | 'ready' | 'no-changes' | 'failed' | 'cancelled'
+type StepState = 'pending' | 'active' | 'done' | 'failed'
+type RunEvent = { seq: number; at: string } & (
+  | { kind: 'step'; step: RunStep; state: 'started' | 'done' }
+  | { kind: 'log'; text: string }
+  | { kind: 'check'; phase: 'before' | 'after'; name: string; passed: boolean; durationMs: number }
+  | { kind: 'text'; text: string }
+  | { kind: 'tool'; tool: string; detail: string }
+  | { kind: 'tool-error'; detail: string }
+)
+interface CheckResult {
+  name: string
+  passed: boolean
+}
+interface RunRecord {
+  id: string
+  projectId: string
+  projectName: string
+  status: RunStatus
+  startedAt: string
+  finishedAt: string | null
+  branch: string | null
+  before: { checks: CheckResult[]; counts: ProjectScan['counts'] | null }
+  after: { checks: CheckResult[]; counts: ProjectScan['counts'] | null }
+  regressions: string[]
+  newAdvisories: string[]
+  changes: { ecosystem: string; package: string; from: string | null; to: string | null; type: string | null; downgrade: boolean }[]
+  claude: {
+    summary: string
+    skipped: { package: string; reason: string }[]
+    costUsd: number | null
+    denials: { tool: string; detail: string }[]
+  } | null
+  problems: string[]
+}
+type BlockReason = 'token' | 'busy' | 'scanning' | 'dirty' | 'error'
+
 const en = {
   title: 'Updates',
   subtitle: 'Security and dependency check of your local projects. Only visible in development.',
@@ -247,6 +442,51 @@ const en = {
   direct: 'direct dependency',
   via: 'via {packages}',
   none: 'None.',
+  update: 'Update',
+  confirm:
+    'Update {name}?\n\nThis creates branch updater/… from {base}, runs the checks, lets Claude apply security fixes and minor/patch updates (max ${budget}), then runs the checks again. Nothing is committed or pushed.',
+  confirmSelf: '\n\nThis is the portfolio itself: reinstalling its packages stops this dev server. Restart it with npm run dev and the run shows up again.',
+  blocked: {
+    token: 'Paste the updater token above first.',
+    busy: 'Another update is running.',
+    scanning: 'Wait for the check to finish.',
+    dirty: 'Commit or stash the uncommitted changes first.',
+    error: 'The last check of this project failed.',
+  },
+  token: {
+    title: 'Updater token',
+    hint: 'Starting updates needs the token the updater created. Copy it with:',
+    placeholder: '64 characters',
+    save: 'Save',
+    rejected: 'The updater rejected the token. Paste it again.',
+  },
+  run: {
+    title: 'Update run: {name}',
+    started: 'started {time}',
+    cancel: 'Cancel',
+    cancelling: 'Cancelling…',
+    close: 'Close',
+    status: { running: 'Running', ready: 'Ready for review', noChanges: 'Nothing changed', failed: 'Failed', cancelled: 'Cancelled' },
+    step: { prepare: 'Prepare branch', baseline: 'Checks before', update: 'Claude updates', verify: 'Checks after' },
+    stepState: { pending: 'waiting', active: 'running', done: 'done', failed: 'stopped' },
+    summary: 'Summary',
+    checks: 'Checks',
+    check: 'Check',
+    before: 'Before',
+    after: 'After',
+    passed: 'pass',
+    failed: 'fail',
+    findings: 'Findings: {before} before, {after} after.',
+    newAdvisories: 'New advisories: {packages}',
+    changes: 'Package changes',
+    added: 'added',
+    removed: 'removed',
+    downgrade: 'downgrade',
+    skipped: 'Skipped by Claude',
+    denials: 'Refused actions',
+    review: 'The changes are uncommitted on {branch}. Review them with git diff; committing and pushing from here comes next.',
+    log: 'Log ({count})',
+  },
 }
 
 // `typeof en` makes TypeScript reject a missing or extra Dutch key.
@@ -287,6 +527,51 @@ const nl: typeof en = {
   direct: 'directe dependency',
   via: 'via {packages}',
   none: 'Geen.',
+  update: 'Update',
+  confirm:
+    '{name} updaten?\n\nDit maakt branch updater/… vanaf {base}, draait de checks, laat Claude beveiligingsfixes en minor/patch-updates toepassen (max ${budget}) en draait de checks opnieuw. Er wordt niets gecommit of gepusht.',
+  confirmSelf: '\n\nDit is het portfolio zelf: het herinstalleren van de packages stopt deze dev-server. Start hem opnieuw met npm run dev en de run verschijnt terug.',
+  blocked: {
+    token: 'Plak eerst hierboven het updater-token.',
+    busy: 'Er loopt al een update.',
+    scanning: 'Wacht tot de controle klaar is.',
+    dirty: 'Commit of stash eerst de niet-gecommitte wijzigingen.',
+    error: 'De laatste controle van dit project is mislukt.',
+  },
+  token: {
+    title: 'Updater-token',
+    hint: 'Om updates te starten is het token nodig dat de updater aanmaakte. Kopieer het met:',
+    placeholder: '64 tekens',
+    save: 'Bewaren',
+    rejected: 'De updater weigerde het token. Plak het opnieuw.',
+  },
+  run: {
+    title: 'Update-run: {name}',
+    started: 'gestart om {time}',
+    cancel: 'Annuleren',
+    cancelling: 'Bezig met annuleren…',
+    close: 'Sluiten',
+    status: { running: 'Bezig', ready: 'Klaar voor review', noChanges: 'Niets gewijzigd', failed: 'Mislukt', cancelled: 'Geannuleerd' },
+    step: { prepare: 'Branch voorbereiden', baseline: 'Checks vooraf', update: 'Claude update', verify: 'Checks achteraf' },
+    stepState: { pending: 'wacht', active: 'bezig', done: 'klaar', failed: 'gestopt' },
+    summary: 'Samenvatting',
+    checks: 'Checks',
+    check: 'Check',
+    before: 'Vooraf',
+    after: 'Achteraf',
+    passed: 'ok',
+    failed: 'faalt',
+    findings: 'Bevindingen: {before} vooraf, {after} achteraf.',
+    newAdvisories: 'Nieuwe advisories: {packages}',
+    changes: 'Packagewijzigingen',
+    added: 'toegevoegd',
+    removed: 'verwijderd',
+    downgrade: 'downgrade',
+    skipped: 'Overgeslagen door Claude',
+    denials: 'Geweigerde acties',
+    review: 'De wijzigingen staan niet-gecommit op {branch}. Bekijk ze met git diff; committen en pushen vanaf hier volgt nog.',
+    log: 'Log ({count})',
+  },
 }
 
 const { t, locale } = useI18n({ useScope: 'local', messages: { en, nl } })
@@ -302,11 +587,42 @@ const STATUS_KEY: Record<ProjectStatus, StatusKey> = {
 const GLYPH: Record<StatusKey, string> = { security: '✗', updates: '↑', upToDate: '✓', error: '!' }
 const TONE: Record<StatusKey, string> = { security: 'down', updates: 'info', upToDate: 'ok', error: 'degraded' }
 
+const TOKEN_KEY = 'project-updater-token'
+const POLL_MS = 1500
+const STEPS: RunStep[] = ['prepare', 'baseline', 'update', 'verify']
+const STEP_GLYPH: Record<StepState, string> = { pending: '·', active: '▸', done: '✓', failed: '✗' }
+const RUN_STATUS_KEY: Record<RunStatus, string> = {
+  running: 'running',
+  ready: 'ready',
+  'no-changes': 'noChanges',
+  failed: 'failed',
+  cancelled: 'cancelled',
+}
+const RUN_TONE: Record<RunStatus, string> = {
+  running: 'info',
+  ready: 'ok',
+  'no-changes': 'ok',
+  failed: 'down',
+  cancelled: 'degraded',
+}
+const RUN_GLYPH: Record<RunStatus, string> = { running: '▸', ready: '✓', 'no-changes': '✓', failed: '✗', cancelled: '!' }
+
 const phase = ref<'connecting' | 'ready' | 'offline'>('connecting')
 const scanning = ref(false)
 const error = ref('')
 const latest = ref<LatestScan | null>(null)
 const open = ref(new Set<string>())
+
+const runsEnabled = ref(false)
+const token = ref(readToken())
+const tokenInput = ref('')
+const projects = ref<{ id: string; baseBranch: string }[]>([])
+const runId = ref<string | null>(null)
+const run = ref<RunRecord | null>(null)
+const events = ref<RunEvent[]>([])
+const cancelling = ref(false)
+const budgetUsd = ref(3)
+let pollTimer: ReturnType<typeof setTimeout> | undefined
 
 const statusKey = (p: ProjectScan): StatusKey => STATUS_KEY[p.status]
 
@@ -345,8 +661,179 @@ function formatTime(iso: string) {
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${UPDATER_URL}${path}`, { ...init, cache: 'no-store' })
   const body = (await res.json().catch(() => null)) as { error?: string } | null
+  if (res.status === 401 && token.value) {
+    forgetToken()
+    throw new Error(t('token.rejected'))
+  }
   if (!res.ok) throw new Error(body?.error ?? `HTTP ${res.status}`)
   return body as T
+}
+
+/** Run routes need the token the updater prints at startup. */
+function runApi<T>(path: string, init: RequestInit = {}): Promise<T> {
+  return api<T>(path, {
+    ...init,
+    headers: { ...init.headers, Authorization: `Bearer ${token.value}`, 'Content-Type': 'application/json' },
+  })
+}
+
+// Storage can be unavailable (private window, blocked site data); the panel
+// then just asks for the token again on the next visit.
+function readToken(): string {
+  try {
+    return localStorage.getItem(TOKEN_KEY) ?? ''
+  } catch {
+    return ''
+  }
+}
+const tokenLooksValid = computed(() => /^[0-9a-f]{64}$/.test(tokenInput.value))
+function saveToken() {
+  if (!tokenLooksValid.value) return
+  token.value = tokenInput.value
+  tokenInput.value = ''
+  try {
+    localStorage.setItem(TOKEN_KEY, token.value)
+  } catch {
+    // kept in memory for this visit
+  }
+  loadRuns()
+}
+function forgetToken() {
+  token.value = ''
+  try {
+    localStorage.removeItem(TOKEN_KEY)
+  } catch {
+    // nothing stored
+  }
+}
+
+const runActive = computed(() => run.value?.status === 'running')
+
+function updateBlock(p: ProjectScan): BlockReason | '' {
+  if (!token.value) return 'token'
+  if (runActive.value) return 'busy'
+  if (scanning.value) return 'scanning'
+  if (p.git && p.git.dirty > 0) return 'dirty'
+  if (p.status === 'error') return 'error'
+  return ''
+}
+
+function stepState(step: RunStep): StepState {
+  let state: StepState = 'pending'
+  for (const e of events.value) {
+    if (e.kind === 'step' && e.step === step) state = e.state === 'done' ? 'done' : 'active'
+  }
+  if (state === 'active' && run.value && run.value.status !== 'running') return 'failed'
+  return state
+}
+
+const checkRows = computed(() => {
+  if (!run.value) return []
+  const names = [...new Set([...run.value.before.checks, ...run.value.after.checks].map((c) => c.name))]
+  return names.map((name) => ({
+    name,
+    before: run.value!.before.checks.find((c) => c.name === name),
+    after: run.value!.after.checks.find((c) => c.name === name),
+  }))
+})
+
+const findingTotal = (counts: ProjectScan['counts']) => SEVERITIES.reduce((sum, s) => sum + counts[s], 0)
+
+// The full log can run to thousands of tool calls; the tail is what matters.
+const visibleEvents = computed(() => events.value.slice(-300))
+
+function clock(iso: string) {
+  return new Date(iso).toLocaleTimeString(locale.value === 'nl' ? 'nl-BE' : 'en-GB')
+}
+
+function describe(e: RunEvent): string {
+  switch (e.kind) {
+    case 'step':
+      return `${t(`run.step.${e.step}`)}: ${t(`run.stepState.${e.state === 'done' ? 'done' : 'active'}`)}`
+    case 'check':
+      return `[${t(`run.${e.phase}`)}] ${e.name}: ${e.passed ? t('run.passed') : t('run.failed')} (${(e.durationMs / 1000).toFixed(1)} s)`
+    case 'tool':
+      return `${e.tool} ${e.detail}`
+    case 'tool-error':
+      return `✗ ${e.detail}`
+    default:
+      return e.text
+  }
+}
+
+async function poll() {
+  const id = runId.value
+  if (!id) return
+  try {
+    const after = events.value.at(-1)?.seq ?? 0
+    const data = await runApi<{ run: RunRecord; events: RunEvent[] }>(`/api/runs/${id}?after=${after}`)
+    if (runId.value !== id) return // closed or replaced meanwhile
+    const finished = run.value?.status === 'running' && data.run.status !== 'running'
+    run.value = data.run
+    events.value = [...events.value, ...data.events]
+    // The run moved the project to its update branch: show that in the cards.
+    if (finished) scan()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e)
+  }
+  if (runId.value === id && run.value?.status === 'running' && token.value) pollTimer = setTimeout(poll, POLL_MS)
+}
+
+async function showRun(id: string) {
+  clearTimeout(pollTimer)
+  runId.value = id
+  run.value = null
+  events.value = []
+  cancelling.value = false
+  await poll()
+}
+
+async function startRun(p: ProjectScan) {
+  if (updateBlock(p)) return
+  const base = projects.value.find((x) => x.id === p.id)?.baseBranch ?? 'develop'
+  const message = t('confirm', { name: p.name, base, budget: budgetUsd.value }) + (p.id === 'portfolio' ? t('confirmSelf') : '')
+  if (!window.confirm(message)) return
+  error.value = ''
+  try {
+    const { id } = await runApi<{ id: string }>('/api/runs', { method: 'POST', body: JSON.stringify({ projectId: p.id }) })
+    await showRun(id)
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e)
+  }
+}
+
+async function cancelRun() {
+  if (!runId.value) return
+  cancelling.value = true
+  try {
+    await runApi(`/api/runs/${runId.value}/cancel`, { method: 'POST', body: '{}' })
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e)
+    cancelling.value = false
+  }
+}
+
+function closeRun() {
+  clearTimeout(pollTimer)
+  runId.value = null
+  run.value = null
+  events.value = []
+}
+
+/** Picks up a run that is still going (or just ended) after a page reload. */
+async function loadRuns() {
+  if (!token.value) return
+  try {
+    const { runs, maxBudgetUsd } = await runApi<{ runs: RunRecord[]; maxBudgetUsd: number }>('/api/runs')
+    budgetUsd.value = maxBudgetUsd
+    const newest = runs[0]
+    if (!newest) return
+    await showRun(newest.id)
+    // A run that ended after the last check changed branches and files.
+    if (newest.finishedAt && latest.value && newest.finishedAt > latest.value.finishedAt) scan()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e)
+  }
 }
 
 async function scan() {
@@ -367,7 +854,7 @@ async function scan() {
 
 onMounted(async () => {
   try {
-    await api('/api/health')
+    runsEnabled.value = (await api<{ runs?: boolean }>('/api/health')).runs === true
   } catch {
     phase.value = 'offline'
     return
@@ -375,10 +862,14 @@ onMounted(async () => {
   phase.value = 'ready'
   try {
     latest.value = await api<LatestScan | null>('/api/scan/latest')
+    if (runsEnabled.value) projects.value = (await api<{ projects: typeof projects.value }>('/api/projects')).projects
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   }
+  if (runsEnabled.value) await loadRuns()
 })
+
+onBeforeUnmount(() => clearTimeout(pollTimer))
 </script>
 
 <style scoped>
@@ -745,8 +1236,171 @@ onMounted(async () => {
   color: var(--status-label);
 }
 
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.why {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: var(--status-label);
+}
+
+.token-form {
+  margin-bottom: 1rem;
+}
+.token-form .notice-title {
+  display: block;
+}
+.token-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.input {
+  flex: 1 1 16rem;
+  min-width: 0;
+  padding: 0.375rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+.input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.run {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-glow);
+  border-left-width: 4px;
+  border-radius: 12px;
+}
+.run--ok {
+  border-left-color: var(--status-ok);
+}
+.run--down {
+  border-left-color: var(--status-down);
+}
+.run--degraded {
+  border-left-color: var(--status-warn);
+}
+.run--info {
+  border-left-color: var(--status-info);
+}
+.run-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--status-label);
+}
+.step--active {
+  color: var(--status-info);
+  font-weight: 700;
+}
+.step--done {
+  color: var(--status-ok);
+}
+.step--failed {
+  color: var(--status-down);
+  font-weight: 700;
+}
+.problems {
+  margin-bottom: 0.75rem;
+}
+.summary {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.checks {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+.checks th,
+.checks td {
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+.checks thead th {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--status-label);
+}
+.checks tbody th {
+  font-weight: 600;
+}
+.checks .pass {
+  color: var(--status-ok);
+}
+.checks .fail {
+  color: var(--status-down);
+  font-weight: 700;
+}
+.checks .is-regression {
+  background: var(--status-down-bg);
+}
+.log {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+}
+.log summary {
+  cursor: pointer;
+  color: var(--status-label);
+}
+.log-lines {
+  max-height: 20rem;
+  overflow: auto;
+  margin: 0.5rem 0 0;
+  padding: 0.75rem;
+  list-style: none;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.log-time {
+  margin-right: 0.5rem;
+  color: var(--status-label);
+}
+.log--step {
+  color: var(--status-info);
+  font-weight: 700;
+}
+.log--tool-error {
+  color: var(--status-down);
+}
+.log--text {
+  color: var(--color-text-primary);
+}
+
 @media (max-width: 640px) {
   .terminal-body {
+    padding: 1rem;
+  }
+  .run {
     padding: 1rem;
   }
 }

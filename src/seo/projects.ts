@@ -20,6 +20,15 @@ export const PROJECTS: SeoProject[] = [
     image: '/exulta-home.jpg',
   },
   {
+    path: '/stalmanagerdetail',
+    name: 'Stal Manager',
+    headline: 'Private app for tracking horse costs',
+    description:
+      'A private app that tracks what two horses cost, with every cost split per horse by percentage. A desktop dashboard with charts and reports, and a mobile app that keeps working offline. Built with Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth.',
+    tech: ['Next.js', 'React', 'TypeScript', 'Prisma', 'PostgreSQL', 'PWA'],
+    image: '/stal-manager-home.jpg',
+  },
+  {
     path: '/vhsdetail',
     name: 'VHS Service',
     headline: 'Website for an equestrian arena builder',

@@ -3,10 +3,6 @@
   display: none;
 }
 
-.customFill {
-  filter: brightness(1.8);
-}
-
 /* Hide scrollbar for Firefox */
 html {
   scrollbar-width: none;

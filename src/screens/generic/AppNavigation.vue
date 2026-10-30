@@ -1,22 +1,8 @@
 <template>
   <div class="nav-bar">
     <router-link class="nav-logo" to="/" @click="onLogoClick">
-      <img
-        class="nav-logo-full customFill"
-        src="/Logo.svg"
-        alt="Robbe Saelens logo"
-        width="132"
-        height="20"
-        fetchpriority="high"
-      />
-      <img
-        class="nav-logo-mark customFill"
-        src="/Fav.png"
-        alt="Robbe Saelens logo"
-        width="17"
-        height="20"
-        fetchpriority="high"
-      />
+      <BrandLogo class="nav-logo-full" />
+      <BrandLogo class="nav-logo-mark" variant="mark" />
     </router-link>
 
     <!-- Secret code revealed via triple-click -->
@@ -89,7 +75,7 @@
       >
         <div class="mobile-top">
           <router-link class="nav-logo" to="/" @click="onLogoClick">
-            <img src="/Fav.png" alt="Robbe Saelens logo" class="h-7 customFill" width="24" height="28" />
+            <BrandLogo class="nav-logo-menu" variant="mark" />
           </router-link>
           <button
             type="button"
@@ -159,6 +145,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Sun, Moon, Phone, Mail, X, ArrowRight } from 'lucide-vue-next'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
+import BrandLogo from '../../components/BrandLogo.vue'
 import { useEasterEgg } from '../../composables/useEasterEgg'
 
 interface NavLink {
@@ -174,7 +161,7 @@ const LINKS: NavLink[] = [
 ]
 
 export default {
-  components: { Sun, Moon, Phone, Mail, X, ArrowRight, LanguageSwitcher },
+  components: { Sun, Moon, Phone, Mail, X, ArrowRight, LanguageSwitcher, BrandLogo },
 
   setup() {
     const route = useRoute()
@@ -233,6 +220,10 @@ export default {
       theme.value = nextTheme
       localStorage.setItem('theme', nextTheme)
       document.documentElement.classList.toggle('dark', nextTheme === 'dark')
+      // Browser UI colour follows the page background (see index.html).
+      document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+        meta.setAttribute('content', nextTheme === 'dark' ? '#222222' : '#f6f6f6')
+      })
     }
 
     const toggleTheme = () => {
@@ -354,13 +345,13 @@ export default {
 }
 .nav-logo-full {
   display: none;
-  height: 1.25rem;
-  width: auto;
+  height: 1rem;
 }
 .nav-logo-mark {
-  display: block;
-  height: 1.25rem;
-  width: auto;
+  height: 1.05rem;
+}
+.nav-logo-menu {
+  height: 1.3rem;
 }
 @media (min-width: 640px) {
   .nav-logo-full {

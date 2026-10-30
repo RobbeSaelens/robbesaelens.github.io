@@ -30,24 +30,33 @@
     "competingText": "Naast mijn job beoefen ik de paardensport op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Ik heb een grote passie voor de sport en focus me voornamelijk op jumping en alles wat daarbij komt kijken."
   },
   "projects": {
-    "title": "Favoriete projecten",
-    "getInTouch": "Neem contact op!",
-    "viewProject": "Bekijk project",
+    "intro": "Websites en apps die ik ontwierp en bouwde.",
     "live": "live",
     "rebranding": "rebranding",
-    "clear": "wissen",
-    "showingCount": "{count} / {total}",
     "items": {
       "exulta": {
-        "description": "De tweede versie van de Exulta stretchtent verhuursite, live op exulta.be: catalogus, tentcalculator, realisaties en blog op Laravel 13 met een React 19 front-end, plus een Filament 5 adminpaneel dat de klant zelf beheert."
+        "tagline": "Website voor tentverhuur met een live tentcalculator"
       },
       "scan2talk": {
-        "description": "Een welbevinden check-in tool voor scholen, live op scan2talk.be. Leerlingen scannen een geprinte QR-poster en delen hoe ze zich voelen; leerkrachten krijgen trends en een anonieme chat."
+        "tagline": "Welzijnscheck-ins voor scholen, via QR-code"
       },
       "vhs": {
-        "description": "Een drietalige site voor een aannemer van paardenpistes in Geluwe, met GSAP scroll-animatie, een WebGL hero en lokale SEO. Gebouwd op Next.js 16."
+        "tagline": "Website voor een aannemer van paardenpistes"
+      },
+      "stal-manager": {
+        "tagline": "Kostenbeheer voor paardeneigenaars, werkt offline"
+      },
+      "coming-soon": {
+        "tagline": "Er is iets nieuws in de maak"
       }
-    }
+    },
+    "private": "live · privé",
+    "comingSoon": "Binnenkort",
+    "viewProjectAria": "Bekijk het project {name}",
+    "inProgress": "in de maak",
+    "viewCase": "Bekijk project",
+    "prev": "Vorig project",
+    "next": "Volgend project"
   },
   "exulta": {
     "title": "Exulta",
@@ -99,6 +108,31 @@
     "viewOther": "Bekijk andere projecten",
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Nog niet live"
+  },
+  "stalManager": {
+    "title": "Stal Manager",
+    "alt": "Stal Manager dashboard voor de kosten van paarden",
+    "privateBadge": "Live",
+    "privateNote": "Privé-app, enkel met login",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Stal Manager houdt bij wat twee paarden kosten: een eigen paard en een pensionpaard. Elke kost wordt geboekt met datum, categorie en hoeveelheid, en procentueel verdeeld over de paarden. Er is een desktopdashboard met maandgrafieken en overzichten, en een mobiele app om kosten meteen in de stal in te geven, ook zonder verbinding. Het is een privé-app: registreren kan niet, accounts worden via de command line aangemaakt.",
+    "featuresTitle": "Wat er in zit",
+    "featureSplit": "Kosten verdelen",
+    "featureSplitText": "Elke kost gaat naar één paard of wordt procentueel over beide verdeeld, zodat de totalen per paard kloppen, ook voor gedeeld hooi of de hoefsmid.",
+    "featureQuick": "Snel toevoegen uit voorraad",
+    "featureQuickText": "Voorraaditems hebben een standaardprijs en eenheid, dus de gewone kosten (hooi, voeding, bodembedekking) zijn één tik op de gsm.",
+    "featureOffline": "Werkt offline",
+    "featureOfflineText": "De mobiele app bewaart de laatste gegevens en zet kosten die zonder verbinding worden toegevoegd in een wachtrij, die vertrekt zodra er weer verbinding is. Een icoon toont de verbindingsstatus.",
+    "featureInsights": "Dashboard & inzichten",
+    "featureInsightsText": "Maandtotalen, kosten per paard en per maand in Recharts-grafieken, en inzichten van maand tot maand op mobiel.",
+    "featureAuth": "Privé van ontwerp",
+    "featureAuthText": "Better Auth met gebruikersnaam en wachtwoord, registreren afgesloten, sessies blijven een maand geldig op de gsm. Elke pagina en server action controleert de sessie.",
+    "featureQuality": "Getest & gemonitord",
+    "featureQualityText": "Vitest-unittests plus databasetests tegen een echte Postgres, en een publiek health-endpoint dat mijn statusdashboard opvraagt.",
+    "languages": "Talen & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "Bekijk andere projecten"
   },
   "scan2talk": {
     "title": "Scan2Talk",
@@ -152,9 +186,10 @@
     "welcome": "Hey! Ik ben Robbe's virtuele assistent. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
     "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
     "skills": "Robbe is een full-stack web developer die werkt met: Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, TailwindCSS, Node.js en meer. Hij heeft ook ervaring met Adobe XD, After Effects en LottieFiles voor design & prototyping. Zijn huidige focus is Drupal backend ontwikkeling bij Dynamate.",
-    "projects": "Robbe heeft 3 projecten gebouwd:\n\n• Exulta — stretchtent verhuur website, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-gebaseerde leerling welzijn check-in, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nBekijk ze op de Projecten pagina!",
+    "projects": "Robbe heeft 4 projecten gebouwd:\n\n• Exulta — stretchtent verhuur website, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-gebaseerde leerling welzijn check-in, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — privé-app om de kosten van paarden bij te houden, werkt offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nBekijk ze op de Projecten pagina!",
     "project-exulta": "Exulta is de tweede versie van de Exulta stretchtent verhuur website, live op exulta.be. Gebouwd met Laravel 13 en React 19 via Inertia, met een Filament 5 adminpaneel, een productcatalogus, een interactieve tentcalculator, realisaties en een blog. Geautomatiseerde CI/CD via GitHub Actions met databaseback-ups en rollback bij fouten, plus Playwright- en Lighthouse-checks.",
     "project-scan2talk": "Scan2Talk is een PWA voor scholen — leerlingen scannen een QR-code en doorlopen een begeleide emotionele welzijn check-in wizard (thermometer → thema's → gevoelens → hulpvraag). Leerkrachten krijgen een dashboard met Chart.js visualisaties. Gebouwd met Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Draait lokaal via DDEV.",
+    "project-stalmanager": "Stal Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun site op Next.js 16 en React 19: een zwart-wit redactioneel design met GSAP scroll-animatie, een WebGL hero en Lenis smooth scrolling, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. Momenteel in rebranding en nog niet publiek.",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens@telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens) en Facebook. De portfolio staat op robbe-saelens.netlify.app.",
     "experience": "Robbe werkt momenteel bij Dynamate als Drupal backend developer. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP & Magento developer — begonnen als stagiair en daarna voltijds aangenomen. Sinds 2017 werkt hij ook als instructeur paardensport bij Sport Vlaanderen in Woumen. Zijn carrière combineert technische ontwikkeling met de mensenkennis uit het lesgeven.",
@@ -164,7 +199,7 @@
     "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur paardensport bij Sport Vlaanderen Woumen. Hij vindt het leuk om mensen iets bij te brengen en met paarden te werken — hier ontwikkelde hij zijn sociale vaardigheden naast zijn technische carrière.",
     "thanks": "Graag gedaan! Laat maar weten als je nog vragen hebt.",
     "bye": "Doei! Je mag altijd contact opnemen. Nog een fijne dag!",
-    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, VHS Service. Typ gewoon wat je wil weten!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Probeer eens te vragen naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen hersteld naar standaard.\n\nTyp 'help' als je hulp nodig hebt.",
     "quickReplies": [

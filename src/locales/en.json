@@ -30,24 +30,33 @@
     "competingText": "Next to my job I practise equestrian sports at a competitive level. I take part in regional competitions and have also ridden national competitions with our own horse. I have a great passion for the sport and mainly focus on show jumping and everything that comes with it."
   },
   "projects": {
-    "title": "Favorite projects",
-    "getInTouch": "Get in touch!",
-    "viewProject": "View project",
+    "intro": "Websites and apps I designed and built.",
     "live": "live",
     "rebranding": "rebranding",
-    "clear": "clear",
-    "showingCount": "{count} / {total}",
     "items": {
       "exulta": {
-        "description": "The second version of the Exulta stretch tent rental site, live at exulta.be: catalog, tent calculator, realisations and blog on Laravel 13 with a React 19 front end, plus a Filament 5 admin panel the client runs themselves."
+        "tagline": "Tent rental website with a live tent calculator"
       },
       "scan2talk": {
-        "description": "A wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster and share how they feel; educators get trends and an anonymous chat."
+        "tagline": "Wellbeing check-ins for schools, by QR code"
       },
       "vhs": {
-        "description": "A trilingual site for an equestrian arena builder in Geluwe, with GSAP scroll animation, a WebGL hero and local SEO. Built on Next.js 16."
+        "tagline": "Website for an equestrian arena builder"
+      },
+      "stal-manager": {
+        "tagline": "Cost tracking for horse owners, works offline"
+      },
+      "coming-soon": {
+        "tagline": "Something new is in the works"
       }
-    }
+    },
+    "private": "live · private",
+    "comingSoon": "Coming soon",
+    "viewProjectAria": "View {name} project details",
+    "inProgress": "in progress",
+    "viewCase": "View project",
+    "prev": "Previous project",
+    "next": "Next project"
   },
   "exulta": {
     "title": "Exulta",
@@ -99,6 +108,31 @@
     "viewOther": "View other projects",
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Not live yet"
+  },
+  "stalManager": {
+    "title": "Stal Manager",
+    "alt": "Stal Manager horse stable cost dashboard",
+    "privateBadge": "Live",
+    "privateNote": "Private app, login only",
+    "overview": "Project Overview",
+    "about": "About",
+    "aboutText": "Stal Manager keeps track of what two horses cost: one of our own and one boarding horse. Every cost is booked with a date, category and quantity, and split between the horses by percentage. There's a desktop dashboard with monthly charts and reports, and a mobile app built for adding costs in the stable itself, even without a connection. It's a private app: sign-up is closed and accounts are created from the command line.",
+    "featuresTitle": "What's in it",
+    "featureSplit": "Cost splitting",
+    "featureSplitText": "Each cost is allocated to one horse or split across both by percentage, so per-horse totals stay correct even for shared hay or a farrier visit.",
+    "featureQuick": "Quick add from inventory",
+    "featureQuickText": "Inventory items carry a default price and unit, so the usual costs (hay, feed, bedding) are one tap on the phone.",
+    "featureOffline": "Works offline",
+    "featureOfflineText": "The mobile app caches the last data and queues costs added without a connection, then sends them once it's back online. A status icon shows the connection state.",
+    "featureInsights": "Dashboard & insights",
+    "featureInsightsText": "Monthly totals, costs per horse and per month in Recharts graphs, and month-over-month insights on mobile.",
+    "featureAuth": "Private by design",
+    "featureAuthText": "Better Auth with username and password, sign-up closed, sessions kept for a month on the phone. Every page and server action checks the session.",
+    "featureQuality": "Tested & monitored",
+    "featureQualityText": "Vitest unit tests plus database tests against a real Postgres, and a public health endpoint polled by my status dashboard.",
+    "languages": "Languages & Frameworks",
+    "tools": "Tools & Services",
+    "viewOther": "View other projects"
   },
   "scan2talk": {
     "title": "Scan2Talk",
@@ -152,9 +186,10 @@
     "welcome": "Hey! I'm Robbe's virtual assistant. Ask me about his skills, projects, experience, or how to get in touch!",
     "greeting": "Hi there! How can I help you? You can ask about my projects, skills, experience, or how to reach me.",
     "skills": "Robbe is a full-stack web developer working with: Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, TailwindCSS, Node.js, and more. He also has experience with Adobe XD, After Effects, and LottieFiles for design & prototyping. His current focus is Drupal backend development at Dynamate.",
-    "projects": "Robbe has built 3 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based student wellbeing check-in, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• VHS Service — trilingual site for an equestrian arena builder, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nCheck them out on the Projects page!",
+    "projects": "Robbe has built 4 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based student wellbeing check-in, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — private app for tracking horse costs, works offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — trilingual site for an equestrian arena builder, in rebranding (Next.js 16 + React 19 + GSAP + WebGL)\n\nCheck them out on the Projects page!",
     "project-exulta": "Exulta is the second version of the Exulta stretch tent rental website, live at exulta.be. Built with Laravel 13 and React 19 over Inertia, with a Filament 5 admin panel, a product catalog, an interactive tent calculator, realisations and a blog. Automated CI/CD via GitHub Actions with database backups and rollback on failure, plus Playwright and Lighthouse checks.",
     "project-scan2talk": "Scan2Talk is a PWA for schools — students scan a QR code and walk through a guided emotional wellbeing check-in wizard (thermometer → themes → feelings → help request). Teachers get an overview dashboard with Chart.js visualizations. Built with Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Runs locally via DDEV.",
+    "project-stalmanager": "Stal Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests.",
     "project-vhs": "VHS Service builds and renovates riding arenas in Geluwe, West Flanders. I built their site on Next.js 16 and React 19: a black-and-white editorial design with GSAP scroll animation, a WebGL hero and Lenis smooth scrolling, in Dutch, French and English. Quote forms go through Resend, and it is tuned for local SEO. Currently in rebranding and not public yet.",
     "contact": "You can reach Robbe via email at robbe.saelens@telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens), and Facebook. The portfolio is hosted at robbe-saelens.netlify.app.",
     "experience": "Robbe currently works at Dynamate as a Drupal backend developer. Previously at Your Mind Our Work (2023) as a PHP & Magento developer — started as an intern and was hired full-time. Since 2017, he also works as an equestrian sports instructor at Sport Vlaanderen in Woumen. His journey combines technical development with people skills from teaching.",
@@ -164,7 +199,7 @@
     "hobbies": "Besides coding, Robbe has been an equestrian sports instructor since 2017 at Sport Vlaanderen Woumen. He enjoys teaching people and working with horses — it's where he developed his people skills alongside his technical career.",
     "thanks": "You're welcome! Let me know if you have any other questions.",
     "bye": "Bye! Feel free to reach out anytime. Have a great day!",
-    "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, VHS Service. Just type what you'd like to know!",
+    "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, Stal Manager, VHS Service. Just type what you'd like to know!",
     "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me! Type 'help' for a list of topics.",
     "reset": "Session terminated. All systems restored to default.\n\nType 'help' if you need guidance.",
     "quickReplies": [
