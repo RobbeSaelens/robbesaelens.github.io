@@ -583,6 +583,8 @@
         </section>
       </div>
     </div>
+
+    <component :is="UpdatesPanel" v-if="UpdatesPanel" />
   </div>
 </template>
 
@@ -593,7 +595,7 @@
 //
 // Prerender-safe: nothing below touches window, document or storage during
 // setup or render. All of that happens in onMounted and event handlers.
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
+import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useI18n } from 'vue-i18n'
 import {
@@ -631,6 +633,13 @@ import type {
   Summary,
   UptimeStatus,
 } from '../status/api'
+
+// Local dependency-update panel (talks to ~/projects/project-updater). Dev
+// only: Vite replaces import.meta.env.DEV with false in production builds, so
+// this import is dropped and the panel's code is never shipped.
+const UpdatesPanel = import.meta.env.DEV
+  ? defineAsyncComponent(() => import('../components/UpdatesPanel.vue'))
+  : null
 
 type Phase = 'unconfigured' | 'booting' | 'login' | 'dashboard'
 type Tone = 'info' | 'success' | 'warning' | 'error'
