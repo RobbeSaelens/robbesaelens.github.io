@@ -1,11 +1,11 @@
 <template>
-  <header class="mb-10 mt-8 md:mb-14 md:mt-12">
+  <header class="terminal-header">
     <h1 class="terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl">
       <span class="terminal-prompt">&gt;</span>
       <span class="terminal-text">{{ title }}</span>
       <span class="terminal-cursor" aria-hidden="true"></span>
     </h1>
-    <p class="terminal-subtitle mt-5 text-sm tracking-wide md:text-base">
+    <p class="terminal-subtitle text-sm tracking-wide md:text-base">
       <span class="opacity-50">$</span> {{ subtitle }}
     </p>
   </header>
@@ -22,3 +22,14 @@ export default defineComponent({
   },
 })
 </script>
+
+<!-- Spacing shrinks with the screen height: the pages using it fill one screen. -->
+<style scoped>
+.terminal-header {
+  flex-shrink: 0;
+  padding: clamp(1rem, 3.5vh, 2.25rem) 0 clamp(0.75rem, 3vh, 1.75rem);
+}
+.terminal-subtitle {
+  margin-top: clamp(0.5rem, 1.5vh, 1.25rem);
+}
+</style>

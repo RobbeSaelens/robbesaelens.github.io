@@ -25,6 +25,7 @@ export const routes: RouteRecordRaw[] = [
           description:
             'About Robbe Saelens: education in Multimedia & Communication Technologies, experience as PHP, Magento and Drupal backend developer, and how to get in touch.',
           image: '/pf2.jpg',
+          fit: true,
         },
       },
       {
@@ -81,25 +82,6 @@ export const routes: RouteRecordRaw[] = [
           description:
             'Scan2Talk by Robbe Saelens, live at scan2talk.be: students scan a QR poster to share how they feel; educators get trends and an anonymous chat.',
           image: '/scan2talk-home.jpg',
-        },
-      },
-      {
-        // Private project status dashboard. Deliberately not linked from the
-        // navigation, footer, llms.txt or JSON-LD. It is still prerendered (an
-        // empty shell with a real 200 + noindex), but `sitemap: false` keeps it
-        // out of sitemap.xml. No robots.txt Disallow on purpose: that would
-        // advertise the path and stop crawlers from ever seeing the noindex.
-        path: 'status',
-        name: 'Status',
-        component: () => import('../screens/Status.vue'),
-        meta: {
-          title: 'Status',
-          description: 'Private project status dashboard.',
-          noindex: true,
-          sitemap: false,
-          // No third-party analytics here: the page keeps a session token in sessionStorage,
-          // which any script on the page could read. Stripped by scripts/prerender.mjs.
-          analytics: false,
         },
       },
     ],

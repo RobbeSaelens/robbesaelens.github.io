@@ -310,7 +310,8 @@ export default {
 <style scoped>
 /* Fills the space between header and footer; the slides take whatever height is left. */
 .car {
-  --gutter: max(1rem, calc((100% - 1280px) / 2 + 1.5rem));
+  /* Same content width as the home and contact pages (max-w-screen-2xl + px-6). */
+  --gutter: max(1.5rem, calc((100% - 1536px) / 2 + 1.5rem));
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -714,6 +715,9 @@ export default {
 }
 
 @media (max-width: 640px) {
+  .car {
+    --gutter: 1rem; /* contact's px-4 on phones: more room for the slides */
+  }
   .car-nav,
   .car-comment,
   .car-cta {
