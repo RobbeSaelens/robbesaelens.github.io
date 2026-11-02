@@ -52,7 +52,6 @@
     },
     "private": "live · privé",
     "comingSoon": "Binnenkort",
-    "viewProjectAria": "Bekijk het project {name}",
     "inProgress": "in de maak",
     "viewCase": "Bekijk project",
     "prev": "Vorig project",
@@ -219,7 +218,17 @@
       "wrong_code": "❌ Dat is niet het juiste nummer. Zorg dat je het duidelijk zag en typ het precies zoals het verscheen.",
       "unlock": "🎉 TOEGANG VERLEEND\n\nJe hebt alle drie raadsels opgelost. Welkom bij de verborgen laag...\n\nDeveloper mode initialiseren..."
     },
-    "aiNotice": "Antwoorden worden gegenereerd door AI (Cloudflare Workers AI) en kunnen fout zijn. Deel geen persoonlijke gegevens."
+    "aiNotice": "Antwoorden worden gegenereerd door AI (Cloudflare Workers AI) en kunnen fout zijn. Deel geen persoonlijke gegevens.",
+    "title": "AI-assistent",
+    "titleBasic": "Portfolio-assistent",
+    "offline": "Ingebouwde antwoorden, AI niet beschikbaar",
+    "clear": "Chat wissen",
+    "send": "Versturen",
+    "open": "AI-chat openen",
+    "close": "AI-chat sluiten",
+    "openBasic": "Chat openen",
+    "closeBasic": "Chat sluiten",
+    "suggestions": "Voorgestelde vragen"
   },
   "aria": {
     "switchToDutch": "Schakel naar Nederlands",
@@ -244,22 +253,13 @@
     "close": "dev mode afsluiten",
     "hint": "Tip: vraag me naar 'sudo' of 'geheim' om opnieuw te beginnen"
   },
-  "consent": {
-    "title": "Cookies",
-    "text": "Deze site gebruikt Google Analytics om bezoeken te tellen, maar alleen als je akkoord gaat. De chatbot en de rest van de site werken hoe dan ook.",
-    "accept": "Accepteren",
-    "decline": "Weigeren",
-    "privacy": "Privacy"
-  },
   "footer": {
-    "privacy": "Privacy",
-    "cookies": "Cookie-instellingen"
+    "privacy": "Privacy"
   },
   "privacy": {
     "title": "Privacy",
     "updated": "Laatst bijgewerkt: 2 november 2026",
     "intro": "Deze pagina legt uit welke persoonsgegevens deze website verwerkt, waarom, en wat je ermee kan doen. Het is mijn persoonlijke portfolio, en ik hou de gegevens die het verwerkt zo beperkt mogelijk.",
-    "cookieSettings": "Cookie-instellingen",
     "sections": [
       {
         "title": "Wie is verantwoordelijk",
@@ -270,8 +270,8 @@
         "text": "De site staat op GitHub Pages. Zoals elke webserver ontvangt GitHub je IP-adres en technische gegevens over je browser wanneer je een pagina laadt, en bewaart die in zijn logs voor de beveiliging. De privacyverklaring van GitHub legt uit hoe het daarmee omgaat."
       },
       {
-        "title": "Statistieken (Google Analytics)",
-        "text": "Alleen als je het accepteert in de cookiebanner, laadt de site Google Analytics om bezoeken te tellen en te zien welke pagina's gelezen worden. Google Analytics plaatst dan de cookies _ga en _ga_<id> (tot 2 jaar bewaard) en ontvangt de pagina's die je bezoekt, je browser en toestel, en je locatie bij benadering. Google Ireland Ltd. verwerkt dit voor mij; gegevens kunnen naar de Verenigde Staten gaan onder het EU-VS Data Privacy Framework. Google bewaart de statistieken hoogstens 14 maanden. Weiger je, dan wordt er niets naar Google gestuurd en worden er geen cookies geplaatst. Je kan je keuze altijd wijzigen."
+        "title": "Statistieken (Cloudflare Web Analytics)",
+        "text": "Om te zien hoeveel mensen de site bezoeken en welke pagina's ze lezen, gebruikt de site Cloudflare Web Analytics. Het plaatst geen cookies, bewaart niets in je browser en volgt je niet over sites of bezoeken heen. Per paginaweergave ontvangt het de pagina, de verwijzende site, je browser- en toesteltype en je land, en telt die zonder je IP-adres te bewaren. Cloudflare, Inc. verwerkt dit voor mij; gegevens kunnen naar de Verenigde Staten gaan onder het EU-VS Data Privacy Framework. Ik steun op mijn gerechtvaardigd belang om te weten hoe de site gebruikt wordt; je kan bezwaar maken door me te mailen of door static.cloudflareinsights.com te blokkeren."
       },
       {
         "title": "Chatbot",
@@ -279,7 +279,7 @@
       },
       {
         "title": "Opgeslagen in je browser",
-        "text": "De site bewaart een paar instellingen in je browser, zodat alles blijft zoals je het achterliet: thema, taal, je cookiekeuze, en of je de intro al zag of de chat al opende. Ze verlaten je browser nooit en worden niet gebruikt om je te volgen."
+        "text": "De site bewaart een paar instellingen in je browser, zodat alles blijft zoals je het achterliet: thema, taal, en of je de intro al zag of de chat al opende. Ze verlaten je browser nooit en worden niet gebruikt om je te volgen."
       },
       {
         "title": "Contact",
@@ -287,22 +287,18 @@
       },
       {
         "title": "Je rechten",
-        "text": "Je kan vragen om je persoonsgegevens in te zien, te verbeteren of te verwijderen, bezwaar maken tegen het gebruik ervan, of je toestemming intrekken, door te mailen naar robbe.saelens{'@'}telenet.be. Vind je dat je gegevens niet correct behandeld worden, dan kan je klacht indienen bij de Belgische Gegevensbeschermingsautoriteit (gegevensbeschermingsautoriteit.be)."
+        "text": "Je kan vragen om je persoonsgegevens in te zien, te verbeteren of te verwijderen, of bezwaar maken tegen het gebruik ervan, door te mailen naar robbe.saelens{'@'}telenet.be. Vind je dat je gegevens niet correct behandeld worden, dan kan je klacht indienen bij de Belgische Gegevensbeschermingsautoriteit (gegevensbeschermingsautoriteit.be)."
       }
     ],
     "glance": {
       "title": "Privacy in het kort",
       "items": [
-        "Geen statistieken zonder je toestemming",
+        "Geen cookies, geen tracking over sites heen",
         "Chatgesprekken worden nooit bewaard",
         "Geen advertenties, geen verkoop van je gegevens",
         "Vraag altijd om je gegevens in te zien, te verbeteren of te verwijderen"
       ],
-      "status": "analytics --status",
-      "on": "aan",
-      "off": "uit",
-      "unset": "nog niet gekozen",
-      "change": "Wijzigen",
+      "status": "cookies --count",
       "toc": "Op deze pagina"
     }
   }

@@ -1,6 +1,7 @@
 // JSON-LD graph builders. The base graph (Person + WebSite) is emitted on every
 // page; each route adds the node that best describes it so search engines and
 // LLM crawlers get an explicit, unambiguous entity for "Robbe Saelens".
+import { localizedPath, stripLocale, type Locale } from '../localePath'
 import { PROJECTS, SKILLS } from './projects'
 
 const PERSON_ID = '#person'
@@ -65,7 +66,7 @@ export function websiteNode(site: string) {
 }
 
 function projectNode(site: string, path: string) {
-  const project = PROJECTS.find((p) => p.path === path)
+  const project = PROJECTS.find((p) => p.path === stripLocale(path))
   if (!project) return null
   return {
     '@type': 'CreativeWork',
@@ -82,11 +83,13 @@ function projectNode(site: string, path: string) {
   }
 }
 
-function breadcrumbNode(site: string, path: string, title: string) {
-  if (path === '/') return null
-  const isProject = PROJECTS.some((p) => p.path === path)
-  const items = [{ name: 'Home', item: `${site}/` }]
-  if (isProject) items.push({ name: 'Projects', item: `${site}/projects` })
+function breadcrumbNode(site: string, path: string, title: string, lang: Locale) {
+  const base = stripLocale(path)
+  if (base === '/') return null
+  const isProject = PROJECTS.some((p) => p.path === base)
+  const home = localizedPath('/', lang)
+  const items = [{ name: 'Home', item: `${site}${home === '/' ? '/' : home}` }]
+  if (isProject) items.push({ name: lang === 'nl' ? 'Projecten' : 'Projects', item: `${site}${localizedPath('/projects', lang)}` })
   items.push({ name: title, item: `${site}${path}` })
 
   return {
@@ -101,9 +104,9 @@ function breadcrumbNode(site: string, path: string, title: string) {
   }
 }
 
-function pageNode(site: string, path: string, title: string, description: string) {
-  const isHome = path === '/'
-  const isAbout = path === '/contact'
+function pageNode(site: string, path: string, title: string, description: string, lang: Locale) {
+  const isHome = stripLocale(path) === '/'
+  const isAbout = stripLocale(path) === '/contact'
   const type = isHome || isAbout ? 'ProfilePage' : 'WebPage'
 
   return {
@@ -115,7 +118,7 @@ function pageNode(site: string, path: string, title: string, description: string
     isPartOf: { '@id': `${site}/${WEBSITE_ID}` },
     about: { '@id': `${site}/${PERSON_ID}` },
     ...(isHome || isAbout ? { mainEntity: { '@id': `${site}/${PERSON_ID}` } } : {}),
-    inLanguage: 'en',
+    inLanguage: lang,
   }
 }
 
@@ -135,15 +138,15 @@ function projectListNode(site: string) {
 }
 
 /** Full @graph for a route, ready to be JSON.stringify'd into a script tag. */
-export function routeJsonLd(path: string, title: string, description: string, site: string) {
+export function routeJsonLd(path: string, title: string, description: string, site: string, lang: Locale = 'en') {
   const graph: unknown[] = [personNode(site), websiteNode(site)]
 
-  graph.push(pageNode(site, path, title, description))
+  graph.push(pageNode(site, path, title, description, lang))
 
-  const breadcrumb = breadcrumbNode(site, path, title)
+  const breadcrumb = breadcrumbNode(site, path, title, lang)
   if (breadcrumb) graph.push(breadcrumb)
 
-  if (path === '/projects') graph.push(projectListNode(site))
+  if (stripLocale(path) === '/projects') graph.push(projectListNode(site))
 
   const project = projectNode(site, path)
   if (project) graph.push(project)

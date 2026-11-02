@@ -15,10 +15,6 @@
         >
           <h2>{{ $rt(section.title) }}</h2>
           <p>{{ $rt(section.text) }}</p>
-          <!-- The analytics section is where the choice can be changed -->
-          <button v-if="i === ANALYTICS_SECTION" type="button" class="privacy-btn" @click="openConsent">
-            {{ $t('privacy.cookieSettings') }}
-          </button>
         </section>
 
         <p class="privacy-updated">{{ $t('privacy.updated') }}</p>
@@ -38,9 +34,8 @@
             <code>
               <span class="glance-prompt">$</span> {{ $t('privacy.glance.status') }}
               <span class="glance-arrow" aria-hidden="true">→</span>
-              <strong :class="`is-${consentState}`">{{ $t(`privacy.glance.${consentState}`) }}</strong>
+              <strong>0</strong>
             </code>
-            <button type="button" class="glance-change" @click="openConsent">{{ $t('privacy.glance.change') }}</button>
           </div>
         </div>
 
@@ -72,15 +67,10 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Check } from 'lucide-vue-next'
 import TerminalHeader from '../components/TerminalHeader.vue'
-import { consent, openConsent } from '../analytics'
 
 const { tm } = useI18n({ useScope: 'global' })
 const sections = computed(() => tm('privacy.sections') as { title: string; text: string }[])
 const glanceItems = computed(() => tm('privacy.glance.items') as string[])
-/** Index of "Statistics (Google Analytics)" in privacy.sections. */
-const ANALYTICS_SECTION = 2
-
-const consentState = computed(() => (consent.value === 'granted' ? 'on' : consent.value === 'denied' ? 'off' : 'unset'))
 
 const articleRef = ref<HTMLElement | null>(null)
 /** Section being read: the last one whose top has passed a line 30% down the screen. */
@@ -217,31 +207,6 @@ html.js .reveal.is-visible {
   transform: none;
 }
 
-.privacy-btn,
-.glance-change {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--color-accent);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-glow);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease;
-}
-.privacy-btn {
-  margin-top: 0.875rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-}
-.privacy-btn:hover,
-.glance-change:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
-}
-.privacy-btn:focus-visible,
-.glance-change:focus-visible,
 .toc-link:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
@@ -326,18 +291,8 @@ html.js.intro-done .glance-list li {
   margin: 0 0.4em;
   color: var(--color-text-muted);
 }
-.glance-status strong.is-on {
-  color: #16a34a;
-}
-.glance-status strong.is-off {
+.glance-status strong {
   color: var(--color-accent);
-}
-.glance-status strong.is-unset {
-  color: var(--color-text-muted);
-}
-.glance-change {
-  padding: 0.3rem 0.7rem;
-  font-size: 0.8125rem;
 }
 
 /* ── Index ── */
@@ -391,7 +346,6 @@ html.js.intro-done .glance-list li {
 .toc-num {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  opacity: 0.7;
   padding-top: 0.1rem;
 }
 .toc-link:hover {

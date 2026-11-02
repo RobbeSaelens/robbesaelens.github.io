@@ -99,7 +99,7 @@
         </div>
 
         <div class="mt-4 inline-block">
-          <router-link class="group flex items-center gap-2" to="/projects">
+          <router-link class="group flex items-center gap-2" :to="$lp('/projects')">
             <span class="text-sm" style="color: var(--color-accent); opacity: 0.6">./</span>
             <span
               class="font-medium transition-colors"

@@ -1,6 +1,6 @@
 <template>
   <div class="nav-bar">
-    <router-link class="nav-logo" to="/" @click="onLogoClick">
+    <router-link class="nav-logo" :to="lp('/')" @click="onLogoClick">
       <BrandLogo class="nav-logo-full" />
       <BrandLogo class="nav-logo-mark" variant="mark" />
     </router-link>
@@ -18,7 +18,7 @@
           <li v-for="link in links" :key="link.to">
             <router-link
               :ref="(el) => setLinkRef(link.to, el)"
-              :to="link.to"
+              :to="lp(link.to)"
               class="nav-link"
               :class="{ 'is-current': isCurrent(link) }"
             >
@@ -74,7 +74,7 @@
         @keydown.tab="trapFocus"
       >
         <div class="mobile-top">
-          <router-link class="nav-logo" to="/" @click="onLogoClick">
+          <router-link class="nav-logo" :to="lp('/')" @click="onLogoClick">
             <BrandLogo class="nav-logo-menu" variant="mark" />
           </router-link>
           <button
@@ -92,7 +92,7 @@
           <router-link
             v-for="(link, i) in mobileLinks"
             :key="link.to"
-            :to="link.to"
+            :to="lp(link.to)"
             class="mobile-link"
             :class="{ 'is-current': isCurrent(link) }"
             :style="{ '--i': i }"
@@ -144,6 +144,7 @@ import {
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Sun, Moon, Phone, Mail, X, ArrowRight } from 'lucide-vue-next'
+import { stripLocale, useLocalePath } from '../../localePath'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
 import BrandLogo from '../../components/BrandLogo.vue'
 import { useEasterEgg } from '../../composables/useEasterEgg'
@@ -172,8 +173,12 @@ export default {
     const links = LINKS
     const mobileLinks: NavLink[] = [{ to: '/', label: 'nav.home' }, ...LINKS]
 
-    const isCurrent = (link: NavLink) =>
-      route.path === link.to || (link.matches?.(route.path) ?? false)
+    const { lp } = useLocalePath()
+    // Compare without the /nl prefix: /nl/projects is the projects page too.
+    const isCurrent = (link: NavLink) => {
+      const path = stripLocale(route.path)
+      return path === link.to || (link.matches?.(path) ?? false)
+    }
 
     // ── Sliding indicator behind the current desktop link ──
     const linkList = ref<HTMLElement | null>(null)
@@ -296,6 +301,7 @@ export default {
       links,
       mobileLinks,
       isCurrent,
+      lp,
       linkList,
       setLinkRef,
       indicatorStyle,

@@ -62,10 +62,9 @@
       >
         <component
           :is="project.route ? 'router-link' : 'div'"
-          :to="project.route ? { name: project.route } : undefined"
+          :to="project.route ? { name: $ln(project.route) } : undefined"
           class="car-card"
           draggable="false"
-          :aria-label="project.route ? $t('projects.viewProjectAria', { name: project.name }) : undefined"
           @click="onCardClick($event, index)"
         >
           <!-- Mockup: the desktop screenshot in a browser window, the phone screenshot overlapping it. -->

@@ -1,16 +1,17 @@
 <template>
   <div ref="rootRef" class="chatbot-root">
-    <!-- Floating toggle button -->
     <button
       @click="toggle"
       class="chatbot-fab"
       :class="{ 'is-open': isOpen, 'is-new': !seen }"
-      aria-label="Toggle terminal"
+      :aria-label="isOpen ? $t(aiEnabled ? 'chat.close' : 'chat.closeBasic') : $t(aiEnabled ? 'chat.open' : 'chat.openBasic')"
       :aria-expanded="isOpen ? 'true' : 'false'"
     >
       <!-- Pulses until the chat has been opened once this session -->
       <span class="fab-ring" aria-hidden="true"></span>
-      <svg class="fab-icon fab-prompt" viewBox="0 0 24 24" aria-hidden="true">
+      <!-- The llama when the AI answers (Llama 3.3); the terminal prompt otherwise -->
+      <LlamaIcon v-if="aiEnabled" class="fab-icon fab-prompt fab-llama" />
+      <svg v-else class="fab-icon fab-prompt" viewBox="0 0 24 24" aria-hidden="true">
         <path class="fab-chevron" d="M5.5 7.5 10 12l-4.5 4.5" />
         <rect class="fab-cursor" x="12.5" y="15.4" width="6.5" height="2.2" rx="1.1" />
       </svg>
@@ -20,99 +21,75 @@
       <span v-if="aiEnabled" class="fab-badge" aria-hidden="true">AI</span>
     </button>
 
-    <!-- Terminal window -->
     <transition name="chat-slide">
-      <div v-if="isOpen" class="chatbot-window" :class="{ 'riddle-active': riddleStep > 0 }">
-        <!-- Title bar -->
-        <div class="terminal-titlebar">
-          <div class="titlebar-dots">
-            <span class="dot dot-red"></span>
-            <span class="dot dot-yellow"></span>
-            <span class="dot dot-green"></span>
-          </div>
-          <span class="titlebar-label">{{
-            riddleStep > 0 ? '⚠ ROOT KIT DETECTED — CAUTION ⚠' : 'robbe@portfolio ~ chatbot'
-          }}</span>
-          <button @click="close" class="titlebar-close" aria-label="Close terminal">
-            <X class="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        <!-- Terminal body -->
-        <div ref="messagesContainer" class="terminal-body">
-          <!-- Welcome banner -->
-          <div class="terminal-banner">
-            <pre class="banner-ascii">
-  ██████╗  ██████╗ ██████╗ ██████╗ ███████╗
-  ██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔════╝
-  ██████╔╝██║   ██║██████╔╝██████╔╝█████╗  
-  ██╔══██╗██║   ██║██╔══██╗██╔══██╗██╔══╝  
-  ██║  ██║╚██████╔╝██████╔╝██████╔╝███████╗
-  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝
-            </pre>
-            <p class="banner-subtitle">Portfolio Assistant v2.0 • Type 'help' for tips</p>
-            <!-- AI disclosure (EU AI Act, Art. 50) and a pointer to the privacy page -->
-            <p v-if="aiEnabled" class="banner-notice">
-              {{ $t('chat.aiNotice') }}
-              <router-link to="/privacy" class="banner-notice-link" @click="close">{{ $t('footer.privacy') }}</router-link>
+      <section
+        v-if="isOpen"
+        class="chatbot-window"
+        :class="{ 'riddle-active': riddleStep > 0 }"
+        :aria-label="$t(aiEnabled ? 'chat.title' : 'chat.titleBasic')"
+      >
+        <header class="chat-head">
+          <span class="chat-avatar" aria-hidden="true"><LlamaIcon /></span>
+          <div class="chat-head-text">
+            <p class="chat-title">
+              {{ riddleStep > 0 ? '⚠ ROOT KIT DETECTED' : $t(aiEnabled ? 'chat.title' : 'chat.titleBasic') }}
             </p>
-            <hr class="terminal-divider" />
+            <p class="chat-sub">
+              <span class="chat-status" :class="aiOnline ? 'is-on' : 'is-off'" aria-hidden="true"></span>
+              {{ aiOnline ? 'Llama 3.3 · Cloudflare Workers AI' : $t('chat.offline') }}
+            </p>
+          </div>
+          <button type="button" class="chat-icon-btn" :aria-label="$t('chat.clear')" :title="$t('chat.clear')" @click="clearChat">
+            <RotateCcw />
+          </button>
+          <button type="button" class="chat-icon-btn" :aria-label="$t(aiEnabled ? 'chat.close' : 'chat.closeBasic')" @click="close">
+            <X />
+          </button>
+        </header>
+
+        <div ref="messagesContainer" class="chat-body" aria-live="polite">
+          <!-- AI disclosure (EU AI Act, Art. 50) and a pointer to the privacy page -->
+          <p v-if="aiEnabled" class="chat-notice">
+            {{ $t('chat.aiNotice') }}
+            <router-link :to="$lp('/privacy')" class="chat-notice-link" @click="close">{{ $t('footer.privacy') }}</router-link>
+          </p>
+
+          <div v-for="(msg, i) in messages" :key="i" class="msg" :class="`msg--${msg.actor}`">
+            <span v-if="msg.actor === 'bot'" class="msg-avatar" aria-hidden="true"><LlamaIcon /></span>
+            <!-- AI replies are plain text (never v-html); the rest are translation keys -->
+            <p class="msg-text">{{ msg.actor === 'user' ? msg.key : (msg.text ?? $t(msg.key)) }}</p>
           </div>
 
-          <div v-for="(msg, i) in messages" :key="i">
-            <!-- Bot message -->
-            <div v-if="msg.actor === 'bot'" class="terminal-line bot-line">
-              <span class="prompt-symbol bot-prompt">❯</span>
-              <!-- AI replies are plain text (never v-html); the rest are translation keys -->
-              <span class="line-text">{{ msg.text ?? $t(msg.key) }}</span>
-            </div>
-            <!-- User message -->
-            <div v-else class="terminal-line user-line">
-              <span class="prompt-symbol user-prompt">$</span>
-              <span class="line-text user-text">{{ msg.key }}</span>
-            </div>
+          <div v-if="isTyping" class="msg msg--bot chat-typing" aria-hidden="true">
+            <span class="msg-avatar"><LlamaIcon /></span>
+            <p class="msg-text"><span class="dot-1"></span><span class="dot-2"></span><span class="dot-3"></span></p>
           </div>
 
-          <!-- Typing indicator -->
-          <div v-if="isTyping" class="terminal-line bot-line">
-            <span class="prompt-symbol bot-prompt">❯</span>
-            <span class="typing-cursor">▊</span>
-          </div>
-
-          <!-- Quick replies -->
-          <div v-if="!isTyping && quickReplies.length" class="quick-replies-row">
-            <button
-              v-for="(qr, i) in quickReplies"
-              :key="i"
-              @click="sendQuickReply(qr)"
-              class="quick-reply-chip"
-            >
-              {{ qr }}
-            </button>
-          </div>
+          <!-- Follow-ups after an AI answer; the starter questions at the beginning -->
+          <ul v-if="!isTyping && chips.length" class="chat-chips" :aria-label="$t('chat.suggestions')">
+            <li v-for="(chip, i) in chips" :key="i">
+              <button type="button" class="chat-chip" @click="sendQuickReply(chip)">{{ chip }}</button>
+            </li>
+          </ul>
         </div>
 
-        <!-- Input line -->
-        <div class="terminal-input-area">
-          <span class="prompt-symbol input-prompt">❯</span>
-          <label
-            for="chat-input"
-            class="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0"
-            >{{ $t('chat.placeholder') }}</label
-          >
+        <form class="chat-input" @submit.prevent="send">
+          <label for="chat-input" class="sr-only">{{ $t('chat.placeholder') }}</label>
           <input
             id="chat-input"
             ref="inputRef"
             v-model="input"
             type="text"
             maxlength="600"
-            :placeholder="inputPlaceholder"
-            class="terminal-input"
-            @keyup.enter="send"
+            autocomplete="off"
             spellcheck="false"
+            :placeholder="inputPlaceholder"
           />
-        </div>
-      </div>
+          <button type="submit" class="chat-send" :aria-label="$t('chat.send')" :disabled="!input.trim() || pending">
+            <ArrowUp />
+          </button>
+        </form>
+      </section>
     </transition>
   </div>
 </template>
@@ -120,9 +97,10 @@
 <script lang="ts">
 import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { X } from 'lucide-vue-next'
+import { ArrowUp, RotateCcw, X } from 'lucide-vue-next'
+import LlamaIcon from './LlamaIcon.vue'
 import { useEasterEgg } from '../composables/useEasterEgg'
-import { askAssistant, type ChatTurn } from '../chatApi'
+import { aiAvailable, askAssistant, type ChatTurn } from '../chatApi'
 import { CHAT_API_URL } from '../site'
 
 interface Message {
@@ -131,6 +109,8 @@ interface Message {
   key: string
   /** An AI reply, shown as is. */
   text?: string
+  /** Follow-up questions offered with an AI reply. */
+  suggestions?: string[]
 }
 
 const KEYWORDS: { keys: string[]; responseKey: string }[] = [
@@ -261,9 +241,9 @@ const RIDDLE_ANSWERS: Record<number, string[]> = {
 
 export default {
   name: 'ChatBot',
-  components: { X },
+  components: { ArrowUp, LlamaIcon, RotateCcw, X },
   setup() {
-    const { t, locale } = useI18n({ useScope: 'global' })
+    const { t, tm, rt, locale } = useI18n({ useScope: 'global' })
     const {
       unlock,
       secretCode,
@@ -274,6 +254,8 @@ export default {
     const isOpen = ref(false)
     const input = ref('')
     const isTyping = ref(false)
+    /** An answer is being worked out; a new message waits until it's there. */
+    const pending = ref(false)
     const messages = ref<Message[]>([])
     const messagesContainer = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
@@ -285,9 +267,19 @@ export default {
 
     const inputPlaceholder = computed(() => t('chat.placeholder'))
 
+    // tm() returns the list itself (t() only resolves single messages)
     const quickReplies = computed(() => {
-      const replies = t('chat.quickReplies') as unknown as string[]
-      return Array.isArray(replies) ? replies : []
+      const replies = tm('chat.quickReplies') as unknown
+      return Array.isArray(replies) ? replies.map((r) => rt(r)) : []
+    })
+
+    const aiOnline = computed(() => aiEnabled && aiAvailable.value)
+
+    /** Follow-ups of the last AI answer; the starter questions until the visitor has asked something. */
+    const chips = computed(() => {
+      const last = messages.value.at(-1)
+      if (last?.actor === 'bot' && last.suggestions?.length) return last.suggestions
+      return messages.value.some((m) => m.actor === 'user') ? [] : quickReplies.value
     })
 
     const scrollToBottom = () => {
@@ -302,8 +294,8 @@ export default {
       scrollToBottom()
     }
 
-    const addReply = (text: string) => {
-      messages.value.push({ actor: 'bot', key: '', text })
+    const addReply = (text: string, suggestions: string[] = []) => {
+      messages.value.push({ actor: 'bot', key: '', text, suggestions })
       scrollToBottom()
     }
 
@@ -393,40 +385,34 @@ export default {
       const responseKey = findResponse(userText)
       // "help" lists the built-in topics; everything else goes to the AI first.
       if (responseKey !== 'chat.help') {
-        const reply = await askAssistant(conversation(), locale.value === 'nl' ? 'nl' : 'en')
-        if (reply) return addReply(reply)
+        const answer = await askAssistant(conversation(), locale.value === 'nl' ? 'nl' : 'en')
+        if (answer) return addReply(answer.reply, answer.suggestions)
       }
       addMessage('bot', responseKey ?? 'chat.fallback')
     }
 
-    const send = () => {
-      const text = input.value.trim()
-      if (!text) return
+    /** Shows the question, then the typing dots until the answer is there. */
+    const ask = (text: string, delay: number) => {
+      if (pending.value) return
+      pending.value = true
       addMessage('user', text)
-      input.value = ''
       isTyping.value = true
       scrollToBottom()
-      setTimeout(
-        async () => {
-          await processMessage(text) // the typing cursor stays while the AI answers
-          isTyping.value = false
-        },
-        600 + Math.random() * 800,
-      )
+      setTimeout(async () => {
+        await processMessage(text)
+        isTyping.value = false
+        pending.value = false
+      }, delay)
     }
 
-    const sendQuickReply = (text: string) => {
-      addMessage('user', text)
-      isTyping.value = true
-      scrollToBottom()
-      setTimeout(
-        async () => {
-          await processMessage(text)
-          isTyping.value = false
-        },
-        400 + Math.random() * 600,
-      )
+    const send = () => {
+      const text = input.value.trim()
+      if (!text || pending.value) return
+      input.value = ''
+      ask(text, 600 + Math.random() * 800)
     }
+
+    const sendQuickReply = (text: string) => ask(text, 400 + Math.random() * 600)
 
     const toggle = () => {
       if (isOpen.value) {
@@ -461,6 +447,15 @@ export default {
 
     const close = () => {
       isOpen.value = false
+    }
+
+    const clearChat = () => {
+      messages.value = []
+      riddleStep.value = 0
+      clearSecretCode()
+      closeEasterEgg()
+      addMessage('bot', 'chat.welcome')
+      nextTick(() => inputRef.value?.focus())
     }
 
     const onClickOutside = (e: MouseEvent) => {
@@ -501,6 +496,10 @@ export default {
 
     return {
       aiEnabled,
+      aiOnline,
+      pending,
+      chips,
+      clearChat,
       seen,
       isOpen,
       input,
@@ -510,14 +509,12 @@ export default {
       inputRef,
       rootRef,
       inputPlaceholder,
-      quickReplies,
       send,
       sendQuickReply,
       toggle,
       open,
       close,
       riddleStep,
-      close,
     }
   },
 }
@@ -537,17 +534,6 @@ export default {
 }
 
 /* ── FAB button ── */
-.banner-notice {
-  margin: 0.5rem 0 0;
-  font-size: 0.6875rem;
-  line-height: 1.5;
-  color: rgba(148, 163, 184, 0.9);
-}
-.banner-notice-link {
-  color: #2dd4bf;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
 .chatbot-fab {
   position: relative;
   width: 3rem;
@@ -600,6 +586,18 @@ export default {
 }
 .fab-chevron {
   transition: transform 0.25s ease;
+}
+/* The llama keeps its own thinner line and tilts its head on hover */
+.fab-llama {
+  width: 1.75rem;
+  height: 1.75rem;
+  stroke-width: 1.7;
+}
+.chatbot-fab:hover .fab-llama {
+  transform: rotate(-8deg);
+}
+.chatbot-fab.is-open:hover .fab-llama {
+  transform: rotate(90deg) scale(0.6);
 }
 .chatbot-fab:hover .fab-chevron {
   transform: translateX(1.5px);
@@ -700,319 +698,385 @@ export default {
   background: rgba(15, 23, 42, 0.95);
 }
 
-/* ── Terminal window ── */
+/* ── Window ── */
 .chatbot-window {
   position: absolute;
   bottom: 4rem;
   right: 0;
-  width: 26rem;
-  max-width: calc(100vw - 3rem);
-  height: 30rem;
-  max-height: calc(100vh - 8rem);
-  background: #0c0c0d;
-  border: 1px solid rgba(20, 184, 166, 0.25);
-  border-radius: 0.5rem;
-  box-shadow:
-    0 12px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(20, 184, 166, 0.1);
   display: flex;
   flex-direction: column;
+  width: 25rem;
+  max-width: calc(100vw - 3rem);
+  height: min(34rem, calc(100vh - 8rem));
   overflow: hidden;
-  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Courier New', monospace;
+  color: #e2e8f0;
+  background: #0d1117;
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  border-radius: 1rem;
+  box-shadow:
+    0 18px 50px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(45, 212, 191, 0.06);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-/* ── Riddle-active easter egg mode ── */
+/* Phones: a sheet over the bottom of the screen */
+@media (max-width: 639px) {
+  .chatbot-window {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 5rem;
+    width: auto;
+    max-width: none;
+    height: min(75vh, 36rem);
+  }
+}
+
+/* ── Header ── */
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.14), rgba(45, 212, 191, 0.02) 70%);
+  border-bottom: 1px solid rgba(45, 212, 191, 0.14);
+}
+.chat-avatar {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.3rem;
+  border-radius: 0.65rem;
+  color: #042f2e;
+  background: #2dd4bf;
+}
+.chat-head-text {
+  flex: 1;
+  min-width: 0;
+}
+.chat-title {
+  margin: 0;
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.chat-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.1rem 0 0;
+  overflow: hidden;
+  font-size: 0.6875rem;
+  color: #a7b4c4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.chat-status {
+  flex-shrink: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+}
+.chat-status.is-on {
+  background: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+}
+.chat-status.is-off {
+  background: #fbbf24;
+}
+.chat-icon-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.45rem;
+  border: 0;
+  border-radius: 0.5rem;
+  color: #a7b4c4;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+.chat-icon-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.08);
+}
+.chat-icon-btn svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Messages ── */
+.chat-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem 0.9rem 0.6rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(45, 212, 191, 0.25) transparent;
+}
+.chat-notice {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: #a7b4c4;
+  background: rgba(148, 163, 184, 0.08);
+  border-radius: 0.6rem;
+}
+.chat-notice-link {
+  color: #5eead4;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  max-width: 92%;
+  animation: msg-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.msg--user {
+  align-self: flex-end;
+}
+.msg-avatar {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  color: #5eead4;
+  background: rgba(45, 212, 191, 0.12);
+}
+.msg-text {
+  margin: 0;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  border-radius: 0.9rem;
+}
+.msg--bot .msg-text {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.1);
+  border-bottom-left-radius: 0.3rem;
+}
+.msg--user .msg-text {
+  color: #042f2e;
+  background: #5eead4;
+  border-bottom-right-radius: 0.3rem;
+}
+
+/* Typing: three bouncing dots */
+.chat-typing .msg-text {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.75rem 0.85rem;
+}
+.chat-typing .msg-text span {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: #5eead4;
+  animation: typing-dot 1.1s ease-in-out infinite;
+}
+.chat-typing .dot-2 {
+  animation-delay: 0.15s !important;
+}
+.chat-typing .dot-3 {
+  animation-delay: 0.3s !important;
+}
+
+/* ── Suggested questions ── */
+.chat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.1rem 0 0 2.1rem;
+  padding: 0;
+  list-style: none;
+}
+.chat-chip {
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  color: #5eead4;
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  border-radius: 999px;
+  cursor: pointer;
+  animation: msg-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.chat-chip:hover {
+  background: rgba(45, 212, 191, 0.16);
+  border-color: #5eead4;
+}
+
+/* ── Input ── */
+.chat-input {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-top: 1px solid rgba(45, 212, 191, 0.14);
+}
+.chat-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.8rem;
+  font: inherit;
+  font-size: 0.875rem;
+  color: #f1f5f9;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 0.65rem;
+  caret-color: #2dd4bf;
+}
+.chat-input input::placeholder {
+  color: #8a97a8;
+}
+.chat-input input:focus {
+  outline: none;
+  border-color: rgba(45, 212, 191, 0.6);
+}
+.chat-send {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  padding: 0.55rem;
+  border: 0;
+  border-radius: 0.65rem;
+  color: #042f2e;
+  background: #2dd4bf;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+.chat-send:hover:not(:disabled) {
+  background: #5eead4;
+}
+.chat-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.chat-send svg {
+  width: 100%;
+  height: 100%;
+}
+.chat-icon-btn:focus-visible,
+.chat-chip:focus-visible,
+.chat-send:focus-visible,
+.chat-notice-link:focus-visible {
+  outline: 2px solid #5eead4;
+  outline-offset: 2px;
+}
+
+/* ── Riddle (easter egg) mode ── */
 .chatbot-window.riddle-active {
   border-color: rgba(251, 191, 36, 0.5);
-  box-shadow:
-    0 12px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(251, 191, 36, 0.3),
-    0 0 24px 4px rgba(251, 191, 36, 0.15);
   animation: riddle-glow 2s ease-in-out infinite alternate;
 }
-.chatbot-window.riddle-active .terminal-titlebar {
-  background: #1e1a0f;
+.chatbot-window.riddle-active .chat-head {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(251, 191, 36, 0.02) 70%);
   border-bottom-color: rgba(251, 191, 36, 0.2);
 }
-.chatbot-window.riddle-active .titlebar-label {
+.chatbot-window.riddle-active .chat-title {
   color: #fbbf24;
-  font-weight: 600;
   letter-spacing: 0.05em;
 }
-.chatbot-window.riddle-active .terminal-input-area {
+.chatbot-window.riddle-active .chat-avatar {
+  background: #fbbf24;
+}
+.chatbot-window.riddle-active .msg--bot .msg-text {
+  color: #fef3c7;
+  background: rgba(251, 191, 36, 0.1);
+}
+.chatbot-window.riddle-active .chat-input {
   border-top-color: rgba(251, 191, 36, 0.2);
 }
-.chatbot-window.riddle-active .input-prompt {
-  color: #fbbf24;
-}
-.chatbot-window.riddle-active .bot-prompt {
-  color: #f59e0b;
-}
-.chatbot-window.riddle-active .bot-line .line-text {
-  color: #fef3c7;
-}
-
 @keyframes riddle-glow {
   from {
     box-shadow:
-      0 12px 48px rgba(0, 0, 0, 0.5),
+      0 18px 50px -12px rgba(0, 0, 0, 0.6),
       0 0 0 1px rgba(251, 191, 36, 0.3),
       0 0 24px 4px rgba(251, 191, 36, 0.12);
   }
   to {
     box-shadow:
-      0 12px 48px rgba(0, 0, 0, 0.5),
+      0 18px 50px -12px rgba(0, 0, 0, 0.6),
       0 0 0 1px rgba(251, 191, 36, 0.45),
       0 0 32px 8px rgba(251, 191, 36, 0.22);
   }
 }
 
-/* ── Slide transition ── */
+/* ── Animations ── */
 .chat-slide-enter-active {
-  transition: all 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
+  transition:
+    opacity 0.28s ease,
+    transform 0.32s cubic-bezier(0.34, 1.3, 0.64, 1);
+  transform-origin: bottom right;
 }
 .chat-slide-leave-active {
-  transition: all 0.18s ease-in;
+  transition:
+    opacity 0.18s ease-in,
+    transform 0.18s ease-in;
+  transform-origin: bottom right;
 }
 .chat-slide-enter-from {
   opacity: 0;
-  transform: translateY(0.75rem) scale(0.96);
+  transform: translateY(0.75rem) scale(0.94);
 }
 .chat-slide-leave-to {
   opacity: 0;
-  transform: translateY(0.5rem) scale(0.98);
+  transform: translateY(0.5rem) scale(0.97);
 }
-
-/* ── Title bar ── */
-.terminal-titlebar {
-  background: #1a1a1e;
-  border-bottom: 1px solid rgba(20, 184, 166, 0.12);
-  padding: 0.5rem 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  flex-shrink: 0;
-  user-select: none;
-}
-.titlebar-dots {
-  display: flex;
-  gap: 0.375rem;
-  flex-shrink: 0;
-}
-.dot {
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 50%;
-}
-.dot-red {
-  background: #ff5f57;
-}
-.dot-yellow {
-  background: #febc2e;
-}
-.dot-green {
-  background: #28c840;
-}
-.titlebar-label {
-  font-size: 0.6875rem;
-  color: #6b7280;
-  flex: 1;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.titlebar-close {
-  color: #6b7280;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.125rem;
-  display: flex;
-  border-radius: 0.25rem;
-  transition: color 0.15s;
-}
-.titlebar-close:hover {
-  color: #e5e7eb;
-}
-
-/* ── Banner ── */
-.terminal-banner {
-  margin-bottom: 0.75rem;
-}
-.banner-ascii {
-  font-size: 0.43rem;
-  line-height: 1.2;
-  color: #14b8a6;
-  opacity: 0.7;
-  margin: 0 0 0.375rem 0;
-  user-select: none;
-}
-.banner-subtitle {
-  font-size: 0.6875rem;
-  color: #6b7280;
-  margin: 0 0 0.5rem 0;
-}
-.terminal-divider {
-  border: none;
-  border-top: 1px dashed rgba(20, 184, 166, 0.15);
-  margin: 0;
-}
-
-/* ── Message area ── */
-.terminal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.875rem 1rem;
-  display: flex;
-  flex-direction: column;
-}
-.terminal-body::-webkit-scrollbar {
-  width: 4px;
-}
-.terminal-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-.terminal-body::-webkit-scrollbar-thumb {
-  background: rgba(20, 184, 166, 0.2);
-  border-radius: 2px;
-}
-
-/* ── Terminal lines ── */
-.terminal-line {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
-.prompt-symbol {
-  flex-shrink: 0;
-  font-weight: 700;
-  font-size: 0.8125rem;
-  margin-top: 0.0625rem;
-}
-.bot-prompt {
-  color: #14b8a6;
-}
-.user-prompt {
-  color: #fbbf24;
-}
-.bot-line .line-text {
-  color: #a5f3d0;
-  font-size: 0.8125rem;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.user-line .line-text,
-.user-text {
-  color: #fde68a;
-  font-size: 0.8125rem;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* ── Typing cursor ── */
-.typing-cursor {
-  color: #14b8a6;
-  font-size: 0.875rem;
-  animation: cursor-blink 1s step-end infinite;
-}
-@keyframes cursor-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
+@keyframes msg-in {
+  from {
     opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
-
-/* ── Quick reply chips ── */
-.quick-replies-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.375rem;
-  margin-bottom: 0.25rem;
-  padding-left: 1.25rem;
-}
-.quick-reply-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.625rem;
-  border-radius: 0.25rem;
-  border: 1px solid rgba(20, 184, 166, 0.3);
-  background: rgba(20, 184, 166, 0.06);
-  color: #5eead4;
-  font-size: 0.6875rem;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.quick-reply-chip:hover {
-  background: rgba(20, 184, 166, 0.18);
-  border-color: #2dd4bf;
-  color: #99f6e4;
-}
-
-/* ── Input area ── */
-.terminal-input-area {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  border-top: 1px solid rgba(20, 184, 166, 0.12);
-  background: #0c0c0d;
-  flex-shrink: 0;
-}
-.input-prompt {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #14b8a6;
-  flex-shrink: 0;
-}
-.terminal-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #e2e8f0;
-  font-size: 16px;
-  font-family: inherit;
-  caret-color: #14b8a6;
-}
-.terminal-input::placeholder {
-  color: #4b5563;
-}
-.terminal-input::selection {
-  background: rgba(20, 184, 166, 0.3);
-}
-
-@media (max-width: 480px) {
-  .chatbot-root {
-    bottom: 0.75rem;
-    right: 0.5rem;
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
   }
-  .chatbot-window {
-    width: calc(100vw - 1rem);
-    max-width: calc(100vw - 1rem);
-    height: 22rem;
-    max-height: 55vh;
-    bottom: 3.5rem;
-    right: 0;
-    border-radius: 0.375rem;
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
   }
-  .banner-ascii {
-    font-size: 0.32rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .msg,
+  .chat-chip,
+  .chat-typing .msg-text span,
+  .chatbot-window.riddle-active {
+    animation: none;
   }
-  .terminal-input-area {
-    padding: 0.5rem 0.75rem;
-  }
-  .terminal-body {
-    padding: 0.625rem 0.75rem;
-  }
-  .terminal-titlebar {
-    padding: 0.375rem 0.625rem;
+  .chat-slide-enter-active,
+  .chat-slide-leave-active {
+    transition: none;
   }
 }
 </style>

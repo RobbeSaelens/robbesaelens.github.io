@@ -121,7 +121,7 @@
         </div>
 
         <div class="mt-4 inline-block">
-          <router-link class="group flex items-center gap-2" to="/projects">
+          <router-link class="group flex items-center gap-2" :to="$lp('/projects')">
             <span class="text-sm" style="color: var(--color-accent); opacity: 0.6">./</span>
             <span
               class="font-medium transition-colors"
@@ -599,7 +599,6 @@ button.shot-phone {
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--color-accent);
-  opacity: 0.65;
 }
 .flow-title {
   font-family: var(--font-mono);

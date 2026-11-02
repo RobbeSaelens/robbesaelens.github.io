@@ -13,5 +13,8 @@ export const ROUTES = [
   '/privacy',
 ]
 
+/** The Dutch version of a page: /nl, /nl/contact, ... */
+export const nl = (route: string) => (route === '/' ? '/nl' : `/nl${route}`)
+
 /** Pages with route meta `fit`: exactly one screen tall, no vertical scroll. */
 export const FIT_ROUTES = ['/projects', '/contact']
