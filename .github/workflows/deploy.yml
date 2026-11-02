@@ -33,6 +33,11 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Base URL of the chatbot's AI worker (status-worker). A repository
+          # *variable*, not a secret: it ends up in the public bundle. Unset
+          # means the chatbot only uses its built-in answers.
+          VITE_CHAT_API_URL: ${{ vars.CHAT_API_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

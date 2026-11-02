@@ -129,7 +129,7 @@
     "featureAuth": "Privé van ontwerp",
     "featureAuthText": "Better Auth met gebruikersnaam en wachtwoord, registreren afgesloten, sessies blijven een maand geldig op de gsm. Elke pagina en server action controleert de sessie.",
     "featureQuality": "Getest & gemonitord",
-    "featureQualityText": "Vitest-unittests plus databasetests tegen een echte Postgres, en een publiek health-endpoint dat mijn statusdashboard opvraagt.",
+    "featureQualityText": "Vitest-unittests plus databasetests tegen een echte Postgres, en een publiek health-endpoint voor uptimecontroles.",
     "languages": "Talen & Frameworks",
     "tools": "Tools & Services",
     "viewOther": "Bekijk andere projecten"

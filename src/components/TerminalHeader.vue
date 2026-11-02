@@ -1,11 +1,11 @@
 <template>
   <header class="terminal-header">
-    <h1 class="terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl">
+    <h1 class="hero-in terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl" style="--i: 0">
       <span class="terminal-prompt">&gt;</span>
       <span class="terminal-text">{{ title }}</span>
       <span class="terminal-cursor" aria-hidden="true"></span>
     </h1>
-    <p class="terminal-subtitle text-sm tracking-wide md:text-base">
+    <p class="hero-in terminal-subtitle text-sm tracking-wide md:text-base" style="--i: 1">
       <span class="opacity-50">$</span> {{ subtitle }}
     </p>
   </header>

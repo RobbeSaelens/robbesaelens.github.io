@@ -1,23 +1,12 @@
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
+import { ROUTES } from './routes'
 
 /**
  * Smoke tests: every public page renders without errors in both languages and
  * on mobile, the prerendered HTML still carries its SEO tags, and the key
  * interactions (language switch, theme, lightbox) work.
- *
- * Keep ROUTES in sync with the router; the sitemap test fails when a public
- * page is added without being listed here.
  */
-const ROUTES = [
-  '/',
-  '/projects',
-  '/contact',
-  '/exultadetail',
-  '/scan2talkdetail',
-  '/stalmanagerdetail',
-  '/vhsdetail',
-]
 
 // Untranslated vue-i18n keys leak through as "namespace.someKey". Domains such
 // as "scan2talk.be" look similar, so known TLDs are excluded.
@@ -245,4 +234,54 @@ test('unknown pages show the not-found page and are kept out of search', async (
   await page.waitForLoadState('networkidle')
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0)
+})
+
+test.describe('chatbot', () => {
+  /** Stands in for the AI worker, with the CORS headers the real one sends. */
+  async function fakeAi(page: Page, answer: (body: unknown) => { status: number; json: unknown }) {
+    const cors = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    }
+    await page.route('https://chat.invalid/chat', async (route) => {
+      if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors })
+      const { status, json } = answer(route.request().postDataJSON())
+      await route.fulfill({ status, json, headers: cors })
+    })
+  }
+
+  async function ask(page: Page, question: string) {
+    await page.getByRole('button', { name: 'Toggle terminal' }).click()
+    await expect(page.locator('.bot-line').first()).toBeVisible()
+    await page.locator('#chat-input').fill(question)
+    await page.locator('#chat-input').press('Enter')
+  }
+
+  test('answers with the AI, sending the conversation and language', async ({ page }) => {
+    await guard(page)
+    let sent: { messages: { role: string; content: string }[]; lang: string } | null = null
+    await fakeAi(page, (body) => {
+      sent = body as typeof sent
+      return { status: 200, json: { reply: 'Robbe works at <b>Dynamate</b>.' } }
+    })
+    await open(page, '/')
+    await ask(page, 'Where does Robbe work?')
+    // Shown as text: the tag is not rendered as HTML.
+    await expect(page.locator('.bot-line').last()).toHaveText(/Robbe works at <b>Dynamate<\/b>\./)
+    expect(sent!.lang).toBe('en')
+    expect(sent!.messages.at(-1)).toEqual({ role: 'user', content: 'Where does Robbe work?' })
+    expect(sent!.messages.every((m) => m.content.length > 0)).toBe(true)
+  })
+
+  test('falls back to the built-in answers when the AI is unavailable', async ({ page }) => {
+    await guard(page)
+    await fakeAi(page, () => ({ status: 503, json: { error: 'unavailable' } }))
+    await open(page, '/')
+    await ask(page, 'What are your skills?')
+    await expect(page.locator('.typing-cursor')).toHaveCount(0)
+    const reply = await page.locator('.bot-line').last().innerText()
+    expect(reply).not.toMatch(RAW_I18N_KEY)
+    expect(reply.length).toBeGreaterThan(20)
+  })
 })

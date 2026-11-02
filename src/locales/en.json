@@ -129,7 +129,7 @@
     "featureAuth": "Private by design",
     "featureAuthText": "Better Auth with username and password, sign-up closed, sessions kept for a month on the phone. Every page and server action checks the session.",
     "featureQuality": "Tested & monitored",
-    "featureQualityText": "Vitest unit tests plus database tests against a real Postgres, and a public health endpoint polled by my status dashboard.",
+    "featureQualityText": "Vitest unit tests plus database tests against a real Postgres, and a public health endpoint for uptime checks.",
     "languages": "Languages & Frameworks",
     "tools": "Tools & Services",
     "viewOther": "View other projects"

@@ -3,9 +3,9 @@
     <div class="about-inner mx-auto w-full max-w-screen-2xl px-4 sm:px-6">
       <TerminalHeader :title="$t('about.title').toLowerCase()" subtitle="cat ./about-me.md" />
 
-      <div ref="gridRef" class="about-grid">
+      <div class="about-grid">
         <!-- Education and experience first, as text; teaching and riding carry the photos. -->
-        <article class="about-card about-card--text card-education" style="--stagger-delay: 0ms">
+        <article class="hero-in about-card about-card--text card-education" style="--i: 2">
           <GraduationCap class="card-deco" aria-hidden="true" :stroke-width="1" />
           <div class="card-body">
             <span class="card-tag">./education</span>
@@ -28,7 +28,7 @@
           </div>
         </article>
 
-        <article class="about-card about-card--text card-experience" style="--stagger-delay: 100ms">
+        <article class="hero-in about-card about-card--text card-experience" style="--i: 3">
           <Briefcase class="card-deco" aria-hidden="true" :stroke-width="1" />
           <div class="card-body">
             <span class="card-tag">./experience</span>
@@ -67,7 +67,7 @@
           </div>
         </article>
 
-        <article class="about-card about-card--photo card-teaching" style="--stagger-delay: 200ms" tabindex="0">
+        <article class="hero-in about-card about-card--photo card-teaching" style="--i: 4" tabindex="0">
           <div class="card-media">
             <img
               src="/about.jpg"
@@ -88,7 +88,7 @@
           </div>
         </article>
 
-        <article class="about-card about-card--photo card-riding" style="--stagger-delay: 300ms" tabindex="0">
+        <article class="hero-in about-card about-card--photo card-riding" style="--i: 5" tabindex="0">
           <div class="card-media">
             <img
               src="/horse.jpg"
@@ -126,32 +126,6 @@ export default {
     BookOpen,
     Trophy,
     TerminalHeader,
-  },
-
-  data() {
-    return {
-      observer: null as IntersectionObserver | null,
-    }
-  },
-
-  mounted() {
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          entry.target.classList.add('is-visible')
-          this.observer!.unobserve(entry.target)
-        })
-      },
-      { threshold: 0.12 },
-    )
-
-    const grid = this.$refs.gridRef as HTMLElement | undefined
-    grid?.querySelectorAll('.about-card').forEach((card) => this.observer!.observe(card))
-  },
-
-  beforeUnmount() {
-    this.observer?.disconnect()
   },
 }
 </script>
@@ -234,20 +208,10 @@ export default {
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.04),
     0 4px 12px rgba(0, 0, 0, 0.02);
-
-  opacity: 0;
-  transform: translateY(24px);
+  /* The entrance is the shared .hero-in rise (styles.css). */
   transition:
-    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.3s ease,
     border-color 0.3s ease;
-  transition-delay: var(--stagger-delay, 0ms);
-}
-
-.about-card.is-visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -582,13 +546,6 @@ export default {
    Reduced Motion
    ============================================= */
 @media (prefers-reduced-motion: reduce) {
-  .about-card {
-    opacity: 1;
-    transform: none;
-    transition:
-      box-shadow 0.2s ease,
-      border-color 0.2s ease;
-  }
   .card-image,
   .card-reveal {
     transition: none;

@@ -3,18 +3,18 @@
     <header class="car-head">
       <div>
         <!-- Same terminal title as the other pages (TerminalHeader), sized for a one-screen layout. -->
-        <h1 class="terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl">
+        <h1 class="hero-in terminal-title text-2xl font-bold sm:text-3xl lg:text-5xl" style="--i: 0">
           <span class="terminal-prompt">&gt;</span>
           <span class="terminal-text">{{ $t('nav.projects').toLowerCase() }}</span>
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
-        <p class="terminal-subtitle car-intro text-sm tracking-wide md:text-base">
+        <p class="hero-in terminal-subtitle car-intro text-sm tracking-wide md:text-base" style="--i: 1">
           <span class="opacity-50">$</span> ls ./projects
           <span class="car-comment"># {{ $t('projects.intro') }}</span>
         </p>
       </div>
 
-      <div class="car-nav">
+      <div class="hero-in car-nav" style="--i: 1">
         <span class="car-count" aria-hidden="true">
           <Transition name="count" mode="out-in">
             <span :key="current" class="car-count-now">{{ pad(current + 1) }}</span>
@@ -44,7 +44,8 @@
 
     <ul
       ref="track"
-      class="car-track"
+      class="hero-in car-track"
+      style="--i: 2"
       :class="{ 'is-dragging': dragging }"
       tabindex="0"
       :aria-label="$t('nav.projects')"
@@ -123,7 +124,7 @@
       </li>
     </ul>
 
-    <div class="car-dots">
+    <div class="hero-in car-dots" style="--i: 3">
       <button
         v-for="(project, index) in projects"
         :key="project.id"

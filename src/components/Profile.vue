@@ -1,178 +1,131 @@
 <template>
-  <div class="fade-out mx-auto my-auto max-w-screen-2xl px-6 pb-8 sm:pb-16">
-    <div class="sm:space-x-15 mr-5% mt-10% flex items-center justify-between">
-      <!-- Left: Social icons -->
-      <div class="hero-in hidden flex-col gap-1 sm:flex" style="--i: 5">
+  <div class="hero mx-auto w-full max-w-screen-2xl px-6">
+    <div class="hero-head">
+      <h1 class="hero-in terminal-title hero-title font-bold" style="--i: 0">
+        <span class="terminal-prompt">&gt;</span>
+        <span class="terminal-text">robbe saelens</span>
+        <span class="terminal-cursor" aria-hidden="true"></span>
+      </h1>
+      <p class="hero-in hero-role" style="--i: 1">
+        <span class="role-rule" aria-hidden="true"></span>
+        <span class="prompt">$</span> {{ $t('home.role').toLowerCase() }}
+      </p>
+    </div>
+
+    <!-- Photo: a wide card on phones, a ringed circle next to the text from 768px -->
+    <div class="hero-in hero-photo" style="--i: 2">
+      <div class="photo-wrapper group" @mousemove="onPhotoMove" @mouseleave="tooltipVisible = false">
+        <div class="photo-glow pointer-events-none" aria-hidden="true"></div>
+
+        <!-- dev tooltip (follows cursor) -->
+        <div
+          :class="[
+            'photo-tooltip pointer-events-none fixed z-50 whitespace-nowrap rounded-lg border border-teal-200 bg-white px-3 py-2 shadow-md transition-opacity duration-150 dark:border-teal-700 dark:bg-gray-800',
+            tooltipVisible ? 'opacity-100' : 'opacity-0',
+          ]"
+          :style="{ left: tooltipX + 'px', top: tooltipY + 'px' }"
+          aria-hidden="true"
+        >
+          <span class="font-mono text-xs text-teal-600 dark:text-teal-400">$ file ./robbe.jpg</span>
+          <span class="mt-0.5 block font-mono text-[0.65rem] text-teal-500 dark:text-teal-300"
+            >→ {{ $t('home.photoTooltip') }}</span
+          >
+        </div>
+
+        <img class="photo-img" src="/pf2.jpg" alt="Robbe Saelens" width="800" height="800" />
+      </div>
+    </div>
+
+    <div class="hero-body">
+      <p class="hero-in hero-bio" style="--i: 2">{{ $t('home.bio') }}</p>
+
+      <ul class="hero-in hero-facts" style="--i: 3">
+        <li>
+          <span class="fact-icon" aria-hidden="true"><Briefcase /></span>
+          <span>
+            @<a target="_blank" rel="noopener noreferrer" href="https://www.dynamate.be/" class="fact-link"
+              >Dynamate</a
+            >
+            {{ $t('home.dynamateRole') }}
+          </span>
+        </li>
+        <li>
+          <span class="fact-icon" aria-hidden="true"><GraduationCap /></span>
+          <span>
+            {{ $t('home.educationLabel') }}
+            <a
+              href="https://www.howest.be/nl/opleidingen/bachelor/multimedia-en-creatieve-technologie"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="fact-link"
+              >MCT</a
+            >
+          </span>
+        </li>
+      </ul>
+
+      <div class="hero-in hero-actions" style="--i: 4">
         <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://www.instagram.com/robbe.saelens/"
-          aria-label="Follow me on Instagram"
-          class="social-link"
+          href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/message"
+          class="hero-btn hero-btn--primary"
         >
-          <Instagram class="social-icon" />
+          {{ $t('home.sayHello') }}
+          <MessageCircle class="hero-btn-icon" aria-hidden="true" />
         </a>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.facebook.com/profile.php?id=100006223099352"
-          aria-label="Connect on Facebook"
-          class="social-link"
-        >
-          <Facebook class="social-icon" />
-        </a>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/"
-          aria-label="Connect on LinkedIn"
-          class="social-link"
-        >
-          <Linkedin class="social-icon" />
-        </a>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://github.com/RobbeSaelens"
-          aria-label="View my GitHub profile"
-          class="social-link"
-        >
-          <Github class="social-icon" />
-        </a>
+        <router-link to="/projects" class="hero-btn hero-btn--ghost">
+          <span class="prompt">$</span> cd ./projects
+          <ArrowRight class="hero-btn-icon hero-btn-arrow" aria-hidden="true" />
+        </router-link>
       </div>
 
-      <!-- Center: Content -->
-      <div class="typewriter space-y-8">
-        <!-- Terminal title -->
-        <h1 class="hero-in terminal-title text-3xl font-bold sm:text-4xl lg:text-6xl" style="--i: 0">
-          <span class="terminal-prompt">&gt;</span>
-          <span class="terminal-text">robbe saelens</span>
-          <span class="terminal-cursor" aria-hidden="true"></span>
-        </h1>
-
-        <!-- Role subtitle -->
-        <div class="hero-in flex items-center font-medium" style="--i: 1">
-          <hr class="mr-3 hidden h-0.5 w-10 border-0 bg-teal-500 lg:block" />
-          <h2
-            class="text-lg font-medium text-teal-600 dark:text-teal-400 md:text-xl"
-            style="
-              font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
-            "
-          >
-            <span class="text-teal-500 dark:text-teal-400">$</span>
-            {{ $t('home.role').toLowerCase() }}
-          </h2>
-        </div>
-
-        <!-- Mobile profile photo -->
-        <img
-          class="hero-in h-56 w-full rounded-3xl object-cover shadow sm:hidden"
-          style="--i: 2"
-          src="/pf2.jpg"
-          alt="Robbe Saelens"
-          loading="lazy"
-        />
-
-        <!-- Bio & details -->
-        <div class="hero-in max-w-lg space-y-5" style="--i: 2">
-          <p class="text-lg leading-relaxed text-teal-800 dark:text-gray-200">
-            {{ $t('home.bio') }}
-          </p>
-          <div class="space-y-3 border-l-2 border-teal-400 pl-5 dark:border-teal-600">
-            <div class="flex items-center gap-2 sm:text-lg">
-              <Briefcase class="h-4 w-4 shrink-0 text-teal-500 dark:text-teal-400" />
-              <span class="text-teal-800 dark:text-gray-200">
-                @<a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.dynamate.be/"
-                  class="font-semibold transition-colors hover:text-teal-600 dark:hover:text-teal-400"
-                  >Dynamate</a
-                >
-                {{ $t('home.dynamateRole') }}
-              </span>
-            </div>
-            <div class="flex items-center gap-2 sm:text-lg">
-              <GraduationCap class="h-4 w-4 shrink-0 text-teal-500 dark:text-teal-400" />
-              <span class="text-teal-800 dark:text-gray-200">
-                {{ $t('home.educationLabel') }}
-                <a
-                  href="https://www.howest.be/nl/opleidingen/bachelor/multimedia-en-creatieve-technologie"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="font-semibold transition-colors hover:text-teal-600 dark:hover:text-teal-400"
-                  >MCT</a
-                >
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- CTA & navigation -->
-        <div class="hero-in flex flex-col items-start" style="--i: 3">
+      <ul class="hero-in hero-social" style="--i: 5">
+        <li>
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/message"
-            class="inline-flex items-center gap-2 rounded-lg bg-teal-500 px-5 py-3 text-base font-semibold text-white shadow-sm transition-all duration-300 hover:bg-teal-600 hover:shadow-md dark:bg-teal-600 dark:hover:bg-teal-500"
+            href="https://www.instagram.com/robbe.saelens/"
+            aria-label="Follow me on Instagram"
+            class="social-link"
           >
-            {{ $t('home.sayHello') }}
-            <MessageCircle class="h-5 w-5" />
+            <Instagram class="social-icon" />
           </a>
-
-          <router-link
-            class="group mt-8 inline-flex items-center gap-2 text-teal-600 transition-colors hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-200 sm:mt-12"
-            to="/projects"
-            style="
-              font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
-              font-size: 0.9375rem;
-            "
+        </li>
+        <li>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.facebook.com/profile.php?id=100006223099352"
+            aria-label="Connect on Facebook"
+            class="social-link"
           >
-            <span class="text-teal-500 dark:text-teal-400">$</span>
-            <span>cd ./projects</span>
-            <ArrowRight
-              class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-            />
-          </router-link>
-        </div>
-      </div>
-
-      <!-- Right: Profile photo (desktop) -->
-      <div class="hero-in hero-photo hidden md:block" style="--i: 2">
-        <div
-          class="photo-wrapper group relative"
-          @mousemove="onPhotoMove"
-          @mouseleave="tooltipVisible = false"
-        >
-          <!-- glow ring -->
-          <div
-            class="photo-glow pointer-events-none absolute -inset-1 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          ></div>
-
-          <!-- dev tooltip (follows cursor) -->
-          <div
-            :class="[
-              'photo-tooltip pointer-events-none fixed z-50 whitespace-nowrap rounded-lg border border-teal-200 bg-white px-3 py-2 shadow-md transition-opacity duration-150 dark:border-teal-700 dark:bg-gray-800',
-              tooltipVisible ? 'opacity-100' : 'opacity-0',
-            ]"
-            :style="{ left: tooltipX + 'px', top: tooltipY + 'px' }"
+            <Facebook class="social-icon" />
+          </a>
+        </li>
+        <li>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/"
+            aria-label="Connect on LinkedIn"
+            class="social-link"
           >
-            <span class="font-mono text-xs text-teal-600 dark:text-teal-400"
-              >$ file ./robbe.jpg</span
-            >
-            <span class="mt-0.5 block font-mono text-[0.65rem] text-teal-500 dark:text-teal-300"
-              >→ {{ $t('home.photoTooltip') }}</span
-            >
-          </div>
-
-          <img
-            class="photo-img relative h-56 w-full rounded-3xl border-2 border-teal-400/30 object-cover shadow-lg transition-all duration-500 group-hover:scale-[1.03] group-hover:border-teal-500 group-hover:shadow-xl lg:h-96 lg:w-96 lg:rounded-full dark:border-teal-500/30 dark:group-hover:border-teal-400"
-            src="/pf2.jpg"
-            alt="Robbe Saelens"
-            loading="lazy"
-          />
-        </div>
-      </div>
+            <Linkedin class="social-icon" />
+          </a>
+        </li>
+        <li>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/RobbeSaelens"
+            aria-label="View my GitHub profile"
+            class="social-link"
+          >
+            <Github class="social-icon" />
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -218,11 +171,57 @@ export default {
 }
 </script>
 
-<style>
-/* CSS Custom Properties — unscoped so :root and .dark apply globally */
-</style>
-
 <style scoped>
+/* =============================================
+   Layout
+   Phones: title, photo, text stacked. From 768px: text left, photo right,
+   the whole hero centred in the screen height.
+   ============================================= */
+.hero {
+  display: grid;
+  grid-template-areas:
+    'head'
+    'photo'
+    'body';
+  gap: 1.75rem;
+  padding-block: clamp(1.5rem, 5vh, 4rem) clamp(2rem, 6vh, 4.5rem);
+}
+
+@media (min-width: 768px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head photo'
+      'body photo';
+    align-items: center;
+    column-gap: clamp(2.5rem, 6vw, 7rem);
+    row-gap: 2rem;
+  }
+  .hero-head {
+    align-self: end;
+  }
+  .hero-body {
+    align-self: start;
+  }
+}
+
+.hero-head {
+  grid-area: head;
+  /* The title scales with its column (cqi), so it never wraps. */
+  container-type: inline-size;
+}
+.hero-photo {
+  grid-area: photo;
+  justify-self: center;
+}
+.hero-body {
+  grid-area: body;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 36rem;
+}
+
 /* =============================================
    Terminal Title
    ============================================= */
@@ -230,19 +229,14 @@ export default {
   font-family: var(--font-mono);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  line-height: 1.2;
+  gap: 0.15em;
+  margin: 0;
+  line-height: 1.15;
+  white-space: nowrap;
 }
-
-@media (max-width: 640px) {
-  .terminal-title {
-    gap: 0.25rem;
-  }
-
-  .terminal-cursor {
-    width: 0.4em;
-    height: 0.8em;
-  }
+.hero-title {
+  /* "> robbe saelens█" is about 9.5em wide in the mono font */
+  font-size: clamp(1.75rem, 10cqi, 4.5rem);
 }
 
 .terminal-prompt {
@@ -260,11 +254,11 @@ export default {
 
 .terminal-cursor {
   display: inline-block;
-  width: 0.55em;
-  height: 1.1em;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 0.1em;
   background: var(--color-cursor);
   animation: blink 1s step-end infinite;
-  vertical-align: text-bottom;
   border-radius: 1px;
   flex-shrink: 0;
 }
@@ -279,19 +273,177 @@ export default {
   }
 }
 
+.hero-role {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  font-weight: 500;
+  color: var(--color-accent);
+}
+.role-rule {
+  display: none;
+  width: 2.5rem;
+  height: 2px;
+  margin-right: 0.25rem;
+  background: var(--color-accent);
+  opacity: 0.7;
+}
+@media (min-width: 1024px) {
+  .role-rule {
+    display: block;
+  }
+}
+.prompt {
+  color: var(--color-prompt);
+  opacity: 0.8;
+}
+
+/* =============================================
+   Text, facts
+   ============================================= */
+.hero-bio {
+  margin: 0;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.65;
+  color: var(--color-text-primary);
+}
+
+.hero-facts {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  color: var(--color-text-secondary);
+}
+.hero-facts li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.fact-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+.fact-icon :deep(svg) {
+  width: 1rem;
+  height: 1rem;
+}
+.fact-link {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-border-glow);
+  text-underline-offset: 3px;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+.fact-link:hover {
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
+}
+
+/* =============================================
+   Buttons
+   ============================================= */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.875rem;
+  padding: 0 1.25rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.hero-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.hero-btn--primary {
+  color: #fff;
+  background: #14b8a6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.hero-btn--primary:hover {
+  background: #0d9488;
+  box-shadow: 0 6px 18px -6px rgba(13, 148, 136, 0.55);
+}
+.dark .hero-btn--primary {
+  background: #0d9488;
+}
+.dark .hero-btn--primary:hover {
+  background: #14b8a6;
+}
+.hero-btn--ghost {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border-glow);
+  background: var(--color-surface);
+}
+.hero-btn--ghost:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+.hero-btn-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.hero-btn-arrow {
+  transition: transform 0.2s ease;
+}
+.hero-btn--ghost:hover .hero-btn-arrow {
+  transform: translateX(3px);
+}
+
 /* =============================================
    Social Icons
    ============================================= */
+.hero-social {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .social-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
   color: #0f766e;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   transition:
     color 0.2s ease,
+    border-color 0.2s ease,
     background 0.2s ease;
 }
 
@@ -300,12 +452,13 @@ export default {
 }
 
 .social-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .social-link:hover {
   color: #0d9488;
+  border-color: var(--color-border-glow);
   background: rgba(13, 148, 136, 0.08);
 }
 
@@ -314,15 +467,43 @@ export default {
   background: rgba(45, 212, 191, 0.1);
 }
 
+.social-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* =============================================
-   Profile Photo Hover Glow
+   Profile Photo
    ============================================= */
 .photo-wrapper {
-  display: inline-block;
   position: relative;
+  display: block;
+}
+
+.photo-img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 15rem;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border-radius: 1.5rem;
+  border: 2px solid rgba(45, 212, 191, 0.3);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.25);
+  transition:
+    transform 0.5s ease,
+    border-color 0.5s ease,
+    box-shadow 0.5s ease;
 }
 
 .photo-glow {
+  position: absolute;
+  inset: -0.35rem;
+  border-radius: 1.75rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
   background: conic-gradient(
     from 0deg,
     transparent,
@@ -345,8 +526,45 @@ export default {
   );
 }
 
-.photo-img {
-  z-index: 1;
+/* Phones: full width card. From 768px: a circle with an offset ring. */
+.hero-photo {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .hero-photo {
+    width: auto;
+  }
+  .photo-wrapper {
+    width: clamp(13rem, 28vw, 26rem);
+  }
+  .photo-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -0.9rem 0.9rem 0.9rem -0.9rem; /* offset up-left, away from the screen edge */
+    border: 1px dashed var(--color-border-glow);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .photo-img {
+    aspect-ratio: 1;
+    max-height: none;
+    border-radius: 50%;
+    object-position: center;
+  }
+  .photo-glow {
+    border-radius: 50%;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .photo-wrapper:hover .photo-glow {
+    opacity: 1;
+  }
+  .photo-wrapper:hover .photo-img {
+    transform: scale(1.03);
+    border-color: #14b8a6;
+    box-shadow: 0 18px 40px -14px rgba(13, 148, 136, 0.45);
+  }
 }
 
 @keyframes glow-spin {
@@ -355,34 +573,12 @@ export default {
   }
 }
 
-
 /* =============================================
-   Entrance
-   Hidden only when JavaScript runs (html.js, set in index.html) and until the
-   intro has finished (html.intro-done), so the hero is never stuck invisible.
+   Entrance: the shared .hero-in rise (styles.css); the photo scales in instead
    ============================================= */
-html.js .hero-in {
-  opacity: 0;
-}
-html.js.intro-done .hero-in {
-  animation: hero-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--i, 0) * 90ms + 60ms);
-}
 html.js.intro-done .hero-photo {
   animation-name: hero-photo-in;
   animation-duration: 1s;
-}
-@keyframes hero-rise {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
 }
 @keyframes hero-photo-in {
   from {
@@ -401,12 +597,6 @@ html.js.intro-done .hero-photo {
    Reduced Motion
    ============================================= */
 @media (prefers-reduced-motion: reduce) {
-  html.js .hero-in,
-  html.js.intro-done .hero-in {
-    opacity: 1;
-    animation: none;
-  }
-
   .terminal-cursor {
     animation: none;
     opacity: 1;
