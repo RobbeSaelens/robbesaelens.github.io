@@ -88,38 +88,7 @@
           </article>
         </div>
 
-
-
-        <button
-          type="button"
-          class="shot shot-wide shot-video reveal"
-          :aria-label="`Open ${shotList[2].caption} video full screen`"
-          @click="lightboxIndex = 2"
-        >
-          <span class="shot-bar" aria-hidden="true">
-            <span class="shot-dot"></span>
-            <span class="shot-dot"></span>
-            <span class="shot-dot"></span>
-            <span class="shot-url">exulta.be/tentcalculator</span>
-          </span>
-          <!-- Real screen recording of the live calculator. Played only while on
-               screen, and never automatically for reduced-motion users. -->
-          <video
-            ref="calcVideo"
-            :aria-label="$t('exulta.featureCalculator')"
-            poster="/exulta-calc-poster.jpg"
-            width="1192"
-            height="486"
-            muted
-            loop
-            playsinline
-            preload="none"
-          >
-            <source src="/exulta-calc.webm" type="video/webm" />
-            <source src="/exulta-calc.mp4" type="video/mp4" />
-          </video>
-        </button>
-        <div class="mt-4 mb-14 flex justify-center">
+        <div class="mb-14 flex justify-center">
           <a
             class="live-link"
             href="https://exulta.be/tentcalculator"
@@ -146,6 +115,8 @@
           </div>
         </div>
 
+        <RepoActivity project="exulta" />
+
         <div class="mt-4 inline-block" style="color: var(--color-accent)">
           <router-link class="group flex items-center gap-2" :to="$lp('/projects')">
             <span class="text-sm" style="color: var(--color-accent); opacity: 0.6">./</span>
@@ -170,6 +141,7 @@
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue'
 import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbox.vue'
+import RepoActivity from '../../components/RepoActivity.vue'
 import {
   ArrowRight,
   ExternalLink,
@@ -182,14 +154,13 @@ import {
 } from 'lucide-vue-next'
 
 export default defineComponent({
-  components: { ArrowRight, ExternalLink, ImageLightbox },
+  components: { ArrowRight, ExternalLink, ImageLightbox, RepoActivity },
 
   data() {
     return {
       lightboxIndex: null as number | null,
       observer: null as IntersectionObserver | null,
       revealFallback: 0 as unknown as ReturnType<typeof setTimeout>,
-      videoObserver: null as IntersectionObserver | null,
       heroTags: ['Laravel 13', 'React 19', 'Inertia.js', 'Filament 5', 'Tailwind CSS 4', 'MySQL'],
       stackLanguages: [
         'PHP 8.4',
@@ -220,12 +191,6 @@ export default defineComponent({
       return [
         { src: '/exulta-home.jpg', alt: this.$t('exulta.alt') as string, caption: 'exulta.be' },
         { src: '/exulta-mobile.jpg', alt: this.$t('exulta.alt') as string, caption: 'exulta.be — mobile' },
-        {
-          src: '/exulta-calc-poster.jpg',
-          alt: this.$t('exulta.featureCalculator') as string,
-          caption: 'exulta.be/tentcalculator',
-          video: { webm: '/exulta-calc.webm', mp4: '/exulta-calc.mp4' },
-        },
       ]
     },
 
@@ -247,8 +212,6 @@ export default defineComponent({
   },
 
   mounted() {
-    this.watchCalcVideo()
-
     const targets = [...this.$el.querySelectorAll('.reveal')] as Element[]
     if (!targets.length) return
 
@@ -284,24 +247,6 @@ export default defineComponent({
   beforeUnmount() {
     clearTimeout(this.revealFallback)
     this.observer?.disconnect()
-    this.videoObserver?.disconnect()
-  },
-
-  methods: {
-    watchCalcVideo() {
-      const video = this.$refs.calcVideo as HTMLVideoElement | undefined
-      if (!video || typeof IntersectionObserver === 'undefined') return
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-      this.videoObserver = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) video.play().catch(() => {})
-          else video.pause()
-        },
-        { threshold: 0.35 },
-      )
-      this.videoObserver.observe(video)
-    },
   },
 })
 </script>
@@ -594,8 +539,7 @@ button.shot:focus-visible {
   outline-offset: 3px;
 }
 
-.shot img,
-.shot video {
+.shot img {
   display: block;
   width: 100%;
   height: auto;
@@ -629,12 +573,6 @@ button.shot:focus-visible {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   color: var(--color-text-muted);
-}
-
-.shot-wide {
-  display: block;
-  width: 100%;
-  max-width: 100%;
 }
 
 .shot-desktop {

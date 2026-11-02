@@ -101,6 +101,8 @@
           </div>
         </div>
 
+        <RepoActivity project="stalManager" />
+
         <div class="mt-4 inline-block">
           <router-link class="group flex items-center gap-2" :to="$lp('/projects')">
             <span class="text-sm" style="color: var(--color-accent); opacity: 0.6">./</span>
@@ -125,6 +127,7 @@
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue'
 import ImageLightbox from '../../components/ImageLightbox.vue'
+import RepoActivity from '../../components/RepoActivity.vue'
 import {
   ArrowRight,
   Percent,
@@ -136,7 +139,7 @@ import {
 } from 'lucide-vue-next'
 
 export default defineComponent({
-  components: { ArrowRight, Lock, ImageLightbox },
+  components: { ArrowRight, Lock, ImageLightbox, RepoActivity },
 
   data() {
     return {

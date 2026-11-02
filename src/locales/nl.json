@@ -190,7 +190,7 @@
     "project-scan2talk": "Scan2Talk is een PWA voor scholen — leerlingen scannen een QR-code en doorlopen een begeleide emotionele welzijn check-in wizard (thermometer → thema's → gevoelens → hulpvraag). Leerkrachten krijgen een dashboard met Chart.js visualisaties. Gebouwd met Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Draait lokaal via DDEV.",
     "project-stalmanager": "Stal Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun site op Next.js 16 en React 19: een zwart-wit redactioneel design met GSAP scroll-animatie, een WebGL hero en Lenis smooth scrolling, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. Momenteel in rebranding en nog niet publiek.",
-    "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens@telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens) en Facebook. De portfolio staat op robbe-saelens.netlify.app.",
+    "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens{'@'}telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens) en Facebook. De portfolio staat op robbesaelens.github.io.",
     "experience": "Robbe werkt momenteel bij Dynamate als Drupal backend developer. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP & Magento developer — begonnen als stagiair en daarna voltijds aangenomen. Sinds 2017 is hij ook instructeur paardensport. Zijn carrière combineert technische ontwikkeling met de mensenkennis uit het lesgeven.",
     "education": "Robbe heeft een Bachelor diploma in Multimedia & Communicatietechnologieën (Next Web Developer traject) van Howest. Daarvoor behaalde hij een graduaatsdiploma in Multimedia & Informatietechnologieën (2018), waar hij de basisprincipes van programmeren en webontwikkeling leerde. Hij is gevestigd in Geluwe, België.",
     "about": "Robbe Saelens is een full-stack web developer uit Geluwe, België. Hij maakt graag coole dingen en ontdekt nieuwe technologieën. Werkt momenteel bij Dynamate als Drupal backend developer, met eerdere ervaring in PHP/Magento en een achtergrond als instructeur paardensport sinds 2017. Hij is gepassioneerd door moderne webtechnologie — van Laravel en Next.js tot Vue, React en TypeScript.",
@@ -301,5 +301,16 @@
       "status": "cookies --count",
       "toc": "Op deze pagina"
     }
+  },
+  "repo": {
+    "title": "Repository-activiteit",
+    "commits": "commits",
+    "last30": "in de laatste 30 dagen",
+    "since": "actief sinds",
+    "lastCommit": "laatste commit",
+    "weekly": "Commits per week, laatste 6 maanden",
+    "weeklySummary": "Staafdiagram: {total} commits in de laatste 6 maanden, hoogstens {max} in één week",
+    "weekBar": "geen commits | 1 commit | {n} commits",
+    "private": "Privérepository: cijfers van {date}"
   }
 }

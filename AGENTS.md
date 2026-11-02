@@ -11,6 +11,7 @@ prerendered to static HTML and deployed to GitHub Pages from `main`.
 | `npm run build` | Client build, SSR build, prerender, sitemap |
 | `npm test` | Smoke + accessibility tests (Playwright, desktop + mobile) against the production build |
 | `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
+| `npm run stats` | Refresh the repository numbers on the project pages (below) |
 
 Run both test suites with `CI=1` so Playwright starts its own server instead of reusing
 a stale one. GitHub Actions runs both on every push to `develop` (`.github/workflows/test.yml`),
@@ -62,6 +63,11 @@ fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
   language. Internal links go through `$lp('/path')` (or `$ln('Name')` for named routes),
   never a bare path, and each page in `src/bootstrap/router.ts` has a Dutch title and
   description in `meta.nl`.
+- The "Repository activity" block on each project page reads `src/data/repo-stats.json`.
+  The project repos are private, so neither the browser nor CI can fetch it: run
+  `npm run stats` locally before a deploy (needs the clones next to this repo) and
+  commit the JSON. It holds counts and dates only, never commit
+  messages, names or e-mail addresses.
 - Statistics are Cloudflare Web Analytics: cookieless, so there is no cookie banner.
   Don't add anything that sets cookies or tracks visitors without revisiting the privacy page.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).

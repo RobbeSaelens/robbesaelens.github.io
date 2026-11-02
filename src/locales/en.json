@@ -190,7 +190,7 @@
     "project-scan2talk": "Scan2Talk is a PWA for schools — students scan a QR code and walk through a guided emotional wellbeing check-in wizard (thermometer → themes → feelings → help request). Teachers get an overview dashboard with Chart.js visualizations. Built with Laravel 13 + Vue.js 3 + Inertia.js + PostgreSQL + Spatie Permissions + Simple QR Code. Runs locally via DDEV.",
     "project-stalmanager": "Stal Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests.",
     "project-vhs": "VHS Service builds and renovates riding arenas in Geluwe, West Flanders. I built their site on Next.js 16 and React 19: a black-and-white editorial design with GSAP scroll animation, a WebGL hero and Lenis smooth scrolling, in Dutch, French and English. Quote forms go through Resend, and it is tuned for local SEO. Currently in rebranding and not public yet.",
-    "contact": "You can reach Robbe via email at robbe.saelens@telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens), and Facebook. The portfolio is hosted at robbe-saelens.netlify.app.",
+    "contact": "You can reach Robbe via email at robbe.saelens{'@'}telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens), and Facebook. The portfolio is hosted at robbesaelens.github.io.",
     "experience": "Robbe currently works at Dynamate as a Drupal backend developer. Previously at Your Mind Our Work (2023) as a PHP & Magento developer — started as an intern and was hired full-time. Since 2017, he has also been an equestrian sports instructor. His journey combines technical development with people skills from teaching.",
     "education": "Robbe holds a Bachelor's degree in Multimedia & Communication Technologies (Next Web Developer track) from Howest. Before that, he completed a graduate degree in Multimedia & Information Technologies (2018), where he learned the fundamentals of programming and web development. He's based in Geluwe, Belgium.",
     "about": "Robbe Saelens is a full-stack web developer from Geluwe, Belgium. He loves building cool stuff and discovering new technologies. Currently working at Dynamate as a Drupal backend developer, with previous experience in PHP/Magento and a background as an equestrian instructor since 2017. He's passionate about modern web tech — from Laravel and Next.js to Vue, React, and TypeScript.",
@@ -301,5 +301,16 @@
       "status": "cookies --count",
       "toc": "On this page"
     }
+  },
+  "repo": {
+    "title": "Repository activity",
+    "commits": "commits",
+    "last30": "in the last 30 days",
+    "since": "active since",
+    "lastCommit": "last commit",
+    "weekly": "Commits per week, last 6 months",
+    "weeklySummary": "Bar chart: {total} commits in the last 6 months, at most {max} in one week",
+    "weekBar": "no commits | 1 commit | {n} commits",
+    "private": "Private repository: numbers as of {date}"
   }
 }
