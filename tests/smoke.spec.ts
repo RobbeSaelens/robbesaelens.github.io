@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { baseCompile } from '@intlify/message-compiler'
 import { expect, test, type Page } from '@playwright/test'
 import { nl, ROUTES } from './routes'
 
@@ -12,7 +13,7 @@ import { nl, ROUTES } from './routes'
 // as "scan2talk.be" and file names like "privacy.md" look similar, so those
 // endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|aria|chat|error|footer|privacy)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|aria|chat|error|footer|privacy|repo)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
 
 /**
  * Blocks third-party requests (analytics) so tests are deterministic and never
@@ -113,25 +114,40 @@ for (const route of ROUTES) {
   })
 }
 
+/** Every translation as [key, text], e.g. ['chat.contact', 'You can reach…']. */
+function translations(file: string): [string, string][] {
+  const out: [string, string][] = []
+  const walk = (node: Record<string, unknown>, prefix: string) => {
+    for (const [k, v] of Object.entries(node)) {
+      const key = prefix ? `${prefix}.${k}` : k
+      if (v && typeof v === 'object') walk(v as Record<string, unknown>, key)
+      else out.push([key, String(v)])
+    }
+  }
+  walk(JSON.parse(readFileSync(new URL(`../src/locales/${file}`, import.meta.url), 'utf8')), '')
+  return out
+}
+
 // vue-i18n falls back to English for a missing Dutch key, so a forgotten
 // translation never shows up as a raw key on the page. Compare the files instead.
 test('English and Dutch translations have the same keys', () => {
-  const keys = (file: string) => {
-    const out: string[] = []
-    const walk = (node: Record<string, unknown>, prefix: string) => {
-      for (const [k, v] of Object.entries(node)) {
-        const key = prefix ? `${prefix}.${k}` : k
-        if (v && typeof v === 'object') walk(v as Record<string, unknown>, key)
-        else out.push(key)
-      }
-    }
-    walk(JSON.parse(readFileSync(new URL(`../src/locales/${file}`, import.meta.url), 'utf8')), '')
-    return out.sort()
-  }
-  const en = keys('en.json')
-  const nl = keys('nl.json')
+  const en = translations('en.json').map(([k]) => k)
+  const nl = translations('nl.json').map(([k]) => k)
   expect(en.filter((k) => !nl.includes(k)), 'missing in nl.json').toEqual([])
   expect(nl.filter((k) => !en.includes(k)), 'missing in en.json').toEqual([])
+})
+
+// "@", "|", "{" and "}" mean something to vue-i18n. A bare one (an email
+// address, an Instagram handle) breaks the message only when it is shown, which
+// can be deep in the chat. Write them as {'@'} etc.
+test('every translation compiles', () => {
+  const broken: string[] = []
+  for (const file of ['en.json', 'nl.json']) {
+    for (const [key, text] of translations(file)) {
+      baseCompile(text, { onError: (e) => broken.push(`${file} ${key}: ${e.message}`) })
+    }
+  }
+  expect(broken).toEqual([])
 })
 
 test('sitemap lists exactly the tested routes', async ({ request }) => {
@@ -221,7 +237,7 @@ test('projects page links to each project', async ({ page }) => {
   }
 })
 
-test('lightbox opens, steps through screenshots and the video, and closes', async ({ page }) => {
+test('lightbox opens, steps through the screenshots, and closes', async ({ page }) => {
   const errors = await guard(page)
   await open(page, '/exultadetail')
 
@@ -229,13 +245,12 @@ test('lightbox opens, steps through screenshots and the video, and closes', asyn
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
-  await expect(dialog.locator('.lightbox-caption')).toContainText('1 / 3')
+  await expect(dialog.locator('.lightbox-caption')).toContainText('1 / 2')
 
   await page.keyboard.press('ArrowRight')
-  await expect(dialog.locator('.lightbox-caption')).toContainText('2 / 3')
+  await expect(dialog.locator('.lightbox-caption')).toContainText('2 / 2')
   await page.keyboard.press('ArrowRight')
-  await expect(dialog.locator('.lightbox-caption')).toContainText('3 / 3')
-  await expect(dialog.locator('video')).toHaveCount(1)
+  await expect(dialog.locator('.lightbox-caption')).toContainText('1 / 2')
 
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
@@ -243,15 +258,66 @@ test('lightbox opens, steps through screenshots and the video, and closes', asyn
   expect(errors).toEqual([])
 })
 
-test('calculator video has a working source', async ({ request }) => {
-  for (const [file, type] of [
-    ['/exulta-calc.webm', 'video/webm'],
-    ['/exulta-calc.mp4', 'video/mp4'],
-  ]) {
-    const res = await request.get(file, { headers: { Range: 'bytes=0-1023' } })
-    expect([200, 206], file).toContain(res.status())
-    expect(res.headers()['content-type'], file).toBe(type)
+test.describe('repository activity', () => {
+  const data = JSON.parse(readFileSync(new URL('../src/data/repo-stats.json', import.meta.url), 'utf8'))
+  const PAGES = [
+    ['/exultadetail', 'exulta'],
+    ['/scan2talkdetail', 'scan2talk'],
+    ['/stalmanagerdetail', 'stalManager'],
+    ['/vhsdetail', 'vhs'],
+  ] as const
+
+  // The repos are private: counts and dates only.
+  test('the stats cover every project and hold no personal data', () => {
+    for (const [, key] of PAGES) expect(data.projects[key], key).toBeTruthy()
+    const text = JSON.stringify(data)
+    expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.-]+/)
+    expect(text).not.toMatch(/"(author|name|email|committer|subject|message|latestCommits)"/i)
+  })
+
+  for (const [route, key] of PAGES) {
+    test(`${route} shows the repository numbers`, async ({ page }) => {
+      const errors = await guard(page)
+      const stats = data.projects[key]
+      await open(page, route)
+      const section = page.locator('.repo--inline')
+      await section.scrollIntoViewIfNeeded()
+      await expect(section).toBeVisible()
+      await expect(section.locator('.repo-number dd').first()).toHaveText(stats.commits.toLocaleString('en-GB'))
+      await expect(section.locator('.repo-number')).toHaveCount(4)
+      await expect(section.locator('.repo-commit')).toHaveCount(0)
+      await expect(section.locator('.repo-bar')).toHaveCount(26)
+      expect(errors).toEqual([])
+    })
   }
+
+  test('on wide screens it floats beside the content instead', async ({ page }) => {
+    await guard(page)
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    await open(page, '/exultadetail')
+    const aside = page.getByRole('complementary', { name: 'Repository activity' })
+    await expect(aside).toBeVisible()
+    await expect(page.locator('.repo--inline')).toBeHidden()
+    // Right of the 1280px content, and it stays put while scrolling.
+    const content = (await page.locator('.detail-page > div').first().boundingBox())!
+    const before = (await aside.boundingBox())!
+    expect(before.x).toBeGreaterThanOrEqual(content.x + content.width)
+    expect(before.x + before.width).toBeLessThanOrEqual(1920)
+    await page.mouse.wheel(0, 1500)
+    await page.waitForTimeout(300)
+    expect((await aside.boundingBox())!.y).toBeCloseTo(before.y, 0)
+
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await expect(aside).toBeHidden()
+    await expect(page.locator('.repo--inline')).toBeVisible()
+  })
+
+  test('in Dutch on /nl', async ({ page }) => {
+    await guard(page)
+    await open(page, '/nl/vhsdetail')
+    await expect(page.getByRole('region', { name: 'Repository-activiteit' })).toBeAttached()
+    await expect(page.locator('.repo-number dt').nth(1)).toHaveText('in de laatste 30 dagen')
+  })
 })
 
 test('unknown pages show the not-found page and are kept out of search', async ({ page }) => {

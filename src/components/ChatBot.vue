@@ -1,6 +1,7 @@
 <template>
   <div ref="rootRef" class="chatbot-root">
     <button
+      ref="fabRef"
       @click="toggle"
       class="chatbot-fab"
       :class="{ 'is-open': isOpen, 'is-new': !seen }"
@@ -36,7 +37,7 @@
             </p>
             <p class="chat-sub">
               <span class="chat-status" :class="aiOnline ? 'is-on' : 'is-off'" aria-hidden="true"></span>
-              {{ aiOnline ? 'Llama 3.3 · Cloudflare Workers AI' : $t('chat.offline') }}
+              <span class="chat-sub-text">{{ aiOnline ? 'Llama 3.3 · Cloudflare Workers AI' : $t('chat.offline') }}</span>
             </p>
           </div>
           <button type="button" class="chat-icon-btn" :aria-label="$t('chat.clear')" :title="$t('chat.clear')" @click="clearChat">
@@ -244,13 +245,7 @@ export default {
   components: { ArrowUp, LlamaIcon, RotateCcw, X },
   setup() {
     const { t, tm, rt, locale } = useI18n({ useScope: 'global' })
-    const {
-      unlock,
-      secretCode,
-      clearSecretCode,
-      close: closeEasterEgg,
-      shouldResetChatbot,
-    } = useEasterEgg()
+    const { unlock, secretCode, clearSecretCode, isEasterEggUnlocked, shouldResetChatbot } = useEasterEgg()
     const isOpen = ref(false)
     const input = ref('')
     const isTyping = ref(false)
@@ -260,6 +255,7 @@ export default {
     const messagesContainer = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
+    const fabRef = ref<HTMLElement | null>(null)
     const riddleStep = ref(0) // 0 = not started, 1-3 = riddles
     const aiEnabled = !!CHAT_API_URL
     const SEEN_KEY = 'chat-seen'
@@ -330,14 +326,7 @@ export default {
         'ctrl+c',
         'cmd+c',
       ]
-      if (RESET_COMMANDS.some((cmd) => lower === cmd)) {
-        messages.value = []
-        riddleStep.value = 0
-        clearSecretCode()
-        closeEasterEgg()
-        addMessage('bot', 'chat.reset')
-        return
-      }
+      if (RESET_COMMANDS.some((cmd) => lower === cmd)) return startOver('chat.reset')
 
       // ── Easter egg riddle logic ──
       // Step 0: check if user typed a trigger word
@@ -449,31 +438,51 @@ export default {
       isOpen.value = false
     }
 
-    const clearChat = () => {
+    /**
+     * Empties the chat and leaves the riddle. Hides the easter egg directly: its
+     * own close() also signals shouldResetChatbot, which would wipe `firstLine`.
+     */
+    const startOver = (firstLine: string) => {
       messages.value = []
       riddleStep.value = 0
       clearSecretCode()
-      closeEasterEgg()
-      addMessage('bot', 'chat.welcome')
+      isEasterEggUnlocked.value = false
+      addMessage('bot', firstLine)
+    }
+
+    const clearChat = () => {
+      startOver('chat.welcome')
       nextTick(() => inputRef.value?.focus())
     }
 
     const onClickOutside = (e: MouseEvent) => {
       const root = rootRef.value
       if (!root || !isOpen.value) return
-      if (!root.contains(e.target as Node)) {
-        close()
-      }
+      // The path as it was when clicked: a chip removes itself from the page
+      // (the answer replaces it) before the click gets here.
+      if (!e.composedPath().includes(root)) close()
+    }
+
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || !isOpen.value) return
+      close()
+      fabRef.value?.focus()
     }
 
     watch(isOpen, (val) => {
       if (val) {
         // timeout skips the current click that opened the chatbot
         setTimeout(() => document.addEventListener('click', onClickOutside), 0)
+        document.addEventListener('keydown', onKeydown)
       } else {
         document.removeEventListener('click', onClickOutside)
+        document.removeEventListener('keydown', onKeydown)
       }
     })
+
+    // The chips appear only once the typing dots are gone, after the answer
+    // itself was scrolled to: scroll again so they aren't cut off.
+    watch(() => [chips.value, isTyping.value], scrollToBottom)
 
     watch(shouldResetChatbot, (val) => {
       if (val) {
@@ -492,7 +501,10 @@ export default {
       }
     })
 
-    onUnmounted(() => document.removeEventListener('click', onClickOutside))
+    onUnmounted(() => {
+      document.removeEventListener('click', onClickOutside)
+      document.removeEventListener('keydown', onKeydown)
+    })
 
     return {
       aiEnabled,
@@ -508,6 +520,7 @@ export default {
       messagesContainer,
       inputRef,
       rootRef,
+      fabRef,
       inputPlaceholder,
       send,
       sendQuickReply,
@@ -770,6 +783,10 @@ export default {
   font-size: 0.6875rem;
   color: #a7b4c4;
   white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.chat-sub-text {
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 .chat-status {
