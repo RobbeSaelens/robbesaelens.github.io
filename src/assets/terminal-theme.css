@@ -10,16 +10,17 @@
   --color-border: rgba(0, 128, 128, 0.1);
   --color-border-glow: rgba(0, 128, 128, 0.35);
   --color-text-primary: #134e4a;
-  --color-text-secondary: #5f8a86;
-  --color-text-muted: #8fb3b0;
-  --color-accent: #0d9488;
+  /* Text colours meet WCAG AA (4.5:1) on every light background they sit on */
+  --color-text-secondary: #4a6d69;
+  --color-text-muted: #4f706d;
+  --color-accent: #0f766e;
   --color-accent-soft: rgba(13, 148, 136, 0.08);
   --color-tag-bg: rgba(13, 148, 136, 0.08);
   --color-tag-text: #0f766e;
   --color-overlay: rgba(13, 22, 28, 0.82);
-  --color-prompt: #0d9488;
+  --color-prompt: #0f766e;
   --color-cursor: #0d9488;
-  --color-subtitle: #5f8a86;
+  --color-subtitle: #4a6d69;
   --color-danger: #ef4444;
   --color-warning: #f59e0b;
   --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
@@ -33,7 +34,7 @@
   --color-border-glow: rgba(45, 212, 191, 0.3);
   --color-text-primary: #e2e8f0;
   --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
+  --color-text-muted: #8a97a8;
   --color-accent: #2dd4bf;
   --color-accent-soft: rgba(45, 212, 191, 0.08);
   --color-tag-bg: rgba(45, 212, 191, 0.1);

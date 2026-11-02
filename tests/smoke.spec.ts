@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
-import { ROUTES } from './routes'
+import { nl, ROUTES } from './routes'
 
 /**
  * Smoke tests: every public page renders without errors in both languages and
@@ -12,22 +12,20 @@ import { ROUTES } from './routes'
 // as "scan2talk.be" and file names like "privacy.md" look similar, so those
 // endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|aria|chat|error|consent|footer|privacy)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|aria|chat|error|footer|privacy)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
 
 /**
  * Blocks third-party requests (analytics) so tests are deterministic and never
  * count as real visits, and collects every same-origin error.
  */
-async function guard(page: Page, { consent = 'denied' as 'denied' | null } = {}) {
+async function guard(page: Page) {
   const errors: string[] = []
-  // A stored choice keeps the cookie banner out of the way; consent tests pass null.
-  if (consent) await page.addInitScript((c) => localStorage.setItem('cookie-consent', c), consent)
   await page.route(/^https?:\/\/(?!localhost[:/])/, (route) => route.abort())
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`))
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return
     // Fallout from the blocked third-party requests above.
-    if (/ERR_FAILED|ERR_BLOCKED|googletagmanager/i.test(msg.text())) return
+    if (/ERR_FAILED|ERR_BLOCKED|cloudflareinsights/i.test(msg.text())) return
     errors.push(`console: ${msg.text()}`)
   })
   page.on('response', (res) => {
@@ -36,10 +34,6 @@ async function guard(page: Page, { consent = 'denied' as 'denied' | null } = {})
     }
   })
   return errors
-}
-
-async function setLocale(page: Page, locale: 'en' | 'nl') {
-  await page.addInitScript((l) => localStorage.setItem('app-locale', l), locale)
 }
 
 /**
@@ -64,8 +58,7 @@ for (const route of ROUTES) {
     for (const locale of ['en', 'nl'] as const) {
       test(`renders cleanly in ${locale}`, async ({ page }) => {
         const errors = await guard(page)
-        await setLocale(page, locale)
-        await open(page, route)
+        await open(page, locale === 'nl' ? nl(route) : route)
 
         await expect(page.locator('html')).toHaveAttribute('lang', locale)
         await expect(page.locator('h1')).toHaveCount(1)
@@ -106,14 +99,16 @@ for (const route of ROUTES) {
       expect(overflow).toBeLessThanOrEqual(1)
     })
 
-    test('ships SEO tags in the prerendered HTML', async ({ request }) => {
+    test('ships SEO tags in the prerendered HTML, in both languages', async ({ request }) => {
       // Raw HTML, no JavaScript: what search engines and AI crawlers get.
-      const html = await (await request.get(route)).text()
-      expect(html).toMatch(/<title>[^<]*Robbe Saelens<\/title>/)
-      expect(html).toMatch(/<meta name="description" content="[^"]{50,160}"/)
-      expect(html).toMatch(/<link rel="canonical" href="https:\/\/robbesaelens\.github\.io\//)
-      expect(html).toContain('application/ld+json')
-      expect(html.match(/<h1[\s>]/g) ?? []).toHaveLength(1)
+      for (const url of [route, nl(route)]) {
+        const html = await (await request.get(url)).text()
+        expect(html, url).toMatch(/<title>[^<]*Robbe Saelens<\/title>/)
+        expect(html, url).toMatch(/<meta name="description" content="[^"]{50,160}"/)
+        expect(html, url).toMatch(/<link rel="canonical" href="https:\/\/robbesaelens\.github\.io\//)
+        expect(html, url).toContain('application/ld+json')
+        expect(html.match(/<h1[\s>]/g) ?? [], url).toHaveLength(1)
+      }
     })
   })
 }
@@ -144,24 +139,51 @@ test('sitemap lists exactly the tested routes', async ({ request }) => {
   const paths = [...xml.matchAll(/<loc>https:\/\/robbesaelens\.github\.io(\/[^<]*)<\/loc>/g)].map(
     (m) => m[1],
   )
-  expect(paths.sort()).toEqual([...ROUTES].sort())
+  expect(paths.sort()).toEqual([...ROUTES, ...ROUTES.map(nl)].sort())
+  // every URL points at both language versions
+  expect(xml.match(/hreflang="nl"/g)).toHaveLength(ROUTES.length * 2)
 })
 
-test('language switch updates the page and remembers the choice', async ({ page }) => {
+test('Dutch pages have their own URL, title, lang and alternates', async ({ request }) => {
+  const html = await (await request.get('/nl/contact')).text()
+  expect(html).toContain('<html lang="nl"')
+  expect(html).toMatch(/<title>Over mij \| Robbe Saelens<\/title>/)
+  expect(html).toContain('<link rel="canonical" href="https://robbesaelens.github.io/nl/contact">')
+  expect(html).toContain('hreflang="en" href="https://robbesaelens.github.io/contact"')
+  expect(html).toContain('hreflang="x-default" href="https://robbesaelens.github.io/contact"')
+  expect(html).toContain('href="/nl/projects"') // links stay in Dutch
+})
+
+test('language switch goes to the Dutch URL and remembers the choice', async ({ page }) => {
   const errors = await guard(page)
-  // No setLocale() here: an init script runs again on reload and would reset the choice.
   await open(page, '/projects')
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await expect(page.locator('h1')).toContainText('projects')
 
   await openMenuIfCollapsed(page)
-  await page.getByRole('button', { name: 'Switch to Dutch' }).filter({ visible: true }).first().click()
+  await page.getByRole('link', { name: /Switch to Dutch/ }).filter({ visible: true }).first().click()
+  await expect(page).toHaveURL(/\/nl\/projects$/)
   await expect(page.locator('html')).toHaveAttribute('lang', 'nl')
   await expect(page.locator('h1')).toContainText('projecten')
 
-  await page.reload()
-  await expect(page.locator('html')).toHaveAttribute('lang', 'nl')
+  // The choice sticks: an English link now opens in Dutch on a new visit.
+  await page.goto('/contact')
+  await expect(page).toHaveURL(/\/nl\/contact$/)
   expect(errors).toEqual([])
+})
+
+test('a Dutch browser lands on the Dutch home page, deep links keep their language', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'nl-BE' })
+  const page = await context.newPage()
+  await guard(page)
+  await page.goto('/')
+  await expect(page).toHaveURL(/\/nl$/)
+  await expect(page.locator('html')).toHaveAttribute('lang', 'nl')
+  const deep = await context.newPage()
+  await guard(deep)
+  await deep.goto('/projects')
+  await expect(deep.locator('html')).toHaveAttribute('lang', 'en')
+  await context.close()
 })
 
 test('theme toggle switches to dark mode and back', async ({ page }) => {
@@ -191,7 +213,9 @@ test('projects page links to each project', async ({ page }) => {
     await open(page, '/projects')
     // Bring the slide to the middle with its page dot, then follow its (real, crawlable) link.
     await page.getByRole('button', { name, exact: true }).click()
-    await page.getByRole('link', { name: `View ${name} project details` }).click()
+    const current = page.locator('.car-slide.is-current')
+    await expect(current).toContainText(name) // the carousel has scrolled there
+    await current.locator('a.car-card').click()
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await expect(page.locator('h1')).toContainText(name)
   }
@@ -255,8 +279,8 @@ test.describe('chatbot', () => {
   }
 
   async function ask(page: Page, question: string) {
-    await page.getByRole('button', { name: 'Toggle terminal' }).click()
-    await expect(page.locator('.bot-line').first()).toBeVisible()
+    await page.getByRole('button', { name: 'Open AI chat' }).click()
+    await expect(page.locator('.msg--bot').first()).toBeVisible()
     await page.locator('#chat-input').fill(question)
     await page.locator('#chat-input').press('Enter')
   }
@@ -266,12 +290,16 @@ test.describe('chatbot', () => {
     let sent: { messages: { role: string; content: string }[]; lang: string } | null = null
     await fakeAi(page, (body) => {
       sent = body as typeof sent
-      return { status: 200, json: { reply: 'Robbe works at <b>Dynamate</b>.' } }
+      return { status: 200, json: { reply: 'Robbe works at <b>Dynamate</b>.', suggestions: ['Which projects?', 'What did he study?'] } }
     })
     await open(page, '/')
     await ask(page, 'Where does Robbe work?')
     // Shown as text: the tag is not rendered as HTML.
-    await expect(page.locator('.bot-line').last()).toHaveText(/Robbe works at <b>Dynamate<\/b>\./)
+    await expect(page.locator('.msg--bot').last()).toHaveText(/Robbe works at <b>Dynamate<\/b>\./)
+    // Follow-up questions show up as buttons, and asking one sends it.
+    const followUp = page.getByRole('button', { name: 'Which projects?' })
+    await expect(followUp).toBeVisible()
+    await expect(page.getByRole('button', { name: 'What did he study?' })).toBeVisible()
     expect(sent!.lang).toBe('en')
     expect(sent!.messages.at(-1)).toEqual({ role: 'user', content: 'Where does Robbe work?' })
     expect(sent!.messages.every((m) => m.content.length > 0)).toBe(true)
@@ -282,62 +310,55 @@ test.describe('chatbot', () => {
     await fakeAi(page, () => ({ status: 503, json: { error: 'unavailable' } }))
     await open(page, '/')
     await ask(page, 'What are your skills?')
-    await expect(page.locator('.typing-cursor')).toHaveCount(0)
-    const reply = await page.locator('.bot-line').last().innerText()
+    await expect(page.locator('.chat-typing')).toHaveCount(0)
+    const reply = await page.locator('.msg--bot').last().innerText()
     expect(reply).not.toMatch(RAW_I18N_KEY)
     expect(reply.length).toBeGreaterThan(20)
   })
 })
 
-test.describe('cookie consent', () => {
-  const GA = /googletagmanager\.com/
-
-  test('loads nothing from Google until the visitor accepts', async ({ page }) => {
-    await guard(page, { consent: null })
-    const google: string[] = []
-    page.on('request', (r) => GA.test(r.url()) && google.push(r.url()))
+test.describe('analytics', () => {
+  test('counts visits with the cookieless Cloudflare beacon, without a banner', async ({ page }) => {
+    await guard(page)
+    const beacon: string[] = []
+    page.on('request', (r) => /static\.cloudflareinsights\.com\/beacon\.min\.js/.test(r.url()) && beacon.push(r.url()))
     await open(page, '/')
 
-    const banner = page.getByRole('dialog', { name: 'Cookies' })
-    await expect(banner).toBeVisible()
-    expect(google).toEqual([])
+    await expect.poll(() => beacon.length).toBe(1)
+    const config = await page.locator('script[data-cf-beacon]').getAttribute('data-cf-beacon')
+    expect(JSON.parse(config!)).toMatchObject({ token: 'test-token' })
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    expect(await page.evaluate(() => document.cookie)).toBe('')
+  })
+
+  test('clears what the old Google Analytics setup left behind', async ({ page }) => {
+    await guard(page)
+    await page.addInitScript(() => {
+      localStorage.setItem('cookie-consent', 'granted')
+      document.cookie = '_ga=GA1.1.123; path=/'
+      document.cookie = '_ga_KTMQFBG1N2=GS1.1.456; path=/'
+    })
+    const google: string[] = []
+    page.on('request', (r) => /google/.test(r.url()) && google.push(r.url()))
+    await open(page, '/')
+
+    expect(await page.evaluate(() => localStorage.getItem('cookie-consent'))).toBeNull()
     expect(await page.evaluate(() => document.cookie)).not.toMatch(/_ga/)
-
-    await banner.getByRole('button', { name: 'Accept' }).click()
-    await expect(banner).toBeHidden()
-    await expect.poll(() => google.length).toBeGreaterThan(0)
-    expect(await page.evaluate(() => localStorage.getItem('cookie-consent'))).toBe('granted')
-  })
-
-  test('declining is remembered and can be changed from the footer', async ({ page }) => {
-    await guard(page, { consent: null })
-    const google: string[] = []
-    page.on('request', (r) => GA.test(r.url()) && google.push(r.url()))
-    await open(page, '/')
-    await page.getByRole('dialog', { name: 'Cookies' }).getByRole('button', { name: 'Decline' }).click()
-
-    await page.reload()
-    await expect(page.locator('#main-content')).toBeVisible()
-    await expect(page.getByRole('dialog', { name: 'Cookies' })).toBeHidden()
     expect(google).toEqual([])
-
-    await page.getByRole('button', { name: 'Cookie settings' }).click()
-    await expect(page.getByRole('dialog', { name: 'Cookies' })).toBeVisible()
   })
 
-  test('the privacy page explains analytics and the chatbot, with cookie settings', async ({ page }) => {
+  test('the privacy page explains the statistics and the chatbot', async ({ page }) => {
     await guard(page)
     await open(page, '/privacy')
-    await expect(page.getByRole('heading', { name: 'Statistics (Google Analytics)' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Statistics (Cloudflare Web Analytics)' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Chatbot' })).toBeVisible()
-    await page.locator('#main-content').getByRole('button', { name: 'Cookie settings' }).click()
-    await expect(page.getByRole('dialog', { name: 'Cookies' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Cookie settings' })).toHaveCount(0)
   })
 })
 
 test('the chatbot says its answers come from AI', async ({ page }) => {
   await guard(page)
   await open(page, '/')
-  await page.getByRole('button', { name: 'Toggle terminal' }).click()
-  await expect(page.locator('.banner-notice')).toContainText('generated by AI')
+  await page.getByRole('button', { name: 'Open AI chat' }).click()
+  await expect(page.locator('.chat-notice')).toContainText('generated by AI')
 })

@@ -1,61 +1,21 @@
-import { ref } from 'vue'
+/**
+ * Cloudflare Web Analytics: counts page views without cookies, without storing
+ * anything in the browser and without fingerprinting, so no consent banner is
+ * needed. The beacon follows route changes of the SPA itself. The token comes
+ * from the build (VITE_CF_ANALYTICS_TOKEN); without one nothing is loaded.
+ */
+const TOKEN = import.meta.env.VITE_CF_ANALYTICS_TOKEN
 
 /**
- * Google Analytics, loaded only after the visitor accepts it (GDPR / ePrivacy).
- * Until then nothing is requested from Google and no cookie is set. The choice
- * is kept in localStorage and can be changed any time from the footer or the
- * privacy page (openConsent()).
+ * Leftovers of the Google Analytics setup with its consent banner (until
+ * November 2026): the stored choice and the _ga cookies of visitors who accepted.
  */
-
-const GA_ID = 'G-KTMQFBG1N2'
-const STORAGE_KEY = 'cookie-consent'
-
-export type Consent = 'granted' | 'denied'
-
-/** The stored choice; null = not asked yet. */
-export const consent = ref<Consent | null>(null)
-/** Whether the banner is showing. */
-export const consentOpen = ref(false)
-
-declare global {
-  interface Window {
-    dataLayer?: unknown[]
-    gtag?: (...args: unknown[]) => void
-  }
-}
-
-let loaded = false
-
-function readConsent(): Consent | null {
+function forgetGoogleAnalytics(): void {
   try {
-    const value = localStorage.getItem(STORAGE_KEY)
-    return value === 'granted' || value === 'denied' ? value : null
+    localStorage.removeItem('cookie-consent')
   } catch {
-    return null
+    // storage blocked: nothing was stored either
   }
-}
-
-function loadAnalytics(): void {
-  ;(window as unknown as Record<string, unknown>)[`ga-disable-${GA_ID}`] = false
-  if (loaded) return
-  loaded = true
-  window.dataLayer = window.dataLayer || []
-  window.gtag = function gtag() {
-    // gtag.js expects the arguments object itself, not an array.
-    // eslint-disable-next-line prefer-rest-params
-    window.dataLayer!.push(arguments)
-  }
-  window.gtag('js', new Date())
-  window.gtag('config', GA_ID)
-  const script = document.createElement('script')
-  script.async = true
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`
-  document.head.append(script)
-}
-
-/** Stops measuring and removes the cookies Google Analytics set. */
-function disableAnalytics(): void {
-  ;(window as unknown as Record<string, unknown>)[`ga-disable-${GA_ID}`] = true
   const host = location.hostname
   for (const name of document.cookie.split(';').map((c) => c.split('=')[0]!.trim())) {
     if (name !== '_ga' && !name.startsWith('_ga_')) continue
@@ -65,26 +25,13 @@ function disableAnalytics(): void {
   }
 }
 
-/** Call once on the client: loads analytics if accepted earlier, else asks. */
-export function initConsent(): void {
-  consent.value = readConsent()
-  consentOpen.value = consent.value === null
-  if (consent.value === 'granted') loadAnalytics()
-}
-
-export function setConsent(value: Consent): void {
-  consent.value = value
-  consentOpen.value = false
-  try {
-    localStorage.setItem(STORAGE_KEY, value)
-  } catch {
-    // not remembered: the banner asks again next visit
-  }
-  if (value === 'granted') loadAnalytics()
-  else disableAnalytics()
-}
-
-/** Shows the banner again, to change the choice. */
-export function openConsent(): void {
-  consentOpen.value = true
+/** Call once on the client. */
+export function initAnalytics(): void {
+  forgetGoogleAnalytics()
+  if (!TOKEN) return
+  const script = document.createElement('script')
+  script.defer = true
+  script.src = 'https://static.cloudflareinsights.com/beacon.min.js'
+  script.dataset.cfBeacon = JSON.stringify({ token: TOKEN, spa: true })
+  document.body.append(script)
 }

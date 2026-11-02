@@ -8,7 +8,7 @@ import { renderSSRHead } from '@unhead/vue/server'
 import { renderToString } from 'vue/server-renderer'
 import App from './App.vue'
 import { createAppRouter, routes } from './bootstrap/router'
-import i18n from './i18n'
+import i18n, { localeLinks } from './i18n'
 
 const staticRoutes = routes
   .flatMap((route) => route.children ?? [route])
@@ -31,6 +31,7 @@ export async function render(
 
   app.use(head)
   app.use(i18n)
+  app.use(localeLinks)
   app.use(router)
 
   await router.push(url)

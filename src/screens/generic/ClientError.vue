@@ -66,7 +66,7 @@
           </div>
 
           <!-- Back link -->
-          <router-link to="/" class="back-link group">
+          <router-link :to="$lp('/')" class="back-link group">
             <span class="back-prompt">$</span>
             <span class="back-command">{{ $t('error.backHome') }}</span>
             <ArrowRight class="back-arrow" />

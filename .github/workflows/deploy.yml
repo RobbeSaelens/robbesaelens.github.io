@@ -38,6 +38,9 @@ jobs:
           # *variable*, not a secret: it ends up in the public bundle. Unset
           # means the chatbot only uses its built-in answers.
           VITE_CHAT_API_URL: ${{ vars.CHAT_API_URL }}
+          # Cloudflare Web Analytics beacon token (cookieless). Also a public
+          # repository variable; unset means no statistics are collected.
+          VITE_CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

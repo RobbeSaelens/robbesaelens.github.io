@@ -2,12 +2,11 @@
   <footer class="border-t border-teal-100 py-6 dark:border-teal-900">
     <div class="footer-inner mx-auto max-w-screen-2xl px-6">
       <div
-        class="flex flex-col items-center justify-between gap-y-1 text-sm text-teal-600 dark:text-teal-400 sm:flex-row"
+        class="flex flex-col items-center justify-between gap-y-1 text-sm text-teal-700 dark:text-teal-400 sm:flex-row"
       >
         <span class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
           <span>&copy; {{ new Date().getFullYear() }} Robbe Saelens</span>
-          <router-link to="/privacy" class="footer-link">{{ $t('footer.privacy') }}</router-link>
-          <button type="button" class="footer-link" @click="openConsent">{{ $t('footer.cookies') }}</button>
+          <router-link :to="$lp('/privacy')" class="footer-link">{{ $t('footer.privacy') }}</router-link>
         </span>
         <div class="flex flex-col items-center gap-x-6 gap-y-1 sm:flex-row">
           <a
@@ -32,16 +31,12 @@
 
 <script lang="ts">
 import { Phone, Mail } from 'lucide-vue-next'
-import { openConsent } from '../../analytics'
 
 export default {
   name: 'AppFooter',
   components: {
     Phone,
     Mail,
-  },
-  setup() {
-    return { openConsent }
   },
 }
 </script>

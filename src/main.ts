@@ -7,8 +7,8 @@ import 'uno.css'
 import './assets/terminal-theme.css'
 import { createWebHistory } from 'vue-router'
 import { createAppRouter } from './bootstrap/router'
-import i18n from './i18n'
-import { initConsent } from './analytics'
+import i18n, { localeLinks } from './i18n'
+import { initAnalytics } from './analytics'
 
 const app: VueApp = createApp(App)
 const head = createHead()
@@ -16,6 +16,7 @@ const router = createAppRouter(createWebHistory())
 
 app.use(head)
 app.use(i18n)
+app.use(localeLinks)
 app.use(router)
 app.mount('#app')
-initConsent()
+initAnalytics()

@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { CHAT_API_URL } from './site'
 
 /**
@@ -11,14 +12,22 @@ export interface ChatTurn {
   content: string
 }
 
+export interface AssistantReply {
+  reply: string
+  /** Follow-up questions the visitor could ask next (may be empty). */
+  suggestions: string[]
+}
+
 const MAX_TURNS = 10
 const MAX_CHARS = 600
 const TIMEOUT_MS = 15_000
 
 // After a 429 or 503, don't ask again for a while; the built-in answers cover it.
 let pausedUntil = 0
+/** False while the AI is paused or failed last time: the chat shows built-in answers. */
+export const aiAvailable = ref(true)
 
-export async function askAssistant(turns: ChatTurn[], lang: 'en' | 'nl'): Promise<string | null> {
+export async function askAssistant(turns: ChatTurn[], lang: 'en' | 'nl'): Promise<AssistantReply | null> {
   if (!CHAT_API_URL || Date.now() < pausedUntil) return null
   const messages = turns
     .slice(-MAX_TURNS)
@@ -37,12 +46,22 @@ export async function askAssistant(turns: ChatTurn[], lang: 'en' | 'nl'): Promis
     })
     if (res.status === 429) pausedUntil = Date.now() + 60_000
     if (res.status === 503) pausedUntil = Date.now() + 5 * 60_000
-    if (!res.ok) return null
-    const body = (await res.json()) as { reply?: unknown }
-    return typeof body.reply === 'string' && body.reply.trim() ? body.reply.trim() : null
+    if (!res.ok) return unavailable()
+    const body = (await res.json()) as { reply?: unknown; suggestions?: unknown }
+    if (typeof body.reply !== 'string' || !body.reply.trim()) return unavailable()
+    aiAvailable.value = true
+    const suggestions = Array.isArray(body.suggestions)
+      ? body.suggestions.filter((q): q is string => typeof q === 'string' && q.trim().length > 0).slice(0, 3)
+      : []
+    return { reply: body.reply.trim(), suggestions }
   } catch {
-    return null
+    return unavailable()
   } finally {
     clearTimeout(timer)
   }
+}
+
+function unavailable(): null {
+  aiAvailable.value = false
+  return null
 }

@@ -26,8 +26,8 @@
           :style="{ left: tooltipX + 'px', top: tooltipY + 'px' }"
           aria-hidden="true"
         >
-          <span class="font-mono text-xs text-teal-600 dark:text-teal-400">$ file ./robbe.jpg</span>
-          <span class="mt-0.5 block font-mono text-[0.65rem] text-teal-500 dark:text-teal-300"
+          <span class="font-mono text-xs text-teal-700 dark:text-teal-400">$ file ./robbe.jpg</span>
+          <span class="mt-0.5 block font-mono text-[0.65rem] text-teal-700 dark:text-teal-300"
             >→ {{ $t('home.photoTooltip') }}</span
           >
         </div>
@@ -74,7 +74,7 @@
           {{ $t('home.sayHello') }}
           <MessageCircle class="hero-btn-icon" aria-hidden="true" />
         </a>
-        <router-link to="/projects" class="hero-btn hero-btn--ghost">
+        <router-link :to="$lp('/projects')" class="hero-btn hero-btn--ghost">
           <span class="prompt">$</span> cd ./projects
           <ArrowRight class="hero-btn-icon hero-btn-arrow" aria-hidden="true" />
         </router-link>
@@ -384,18 +384,12 @@ export default {
 }
 .hero-btn--primary {
   color: #fff;
-  background: #14b8a6;
+  background: #0f766e; /* teal-700: white text stays above 4.5:1 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 .hero-btn--primary:hover {
-  background: #0d9488;
+  background: #115e59;
   box-shadow: 0 6px 18px -6px rgba(13, 148, 136, 0.55);
-}
-.dark .hero-btn--primary {
-  background: #0d9488;
-}
-.dark .hero-btn--primary:hover {
-  background: #14b8a6;
 }
 .hero-btn--ghost {
   font-family: var(--font-mono);

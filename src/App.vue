@@ -17,6 +17,7 @@ import { useRoute } from 'vue-router'
 import CustomCursor from './components/CustomCursor.vue'
 import EasterEgg from './components/EasterEgg.vue'
 import { SITE_NAME, SITE_TAGLINE, SITE_URL, absoluteUrl } from './site'
+import { localeOfPath, localizedPath, stripLocale } from './localePath'
 import { routeJsonLd } from './seo/jsonld'
 
 const DEFAULT_DESCRIPTION =
@@ -35,6 +36,9 @@ export default defineComponent({
     const description = () => (route.meta?.description as string) || DEFAULT_DESCRIPTION
     const image = () => absoluteUrl((route.meta?.image as string) || '/pf2.jpg')
     const url = () => absoluteUrl(route.path)
+    const lang = () => localeOfPath(route.path)
+    /** The page without /nl, for logic that doesn't depend on the language. */
+    const page = () => stripLocale(route.path)
     const fullTitle = () => `${title()} | ${SITE_NAME}`
 
     useHead({
@@ -50,10 +54,10 @@ export default defineComponent({
             : 'index, follow, max-image-preview:large',
         },
 
-        { property: 'og:type', content: route.path === '/' ? 'profile' : 'website' },
+        { property: 'og:type', content: page() === '/' ? 'profile' : 'website' },
         { property: 'og:site_name', content: `${SITE_NAME} - Portfolio` },
-        { property: 'og:locale', content: 'en_US' },
-        { property: 'og:locale:alternate', content: 'nl_BE' },
+        { property: 'og:locale', content: lang() === 'nl' ? 'nl_BE' : 'en_US' },
+        { property: 'og:locale:alternate', content: lang() === 'nl' ? 'en_US' : 'nl_BE' },
         { property: 'og:title', content: fullTitle() },
         { property: 'og:description', content: description() },
         { property: 'og:url', content: url() },
@@ -65,16 +69,21 @@ export default defineComponent({
         { name: 'twitter:description', content: description() },
         { name: 'twitter:image', content: image() },
       ],
-      // A noindex page (the catch-all 404) must not claim a canonical URL.
-      //
-      // No hreflang alternates: English and Dutch are served from the same URL
-      // (the language is a client-side toggle), so there is no per-language URL
-      // to point at. Pointing en and nl at one URL would be a conflicting
-      // signal. Adding /nl/ routes later is what would make hreflang correct.
-      link: () => (route.meta?.noindex ? [] : [{ rel: 'canonical', href: url() }]),
+      // Each language has its own URL (/nl/... is Dutch): canonical to itself,
+      // plus hreflang alternates so search engines show the right language.
+      // A noindex page (the catch-all 404) claims neither.
+      link: () =>
+        route.meta?.noindex
+          ? []
+          : [
+              { rel: 'canonical', href: url() },
+              { rel: 'alternate', hreflang: 'en', href: absoluteUrl(localizedPath(route.path, 'en')) },
+              { rel: 'alternate', hreflang: 'nl', href: absoluteUrl(localizedPath(route.path, 'nl')) },
+              { rel: 'alternate', hreflang: 'x-default', href: absoluteUrl(localizedPath(route.path, 'en')) },
+            ],
       script: () => {
         if (route.meta?.noindex) return []
-        const graph = routeJsonLd(route.path, title(), description(), SITE_URL)
+        const graph = routeJsonLd(route.path, title(), description(), SITE_URL, lang())
         return [{ type: 'application/ld+json', key: 'route-jsonld', innerHTML: JSON.stringify(graph) }]
       },
     })

@@ -1,5 +1,6 @@
 // Generates dist/sitemap.xml from the actual router table, so the sitemap can
-// never drift from the routes that exist: every prerendered page is listed.
+// never drift from the routes that exist: every prerendered page is listed, in
+// English and Dutch (/nl/...), each with hreflang alternates to the other.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -38,13 +39,21 @@ const PRIORITY = {
   '/contact': '0.8',
 }
 
+// Same rules as src/localePath.ts: English at the root, Dutch under /nl.
+const stripLocale = (path) => (path === '/nl' ? '/' : path.startsWith('/nl/') ? path.slice(3) : path)
+const nlPath = (base) => (base === '/' ? '/nl' : `/nl${base}`)
+const absolute = (path) => (path === '/' ? `${SITE_URL}/` : `${SITE_URL}${path}`)
+
 const urls = prerenderRoutes
   .map((route) => {
-    const loc = route === '/' ? `${SITE_URL}/` : `${SITE_URL}${route}`
-    const priority = PRIORITY[route] ?? '0.6'
+    const base = stripLocale(route)
+    const priority = PRIORITY[base] ?? '0.6'
     return [
       '  <url>',
-      `    <loc>${loc}</loc>`,
+      `    <loc>${absolute(route)}</loc>`,
+      `    <xhtml:link rel="alternate" hreflang="en" href="${absolute(base)}"/>`,
+      `    <xhtml:link rel="alternate" hreflang="nl" href="${absolute(nlPath(base))}"/>`,
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${absolute(base)}"/>`,
       `    <lastmod>${lastmod}</lastmod>`,
       '    <changefreq>monthly</changefreq>',
       `    <priority>${priority}</priority>`,
@@ -54,7 +63,7 @@ const urls = prerenderRoutes
   .join('\n')
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls}
 </urlset>
 `

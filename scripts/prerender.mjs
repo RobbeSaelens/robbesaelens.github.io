@@ -52,7 +52,13 @@ for (const route of prerenderRoutes) {
     process.exit(1)
   }
 
-  const html = injectApp(injectHead(baseTemplate, rendered.head), rendered.html, rendered.bodyTags)
+  // Dutch pages (/nl/...) declare lang="nl" in the HTML search engines read.
+  const lang = route === '/nl' || route.startsWith('/nl/') ? 'nl' : 'en'
+  const html = injectApp(
+    injectHead(baseTemplate.replace('<html lang="en">', `<html lang="${lang}">`), rendered.head),
+    rendered.html,
+    rendered.bodyTags,
+  )
 
   if (route === '/') {
     writeFileSync(join(distDir, 'index.html'), html)

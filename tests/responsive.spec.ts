@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { FIT_ROUTES, ROUTES } from './routes'
+import { FIT_ROUTES, nl, ROUTES } from './routes'
 
 /**
  * Responsive check: every page at every breakpoint that matters, plus dark mode
@@ -20,19 +20,22 @@ const BREAKPOINTS = [
   { name: 'desktop', width: 1920, height: 1080 },
 ]
 const DARK = ['phone', 'laptop']
+/** Dutch text runs longer: the Dutch pages get checked at these sizes too. */
+const DUTCH = ['phone', 'laptop']
 
 /** Fit pages only promise one screen from this height up (AppHolder.vue). */
 const FIT_MIN_HEIGHT = 560
 
 const cases = BREAKPOINTS.flatMap((bp) => [
-  { ...bp, theme: 'light' as const },
-  ...(DARK.includes(bp.name) ? [{ ...bp, theme: 'dark' as const }] : []),
+  { ...bp, theme: 'light' as const, dutch: false },
+  ...(DARK.includes(bp.name) ? [{ ...bp, theme: 'dark' as const, dutch: false }] : []),
+  ...(DUTCH.includes(bp.name) ? [{ ...bp, theme: 'light' as const, dutch: true }] : []),
 ])
 
-for (const route of ROUTES) {
-  const slug = route === '/' ? 'home' : route.slice(1)
-
-  for (const { name, width, height, theme } of cases) {
+for (const base of ROUTES) {
+  for (const { name, width, height, theme, dutch } of cases) {
+    const route = dutch ? nl(base) : base
+    const slug = route === '/' ? 'home' : route.slice(1).replace('/', '-')
     test(`${slug} at ${name} ${width}x${height}${theme === 'dark' ? ' (dark)' : ''}`, async ({ browser }) => {
       const context = await browser.newContext({
         viewport: { width, height },
@@ -44,7 +47,6 @@ for (const route of ROUTES) {
       await context.addInitScript((t) => {
         sessionStorage.setItem('intro-seen', '1')
         localStorage.setItem('theme', t)
-        localStorage.setItem('cookie-consent', 'denied') // banner off: it would cover the layout
       }, theme)
       const page = await context.newPage()
       await page.route(/^https?:\/\/(?!localhost[:/])/, (r) => r.abort()) // no analytics
@@ -68,7 +70,7 @@ for (const route of ROUTES) {
         vertical: document.documentElement.scrollHeight - document.documentElement.clientHeight,
       }))
       expect(size.sideways, 'scrolls sideways').toBeLessThanOrEqual(1)
-      if (FIT_ROUTES.includes(route) && height >= FIT_MIN_HEIGHT) {
+      if (FIT_ROUTES.includes(base) && height >= FIT_MIN_HEIGHT) {
         expect(size.vertical, 'one-screen page scrolls vertically').toBeLessThanOrEqual(1)
       }
 

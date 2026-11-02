@@ -25,8 +25,9 @@ export default defineConfig({
   webServer: {
     command: `npm run build && npx vite preview --port ${PORT} --strictPort`,
     // The chatbot's AI is a fake host: tests answer it themselves, or it is
-    // blocked and the chatbot falls back to its built-in answers.
-    env: { VITE_CHAT_API_URL: 'https://chat.invalid' },
+    // blocked and the chatbot falls back to its built-in answers. The analytics
+    // token is a dummy: the beacon is requested (and blocked by the tests).
+    env: { VITE_CHAT_API_URL: 'https://chat.invalid', VITE_CF_ANALYTICS_TOKEN: 'test-token' },
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
