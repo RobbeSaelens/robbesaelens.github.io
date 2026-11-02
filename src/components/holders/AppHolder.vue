@@ -6,6 +6,7 @@
       <router-view> </router-view>
     </main>
     <ChatBot />
+    <CookieConsent />
     <AppFooter />
   </div>
 </template>
@@ -14,12 +15,14 @@
 import AppFooter from '../../screens/generic/AppFooter.vue'
 import AppHeader from '../../screens/generic/AppHeader.vue'
 import ChatBot from '../ChatBot.vue'
+import CookieConsent from '../CookieConsent.vue'
 
 export default {
   components: {
     AppFooter,
     AppHeader,
     ChatBot,
+    CookieConsent,
   },
 }
 </script>

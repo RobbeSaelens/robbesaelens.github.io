@@ -8,6 +8,7 @@ import './assets/terminal-theme.css'
 import { createWebHistory } from 'vue-router'
 import { createAppRouter } from './bootstrap/router'
 import i18n from './i18n'
+import { initConsent } from './analytics'
 
 const app: VueApp = createApp(App)
 const head = createHead()
@@ -17,3 +18,4 @@ app.use(head)
 app.use(i18n)
 app.use(router)
 app.mount('#app')
+initConsent()

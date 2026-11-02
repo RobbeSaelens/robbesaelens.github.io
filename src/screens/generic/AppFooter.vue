@@ -4,7 +4,11 @@
       <div
         class="flex flex-col items-center justify-between gap-y-1 text-sm text-teal-600 dark:text-teal-400 sm:flex-row"
       >
-        <span>&copy; {{ new Date().getFullYear() }} Robbe Saelens</span>
+        <span class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+          <span>&copy; {{ new Date().getFullYear() }} Robbe Saelens</span>
+          <router-link to="/privacy" class="footer-link">{{ $t('footer.privacy') }}</router-link>
+          <button type="button" class="footer-link" @click="openConsent">{{ $t('footer.cookies') }}</button>
+        </span>
         <div class="flex flex-col items-center gap-x-6 gap-y-1 sm:flex-row">
           <a
             href="tel:0471958195"
@@ -28,6 +32,7 @@
 
 <script lang="ts">
 import { Phone, Mail } from 'lucide-vue-next'
+import { openConsent } from '../../analytics'
 
 export default {
   name: 'AppFooter',
@@ -35,10 +40,30 @@ export default {
     Phone,
     Mail,
   },
+  setup() {
+    return { openConsent }
+  },
 }
 </script>
 
 <style scoped>
+.footer-link {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+.footer-link:hover,
+.footer-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
 /* The chat button (fixed, bottom right, 3rem wide at 1.5rem from the edge) must
    not cover the contact links. Only needed while the container reaches that
    close to the right edge, i.e. below 1536px plus the button's width. */

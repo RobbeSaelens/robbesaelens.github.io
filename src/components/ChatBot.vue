@@ -50,7 +50,12 @@
   ██║  ██║╚██████╔╝██████╔╝██████╔╝███████╗
   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝
             </pre>
-            <p class="banner-subtitle">Portfolio Assistant v1.0 • Type 'help' for tips</p>
+            <p class="banner-subtitle">Portfolio Assistant v2.0 • Type 'help' for tips</p>
+            <!-- AI disclosure (EU AI Act, Art. 50) and a pointer to the privacy page -->
+            <p v-if="aiEnabled" class="banner-notice">
+              {{ $t('chat.aiNotice') }}
+              <router-link to="/privacy" class="banner-notice-link" @click="close">{{ $t('footer.privacy') }}</router-link>
+            </p>
             <hr class="terminal-divider" />
           </div>
 
@@ -216,8 +221,6 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
       'instructeur',
       'hobby',
       'teaching',
-      'sport vlaanderen',
-      'woumen',
     ],
     responseKey: 'chat.hobbies',
   },
@@ -534,6 +537,17 @@ export default {
 }
 
 /* ── FAB button ── */
+.banner-notice {
+  margin: 0.5rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: rgba(148, 163, 184, 0.9);
+}
+.banner-notice-link {
+  color: #2dd4bf;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .chatbot-fab {
   position: relative;
   width: 3rem;
