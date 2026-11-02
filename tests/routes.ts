@@ -10,6 +10,7 @@ export const ROUTES = [
   '/scan2talkdetail',
   '/stalmanagerdetail',
   '/vhsdetail',
+  '/privacy',
 ]
 
 /** Pages with route meta `fit`: exactly one screen tall, no vertical scroll. */

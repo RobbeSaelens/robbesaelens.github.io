@@ -29,6 +29,17 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'privacy',
+        name: 'Privacy',
+        component: () => import('../screens/Privacy.vue'),
+        meta: {
+          title: 'Privacy',
+          description:
+            'How robbesaelens.github.io handles personal data: hosting, Google Analytics only with consent, the AI chatbot, and your rights under the GDPR.',
+          image: '/pf2.jpg',
+        },
+      },
+      {
         path: 'projects',
         name: 'Projects',
         component: () => import('../screens/Projects.vue'),

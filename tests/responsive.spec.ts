@@ -44,6 +44,7 @@ for (const route of ROUTES) {
       await context.addInitScript((t) => {
         sessionStorage.setItem('intro-seen', '1')
         localStorage.setItem('theme', t)
+        localStorage.setItem('cookie-consent', 'denied') // banner off: it would cover the layout
       }, theme)
       const page = await context.newPage()
       await page.route(/^https?:\/\/(?!localhost[:/])/, (r) => r.abort()) // no analytics

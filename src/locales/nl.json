@@ -192,11 +192,11 @@
     "project-stalmanager": "Stal Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun site op Next.js 16 en React 19: een zwart-wit redactioneel design met GSAP scroll-animatie, een WebGL hero en Lenis smooth scrolling, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. Momenteel in rebranding en nog niet publiek.",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens@telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram (@robbe.saelens) en Facebook. De portfolio staat op robbe-saelens.netlify.app.",
-    "experience": "Robbe werkt momenteel bij Dynamate als Drupal backend developer. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP & Magento developer — begonnen als stagiair en daarna voltijds aangenomen. Sinds 2017 werkt hij ook als instructeur paardensport bij Sport Vlaanderen in Woumen. Zijn carrière combineert technische ontwikkeling met de mensenkennis uit het lesgeven.",
+    "experience": "Robbe werkt momenteel bij Dynamate als Drupal backend developer. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP & Magento developer — begonnen als stagiair en daarna voltijds aangenomen. Sinds 2017 is hij ook instructeur paardensport. Zijn carrière combineert technische ontwikkeling met de mensenkennis uit het lesgeven.",
     "education": "Robbe heeft een Bachelor diploma in Multimedia & Communicatietechnologieën (Next Web Developer traject) van Howest. Daarvoor behaalde hij een graduaatsdiploma in Multimedia & Informatietechnologieën (2018), waar hij de basisprincipes van programmeren en webontwikkeling leerde. Hij is gevestigd in Geluwe, België.",
     "about": "Robbe Saelens is een full-stack web developer uit Geluwe, België. Hij maakt graag coole dingen en ontdekt nieuwe technologieën. Werkt momenteel bij Dynamate als Drupal backend developer, met eerdere ervaring in PHP/Magento en een achtergrond als instructeur paardensport sinds 2017. Hij is gepassioneerd door moderne webtechnologie — van Laravel en Next.js tot Vue, React en TypeScript.",
-    "location": "Robbe is gevestigd in Gilwe (Geluwe), België. Hij werkt bij Dynamate en geeft ook les bij Sport Vlaanderen in Woumen.",
-    "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur paardensport bij Sport Vlaanderen Woumen. Hij vindt het leuk om mensen iets bij te brengen en met paarden te werken — hier ontwikkelde hij zijn sociale vaardigheden naast zijn technische carrière.",
+    "location": "Robbe is gevestigd in Gilwe (Geluwe), België. Hij werkt bij Dynamate.",
+    "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur paardensport en rijdt hij jumpingwedstrijden. Hij vindt het leuk om mensen iets bij te brengen en met paarden te werken — hier ontwikkelde hij zijn sociale vaardigheden naast zijn technische carrière.",
     "thanks": "Graag gedaan! Laat maar weten als je nog vragen hebt.",
     "bye": "Doei! Je mag altijd contact opnemen. Nog een fijne dag!",
     "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service. Typ gewoon wat je wil weten!",
@@ -218,7 +218,8 @@
       "no_code": "🔒 Nog niets. Het geheim ligt waar elke reis op deze site begint. Probeer de ingang te bezoeken.",
       "wrong_code": "❌ Dat is niet het juiste nummer. Zorg dat je het duidelijk zag en typ het precies zoals het verscheen.",
       "unlock": "🎉 TOEGANG VERLEEND\n\nJe hebt alle drie raadsels opgelost. Welkom bij de verborgen laag...\n\nDeveloper mode initialiseren..."
-    }
+    },
+    "aiNotice": "Antwoorden worden gegenereerd door AI (Cloudflare Workers AI) en kunnen fout zijn. Deel geen persoonlijke gegevens."
   },
   "aria": {
     "switchToDutch": "Schakel naar Nederlands",
@@ -242,5 +243,67 @@
     "fact5": "Stack Overflow werd opgericht in 2008. Sindsdien copy-pasten developers erop los.",
     "close": "dev mode afsluiten",
     "hint": "Tip: vraag me naar 'sudo' of 'geheim' om opnieuw te beginnen"
+  },
+  "consent": {
+    "title": "Cookies",
+    "text": "Deze site gebruikt Google Analytics om bezoeken te tellen, maar alleen als je akkoord gaat. De chatbot en de rest van de site werken hoe dan ook.",
+    "accept": "Accepteren",
+    "decline": "Weigeren",
+    "privacy": "Privacy"
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "cookies": "Cookie-instellingen"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "updated": "Laatst bijgewerkt: 2 november 2026",
+    "intro": "Deze pagina legt uit welke persoonsgegevens deze website verwerkt, waarom, en wat je ermee kan doen. Het is mijn persoonlijke portfolio, en ik hou de gegevens die het verwerkt zo beperkt mogelijk.",
+    "cookieSettings": "Cookie-instellingen",
+    "sections": [
+      {
+        "title": "Wie is verantwoordelijk",
+        "text": "Robbe Saelens, Geluwe, België. Voor elke vraag over je gegevens kan je mailen naar robbe.saelens{'@'}telenet.be."
+      },
+      {
+        "title": "Hosting",
+        "text": "De site staat op GitHub Pages. Zoals elke webserver ontvangt GitHub je IP-adres en technische gegevens over je browser wanneer je een pagina laadt, en bewaart die in zijn logs voor de beveiliging. De privacyverklaring van GitHub legt uit hoe het daarmee omgaat."
+      },
+      {
+        "title": "Statistieken (Google Analytics)",
+        "text": "Alleen als je het accepteert in de cookiebanner, laadt de site Google Analytics om bezoeken te tellen en te zien welke pagina's gelezen worden. Google Analytics plaatst dan de cookies _ga en _ga_<id> (tot 2 jaar bewaard) en ontvangt de pagina's die je bezoekt, je browser en toestel, en je locatie bij benadering. Google Ireland Ltd. verwerkt dit voor mij; gegevens kunnen naar de Verenigde Staten gaan onder het EU-VS Data Privacy Framework. Google bewaart de statistieken hoogstens 14 maanden. Weiger je, dan wordt er niets naar Google gestuurd en worden er geen cookies geplaatst. Je kan je keuze altijd wijzigen."
+      },
+      {
+        "title": "Chatbot",
+        "text": "De chatbot antwoordt met AI. Wat je typt, gaat naar mijn worker bij Cloudflare (Cloudflare Workers AI), die het antwoord schrijft op basis van de openbare informatie op deze site. Gesprekken worden niet bewaard: ze verdwijnen wanneer je de pagina herlaadt. Cloudflare gebruikt je IP-adres om het aantal berichten per bezoeker te beperken en verwerkt de berichten voor mij. Deel geen persoonlijke gegevens in de chat. Antwoorden worden gegenereerd door AI en kunnen fout zijn."
+      },
+      {
+        "title": "Opgeslagen in je browser",
+        "text": "De site bewaart een paar instellingen in je browser, zodat alles blijft zoals je het achterliet: thema, taal, je cookiekeuze, en of je de intro al zag of de chat al opende. Ze verlaten je browser nooit en worden niet gebruikt om je te volgen."
+      },
+      {
+        "title": "Contact",
+        "text": "Als je me mailt of via LinkedIn contacteert, gebruik ik je gegevens alleen om je te antwoorden, en verwijder ik ze wanneer ze niet meer nodig zijn."
+      },
+      {
+        "title": "Je rechten",
+        "text": "Je kan vragen om je persoonsgegevens in te zien, te verbeteren of te verwijderen, bezwaar maken tegen het gebruik ervan, of je toestemming intrekken, door te mailen naar robbe.saelens{'@'}telenet.be. Vind je dat je gegevens niet correct behandeld worden, dan kan je klacht indienen bij de Belgische Gegevensbeschermingsautoriteit (gegevensbeschermingsautoriteit.be)."
+      }
+    ],
+    "glance": {
+      "title": "Privacy in het kort",
+      "items": [
+        "Geen statistieken zonder je toestemming",
+        "Chatgesprekken worden nooit bewaard",
+        "Geen advertenties, geen verkoop van je gegevens",
+        "Vraag altijd om je gegevens in te zien, te verbeteren of te verwijderen"
+      ],
+      "status": "analytics --status",
+      "on": "aan",
+      "off": "uit",
+      "unset": "nog niet gekozen",
+      "change": "Wijzigen",
+      "toc": "Op deze pagina"
+    }
   }
 }
