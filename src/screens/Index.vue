@@ -1,8 +1,6 @@
 <template>
-  <header class="fade-out">
-    <div class="mx-auto max-w-screen-2xl">
-      <Profile />
-    </div>
+  <header class="fade-out flex flex-1 items-center">
+    <Profile />
   </header>
 </template>
 

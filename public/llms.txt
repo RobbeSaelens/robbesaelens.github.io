@@ -16,6 +16,19 @@ Canonical site: https://robbesaelens.github.io/
 - Languages: Dutch (native), English
 - GitHub: https://github.com/RobbeSaelens
 - LinkedIn: https://linkedin.com/in/robbe-saelens-1a14511b8
+- Email: robbe.saelens@telenet.be
+
+## Background
+
+- Education: graduate program in Multimedia & Information Technologies (MIT,
+  from 2018), then a bachelor's degree in Multimedia & Communication Technologies
+  (MCT, Howest), Next Web Developer track.
+- Experience: started in February 2023 as an intern at Your Mind Our Work, then
+  worked there as a PHP & Magento developer. Now a junior backend developer at
+  Dynamate, working on Drupal.
+- Outside work: equestrian sports instructor since 2017, which taught him a lot
+  about teaching and working with people. Rides show jumping at a competitive
+  level, in regional and national competitions.
 
 ## Core technologies
 

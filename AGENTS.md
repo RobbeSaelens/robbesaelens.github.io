@@ -1,0 +1,58 @@
+# AGENTS.md
+
+Notes for coding agents (and people) working on this portfolio: a Vue 3 + Vite site,
+prerendered to static HTML and deployed to GitHub Pages from `main`.
+
+## Commands
+
+| | |
+|---|---|
+| `npm run dev` | Dev server. Port 5173 can be taken by ddev's router (Exulta); the `.claude/launch.json` preview uses `127.0.0.1:5180` |
+| `npm run build` | Client build, SSR build, prerender, sitemap |
+| `npm test` | Smoke tests (Playwright, desktop + mobile) against the production build |
+| `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
+
+Run both test suites with `CI=1` so Playwright starts its own server instead of reusing
+a stale one.
+
+## After every frontend change: responsive check
+
+Any change that can affect what a page looks like (templates, styles, layout, copy,
+images) needs the responsive check, not just the smoke tests:
+
+```bash
+CI=1 npm run test:responsive
+```
+
+It opens every page in `tests/routes.ts` at these sizes:
+
+| Name | Size | Stands for |
+|---|---|---|
+| phone-small | 360 × 740 | small Android phones |
+| phone | 390 × 844 | iPhone (also in dark mode) |
+| tablet | 768 × 1024 | iPad portrait |
+| tablet-landscape | 1024 × 768 | iPad landscape, small laptops |
+| laptop-small | 1280 × 720 | 13" laptops, short screens |
+| laptop | 1440 × 900 | common laptop (also in dark mode) |
+| desktop | 1920 × 1080 | full HD monitor |
+
+It fails when a page scrolls sideways, or when a one-screen page (`FIT_ROUTES`: the
+projects and about pages) scrolls vertically. It also writes a full-page screenshot per
+case to `test-results/responsive/<page>/<width>x<height>-<theme>.png`.
+
+The assertions can't tell whether a layout looks right. **Open the screenshots of every
+page you touched, at every size**, and check for: text that wraps badly or is cut off,
+elements that overlap (the fixed chat button in the bottom-right corner is a usual
+suspect), content that doesn't line up with the header logo, large empty areas, and
+dark-mode contrast.
+
+When you add a page: add it to `tests/routes.ts` (the smoke test's sitemap check
+fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
+
+## Conventions
+
+- Every visible string exists in both `src/locales/en.json` and `src/locales/nl.json`;
+  the smoke tests check that the keys match.
+- Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).
+- Screenshots of projects are real ones from the live sites, never mockups.
+- No secrets or private tooling in this repo: it is public.

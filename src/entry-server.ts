@@ -16,24 +16,11 @@ const staticRoutes = routes
 
 const toUrlPath = (path: string): string => (path.startsWith('/') ? path : `/${path}`)
 
-/** Every static route; each one is written to dist/ as real HTML. */
-export const prerenderRoutes: string[] = staticRoutes.map((route) => toUrlPath(route.path))
-
 /**
- * The prerendered routes that belong in sitemap.xml. A route opts out with
- * `meta.sitemap: false` (the private /status page). noindex routes are left
- * out as well, because listing a noindex URL in a sitemap is a contradictory
- * signal to search engines.
+ * Every static route; each one is written to dist/ as real HTML and listed in
+ * sitemap.xml. The noindex 404 is the catch-all, which is not a static route.
  */
-export const sitemapRoutes: string[] = staticRoutes
-  .filter((route) => route.meta?.sitemap !== false && !route.meta?.noindex)
-  .map((route) => toUrlPath(route.path))
-
-/** Routes that must ship without the analytics tag (meta.analytics === false). */
-export const noAnalyticsRoutes: string[] = routes
-  .flatMap((route) => route.children ?? [route])
-  .filter((route) => route.meta?.analytics === false)
-  .map((route) => (route.path.startsWith('/') ? route.path : `/${route.path}`))
+export const prerenderRoutes: string[] = staticRoutes.map((route) => toUrlPath(route.path))
 
 export async function render(
   url: string,

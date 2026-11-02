@@ -75,9 +75,7 @@ export default defineComponent({
       script: () => {
         if (route.meta?.noindex) return []
         const graph = routeJsonLd(route.path, title(), description(), SITE_URL)
-        return graph
-          ? [{ type: 'application/ld+json', key: 'route-jsonld', innerHTML: JSON.stringify(graph) }]
-          : []
+        return [{ type: 'application/ld+json', key: 'route-jsonld', innerHTML: JSON.stringify(graph) }]
       },
     })
   },

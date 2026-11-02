@@ -1,6 +1,6 @@
 <template>
   <footer class="border-t border-teal-100 py-6 dark:border-teal-900">
-    <div class="mx-auto max-w-screen-2xl px-6">
+    <div class="footer-inner mx-auto max-w-screen-2xl px-6">
       <div
         class="flex flex-col items-center justify-between gap-y-1 text-sm text-teal-600 dark:text-teal-400 sm:flex-row"
       >
@@ -37,3 +37,14 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/* The chat button (fixed, bottom right, 3rem wide at 1.5rem from the edge) must
+   not cover the contact links. Only needed while the container reaches that
+   close to the right edge, i.e. below 1536px plus the button's width. */
+@media (min-width: 640px) {
+  .footer-inner {
+    padding-right: max(1.5rem, calc(5.5rem - max(0px, (100vw - 96rem) / 2)));
+  }
+}
+</style>

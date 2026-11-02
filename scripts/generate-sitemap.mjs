@@ -1,7 +1,5 @@
 // Generates dist/sitemap.xml from the actual router table, so the sitemap can
-// never drift from the routes that exist. Uses `sitemapRoutes`, not
-// `prerenderRoutes`: some pages are prerendered but must not be listed (routes
-// with `meta.sitemap: false` or `meta.noindex`, e.g. the private /status page).
+// never drift from the routes that exist: every prerendered page is listed.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -14,11 +12,11 @@ if (!existsSync(ssrEntry)) {
   process.exit(1)
 }
 
-const { sitemapRoutes } = await import(ssrEntry)
+const { prerenderRoutes } = await import(ssrEntry)
 
-if (!Array.isArray(sitemapRoutes)) {
+if (!Array.isArray(prerenderRoutes)) {
   console.error(
-    '[sitemap] dist-ssr/entry-server.js does not export sitemapRoutes; rebuild with `npm run build:ssr`',
+    '[sitemap] dist-ssr/entry-server.js does not export prerenderRoutes; rebuild with `npm run build:ssr`',
   )
   process.exit(1)
 }
@@ -40,7 +38,7 @@ const PRIORITY = {
   '/contact': '0.8',
 }
 
-const urls = sitemapRoutes
+const urls = prerenderRoutes
   .map((route) => {
     const loc = route === '/' ? `${SITE_URL}/` : `${SITE_URL}${route}`
     const priority = PRIORITY[route] ?? '0.6'
@@ -62,4 +60,4 @@ ${urls}
 `
 
 writeFileSync(join(root, 'dist', 'sitemap.xml'), xml)
-console.log(`[sitemap] wrote ${sitemapRoutes.length} urls: ${sitemapRoutes.join(', ')}`)
+console.log(`[sitemap] wrote ${prerenderRoutes.length} urls: ${prerenderRoutes.join(', ')}`)

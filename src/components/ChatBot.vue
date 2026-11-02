@@ -1,8 +1,23 @@
 <template>
   <div ref="rootRef" class="chatbot-root">
     <!-- Floating toggle button -->
-    <button @click="toggle" class="chatbot-fab" aria-label="Toggle terminal">
-      <span class="fab-text">{{ isOpen ? '✕' : '&gt;_' }}</span>
+    <button
+      @click="toggle"
+      class="chatbot-fab"
+      :class="{ 'is-open': isOpen, 'is-new': !seen }"
+      aria-label="Toggle terminal"
+      :aria-expanded="isOpen ? 'true' : 'false'"
+    >
+      <!-- Pulses until the chat has been opened once this session -->
+      <span class="fab-ring" aria-hidden="true"></span>
+      <svg class="fab-icon fab-prompt" viewBox="0 0 24 24" aria-hidden="true">
+        <path class="fab-chevron" d="M5.5 7.5 10 12l-4.5 4.5" />
+        <rect class="fab-cursor" x="12.5" y="15.4" width="6.5" height="2.2" rx="1.1" />
+      </svg>
+      <svg class="fab-icon fab-close" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.5 7.5l9 9M16.5 7.5l-9 9" />
+      </svg>
+      <span v-if="aiEnabled" class="fab-badge" aria-hidden="true">AI</span>
     </button>
 
     <!-- Terminal window -->
@@ -43,7 +58,8 @@
             <!-- Bot message -->
             <div v-if="msg.actor === 'bot'" class="terminal-line bot-line">
               <span class="prompt-symbol bot-prompt">❯</span>
-              <span class="line-text">{{ $t(msg.key) }}</span>
+              <!-- AI replies are plain text (never v-html); the rest are translation keys -->
+              <span class="line-text">{{ msg.text ?? $t(msg.key) }}</span>
             </div>
             <!-- User message -->
             <div v-else class="terminal-line user-line">
@@ -84,6 +100,7 @@
             ref="inputRef"
             v-model="input"
             type="text"
+            maxlength="600"
             :placeholder="inputPlaceholder"
             class="terminal-input"
             @keyup.enter="send"
@@ -96,14 +113,19 @@
 </template>
 
 <script lang="ts">
-import { ref, nextTick, computed, watch, onUnmounted } from 'vue'
+import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { X } from 'lucide-vue-next'
 import { useEasterEgg } from '../composables/useEasterEgg'
+import { askAssistant, type ChatTurn } from '../chatApi'
+import { CHAT_API_URL } from '../site'
 
 interface Message {
   actor: 'bot' | 'user'
+  /** Translation key (bot) or what the visitor typed (user). */
   key: string
+  /** An AI reply, shown as is. */
+  text?: string
 }
 
 const KEYWORDS: { keys: string[]; responseKey: string }[] = [
@@ -238,7 +260,7 @@ export default {
   name: 'ChatBot',
   components: { X },
   setup() {
-    const { t } = useI18n({ useScope: 'global' })
+    const { t, locale } = useI18n({ useScope: 'global' })
     const {
       unlock,
       secretCode,
@@ -254,6 +276,9 @@ export default {
     const inputRef = ref<HTMLInputElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const riddleStep = ref(0) // 0 = not started, 1-3 = riddles
+    const aiEnabled = !!CHAT_API_URL
+    const SEEN_KEY = 'chat-seen'
+    const seen = ref(true) // set on mount: sessionStorage is not there during prerender
 
     const inputPlaceholder = computed(() => t('chat.placeholder'))
 
@@ -274,7 +299,28 @@ export default {
       scrollToBottom()
     }
 
-    const processMessage = (userText: string) => {
+    const addReply = (text: string) => {
+      messages.value.push({ actor: 'bot', key: '', text })
+      scrollToBottom()
+    }
+
+    /**
+     * The conversation as the AI sees it, up to the visitor's last message (the
+     * welcome line can land after a quick first question). Bot lines are sent in
+     * the visitor's language.
+     */
+    const conversation = (): ChatTurn[] => {
+      const lastUser = messages.value.map((m) => m.actor).lastIndexOf('user')
+      return messages.value
+        .slice(0, lastUser + 1)
+        .map((m) =>
+          m.actor === 'user'
+            ? { role: 'user', content: m.key }
+            : { role: 'assistant', content: m.text ?? t(m.key) },
+        )
+    }
+
+    const processMessage = async (userText: string) => {
       const lower = userText.toLowerCase().trim()
 
       // ── Terminal reset / clear ──
@@ -342,11 +388,12 @@ export default {
 
       // ── Normal message processing ──
       const responseKey = findResponse(userText)
-      if (responseKey) {
-        addMessage('bot', responseKey)
-      } else {
-        addMessage('bot', 'chat.fallback')
+      // "help" lists the built-in topics; everything else goes to the AI first.
+      if (responseKey !== 'chat.help') {
+        const reply = await askAssistant(conversation(), locale.value === 'nl' ? 'nl' : 'en')
+        if (reply) return addReply(reply)
       }
+      addMessage('bot', responseKey ?? 'chat.fallback')
     }
 
     const send = () => {
@@ -357,9 +404,9 @@ export default {
       isTyping.value = true
       scrollToBottom()
       setTimeout(
-        () => {
+        async () => {
+          await processMessage(text) // the typing cursor stays while the AI answers
           isTyping.value = false
-          processMessage(text)
         },
         600 + Math.random() * 800,
       )
@@ -370,9 +417,9 @@ export default {
       isTyping.value = true
       scrollToBottom()
       setTimeout(
-        () => {
+        async () => {
+          await processMessage(text)
           isTyping.value = false
-          processMessage(text)
         },
         400 + Math.random() * 600,
       )
@@ -388,6 +435,14 @@ export default {
 
     const open = () => {
       isOpen.value = true
+      if (!seen.value) {
+        seen.value = true
+        try {
+          sessionStorage.setItem(SEEN_KEY, '1')
+        } catch {
+          // only this page view then
+        }
+      }
       if (messages.value.length === 0) {
         isTyping.value = true
         setTimeout(() => {
@@ -431,9 +486,19 @@ export default {
       }
     })
 
+    onMounted(() => {
+      try {
+        seen.value = sessionStorage.getItem(SEEN_KEY) === '1'
+      } catch {
+        seen.value = false
+      }
+    })
+
     onUnmounted(() => document.removeEventListener('click', onClickOutside))
 
     return {
+      aiEnabled,
+      seen,
       isOpen,
       input,
       isTyping,
@@ -470,33 +535,151 @@ export default {
 
 /* ── FAB button ── */
 .chatbot-fab {
+  position: relative;
   width: 3rem;
   height: 3rem;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border: 1px solid rgba(20, 184, 166, 0.35);
   background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(8px);
-  color: #14b8a6;
+  color: #2dd4bf;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
-  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    box-shadow 0.25s ease;
+  animation: fab-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.9s backwards; /* no end state: keeps :hover working */
 }
 .chatbot-fab:hover {
   border-color: #2dd4bf;
-  box-shadow: 0 4px 24px rgba(20, 184, 166, 0.25);
+  box-shadow: 0 6px 26px rgba(20, 184, 166, 0.35);
   transform: translateY(-2px);
 }
 .chatbot-fab:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.96);
 }
-.fab-text {
-  font-size: 1.125rem;
+.chatbot-fab:focus-visible {
+  outline: 2px solid #2dd4bf;
+  outline-offset: 3px;
+}
+.dark .chatbot-fab {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+/* Icon: a drawn ">_" whose cursor blinks; it turns into an ✕ while open */
+.fab-icon {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fab-chevron {
+  transition: transform 0.25s ease;
+}
+.chatbot-fab:hover .fab-chevron {
+  transform: translateX(1.5px);
+}
+.fab-cursor {
+  fill: currentColor;
+  stroke: none;
+  animation: fab-blink 1.1s step-end infinite;
+}
+.fab-close {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+.chatbot-fab.is-open .fab-prompt {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
+}
+.chatbot-fab.is-open .fab-close {
+  opacity: 1;
+  transform: none;
+}
+
+/* Soft ping until the visitor has opened the chat once */
+.fab-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 2px solid #2dd4bf;
+  opacity: 0;
+  pointer-events: none;
+}
+.chatbot-fab.is-new:not(.is-open) .fab-ring {
+  animation: fab-ping 2.8s cubic-bezier(0, 0, 0.2, 1) 2s infinite;
+}
+
+.fab-badge {
+  position: absolute;
+  top: -0.45rem;
+  right: -0.45rem;
+  padding: 0.05rem 0.3rem;
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.5625rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: #042f2e;
+  background: #2dd4bf;
+  border: 2px solid var(--color-bg, #0f172a);
+  border-radius: 999px;
+  transition:
+    opacity 0.2s ease,
+    transform 0.25s ease;
+}
+.chatbot-fab.is-open .fab-badge {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+@keyframes fab-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fab-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes fab-ping {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chatbot-fab,
+  .fab-cursor,
+  .fab-ring {
+    animation: none !important;
+  }
+  .fab-icon,
+  .fab-chevron {
+    transition: none;
+  }
 }
 
 .dark .chatbot-fab {

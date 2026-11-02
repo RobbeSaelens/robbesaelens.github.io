@@ -29,3 +29,36 @@ body {
     cursor: none !important;
   }
 }
+
+/* =============================================
+   Page entrance (home, projects, about)
+   Elements with .hero-in rise into place one after another, in the order of
+   --i. Hidden only when JavaScript runs (html.js, set in index.html) and until
+   the intro has finished (html.intro-done), so nothing is ever stuck invisible.
+   ============================================= */
+html.js .hero-in {
+  opacity: 0;
+}
+html.js.intro-done .hero-in {
+  animation: hero-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+}
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .hero-in,
+  html.js.intro-done .hero-in {
+    opacity: 1;
+    animation: none;
+  }
+}
