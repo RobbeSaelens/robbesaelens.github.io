@@ -68,6 +68,11 @@ fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
   `npm run stats` locally before a deploy (needs the clones next to this repo) and
   commit the JSON. It holds counts and dates only, never commit
   messages, names or e-mail addresses.
+- Errors go to Sentry (`src/sentry.ts`, project `portfolio`, EU region), only from the live
+  site. Errors only: no tracing, session replay or session pings, and `dataCollection`
+  keeps IP, headers, cookies, query strings and local variables out. Changing that means
+  changing the privacy page. To test reporting locally, build with
+  `VITE_SENTRY_ENVIRONMENT=local`.
 - Statistics are Cloudflare Web Analytics: cookieless, so there is no cookie banner.
   Don't add anything that sets cookies or tracks visitors without revisiting the privacy page.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).

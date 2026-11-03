@@ -258,7 +258,7 @@
   },
   "privacy": {
     "title": "Privacy",
-    "updated": "Laatst bijgewerkt: 2 november 2026",
+    "updated": "Laatst bijgewerkt: 3 november 2026",
     "intro": "Deze pagina legt uit welke persoonsgegevens deze website verwerkt, waarom, en wat je ermee kan doen. Het is mijn persoonlijke portfolio, en ik hou de gegevens die het verwerkt zo beperkt mogelijk.",
     "sections": [
       {
@@ -272,6 +272,10 @@
       {
         "title": "Statistieken (Cloudflare Web Analytics)",
         "text": "Om te zien hoeveel mensen de site bezoeken en welke pagina's ze lezen, gebruikt de site Cloudflare Web Analytics. Het plaatst geen cookies, bewaart niets in je browser en volgt je niet over sites of bezoeken heen. Per paginaweergave ontvangt het de pagina, de verwijzende site, je browser- en toesteltype en je land, en telt die zonder je IP-adres te bewaren. Cloudflare, Inc. verwerkt dit voor mij; gegevens kunnen naar de Verenigde Staten gaan onder het EU-VS Data Privacy Framework. Ik steun op mijn gerechtvaardigd belang om te weten hoe de site gebruikt wordt; je kan bezwaar maken door me te mailen of door static.cloudflareinsights.com te blokkeren."
+      },
+      {
+        "title": "Foutmeldingen (Sentry)",
+        "text": "Als er iets misgaat op deze site of in de chatbot, gaat er een technische foutmelding naar Sentry zodat ik het kan oplossen: de foutmelding en waar in de code het gebeurde, de pagina, je browser, besturingssysteem en tijdzone, en de laatste stappen voor de fout (zoals welke pagina je opende of op welke knop je klikte, nooit wat je typte). Als er niets misgaat, wordt er niets verstuurd. Meldingen bevatten geen IP-adres, cookies of chatberichten, en je bezoek wordt niet opgenomen; Sentry leidt je locatie bij benadering (land en stad) af uit je IP-adres en gooit het adres daarna weg. Functional Software, Inc. (Sentry) verwerkt de meldingen voor mij en bewaart ze in de EU (Frankfurt), hoogstens 90 dagen. Ik steun op mijn gerechtvaardigd belang bij een site die werkt."
       },
       {
         "title": "Chatbot",
@@ -295,6 +299,7 @@
       "items": [
         "Geen cookies, geen tracking over sites heen",
         "Chatgesprekken worden nooit bewaard",
+        "Foutmeldingen zonder IP-adres of chatinhoud",
         "Geen advertenties, geen verkoop van je gegevens",
         "Vraag altijd om je gegevens in te zien, te verbeteren of te verwijderen"
       ],

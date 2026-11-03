@@ -258,7 +258,7 @@
   },
   "privacy": {
     "title": "Privacy",
-    "updated": "Last updated: 2 November 2026",
+    "updated": "Last updated: 3 November 2026",
     "intro": "This page explains what personal data this website processes, why, and what you can do about it. It is my personal portfolio, and I keep the data it handles to a minimum.",
     "sections": [
       {
@@ -272,6 +272,10 @@
       {
         "title": "Statistics (Cloudflare Web Analytics)",
         "text": "To see how many people visit and which pages they read, the site uses Cloudflare Web Analytics. It sets no cookies, stores nothing in your browser and doesn't follow you across sites or visits. Per page view it receives the page, the referring site, your browser and device type and your country, and counts them without keeping your IP address. Cloudflare, Inc. processes this for me; data can be transferred to the United States under the EU-US Data Privacy Framework. I rely on my legitimate interest in knowing how the site is used; you can object by emailing me or by blocking static.cloudflareinsights.com."
+      },
+      {
+        "title": "Error reports (Sentry)",
+        "text": "When something breaks on this site or in the chatbot, a technical error report is sent to Sentry so I can fix it: the error message and where in the code it happened, the page, your browser, operating system and time zone, and the last steps before the error (such as which page you opened or which button you clicked, never what you typed). Nothing is sent when nothing goes wrong. Reports contain no IP address, cookies or chat messages, and no recordings of your visit; Sentry derives your approximate location (country and city) from your IP address and then discards the address. Functional Software, Inc. (Sentry) processes the reports for me and stores them in the EU (Frankfurt) for at most 90 days. I rely on my legitimate interest in a site that works."
       },
       {
         "title": "Chatbot",
@@ -295,6 +299,7 @@
       "items": [
         "No cookies, no tracking across sites",
         "Chat conversations are never stored",
+        "Error reports without IP address or chat content",
         "No ads, no selling of your data",
         "Ask any time to see, fix or delete your data"
       ],

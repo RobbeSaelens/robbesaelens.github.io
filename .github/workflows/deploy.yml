@@ -41,6 +41,11 @@ jobs:
           # Cloudflare Web Analytics beacon token (cookieless). Also a public
           # repository variable; unset means no statistics are collected.
           VITE_CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN }}
+          # Tags Sentry error reports with the deployed commit.
+          VITE_SENTRY_RELEASE: ${{ github.sha }}
+          # Uploads source maps to Sentry (readable stack traces). A secret; unset
+          # means no source maps, everything else works the same.
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
