@@ -19,7 +19,7 @@ const pages: RouteRecordRaw[] = [
       nl: {
         title: 'Full-stack webontwikkelaar',
         description:
-          'Robbe Saelens is full-stack webontwikkelaar uit Geluwe, België, bij Dynamate. Portfolio met werk in Vue, TypeScript, React, Next.js, Laravel en Drupal.',
+          'Robbe Saelens is full-stack webontwikkelaar uit Geluwe en werkt bij Dynamate. Portfolio met werk in Vue, TypeScript, React, Next.js, Laravel en Drupal.',
       },
     },
   },
@@ -30,12 +30,12 @@ const pages: RouteRecordRaw[] = [
     meta: {
       title: 'About me',
       description:
-        'About Robbe Saelens: education in Multimedia & Communication Technologies, experience as PHP, Magento and Drupal backend developer, and how to get in touch.',
+        'About Robbe Saelens: education in Multimedia & Creative Technology, experience as PHP, Magento and Drupal backend developer, and how to get in touch.',
       image: '/pf2.jpg',
       nl: {
         title: 'Over mij',
         description:
-          'Over Robbe Saelens: opleiding Multimedia & Communicatietechnologieën, ervaring als PHP-, Magento- en Drupal-backendontwikkelaar, en hoe je hem bereikt.',
+          'Over Robbe Saelens: opleiding Multimedia en Creatieve Technologie, ervaring als PHP-, Magento- en Drupal-backendontwikkelaar, en hoe je hem bereikt.',
       },
       fit: true,
     },
@@ -112,12 +112,12 @@ const pages: RouteRecordRaw[] = [
     meta: {
       title: 'VHS Service - Equestrian arena website',
       description:
-        'VHS Service by Robbe Saelens: trilingual Next.js 16 site for a riding-arena builder in Geluwe, with GSAP motion, a WebGL hero and local SEO. In rebranding.',
+        'VHS Service by Robbe Saelens: trilingual Next.js 16 site for a riding arena builder in Geluwe, photo-led with GSAP motion and local SEO. In rebranding.',
       image: '/vhs-home.jpg',
       nl: {
         title: 'VHS Service - Website voor paardenpistes',
         description:
-          'VHS Service door Robbe Saelens: drietalige Next.js 16-site voor een bouwer van paardenpistes in Geluwe, met GSAP, een WebGL-hero en lokale SEO. In rebranding.',
+          "VHS Service door Robbe Saelens: drietalige Next.js 16-site voor een bouwer van paardenpistes in Geluwe, met grote foto's, GSAP en lokale SEO. In rebranding.",
       },
     },
   },

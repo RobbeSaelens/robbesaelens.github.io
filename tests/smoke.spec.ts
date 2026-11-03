@@ -320,6 +320,51 @@ test.describe('repository activity', () => {
   })
 })
 
+test('hovering Geluwe shows a map, Escape hides it', async ({ page }) => {
+  const errors = await guard(page)
+  await open(page, '/')
+  const place = page.getByRole('button', { name: 'Geluwe' })
+  const card = page.getByRole('tooltip')
+  await expect(card).toBeHidden()
+  await place.hover()
+  await expect(card).toBeVisible()
+  await expect(card.getByRole('img', { name: /Map of Geluwe/ })).toHaveJSProperty('complete', true)
+  expect(await card.locator('img').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(320)
+  await page.keyboard.press('Escape')
+  await expect(card).toBeHidden()
+  // Also reachable with the keyboard
+  await place.focus()
+  await expect(card).toBeVisible()
+  expect(errors).toEqual([])
+})
+
+// The map is inverted in dark mode; nothing else may be (a stray filter once
+// inverted the whole page).
+test('dark mode inverts only the map', async ({ page }) => {
+  await guard(page)
+  await page.addInitScript(() => localStorage.setItem('theme', 'dark'))
+  await open(page, '/')
+  const filtered = await page.evaluate(() =>
+    [...document.querySelectorAll('body, body *')]
+      .filter((el) => getComputedStyle(el).filter !== 'none' && !el.closest('.place-map'))
+      .map((el) => el.className.toString() || el.tagName),
+  )
+  expect(filtered).toEqual([])
+  expect(await page.locator('.place-map img').evaluate((img) => getComputedStyle(img).filter)).toContain('invert')
+})
+
+test('the Scan2Talk check-in video has working sources', async ({ request }) => {
+  for (const [file, type] of [
+    ['/scan2talk-checkin.webm', 'video/webm'],
+    ['/scan2talk-checkin.mp4', 'video/mp4'],
+    ['/scan2talk-checkin-poster.jpg', 'image/jpeg'],
+  ]) {
+    const res = await request.get(file, { headers: { Range: 'bytes=0-1023' } })
+    expect([200, 206], file).toContain(res.status())
+    expect(res.headers()['content-type'], file).toBe(type)
+  }
+})
+
 test('unknown pages show the not-found page and are kept out of search', async ({ page }) => {
   await guard(page)
   // Not wrapped in the app layout, so there is no #main-content to wait for.

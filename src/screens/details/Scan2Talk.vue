@@ -83,15 +83,38 @@
 
         <!-- Flow -->
         <h2 class="section-heading">{{ $t('scan2talk.flowTitle') }}</h2>
-        <ol class="flow-list mb-14">
-          <li v-for="(s, i) in flowSteps" :key="s.title" class="flow-item reveal">
-            <span class="flow-index">{{ String(i + 1).padStart(2, '0') }}</span>
-            <div>
-              <h3 class="flow-title">{{ s.title }}</h3>
-              <p class="flow-text">{{ s.text }}</p>
-            </div>
-          </li>
-        </ol>
+        <div class="flow-wrap mb-14">
+          <!-- A real check-in, recorded in the app's demo mode (nothing is saved).
+               Plays only while on screen; never on its own for reduced-motion users. -->
+          <figure class="flow-phone reveal">
+            <span class="shot-notch" aria-hidden="true"></span>
+            <video
+              ref="flowVideo"
+              :aria-label="$t('scan2talk.flowVideo')"
+              poster="/scan2talk-checkin-poster.jpg"
+              width="600"
+              height="1298"
+              muted
+              loop
+              playsinline
+              preload="none"
+              :controls="reduceMotion"
+            >
+              <source src="/scan2talk-checkin.webm" type="video/webm" />
+              <source src="/scan2talk-checkin.mp4" type="video/mp4" />
+            </video>
+          </figure>
+
+          <ol class="flow-list">
+            <li v-for="(s, i) in flowSteps" :key="s.title" class="flow-item reveal">
+              <span class="flow-index">{{ String(i + 1).padStart(2, '0') }}</span>
+              <div>
+                <h3 class="flow-title">{{ s.title }}</h3>
+                <p class="flow-text">{{ s.text }}</p>
+              </div>
+            </li>
+          </ol>
+        </div>
 
 
         <!-- Features -->
@@ -165,6 +188,8 @@ export default defineComponent({
     return {
       lightboxIndex: null as number | null,
       observer: null as IntersectionObserver | null,
+      videoObserver: null as IntersectionObserver | null,
+      reduceMotion: false,
       revealFallback: 0 as unknown as ReturnType<typeof setTimeout>,
       heroTags: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PostgreSQL', 'Chart.js'],
       stackLanguages: [
@@ -222,6 +247,8 @@ export default defineComponent({
   },
 
   mounted() {
+    this.watchFlowVideo()
+
     const targets = [...this.$el.querySelectorAll('.reveal')] as Element[]
 
     // Content is visible by default and only hidden once the observer is armed,
@@ -257,6 +284,25 @@ export default defineComponent({
   beforeUnmount() {
     clearTimeout(this.revealFallback)
     this.observer?.disconnect()
+    this.videoObserver?.disconnect()
+  },
+
+  methods: {
+    /** Plays the check-in video while it is on screen. */
+    watchFlowVideo() {
+      const video = this.$refs.flowVideo as HTMLVideoElement | undefined
+      this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (!video || this.reduceMotion || typeof IntersectionObserver === 'undefined') return
+
+      this.videoObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) video.play().catch(() => {})
+          else video.pause()
+        },
+        { threshold: 0.35 },
+      )
+      this.videoObserver.observe(video)
+    },
   },
 })
 </script>
@@ -570,17 +616,47 @@ button.shot-phone {
   margin-bottom: 0.875rem;
 }
 
-/* Flow */
+/* Flow: the recorded check-in next to the steps */
+.flow-wrap {
+  display: grid;
+  gap: 2rem;
+  justify-items: center;
+}
+@media (min-width: 900px) {
+  .flow-wrap {
+    grid-template-columns: 250px minmax(0, 1fr);
+    align-items: center;
+    gap: 3rem;
+  }
+}
+.flow-phone {
+  width: min(250px, 72%);
+  margin: 0;
+  padding: 0.6rem;
+  border-radius: 1.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+@media (min-width: 900px) {
+  .flow-phone {
+    width: 100%;
+  }
+}
+.flow-phone video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1.25rem;
+  background: #e8f6f5;
+}
 .flow-list {
   display: grid;
   gap: 1rem;
+  width: 100%;
+  margin: 0;
   padding: 0;
   list-style: none;
-}
-@media (min-width: 900px) {
-  .flow-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 .flow-item {
   display: flex;

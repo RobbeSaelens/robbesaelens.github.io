@@ -143,8 +143,8 @@ export default defineComponent({
       lightboxIndex: null as number | null,
       observer: null as IntersectionObserver | null,
       revealFallback: 0 as unknown as ReturnType<typeof setTimeout>,
-      heroTags: ['Next.js 16', 'React 19', 'TypeScript', 'GSAP', 'WebGL', 'i18n'],
-      stackLanguages: ['TypeScript', 'Next.js 16', 'React 19', 'CSS', 'GSAP', 'Motion', 'OGL (WebGL)'],
+      heroTags: ['Next.js 16', 'React 19', 'TypeScript', 'GSAP', 'Tailwind CSS', 'i18n'],
+      stackLanguages: ['TypeScript', 'Next.js 16', 'React 19', 'Tailwind CSS 4', 'GSAP', 'Motion'],
       stackTools: [
         'Vercel',
         'Turbopack',
@@ -152,6 +152,7 @@ export default defineComponent({
         'Resend',
         'Vercel Analytics',
         'Speed Insights',
+        'Sentry',
         'Playwright',
         'ESLint',
       ],

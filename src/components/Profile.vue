@@ -37,7 +37,9 @@
     </div>
 
     <div class="hero-body">
-      <p class="hero-in hero-bio" style="--i: 2">{{ $t('home.bio') }}</p>
+      <i18n-t keypath="home.bio" tag="p" class="hero-in hero-bio" style="--i: 2">
+        <template #place><PlaceMap /></template>
+      </i18n-t>
 
       <ul class="hero-in hero-facts" style="--i: 3">
         <li>
@@ -141,9 +143,11 @@ import {
   Briefcase,
   GraduationCap,
 } from 'lucide-vue-next'
+import PlaceMap from './PlaceMap.vue'
 
 export default {
   components: {
+    PlaceMap,
     Instagram,
     Linkedin,
     Facebook,
