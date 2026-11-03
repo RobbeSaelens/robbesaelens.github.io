@@ -413,10 +413,24 @@ test.describe('analytics', () => {
     expect(google).toEqual([])
   })
 
-  test('the privacy page explains the statistics and the chatbot', async ({ page }) => {
+  // Sentry only reports from robbesaelens.github.io (src/sentry.ts).
+  test('error reporting stays off outside the live site', async ({ page }) => {
+    await guard(page)
+    const sentry: string[] = []
+    page.on('request', (r) => /sentry\.io/.test(r.url()) && sentry.push(r.url()))
+    await open(page, '/')
+    await page.evaluate(() => setTimeout(() => {
+      throw new Error('test error, must not be reported')
+    }))
+    await page.waitForTimeout(1500)
+    expect(sentry).toEqual([])
+  })
+
+  test('the privacy page explains the statistics, error reports and the chatbot', async ({ page }) => {
     await guard(page)
     await open(page, '/privacy')
     await expect(page.getByRole('heading', { name: 'Statistics (Cloudflare Web Analytics)' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Error reports (Sentry)' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Chatbot' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Cookie settings' })).toHaveCount(0)
   })
