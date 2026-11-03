@@ -52,7 +52,7 @@
             </i18n-t>
             <i18n-t keypath="about.experienceText2" tag="p" class="card-text">
               <template #role>
-                <strong>{{ $t('about.juniorBackendDev') }}</strong>
+                <strong>{{ $t('about.backendDev') }}</strong>
               </template>
               <template #link2>
                 <a
@@ -226,22 +226,13 @@ export default {
   }
 }
 
-/* Text cards: an accent edge instead of a photo, content centred in the space */
+/* Text cards: a soft accent glow instead of a photo */
 .about-card--text {
   position: relative;
   justify-content: flex-start;
   background:
     radial-gradient(120% 90% at 100% 0%, var(--color-accent-soft), transparent 60%),
     var(--color-surface);
-}
-.about-card--text::before {
-  content: '';
-  position: absolute;
-  inset: 1.25rem auto 1.25rem 0;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: var(--color-accent);
-  opacity: 0.7;
 }
 
 /* Large faint icon in the corner, so a tall text card doesn't look empty */

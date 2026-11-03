@@ -33,8 +33,8 @@ export const PROJECTS: SeoProject[] = [
     name: 'VHS Service',
     headline: 'Website for an equestrian arena builder',
     description:
-      'A trilingual marketing site for VHS Service, who build and renovate riding arenas in Geluwe, Belgium. The site is in rebranding and not public yet. Built with Next.js 16 and React 19, with GSAP and Motion for scroll-driven animation, an OGL WebGL hero, Resend-backed quote forms and local SEO.',
-    tech: ['Next.js', 'React', 'TypeScript', 'GSAP', 'WebGL', 'Vercel'],
+      'A trilingual marketing site for VHS Service, who build and renovate riding arenas in Geluwe, Belgium. The site is in rebranding and not public yet. Built with Next.js 16, React 19 and Tailwind CSS 4: an editorial design around large photography, GSAP and Motion for scroll-driven animation, Resend-backed quote forms and local SEO.',
+    tech: ['Next.js', 'React', 'TypeScript', 'GSAP', 'Tailwind CSS', 'Vercel'],
     image: '/vhs-home.jpg',
   },
   {
