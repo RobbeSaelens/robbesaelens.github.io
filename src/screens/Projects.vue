@@ -67,7 +67,7 @@
           draggable="false"
           @click="onCardClick($event, index)"
         >
-          <!-- Mockup: the desktop screenshot in a browser window, the phone screenshot overlapping it. -->
+          <!-- Mockup: the desktop screenshot in a browser window. -->
           <div class="car-stage">
             <div v-if="project.image" class="car-mock">
               <div class="car-browser">
@@ -85,15 +85,6 @@
                   :loading="index < 2 ? 'eager' : 'lazy'"
                 />
               </div>
-              <img
-                class="car-phone"
-                :src="project.mobileImage"
-                :alt="`${project.name} on mobile`"
-                width="470"
-                height="800"
-                draggable="false"
-                :loading="index < 2 ? 'eager' : 'lazy'"
-              />
             </div>
             <div v-else class="car-soon" aria-hidden="true">+</div>
           </div>
@@ -151,7 +142,6 @@ interface Project {
   /** Shown in the mockup's address bar. */
   host?: string
   image?: string
-  mobileImage?: string
   route?: string
   status: Status
 }
@@ -163,7 +153,6 @@ const PROJECTS: Project[] = [
     name: 'Exulta',
     host: 'exulta.be',
     image: '/exulta-home.jpg',
-    mobileImage: '/exulta-mobile.jpg',
     route: 'ExultaDetail',
     status: 'live',
   },
@@ -172,7 +161,6 @@ const PROJECTS: Project[] = [
     name: 'Scan2Talk',
     host: 'scan2talk.be',
     image: '/scan2talk-home.jpg',
-    mobileImage: '/scan2talk-mobile.jpg',
     route: 'Scan2TalkDetail',
     status: 'live',
   },
@@ -181,7 +169,6 @@ const PROJECTS: Project[] = [
     name: 'Stal Manager',
     host: 'stal-manager',
     image: '/stal-manager-home.jpg',
-    mobileImage: '/stal-manager-mobile.jpg',
     route: 'StalManagerDetail',
     status: 'private',
   },
@@ -190,7 +177,6 @@ const PROJECTS: Project[] = [
     name: 'VHS Service',
     host: 'vhs-service',
     image: '/vhs-home.jpg',
-    mobileImage: '/vhs-mobile.jpg',
     route: 'VHSDetail',
     status: 'rebranding',
   },
@@ -429,9 +415,10 @@ export default {
   outline-offset: 4px;
 }
 
-/* Slide width follows the track height (minus the caption), capped by the track width. */
+/* Slide width follows the track height (minus the caption), capped by the track width.
+   The mockup always fills the slide's width (see .car-mock). */
 .car-slide {
-  flex: 0 0 min(82cqw, calc((100cqh - 6.5rem) * 1.9));
+  flex: 0 0 min(82cqw, calc((100cqh - 6.5rem) * 1.8));
   scroll-snap-align: center;
   opacity: 0.45;
   transform: scale(0.92);
@@ -453,51 +440,29 @@ export default {
   outline: none;
 }
 
-/* Stage: a soft teal glow over a faint terminal grid, holding the mockup. */
+/* Stage: no frame of its own, it sizes the mockup and lines it up with the caption. */
 .car-stage {
   container-type: size;
   position: relative;
   display: flex;
   flex: 1;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 0;
   border-radius: 1.5rem;
-  border: 1px solid var(--color-border);
-  background:
-    radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 65%),
-    linear-gradient(var(--color-border) 1px, transparent 1px) 0 0 / 28px 28px,
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px) 0 0 / 28px 28px,
-    var(--color-surface);
-  box-shadow:
-    0 1px 2px rgba(8, 40, 38, 0.06),
-    0 12px 28px -16px rgba(8, 40, 38, 0.25);
-  transition: box-shadow 0.6s ease;
-}
-/* Layered shadow: tight contact shadow, soft depth, and a teal glow underneath. */
-.car-slide.is-current .car-stage {
-  box-shadow:
-    0 1px 2px rgba(8, 40, 38, 0.08),
-    0 18px 36px -20px rgba(8, 40, 38, 0.35),
-    0 40px 80px -40px color-mix(in srgb, var(--color-accent) 50%, transparent);
-}
-.dark .car-stage {
-  box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.8);
-}
-.dark .car-slide.is-current .car-stage {
-  box-shadow:
-    0 24px 50px -24px rgba(0, 0, 0, 0.9),
-    0 40px 90px -40px color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
-/* Browser sized to fit the stage both ways; the phone hangs off its bottom-right corner. */
+/* The browser spans the stage, from the caption's left edge to its right edge. It is
+   16:10 plus its bar; on a stage too short for that it gets wider than 16:10 and
+   shows less of the page, so it still lines up. */
 .car-mock {
-  position: relative;
-  width: min(70cqw, calc((76cqh - 1.9rem) * 1.6));
-  transform: translateX(-4%);
+  width: 100cqw;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .car-browser {
+  display: flex;
+  flex-direction: column;
+  height: min(calc(100cqw / 1.6 + 1.9rem), 100cqh);
   overflow: hidden;
   border-radius: 0.75rem;
   border: 1px solid var(--color-border);
@@ -505,8 +470,25 @@ export default {
   box-shadow:
     0 2px 4px rgba(8, 40, 38, 0.06),
     0 24px 50px -24px rgba(8, 40, 38, 0.45);
+  transition: box-shadow 0.6s ease;
+}
+/* The current slide gets a teal glow underneath. */
+.car-slide.is-current .car-browser {
+  box-shadow:
+    0 2px 4px rgba(8, 40, 38, 0.08),
+    0 24px 50px -24px rgba(8, 40, 38, 0.45),
+    0 40px 80px -40px color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+.dark .car-browser {
+  box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.9);
+}
+.dark .car-slide.is-current .car-browser {
+  box-shadow:
+    0 24px 50px -24px rgba(0, 0, 0, 0.9),
+    0 40px 90px -40px color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 .car-chrome {
+  flex-shrink: 0;
   display: grid;
   grid-template-columns: 2.5rem 1fr 2.5rem;
   align-items: center;
@@ -546,31 +528,15 @@ export default {
 }
 .car-shot {
   display: block;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  aspect-ratio: 16 / 10;
   object-fit: cover;
   object-position: top;
-}
-.car-phone {
-  position: absolute;
-  right: -9%;
-  bottom: -10%;
-  width: 21%;
-  aspect-ratio: 470 / 800;
-  object-fit: cover;
-  object-position: top;
-  border: 4px solid #0b1215;
-  border-radius: 1rem;
-  background: #0b1215;
-  box-shadow: 0 24px 40px -16px rgba(0, 0, 0, 0.55);
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (hover: hover) {
   .car-slide.is-current .car-card:hover .car-mock {
-    transform: translateX(-4%) translateY(-4px);
-  }
-  .car-slide.is-current .car-card:hover .car-phone {
-    transform: translateY(-10px);
+    transform: translateY(-4px);
   }
   .car-slide.is-current .car-card:hover .car-cta {
     background: var(--color-accent-soft);
@@ -592,6 +558,7 @@ export default {
   background: var(--color-surface);
 }
 .car-slide.is-soon .car-stage {
+  justify-content: center;
   border: 2px dashed var(--color-border-glow);
   box-shadow: none;
 }
@@ -602,7 +569,6 @@ export default {
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0 0.25rem;
 }
 .car-caption > * {
   opacity: 0;
@@ -729,17 +695,6 @@ export default {
   .car-stage {
     border-radius: 1.25rem;
   }
-  .car-mock {
-    width: min(74cqw, calc((70cqh - 1.9rem) * 1.6));
-    transform: translateX(-7%);
-  }
-  .car-phone {
-    right: -14%;
-    bottom: -22%;
-    width: 32%;
-    border-width: 3px;
-    border-radius: 0.75rem;
-  }
   .car-caption {
     flex-direction: column;
     align-items: flex-start;
@@ -753,7 +708,6 @@ export default {
   }
   .car-slide,
   .car-mock,
-  .car-phone,
   .car-caption > *,
   .car-dot span {
     transition: none;
