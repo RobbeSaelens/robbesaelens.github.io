@@ -1,6 +1,7 @@
 <template>
-  <!-- "Geluwe" with a small map card on hover, focus or tap. The map is a static
-       OpenStreetMap image in public/, so showing it contacts no third party. -->
+  <!-- "Geluwe" with a small map card on hover, focus or tap. The map is an SVG
+       drawn from OpenStreetMap data (src/assets/geluwe-map.svg), coloured by the
+       site's theme; showing it contacts no third party. -->
   <span
     ref="root"
     class="place"
@@ -14,8 +15,9 @@
       Geluwe
     </button>
     <span id="place-card" class="place-card" role="tooltip" :style="{ '--shift': `${shift}px` }">
-      <span class="place-map">
-        <img src="/geluwe-map.webp" width="320" height="200" :alt="$t('home.map.alt')" loading="lazy" decoding="async" />
+      <span class="place-map" role="img" :aria-label="$t('home.map.alt')">
+        <!-- Local, generated file (no user content) -->
+        <span class="place-svg" v-html="svg"></span>
         <span class="place-dot" aria-hidden="true"></span>
       </span>
       <span class="place-foot">
@@ -38,12 +40,20 @@ import { MapPin } from 'lucide-vue-next'
 
 const root = ref<HTMLElement | null>(null)
 const open = ref(false)
+/** The map, fetched the first time the card opens (~28 KB gzipped). */
+const svg = ref('')
+
+function loadMap() {
+  if (svg.value) return
+  import('../assets/geluwe-map.svg?raw').then((m) => (svg.value = m.default))
+}
 /** Horizontal nudge that keeps the card inside the viewport. */
 const shift = ref(0)
 
 /** Opens on hover, focus and tap; a tap elsewhere (focus leaves) or Escape closes it. */
 async function show() {
   if (open.value) return
+  loadMap()
   open.value = true
   shift.value = 0
   await nextTick()
@@ -146,14 +156,95 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   border-radius: 0.7rem;
   aspect-ratio: 320 / 200;
 }
-.place-map img {
+.place-map {
+  --map-bg: #f3f7f6;
+  --map-built: #e2ebe9;
+  --map-water: #bfe0e4;
+  --map-minor: #d5e2e0;
+  --map-mid: #c3d8d4;
+  --map-major: #a6d4cc;
+  --map-motorway: #7cc3b8;
+  --map-rail: #9fb1ae;
+  --map-label: #3d5c58;
+  --map-main: var(--color-accent);
+  background: var(--map-bg);
+}
+.dark .place-map {
+  --map-bg: #111a22;
+  --map-built: #18242e;
+  --map-water: #16323b;
+  --map-minor: #26333f;
+  --map-mid: #2f3f4d;
+  --map-major: #2f5753;
+  --map-motorway: #3a7a72;
+  --map-rail: #3a4855;
+  --map-label: #8fa3b5;
+}
+.place-svg,
+.place-svg :deep(svg) {
   display: block;
   width: 100%;
   height: 100%;
 }
-/* Dark mode: an inverted map (scoped, so it can only reach this image) */
-.dark .place-map img {
-  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+.place-svg :deep(.m-bg) {
+  fill: var(--map-bg);
+}
+.place-svg :deep(.m-built) {
+  fill: var(--map-built);
+}
+.place-svg :deep(.m-water) {
+  fill: var(--map-water);
+}
+.place-svg :deep(path:not(.m-built, .m-water)) {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.place-svg :deep(.m-river) {
+  stroke: var(--map-water);
+  stroke-width: 5;
+}
+.place-svg :deep(.m-rail) {
+  stroke: var(--map-rail);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+  stroke-linecap: butt;
+}
+.place-svg :deep(.m-minor) {
+  stroke: var(--map-minor);
+  stroke-width: 1.1;
+}
+.place-svg :deep(.m-mid) {
+  stroke: var(--map-mid);
+  stroke-width: 2.2;
+}
+.place-svg :deep(.m-major) {
+  stroke: var(--map-major);
+  stroke-width: 3.4;
+}
+.place-svg :deep(.m-motorway) {
+  stroke: var(--map-motorway);
+  stroke-width: 4.6;
+}
+.place-svg :deep(.m-label) {
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 600;
+  fill: var(--map-label);
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--map-bg);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.place-svg :deep(.m-label-small) {
+  font-size: 15px;
+  font-weight: 500;
+}
+.place-svg :deep(.m-label-main) {
+  font-size: 24px;
+  font-weight: 700;
+  fill: var(--map-main);
 }
 .place-dot {
   position: absolute;
