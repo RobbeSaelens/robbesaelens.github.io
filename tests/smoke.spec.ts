@@ -328,8 +328,9 @@ test('hovering Geluwe shows a map, Escape hides it', async ({ page }) => {
   await expect(card).toBeHidden()
   await place.hover()
   await expect(card).toBeVisible()
-  await expect(card.getByRole('img', { name: /Map of Geluwe/ })).toHaveJSProperty('complete', true)
-  expect(await card.locator('img').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(320)
+  await expect(card.getByRole('img', { name: /Map of Geluwe/ })).toBeVisible()
+  // The SVG map loads on first open, with Geluwe labelled
+  await expect(card.locator('svg .m-label-main')).toHaveText('Geluwe')
   await page.keyboard.press('Escape')
   await expect(card).toBeHidden()
   // Also reachable with the keyboard
@@ -338,19 +339,20 @@ test('hovering Geluwe shows a map, Escape hides it', async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-// The map is inverted in dark mode; nothing else may be (a stray filter once
-// inverted the whole page).
-test('dark mode inverts only the map', async ({ page }) => {
+// The map has its own dark palette. No filters anywhere: a stray one once
+// inverted the whole page.
+test('dark mode uses the dark map palette and no filters', async ({ page }) => {
   await guard(page)
   await page.addInitScript(() => localStorage.setItem('theme', 'dark'))
   await open(page, '/')
   const filtered = await page.evaluate(() =>
     [...document.querySelectorAll('body, body *')]
-      .filter((el) => getComputedStyle(el).filter !== 'none' && !el.closest('.place-map'))
+      .filter((el) => getComputedStyle(el).filter !== 'none')
       .map((el) => el.className.toString() || el.tagName),
   )
   expect(filtered).toEqual([])
-  expect(await page.locator('.place-map img').evaluate((img) => getComputedStyle(img).filter)).toContain('invert')
+  await page.getByRole('button', { name: 'Geluwe' }).hover()
+  await expect(page.locator('.place-map .m-bg')).toHaveCSS('fill', 'rgb(17, 26, 34)')
 })
 
 test('the Scan2Talk check-in video has working sources', async ({ request }) => {
