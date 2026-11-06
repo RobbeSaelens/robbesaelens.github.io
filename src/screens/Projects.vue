@@ -132,7 +132,7 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-vue-next'
 import MacBook3D from '../components/MacBook3D.vue'
 
-type Status = 'live' | 'private' | 'rebranding' | 'soon'
+type Status = 'live' | 'private' | 'open-source' | 'rebranding' | 'soon'
 
 interface Project {
   id: string
@@ -173,12 +173,20 @@ const PROJECTS: Project[] = [
     route: 'VHSDetail',
     status: 'rebranding',
   },
-  { id: 'coming-soon', name: 'Coming soon', status: 'soon' },
+  {
+    id: 'shared-costs',
+    // Short on the slide, like the others: the full name wraps badly on narrow slides
+    name: 'Shared Costs',
+    screenshot: '/shared-costs-home.jpg',
+    route: 'SharedCostsDetail',
+    status: 'open-source',
+  },
 ]
 
 const STATUS_KEYS: Record<Status, string> = {
   live: 'projects.live',
   private: 'projects.private',
+  'open-source': 'projects.openSource',
   rebranding: 'projects.rebranding',
   soon: 'projects.inProgress',
 }
@@ -516,6 +524,11 @@ export default {
   --ry: -24deg;
 }
 .car-slide.is-current:nth-child(even) {
+  --ry: 24deg;
+}
+/* The last one sits against the right end of the track: it turns away from that edge,
+   as the first one does from the left, so its lid isn't cut off there */
+.car-slide.is-current:last-child {
   --ry: 24deg;
 }
 

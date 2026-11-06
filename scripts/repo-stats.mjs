@@ -23,6 +23,7 @@ const PROJECTS = {
   scan2talk: 'scan2talk',
   stalManager: 'stal-manager',
   vhs: 'VHS',
+  sharedCosts: 'shared_costs',
 }
 
 const WEEKS = 26

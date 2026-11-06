@@ -50,11 +50,12 @@
       "stal-manager": {
         "tagline": "Kostenbeheer voor paardeneigenaars, werkt offline"
       },
-      "coming-soon": {
-        "tagline": "Er is iets nieuws in de maak"
+      "shared-costs": {
+        "tagline": "Drupal-module die kosten tot op de cent verdeelt"
       }
     },
     "private": "live · privé",
+    "openSource": "open source",
     "comingSoon": "Binnenkort",
     "inProgress": "in de maak",
     "mockupAlt": "{name} op een MacBook",
@@ -171,6 +172,34 @@
     "tools": "Tools & diensten",
     "viewOther": "Bekijk andere projecten"
   },
+  "sharedCosts": {
+    "title": "Shared Costs for Drupal",
+    "alt": "Dashboard van Stal Manager in Drupal, gebouwd met de module Shared Costs en haar recipes",
+    "openSourceBadge": "Open source",
+    "viewOnGithub": "Bekijk op GitHub",
+    "overview": "Projectoverzicht",
+    "about": "Over",
+    "aboutText": "Shared Costs is een Drupal 11-module, opgezet als contribproject en publiek op GitHub. Ze voegt één veldtype toe dat een bedrag verdeelt over andere entiteiten, zoals een uitgave van de stal over de paarden, gelijk of procentueel, en elk deel opslaat als een exact bedrag in centen. Views telt de delen daarna op per paard en per maand. Drie recipes en een front-end-thema bouwen er een volledige kostentracker bovenop.",
+    "relationTitle": "Stal Manager, in Drupal",
+    "relationText": "Dit is de Drupal-versie van {link}, mijn Next.js-app voor de kosten van onze paarden. De recipes bouwen die app na met enkel configuratie: inhoudstypes, views, grafieken, een rol en vertalingen, bovenop deze ene kleine module. Offline werken, wat de Next.js-app als PWA doet, zit er niet in.",
+    "featuresTitle": "Wat erin zit",
+    "featureField": "Een veld dat kosten verdeelt",
+    "featureFieldText": "Je kiest in een tabel wie meebetaalt, met per rij een vinkje en een optioneel percentage; wie geen percentage heeft, krijgt een gelijk deel van wat overblijft. De bedragen passen zich live aan terwijl je typt, via de HTMX van Drupal core, zonder eigen JavaScript.",
+    "featureCents": "Tot op de cent",
+    "featureCentsText": "Elk deel wordt in hele centen opgeslagen met de methode van de grootste rest: 12,35 over twee paarden is 6,18 + 6,17, nooit 6,18 + 6,18. Validatie houdt de percentages op hoogstens 100 %, en niemand betaalt twee keer mee.",
+    "featureViews": "Integratie met Views",
+    "featureViewsText": "Relaties van en naar wie meebetaalt, bedragen die je kan optellen, en een veld en argument voor jaar en maand: zo krijg je de kosten per paard en per maand. De content-export van core exporteert wie meebetaalt via de UUID.",
+    "featureRecipes": "Drie recipes",
+    "featureRecipesText": "Enkel configuratie, geen eigen code. stal_manager: het inhoudsmodel, een dashboard met Chart.js-grafieken, een maandoverzicht, de lijst met uitgaven en een rol Stable manager. stal_manager_demo: een demosite met een jaar aan voorbeeldkosten. stal_manager_nl: alles in het Nederlands.",
+    "featureTheme": "Een thema dat werkt als een app",
+    "featureThemeText": "Gegenereerd met de Starterkit van core: een inklapbare zijbalk, een tabbalk op gsm, HTMX-navigatie die enkel de hoofdinhoud vervangt met view transitions, live filters, kaarten met een getal dat oploopt, grafieken in de kleuren van het thema en een donkere modus. Gebouwd met single-directory components en autowired #[Hook]-klassen; Gin en Admin Toolbar voor de beheerpagina's.",
+    "featureQuality": "Getest & gecontroleerd",
+    "featureQualityText": "Unit-, Kernel-, Functional- en browsertests (Selenium), met een toegankelijkheidsscan (axe) van elke pagina in licht en donker. Kerneltests op MariaDB, PostgreSQL en SQLite; PHPStan level 8, de codestandaarden van Drupal, stylelint en ESLint in GitHub Actions. Ongeveer 95 % van de PHP-regels is gedekt.",
+    "tryDemo": "Probeer de demo via GitHub",
+    "languages": "Talen & frameworks",
+    "tools": "Tools & diensten",
+    "viewOther": "Bekijk andere projecten"
+  },
   "error": {
     "defaultTitle": "Er is iets fout gegaan",
     "defaultDescription": "Er is een onverwachte fout opgetreden. Probeer het later opnieuw.",
@@ -191,11 +220,12 @@
     "welcome": "Hoi! Ik ben de virtuele assistent van Robbe. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
     "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
     "skills": "Robbe is een full-stack webdeveloper die werkt met Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, Tailwind CSS, Node.js en meer. Hij heeft ook ervaring met Adobe XD, After Effects en LottieFiles voor design en prototyping. Momenteel focust hij op backendontwikkeling in Drupal bij Dynamate.",
-    "projects": "Robbe bouwde onder meer deze 4 projecten:\n\n• Exulta — website voor stretchtentverhuur, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — check-ins over het welbevinden van leerlingen via QR-code, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — privé-app om de kosten van paarden bij te houden, werkt offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nBekijk ze op de pagina Projecten!",
+    "projects": "Robbe bouwde onder meer deze 5 projecten:\n\n• Exulta — website voor stretchtentverhuur, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — check-ins over het welbevinden van leerlingen via QR-code, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — privé-app om de kosten van paarden bij te houden, werkt offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n• Shared Costs for Drupal — open-source Drupal 11-module die kosten tot op de cent verdeelt, met recipes die Stal Manager in Drupal nabouwen (Drupal 11 + HTMX + Views + Recipes)\n\nBekijk ze op de pagina Projecten!",
     "project-exulta": "Exulta is de tweede versie van de website van Exulta, dat stretchtenten verhuurt, live op exulta.be. Gebouwd met Laravel 13 en React 19 via Inertia, met een Filament 5-adminpaneel, een productcatalogus, een interactieve tentcalculator, realisaties en een blog. Geautomatiseerde CI/CD via GitHub Actions met databaseback-ups en een rollback bij fouten, plus Playwright- en Lighthouse-checks.",
     "project-scan2talk": "Scan2Talk is een PWA voor scholen: leerlingen scannen een QR-code en doorlopen een korte, begeleide check-in over hoe ze zich voelen (thermometer → thema → gevoelens → hulpvraag). Leerkrachten krijgen een overzichtsdashboard met Chart.js-grafieken. Gebouwd met Laravel 13, Vue.js 3, Inertia.js, PostgreSQL, Spatie Permissions en Simple QR Code.",
     "project-stalmanager": "Stal Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun nieuwe site op Next.js 16 en React 19: een redactioneel design rond grote foto's, met scroll-animaties in GSAP en Motion en vloeiend scrollen met Lenis, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. De site krijgt een rebranding en is nog niet publiek.",
+    "project-sharedcosts": "Shared Costs is een open-source Drupal 11-module (github.com/RobbeSaelens/shared_costs): een veldtype dat een bedrag gelijk of procentueel verdeelt over andere entiteiten, tot op de cent, met een live HTMX-voorbeeld en integratie met Views. Drie Drupal-recipes bouwen Robbes app Stal Manager na in Drupal met enkel configuratie, en een thema op basis van de Starterkit van core laat het werken als een app. Getest met PHPUnit (Unit, Kernel, Functional en in de browser), PHPStan level 8 en GitHub Actions.",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens{'@'}telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens) en Facebook. Het portfolio staat op robbesaelens.github.io.",
     "experience": "Robbe werkt momenteel bij Dynamate als backend developer voor Drupal-projecten. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP- en Magento-developer: hij begon er als stagiair en werd daarna voltijds aangenomen. Sinds 2017 is hij ook instructeur in de paardensport, dus zijn loopbaan combineert technisch werk met de mensenkennis die hij opdeed als lesgever.",
     "education": "Robbe heeft een bachelordiploma in Multimedia en Creatieve Technologie (traject Next Web Developer) van Howest. Daarvoor volgde hij vanaf 2018 de graduaatsopleiding Multimedia & Informatietechnologieën, waar hij de basis van programmeren en webontwikkeling leerde. Hij woont in Geluwe, België.",
@@ -204,7 +234,7 @@
     "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur in de paardensport en rijdt hij jumpingwedstrijden. Hij brengt mensen graag iets bij en werkt graag met paarden — zo ontwikkelde hij zijn sociale vaardigheden, naast zijn technische loopbaan.",
     "thanks": "Graag gedaan! Laat gerust weten als je nog vragen hebt.",
     "bye": "Tot ziens! Neem gerust contact op wanneer je wil. Nog een fijne dag!",
-    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service. Typ gewoon wat je wil weten!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service, Shared Costs. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Vraag me eens naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen staan terug op standaard.\n\nTyp 'help' als je hulp nodig hebt.",
     "quickReplies": [
@@ -322,6 +352,7 @@
     "weekly": "Commits per week, laatste 6 maanden",
     "weeklySummary": "Staafdiagram: {total} commits in de laatste 6 maanden, hoogstens {max} in één week",
     "weekBar": "geen commits | 1 commit | {n} commits",
-    "private": "Privérepository: cijfers van {date}"
+    "private": "Privérepository: cijfers van {date}",
+    "public": "Publieke repository op {link}: cijfers van {date}"
   }
 }

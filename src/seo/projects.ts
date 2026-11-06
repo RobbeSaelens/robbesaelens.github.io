@@ -7,6 +7,8 @@ export interface SeoProject {
   description: string
   tech: string[]
   image: string
+  /** Public source code, for projects whose repository is open. */
+  repository?: string
 }
 
 export const PROJECTS: SeoProject[] = [
@@ -45,6 +47,26 @@ export const PROJECTS: SeoProject[] = [
       'A wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster and share how they feel in under a minute; educators get trends over time and an anonymous chat with students who ask for help. Built with Laravel, Vue.js and Inertia.js.',
     tech: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PHP', 'PostgreSQL', 'Chart.js'],
     image: '/scan2talk-home.jpg',
+  },
+  {
+    path: '/sharedcostsdetail',
+    name: 'Shared Costs for Drupal',
+    headline: 'Open-source Drupal module that splits costs to the cent',
+    description:
+      "An open-source Drupal 11 module: a field type that splits an amount over other entities, such as a stable's expenses over its horses, equally or by percentage, stored as cent-exact amounts with a live HTMX preview and Views integration. Three Drupal recipes and a Starterkit theme rebuild the Stal Manager app in Drupal with configuration only.",
+    tech: [
+      'Drupal',
+      'PHP',
+      'HTMX',
+      'Views',
+      'Drupal recipes',
+      'Twig',
+      'Chart.js',
+      'PHPUnit',
+      'GitHub Actions',
+    ],
+    image: '/shared-costs-home.jpg',
+    repository: 'https://github.com/RobbeSaelens/shared_costs',
   },
 ]
 

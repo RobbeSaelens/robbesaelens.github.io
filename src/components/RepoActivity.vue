@@ -1,5 +1,6 @@
 <template>
-  <!-- Activity of the project's (private) repository, from src/data/repo-stats.json (npm run stats).
+  <!-- Activity of the project's repository (private, unless `repository` links to it), from
+       src/data/repo-stats.json (npm run stats).
        A section on the page; on screens with room beside the content, a panel there instead. -->
   <component
     :is="variant === 'aside' ? 'aside' : 'section'"
@@ -10,7 +11,7 @@
   >
     <!-- In body: a transformed page ancestor would break position: fixed -->
     <Teleport v-if="variant !== 'aside'" to="body">
-      <RepoActivity :project="project" variant="aside" />
+      <RepoActivity :project="project" :repository="repository" variant="aside" />
     </Teleport>
 
     <h2 :id="titleId" class="repo-heading">{{ $t('repo.title') }}</h2>
@@ -49,7 +50,16 @@
         <figcaption>{{ $t('repo.weekly') }}</figcaption>
       </figure>
 
-      <p class="repo-note">
+      <p v-if="repository" class="repo-note">
+        <Github class="repo-note-icon" aria-hidden="true" />
+        <i18n-t keypath="repo.public" tag="span">
+          <template #link>
+            <a class="repo-note-link" :href="repository" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </template>
+          <template #date>{{ day(data.generatedAt) }}</template>
+        </i18n-t>
+      </p>
+      <p v-else class="repo-note">
         <Lock class="repo-note-icon" aria-hidden="true" />
         {{ $t('repo.private', { date: day(data.generatedAt) }) }}
       </p>
@@ -60,7 +70,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Lock } from 'lucide-vue-next'
+import { Github, Lock } from 'lucide-vue-next'
 import data from '../data/repo-stats.json'
 
 interface RepoStats {
@@ -72,7 +82,12 @@ interface RepoStats {
 }
 
 const props = withDefaults(
-  defineProps<{ project: 'exulta' | 'scan2talk' | 'stalManager' | 'vhs'; variant?: 'inline' | 'aside' }>(),
+  defineProps<{
+    project: 'exulta' | 'scan2talk' | 'stalManager' | 'vhs' | 'sharedCosts'
+    /** The repository's public URL, for an open-source project */
+    repository?: string
+    variant?: 'inline' | 'aside'
+  }>(),
   { variant: 'inline' },
 )
 const titleId = computed(() => `repo-title-${props.project}-${props.variant}`)
@@ -234,6 +249,11 @@ function ago(iso: string) {
   width: 0.85rem;
   height: 0.85rem;
   flex-shrink: 0;
+}
+.repo-note-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* ── Side panel: in the free space right of the 1280px content, fixed while

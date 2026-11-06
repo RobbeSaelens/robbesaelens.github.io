@@ -49,6 +49,7 @@ CMS & cloud: Drupal, Azure, Netlify, Vercel
 - [Stal Manager](https://robbesaelens.github.io/stalmanagerdetail): Private app tracking what two horses cost, split per horse, with a dashboard and an offline mobile app. Next.js 16, React 19, Prisma 7, PostgreSQL.
 - [VHS Service](https://robbesaelens.github.io/vhsdetail): Trilingual website for VHS Service, an equestrian arena builder in Geluwe, currently in rebranding and not public yet. Next.js 16, React 19, Tailwind CSS 4, GSAP, Motion, Vercel.
 - [Scan2Talk](https://robbesaelens.github.io/scan2talkdetail): Wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster to share how they feel; educators get trends and an anonymous chat. Laravel, Vue.js, Inertia.js, PostgreSQL.
+- [Shared Costs for Drupal](https://robbesaelens.github.io/sharedcostsdetail): Open-source Drupal 11 module, public at https://github.com/RobbeSaelens/shared_costs. A field type that splits an amount over other entities (a stable's expense over its horses), equally or by percentage, stored as cent-exact amounts, with a live HTMX preview and Views integration. Three Drupal recipes and a Starterkit theme rebuild Stal Manager in Drupal with configuration only. PHP 8.3+, HTMX, Views, Recipes, Twig/SDC, Chart.js, PHPUnit, GitHub Actions.
 
 ## Optional
 

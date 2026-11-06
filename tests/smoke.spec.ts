@@ -14,7 +14,7 @@ import { measureCurrentSlide, SLIDES } from './slides'
 // as "scan2talk.be" and file names like "privacy.md" look similar, so those
 // endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|aria|chat|error|footer|privacy|repo)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|sharedCosts|aria|chat|error|footer|privacy|repo)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
 
 /**
  * Blocks third-party requests (analytics) so tests are deterministic and never
@@ -240,6 +240,7 @@ test('projects page links to each project', async ({ page }) => {
     ['Scan2Talk', '/scan2talkdetail'],
     ['Stal Manager', '/stalmanagerdetail'],
     ['VHS Service', '/vhsdetail'],
+    ['Shared Costs', '/sharedcostsdetail'],
   ]) {
     await open(page, '/projects')
     // Bring the slide to the middle with its page dot, then follow its (real, crawlable) link.
@@ -254,6 +255,20 @@ test('projects page links to each project', async ({ page }) => {
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await expect(page.locator('h1')).toContainText(name)
   }
+})
+
+test('Shared Costs links its public repository, and Stal Manager in the same language', async ({ page }) => {
+  const errors = await guard(page)
+  const repo = 'https://github.com/RobbeSaelens/shared_costs'
+  await open(page, '/sharedcostsdetail')
+  await expect(page.getByRole('link', { name: 'View on GitHub' })).toHaveAttribute('href', repo)
+  await expect(page.locator('.repo--inline .repo-note-link')).toHaveAttribute('href', repo)
+  await expect(page.getByRole('link', { name: 'Stal Manager', exact: true })).toHaveAttribute('href', '/stalmanagerdetail')
+
+  await open(page, nl('/sharedcostsdetail'))
+  await expect(page.getByRole('link', { name: 'Bekijk op GitHub' })).toHaveAttribute('href', repo)
+  await expect(page.getByRole('link', { name: 'Stal Manager', exact: true })).toHaveAttribute('href', '/nl/stalmanagerdetail')
+  expect(errors).toEqual([])
 })
 
 test.describe('project slides', () => {
@@ -350,15 +365,20 @@ test.describe('project slides', () => {
     await page.getByRole('button', { name: 'Stal Manager', exact: true }).click()
     await expect(page.locator('.car-slide.is-current')).toContainText('Stal Manager')
     const p = await poses(page)
-    expect(p.map((x) => x.lid)).toEqual([-38, -38, 14, -38])
+    expect(p.map((x) => x.lid)).toEqual([-38, -38, 14, -38, -38])
     // Before the current one they turn right (towards it), after it left
     expect(p[0].ry).toBeGreaterThan(0)
     expect(p[1].ry).toBeGreaterThan(0)
     expect(p[3].ry).toBeLessThan(0)
+    expect(p[4].ry).toBeLessThan(0)
     // Every other current MacBook is seen from the other side
     await page.getByRole('button', { name: 'VHS Service', exact: true }).click()
     await expect(page.locator('.car-slide.is-current')).toContainText('VHS Service')
     expect(Math.sign((await poses(page))[3].ry)).toBe(-Math.sign(p[2].ry))
+    // ...except the last one, which turns away from the right edge it sits against
+    await page.getByRole('button', { name: 'Shared Costs', exact: true }).click()
+    await expect(page.locator('.car-slide.is-current')).toContainText('Shared Costs')
+    expect((await poses(page))[4].ry).toBeGreaterThan(0)
   })
 
   test('the lid is closed until the intro has played, then it opens', async ({ page }) => {
@@ -378,7 +398,7 @@ test.describe('project slides', () => {
       page.locator('.mb-sway').evaluateAll((els) =>
         els.map((el) => el.getAnimations().some((a) => a.playState === 'running')),
       )
-    expect(await swaying()).toEqual([true, false, false, false])
+    expect(await swaying()).toEqual([true, false, false, false, false])
     test.skip(isMobile, 'mouse only')
 
     const stage = page.locator('.car-slide.is-current .car-stage')
@@ -389,7 +409,7 @@ test.describe('project slides', () => {
     const tilt = () => stage.evaluate((el) => [el.style.getPropertyValue('--tx'), el.style.getPropertyValue('--ty')].map(parseFloat))
     await expect.poll(async () => (await tilt())[0], { message: 'tips back at the top' }).toBeGreaterThan(3)
     await expect.poll(async () => (await tilt())[1], { message: 'turns right on the right' }).toBeGreaterThan(8)
-    expect(await swaying(), 'the sway pauses under the mouse').toEqual([false, false, false, false])
+    expect(await swaying(), 'the sway pauses under the mouse').toEqual([false, false, false, false, false])
     await page.mouse.move(box.x + box.width / 2, box.y + box.height + 200)
     await expect(stage).not.toHaveClass(/is-tilted/)
   })
@@ -412,7 +432,7 @@ test.describe('project slides', () => {
 })
 
 test.describe('project page animations', () => {
-  const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stalmanagerdetail', '/vhsdetail']
+  const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stalmanagerdetail', '/vhsdetail', '/sharedcostsdetail']
 
   for (const route of DETAILS) {
     test(`${route} rises in like the other pages, and the rest as you scroll to it`, async ({ page }) => {
@@ -496,9 +516,10 @@ test.describe('repository activity', () => {
     ['/scan2talkdetail', 'scan2talk'],
     ['/stalmanagerdetail', 'stalManager'],
     ['/vhsdetail', 'vhs'],
+    ['/sharedcostsdetail', 'sharedCosts'],
   ] as const
 
-  // The repos are private: counts and dates only.
+  // Most repos are private: counts and dates only.
   test('the stats cover every project and hold no personal data', () => {
     for (const [, key] of PAGES) expect(data.projects[key], key).toBeTruthy()
     const text = JSON.stringify(data)

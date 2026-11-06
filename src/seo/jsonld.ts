@@ -77,6 +77,7 @@ function projectNode(site: string, path: string) {
     url: `${site}${path}`,
     image: `${site}${project.image}`,
     keywords: project.tech.join(', '),
+    ...(project.repository ? { sameAs: project.repository } : {}),
     creator: { '@id': `${site}/${PERSON_ID}` },
     author: { '@id': `${site}/${PERSON_ID}` },
     isPartOf: { '@id': `${site}/${WEBSITE_ID}` },

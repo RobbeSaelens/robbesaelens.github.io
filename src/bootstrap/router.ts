@@ -63,12 +63,12 @@ const pages: RouteRecordRaw[] = [
     meta: {
       title: 'Projects',
       description:
-        'Projects by Robbe Saelens: Exulta tent rental, Scan2Talk student check-ins, Stal Manager horse costs and VHS Service arenas. Laravel, React, Vue, Next.js.',
+        'Projects by Robbe Saelens: Exulta tent rental, Scan2Talk check-ins, Stal Manager horse costs, VHS Service and a Drupal module. Laravel, React, Vue, Next.js.',
       image: '/exulta-home.jpg',
       nl: {
         title: 'Projecten',
         description:
-          'Projecten van Robbe Saelens: Exulta tentverhuur, Scan2Talk check-ins voor leerlingen, Stal Manager paardenkosten en VHS Service. Laravel, React, Vue, Next.js.',
+          'Projecten van Robbe Saelens: Exulta tentverhuur, Scan2Talk check-ins, Stal Manager paardenkosten, VHS Service en een Drupal-module. Laravel, React, Vue, Drupal.',
       },
       fit: true,
     },
@@ -102,6 +102,22 @@ const pages: RouteRecordRaw[] = [
         title: 'Stal Manager - Paardenkosten bijhouden',
         description:
           'Stal Manager door Robbe Saelens: privé-app die paardenkosten per paard bijhoudt, met dashboard en offline mobiele app. Next.js 16, Prisma, PostgreSQL.',
+      },
+    },
+  },
+  {
+    path: 'sharedcostsdetail',
+    name: 'SharedCostsDetail',
+    component: () => import('../screens/details/SharedCosts.vue'),
+    meta: {
+      title: 'Shared Costs - Drupal module for splitting costs',
+      description:
+        'Shared Costs by Robbe Saelens: open-source Drupal 11 field that splits costs to the cent, with recipes that rebuild Stal Manager in Drupal. HTMX, Views.',
+      image: '/shared-costs-home.jpg',
+      nl: {
+        title: 'Shared Costs - Drupal-module om kosten te verdelen',
+        description:
+          'Shared Costs door Robbe Saelens: open-source Drupal 11-veld dat kosten tot op de cent verdeelt, met recipes die Stal Manager in Drupal nabouwen. HTMX, Views.',
       },
     },
   },

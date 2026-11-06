@@ -137,6 +137,11 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
   { keys: ['exulta'], responseKey: 'chat.project-exulta' },
   { keys: ['scan2talk', 'scan', 'qr'], responseKey: 'chat.project-scan2talk' },
   { keys: ['vhs', 'vhs service', 'paardenpistes', 'manegebodems'], responseKey: 'chat.project-vhs' },
+  // Before Stal Manager: "Stal Manager recipes" is about the Drupal version
+  {
+    keys: ['shared cost', 'shared_costs', 'sharedcosts', 'gedeelde kosten', 'drupal module', 'drupal-module', 'recipe'],
+    responseKey: 'chat.project-sharedcosts',
+  },
   { keys: ['stal manager', 'stalmanager', 'stal', 'paardenkosten', 'horse costs'], responseKey: 'chat.project-stalmanager' },
   // General projects
   {
