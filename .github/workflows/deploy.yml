@@ -3,6 +3,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Every morning, so the Drupal contributions follow drupal.org without a push
+  # (the build fetches them, see "Refresh Drupal contributions"). Scheduled runs
+  # use the default branch.
+  schedule:
+    - cron: '17 5 * * *'
+  # The "Run workflow" button on the Actions tab: deploy again, refreshing the
+  # Drupal contributions.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -30,6 +38,14 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      # The Drupal contributions page (src/data/drupal.json), fresh from drupal.org
+      # and git.drupalcode.org. If they don't answer, the committed file is used
+      # and the deploy goes on.
+      - name: Refresh Drupal contributions
+        run: npm run drupal || echo "::warning::Drupal contributions not refreshed, deploying the committed src/data/drupal.json"
+        timeout-minutes: 5
+        continue-on-error: true
 
       - name: Build
         run: npm run build

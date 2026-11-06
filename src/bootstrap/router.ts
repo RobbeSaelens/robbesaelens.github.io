@@ -41,6 +41,22 @@ const pages: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'drupal',
+    name: 'Drupal',
+    component: () => import('../screens/Drupal.vue'),
+    meta: {
+      title: 'Drupal contributions',
+      description:
+        'Drupal contributions by Robbe Saelens, backend developer at Dynamate: credited fixes, merge requests and issues he opened or took part in on drupal.org.',
+      image: '/pf2.jpg',
+      nl: {
+        title: 'Drupal-bijdragen',
+        description:
+          'Drupal-bijdragen van Robbe Saelens, backend developer bij Dynamate: credits, merge requests en issues op drupal.org die hij aanmaakte of waaraan hij meewerkte.',
+      },
+    },
+  },
+  {
     path: 'privacy',
     name: 'Privacy',
     component: () => import('../screens/Privacy.vue'),
@@ -63,12 +79,12 @@ const pages: RouteRecordRaw[] = [
     meta: {
       title: 'Projects',
       description:
-        'Projects by Robbe Saelens: Exulta tent rental, Scan2Talk student check-ins, Stal Manager horse costs and VHS Service arenas. Laravel, React, Vue, Next.js.',
+        'Projects by Robbe Saelens: Exulta tent rental, Scan2Talk student check-ins, Stable Manager horse costs and VHS Service arenas. Laravel, React, Vue, Next.js.',
       image: '/exulta-home.jpg',
       nl: {
         title: 'Projecten',
         description:
-          'Projecten van Robbe Saelens: Exulta tentverhuur, Scan2Talk check-ins voor leerlingen, Stal Manager paardenkosten en VHS Service. Laravel, React, Vue, Next.js.',
+          'Projecten van Robbe Saelens: Exulta tentverhuur, Scan2Talk check-ins voor leerlingen, Stable Manager paardenkosten en VHS Service. Laravel, React, Vue, Next.js.',
       },
       fit: true,
     },
@@ -90,18 +106,18 @@ const pages: RouteRecordRaw[] = [
     },
   },
   {
-    path: 'stalmanagerdetail',
-    name: 'StalManagerDetail',
-    component: () => import('../screens/details/StalManager.vue'),
+    path: 'stablemanagerdetail',
+    name: 'StableManagerDetail',
+    component: () => import('../screens/details/StableManager.vue'),
     meta: {
-      title: 'Stal Manager - Horse cost tracker',
+      title: 'Stable Manager - Horse cost tracker',
       description:
-        'Stal Manager by Robbe Saelens: private app tracking horse costs, split per horse, with a dashboard and an offline mobile app. Next.js 16, Prisma, PostgreSQL.',
-      image: '/stal-manager-home.jpg',
+        'Stable Manager by Robbe Saelens: horse costs split per horse, in a private Next.js 16 app that works offline and an open-source Drupal 11 module with recipes.',
+      image: '/stable-manager-home.jpg',
       nl: {
-        title: 'Stal Manager - Paardenkosten bijhouden',
+        title: 'Stable Manager - Paardenkosten bijhouden',
         description:
-          'Stal Manager door Robbe Saelens: privé-app die paardenkosten per paard bijhoudt, met dashboard en offline mobiele app. Next.js 16, Prisma, PostgreSQL.',
+          'Stable Manager door Robbe Saelens: paardenkosten per paard verdeeld, in een privé-app met Next.js 16 die offline werkt en in een open-source Drupal 11-module.',
       },
     },
   },
@@ -153,6 +169,25 @@ function localized(locale: 'en' | 'nl'): RouteRecordRaw[] {
   })
 }
 
+/**
+ * Old URLs of pages that moved, old → new, in English (the Dutch ones follow).
+ * They are public and may be linked or indexed, so they keep working: the router
+ * sends them on, and the prerenderer writes a page for each that sends visitors
+ * and crawlers on (scripts/prerender.mjs). They are not in the sitemap.
+ */
+const REDIRECTS: Record<string, string> = {
+  // Stal Manager was renamed to Stable Manager
+  '/stalmanagerdetail': '/stablemanagerdetail',
+}
+
+/** Every old URL in both languages, with the new URL it moved to. */
+export const redirects: { from: string; to: string }[] = (['en', 'nl'] as const).flatMap((locale) =>
+  Object.entries(REDIRECTS).map(([from, to]) => ({
+    from: localizedPath(from, locale),
+    to: localizedPath(to, locale),
+  })),
+)
+
 export const routes: RouteRecordRaw[] = [
   {
     // One layout for both languages, so switching language doesn't remount it.
@@ -160,6 +195,8 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../components/holders/AppHolder.vue'),
     children: [...localized('en'), ...localized('nl')],
   },
+  // Query and hash go along with the redirect.
+  ...redirects.map(({ from, to }): RouteRecordRaw => ({ path: from, redirect: to })),
   {
     path: '/:pathMatch(.*)*',
     name: 'ClientError',

@@ -7,6 +7,14 @@ export interface SeoProject {
   description: string
   tech: string[]
   image: string
+  /** Open-source code that is part of the project. */
+  sourceCode?: {
+    name: string
+    description: string
+    repository: string
+    language: string
+    platform: string
+  }
 }
 
 export const PROJECTS: SeoProject[] = [
@@ -20,13 +28,21 @@ export const PROJECTS: SeoProject[] = [
     image: '/exulta-home.jpg',
   },
   {
-    path: '/stalmanagerdetail',
-    name: 'Stal Manager',
+    path: '/stablemanagerdetail',
+    name: 'Stable Manager',
     headline: 'Private app for tracking horse costs',
     description:
-      'A private app that tracks what two horses cost, with every cost split per horse by percentage. A desktop dashboard with charts and reports, and a mobile app that keeps working offline. Built with Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth.',
-    tech: ['Next.js', 'React', 'TypeScript', 'Prisma', 'PostgreSQL', 'PWA'],
-    image: '/stal-manager-home.jpg',
+      'A private app that tracks what two horses cost, with every cost split per horse by percentage. A desktop dashboard with charts and reports, and a mobile app that keeps working offline. Built with Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth. Also rebuilt in Drupal: Shared Costs, an open-source Drupal 11 module that splits costs to the cent, with recipes and a Starterkit theme that rebuild the app with configuration only.',
+    tech: ['Next.js', 'React', 'TypeScript', 'Prisma', 'PostgreSQL', 'PWA', 'Drupal', 'PHP', 'HTMX'],
+    image: '/stable-manager-home.jpg',
+    sourceCode: {
+      name: 'Shared Costs',
+      description:
+        'Open-source Drupal 11 module: a field type that splits an amount over other entities, equally or by percentage, stored to the cent, with Views integration. Four recipes and a Starterkit theme rebuild Stable Manager in Drupal.',
+      repository: 'https://github.com/RobbeSaelens/shared_costs',
+      language: 'PHP',
+      platform: 'Drupal 11',
+    },
   },
   {
     path: '/vhsdetail',

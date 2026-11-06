@@ -1,6 +1,7 @@
 {
   "nav": {
     "projects": "Projecten",
+    "drupal": "Drupal-bijdragen",
     "aboutMe": "Over mij",
     "home": "Home"
   },
@@ -27,9 +28,10 @@
     "educationText2": "Na MIT volgde ik de bacheloropleiding Multimedia en Creatieve Technologie, in het traject {link}.",
     "experience": "Ervaring",
     "experienceText1": "In februari 2023 begon ik als stagiair bij {link1}. Na mijn stage mocht ik er blijven als {role}.",
-    "experienceText2": "Vandaag werk ik bij {link2} als {role}, en ik zet die ervaring graag in voor nieuwe projecten.",
+    "experienceText2": "Vandaag werk ik bij {link2} als {role}, en ik zet die ervaring graag in voor nieuwe projecten. {drupal}",
     "phpMagentoDev": "PHP- en Magento-ontwikkelaar",
     "backendDev": "backend developer",
+    "drupalLink": "Mijn Drupal-bijdragen",
     "competing": "Paardrijden",
     "competingText": "Naast mijn job rijd ik op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Mijn grote passie is jumping, met alles wat daarbij komt kijken."
   },
@@ -47,7 +49,7 @@
       "vhs": {
         "tagline": "Website voor een aannemer van paardenpistes"
       },
-      "stal-manager": {
+      "stable-manager": {
         "tagline": "Kostenbeheer voor paardeneigenaars, werkt offline"
       },
       "coming-soon": {
@@ -113,14 +115,14 @@
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Nog niet live"
   },
-  "stalManager": {
-    "title": "Stal Manager",
-    "alt": "Dashboard van Stal Manager met de kosten van de paarden",
+  "stableManager": {
+    "title": "Stable Manager",
+    "alt": "Dashboard van Stable Manager met de kosten van de paarden",
     "privateBadge": "Live",
     "privateNote": "Privé-app, enkel met login",
     "overview": "Projectoverzicht",
     "about": "Over",
-    "aboutText": "Stal Manager houdt bij wat twee paarden kosten: een eigen paard en een pensionpaard. Elke kost wordt geboekt met datum, categorie en hoeveelheid, en procentueel verdeeld over de paarden. Er is een desktopdashboard met maandgrafieken en overzichten, en een mobiele app om kosten meteen in de stal in te geven, ook zonder verbinding. Het is een privé-app: registreren kan niet, accounts worden via de command line aangemaakt.",
+    "aboutText": "Stable Manager houdt bij wat twee paarden kosten: een eigen paard en een pensionpaard. Elke kost wordt geboekt met datum, categorie en hoeveelheid, en procentueel verdeeld over de paarden. Er is een desktopdashboard met maandgrafieken en overzichten, en een mobiele app om kosten meteen in de stal in te geven, ook zonder verbinding. Het is een privé-app: registreren kan niet, accounts worden via de command line aangemaakt.",
     "featuresTitle": "Wat erin zit",
     "featureSplit": "Kosten verdelen",
     "featureSplitText": "Elke kost gaat naar één paard of wordt procentueel over beide verdeeld, zodat de totalen per paard kloppen, ook voor gedeeld hooi of de hoefsmid.",
@@ -136,6 +138,24 @@
     "featureQualityText": "Vitest-unittests plus databasetests tegen een echte Postgres, en een publiek health-endpoint voor uptimecontroles.",
     "languages": "Talen & frameworks",
     "tools": "Tools & diensten",
+    "drupalTitle": "Ook in Drupal",
+    "drupalName": "Shared Costs · Drupal 11-module",
+    "drupalIntro": "Shared Costs is de Drupal-versie van Stable Manager, open source op GitHub: een Drupal 11-module, plus vier recipes en een thema die de app nabouwen met enkel configuratie. Offline werken, wat de Next.js-app als PWA doet, zit er niet in.",
+    "drupalAlt": "Dashboard van Stable Manager in Drupal, gebouwd met de module Shared Costs en haar recipes",
+    "openSourceBadge": "Open source",
+    "viewOnGithub": "Bekijk op GitHub",
+    "drupalContributions": "Mijn Drupal-bijdragen",
+    "drupalField": "Tot op de cent",
+    "drupalFieldText": "Een veldtype verdeelt elke kost over de paarden, gelijk of procentueel, in hele centen: 12,35 over twee paarden is 6,18 + 6,17, nooit 6,18 + 6,18. Views telt de delen op per paard en per maand.",
+    "drupalRecipes": "Vier recipes, geen eigen code",
+    "drupalRecipesText": "De app zelf (stable_manager), een JSON:API voor apps zoals de mobiele (stable_manager_api), een demo met een jaar aan voorbeeldkosten (stable_manager_demo) en een Nederlandse vertaling (stable_manager_nl), op een thema op basis van de Starterkit van core.",
+    "drupalApp": "Van dashboard tot CSV",
+    "drupalAppText": "Grafieken, een maandoverzicht, een afrekening per paard om af te drukken, private bonnetjes, een CSV-download en \"als uitgave toevoegen\" vanuit de inventaris, met HTMX-navigatie en een donkere modus.",
+    "drupalQuality": "Getest & gecontroleerd",
+    "drupalQualityText": "PHPUnit (Unit, Kernel, Functional en in de browser) met een axe-scan van elke pagina, visuele regressietests met Playwright, PHPStan level 8 en ongeveer 95 % dekking.",
+    "drupalStack": "Drupal-stack",
+    "repoApp": "Next.js-app",
+    "repoDrupal": "Drupal-versie",
     "viewOther": "Bekijk andere projecten"
   },
   "scan2talk": {
@@ -191,11 +211,12 @@
     "welcome": "Hoi! Ik ben de virtuele assistent van Robbe. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
     "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
     "skills": "Robbe is een full-stack webdeveloper die werkt met Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, Tailwind CSS, Node.js en meer. Hij heeft ook ervaring met Adobe XD, After Effects en LottieFiles voor design en prototyping. Momenteel focust hij op backendontwikkeling in Drupal bij Dynamate.",
-    "projects": "Robbe bouwde onder meer deze 4 projecten:\n\n• Exulta — website voor stretchtentverhuur, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — check-ins over het welbevinden van leerlingen via QR-code, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — privé-app om de kosten van paarden bij te houden, werkt offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nBekijk ze op de pagina Projecten!",
+    "projects": "Robbe bouwde onder meer deze 4 projecten:\n\n• Exulta — website voor stretchtentverhuur, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — check-ins over het welbevinden van leerlingen via QR-code, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stable Manager — privé-app om de kosten van paarden bij te houden, werkt offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nBekijk ze op de pagina Projecten!",
     "project-exulta": "Exulta is de tweede versie van de website van Exulta, dat stretchtenten verhuurt, live op exulta.be. Gebouwd met Laravel 13 en React 19 via Inertia, met een Filament 5-adminpaneel, een productcatalogus, een interactieve tentcalculator, realisaties en een blog. Geautomatiseerde CI/CD via GitHub Actions met databaseback-ups en een rollback bij fouten, plus Playwright- en Lighthouse-checks.",
     "project-scan2talk": "Scan2Talk is een PWA voor scholen: leerlingen scannen een QR-code en doorlopen een korte, begeleide check-in over hoe ze zich voelen (thermometer → thema → gevoelens → hulpvraag). Leerkrachten krijgen een overzichtsdashboard met Chart.js-grafieken. Gebouwd met Laravel 13, Vue.js 3, Inertia.js, PostgreSQL, Spatie Permissions en Simple QR Code.",
-    "project-stalmanager": "Stal Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests.",
+    "project-stablemanager": "Stable Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests. Er is ook een open-source Drupal-versie, Shared Costs (github.com/RobbeSaelens/shared_costs): een Drupal 11-module die kosten tot op de cent verdeelt, met recipes en een thema die de app nabouwen met enkel configuratie, getest met PHPUnit, Playwright en PHPStan.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun nieuwe site op Next.js 16 en React 19: een redactioneel design rond grote foto's, met scroll-animaties in GSAP en Motion en vloeiend scrollen met Lenis, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. De site krijgt een rebranding en is nog niet publiek.",
+    "drupal": "Robbe werkt bij Dynamate als backend developer voor Drupal-projecten en draagt ook bij op drupal.org: hij meldt de bugs die hij tegenkomt in Drupal core en contributed modules, helpt mee in issues van anderen en stuurt fixes in als merge requests. De maintainers van Queue UI, Teamleader Integration en Resend registration / welcome email gaven hem credit voor ondersteuning van OOP-hooks. Je vindt alles op de pagina Drupal-bijdragen: robbesaelens.github.io/nl/drupal",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens{'@'}telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens) en Facebook. Het portfolio staat op robbesaelens.github.io.",
     "experience": "Robbe werkt momenteel bij Dynamate als backend developer voor Drupal-projecten. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP- en Magento-developer: hij begon er als stagiair en werd daarna voltijds aangenomen. Sinds 2017 is hij ook instructeur in de paardensport, dus zijn loopbaan combineert technisch werk met de mensenkennis die hij opdeed als lesgever.",
     "education": "Robbe heeft een bachelordiploma in Multimedia en Creatieve Technologie (traject Next Web Developer) van Howest. Daarvoor volgde hij vanaf 2018 de graduaatsopleiding Multimedia & Informatietechnologieën, waar hij de basis van programmeren en webontwikkeling leerde. Hij woont in Geluwe, België.",
@@ -204,7 +225,7 @@
     "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur in de paardensport en rijdt hij jumpingwedstrijden. Hij brengt mensen graag iets bij en werkt graag met paarden — zo ontwikkelde hij zijn sociale vaardigheden, naast zijn technische loopbaan.",
     "thanks": "Graag gedaan! Laat gerust weten als je nog vragen hebt.",
     "bye": "Tot ziens! Neem gerust contact op wanneer je wil. Nog een fijne dag!",
-    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service. Typ gewoon wat je wil weten!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, Drupal-bijdragen, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stable Manager, VHS Service. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Vraag me eens naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen staan terug op standaard.\n\nTyp 'help' als je hulp nodig hebt.",
     "quickReplies": [
@@ -313,6 +334,70 @@
       "toc": "Op deze pagina"
     }
   },
+  "drupal": {
+    "title": "Drupal-bijdragen",
+    "intro": "Als backend developer bij {dynamate} werk ik elke dag met Drupal en ik draag er met passie aan bij.",
+    "profile": "Profiel op drupal.org",
+    "gitlab": "git.drupalcode.org",
+    "projectsTitle": "Projecten waaraan ik bijdroeg",
+    "projectIssues": "geen issues | 1 issue | {n} issues",
+    "statsTitle": "In cijfers",
+    "stats": {
+      "opened": "issues gemeld",
+      "joined": "issues meegewerkt",
+      "credits": "credits",
+      "merged": "merge requests gemerged"
+    },
+    "asOf": "Opgehaald van drupal.org en git.drupalcode.org bij elke deploy, laatst op {date}",
+    "credits": "Bijdragen met credit",
+    "creditsText": "Issues waarvoor de maintainers me credit gaven.",
+    "credited": "Credit",
+    "mergeRequests": "Merge requests",
+    "mergeRequestsText": "Code die ik voorstelde op git.drupalcode.org.",
+    "issuesOpened": "Issues die ik aanmaakte",
+    "issuesOpenedText": "Bugs en taken die ik meldde.",
+    "issuesJoined": "Issues waaraan ik meewerkte",
+    "issuesJoinedText": "Issues van anderen waarin ik reageerde of meewerkte.",
+    "empty": "Hier staat nog niets.",
+    "opened": "aangemaakt op {date}",
+    "updated": "bijgewerkt op {date}",
+    "merged": "gemerged op {date}",
+    "mrState": {
+      "merged": "Merged",
+      "opened": "Open",
+      "closed": "Closed",
+      "locked": "Locked"
+    },
+    "status": {
+      "active": "Active",
+      "needs-work": "Needs work",
+      "needs-review": "Needs review",
+      "rtbc": "RTBC",
+      "patch-to-be-ported": "Patch (to be ported)",
+      "fixed": "Fixed",
+      "postponed": "Postponed",
+      "postponed-needs-info": "Postponed (needs info)",
+      "closed": "Closed",
+      "closed-fixed": "Closed (fixed)",
+      "closed-duplicate": "Closed (duplicate)",
+      "closed-wont-fix": "Closed (won't fix)",
+      "closed-works-as-designed": "Closed (works as designed)",
+      "closed-outdated": "Closed (outdated)",
+      "closed-cannot-reproduce": "Closed (cannot reproduce)"
+    },
+    "category": {
+      "bug": "Bugmelding",
+      "task": "Taak",
+      "feature": "Featureverzoek",
+      "support": "Supportvraag",
+      "plan": "Plan"
+    },
+    "priority": {
+      "critical": "Kritieke prioriteit",
+      "major": "Hoge prioriteit"
+    },
+    "viewProjects": "Bekijk mijn projecten"
+  },
   "repo": {
     "title": "Repository-activiteit",
     "commits": "commits",
@@ -322,6 +407,7 @@
     "weekly": "Commits per week, laatste 6 maanden",
     "weeklySummary": "Staafdiagram: {total} commits in de laatste 6 maanden, hoogstens {max} in één week",
     "weekBar": "geen commits | 1 commit | {n} commits",
-    "private": "Privérepository: cijfers van {date}"
+    "private": "Privérepository: cijfers van {date}",
+    "public": "Publieke repository op {link}: cijfers van {date}"
   }
 }

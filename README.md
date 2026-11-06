@@ -14,6 +14,8 @@ at <https://robbesaelens.github.io>.
 | `npm run prerender`    | Writes static HTML per route into `dist/`                          |
 | `npm run sitemap`      | Regenerates `dist/sitemap.xml` from the router (`sitemapRoutes`)   |
 | `npm run preview`      | Serves the built `dist/`                                          |
+| `npm run stats`        | Refreshes the repository numbers (`src/data/repo-stats.json`)     |
+| `npm run drupal`       | Refreshes the Drupal contributions (`src/data/drupal.json`)       |
 
 ## How SEO works here
 
@@ -29,6 +31,11 @@ build therefore prerenders every route to real HTML:
 Each route is written twice — `slug/index.html` and `slug.html` — so GitHub Pages can
 serve both `/slug` and `/slug/` without a redirect. The catch-all route is rendered
 separately to `404.html` as a real, `noindex` 404 page.
+
+Old URLs of pages that moved (`REDIRECTS` in `src/bootstrap/router.ts`) keep working.
+GitHub Pages can't send a 301, so the router redirects them in the app, and the
+prerenderer writes a `noindex` page for each with a canonical link and an instant meta
+refresh to the new URL. They are not in the sitemap.
 
 The client does **not** hydrate; it mounts a fresh app over the prerendered markup. That
 sidesteps hydration mismatches entirely at the cost of a re-render on load.
@@ -59,4 +66,10 @@ The sitemap picks the origin up from `src/site.ts` automatically.
 ## Deployment
 
 `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
-`main`.
+`main`, every morning (05:17 UTC) and when you press **Run workflow** on the Actions tab.
+Before the build it refreshes the Drupal contributions (`npm run drupal`); when
+drupal.org doesn't answer, it deploys the committed `src/data/drupal.json`. The scheduled
+and manual runs commit nothing: they build `main` as it is, with fresh Drupal data. The
+repository numbers (`src/data/repo-stats.json`) can't be fetched in CI (private repos):
+refresh them with `npm run stats`, or with the "Refresh data" button in Project Updater,
+and merge to `main`.

@@ -12,6 +12,7 @@ prerendered to static HTML and deployed to GitHub Pages from `main`.
 | `npm test` | Smoke + accessibility tests (Playwright, desktop + mobile) against the production build |
 | `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
 | `npm run stats` | Refresh the repository numbers on the project pages (below) |
+| `npm run drupal` | Refresh the Drupal contributions page from drupal.org (below) |
 
 Run both test suites with `CI=1` so Playwright starts its own server instead of reusing
 a stale one. GitHub Actions runs both on every push to `develop` (`.github/workflows/test.yml`),
@@ -55,6 +56,9 @@ dark-mode contrast.
 When you add a page: add it to `tests/routes.ts` (the smoke test's sitemap check
 fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
 
+When you change a page's URL, keep the old one working: add it to `REDIRECTS` in
+`src/bootstrap/router.ts` and to `MOVED` in `tests/routes.ts`.
+
 ## Conventions
 
 - Every visible string exists in both `src/locales/en.json` and `src/locales/nl.json`;
@@ -65,9 +69,17 @@ fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
   description in `meta.nl`.
 - The "Repository activity" block on each project page reads `src/data/repo-stats.json`.
   The project repos are private, so neither the browser nor CI can fetch it: run
-  `npm run stats` locally before a deploy (needs the clones next to this repo) and
-  commit the JSON. It holds counts and dates only, never commit
+  `npm run stats` locally before a deploy (needs the clones next to this repo; the
+  "Refresh data" button in Project Updater does it, with review) and commit the JSON. It holds counts and dates only, never commit
   messages, names or e-mail addresses.
+- The Drupal contributions page (`/drupal`) reads `src/data/drupal.json`, written by
+  `npm run drupal` (`scripts/drupal-stats.mjs`) from the public drupal.org and
+  git.drupalcode.org APIs. drupal.org asks API users for a descriptive User-Agent, one
+  request at a time and cached results, so the browser never calls it: the script runs
+  before every deploy (`deploy.yml`, keeping the committed JSON when it fails; deploys
+  also run every morning and from the "Run workflow" button, so the page follows
+  drupal.org without a push), and the JSON is committed like repo-stats.json. Public metadata only: titles, projects,
+  statuses, dates, links. Never comment text or e-mail addresses.
 - Errors go to Sentry (`src/sentry.ts`, project `portfolio`, EU region), only from the live
   site. Errors only: no tracing, session replay or session pings, and `dataCollection`
   keeps IP, headers, cookies, query strings and local variables out. Changing that means

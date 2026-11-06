@@ -160,10 +160,10 @@ const PROJECTS: Project[] = [
     status: 'live',
   },
   {
-    id: 'stal-manager',
-    name: 'Stal Manager',
-    screenshot: '/stal-manager-home.jpg',
-    route: 'StalManagerDetail',
+    id: 'stable-manager',
+    name: 'Stable Manager',
+    screenshot: '/stable-manager-home.jpg',
+    route: 'StableManagerDetail',
     status: 'private',
   },
   {
@@ -570,12 +570,15 @@ export default {
   box-shadow: none;
 }
 
-/* Caption under the stage, in the terminal type; it rises in when the slide becomes current. */
+/* Caption under the stage, in the terminal type; it rises in when the slide becomes current.
+   The status and the button sit beside the text, or under it on a slide too narrow
+   for both and the project's name on one line (short screens). */
 .car-caption {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
 }
 .car-caption > * {
   opacity: 0;
@@ -594,10 +597,12 @@ export default {
 .car-slide.is-current .car-caption > :nth-child(2) {
   transition-delay: 0.22s;
 }
+/* Takes the room the status and the button leave, but never less than the name */
 .car-caption-text {
-  min-width: 0;
+  flex: 1 1 0;
 }
 .car-name {
+  white-space: nowrap;
   display: flex;
   align-items: baseline;
   gap: 0.6rem;

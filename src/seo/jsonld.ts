@@ -30,6 +30,8 @@ export function personNode(site: string) {
       'https://linkedin.com/in/robbe-saelens-1a14511b8',
       'https://instagram.com/robbe.saelens',
       'https://facebook.com/robbe.saelens',
+      'https://www.drupal.org/u/robbesaelens',
+      'https://git.drupalcode.org/robbesaelens',
     ],
     knowsAbout: SKILLS,
     knowsLanguage: [
@@ -77,6 +79,19 @@ function projectNode(site: string, path: string) {
     url: `${site}${path}`,
     image: `${site}${project.image}`,
     keywords: project.tech.join(', '),
+    ...(project.sourceCode
+      ? {
+          hasPart: {
+            '@type': 'SoftwareSourceCode',
+            name: project.sourceCode.name,
+            description: project.sourceCode.description,
+            codeRepository: project.sourceCode.repository,
+            programmingLanguage: project.sourceCode.language,
+            runtimePlatform: project.sourceCode.platform,
+            author: { '@id': `${site}/${PERSON_ID}` },
+          },
+        }
+      : {}),
     creator: { '@id': `${site}/${PERSON_ID}` },
     author: { '@id': `${site}/${PERSON_ID}` },
     isPartOf: { '@id': `${site}/${WEBSITE_ID}` },
@@ -133,6 +148,32 @@ function projectListNode(site: string) {
       position: index + 1,
       url: `${site}${project.path}`,
       name: project.name,
+    })),
+  }
+}
+
+/**
+ * The Drupal contributions page adds its credited contributions (src/data/drupal.json)
+ * itself, so that data stays in the page's own bundle.
+ */
+export function drupalCreditsJsonLd(
+  site: string,
+  path: string,
+  credits: { title: string; project: string; url: string }[],
+  projects: Record<string, { name: string } | undefined>,
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `${site}${path}#credits`,
+    name: 'Credited Drupal contributions by Robbe Saelens',
+    author: { '@id': `${site}/${PERSON_ID}` },
+    numberOfItems: credits.length,
+    itemListElement: credits.map((credit, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: credit.url,
+      name: `${credit.title} (${projects[credit.project]?.name ?? credit.project})`,
     })),
   }
 }

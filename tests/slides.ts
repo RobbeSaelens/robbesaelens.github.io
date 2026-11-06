@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test'
 export const SLIDES = [
   { name: 'Exulta', screenshot: '/exulta-home.jpg' },
   { name: 'Scan2Talk', screenshot: '/scan2talk-home.jpg' },
-  { name: 'Stal Manager', screenshot: '/stal-manager-home.jpg' },
+  { name: 'Stable Manager', screenshot: '/stable-manager-home.jpg' },
   { name: 'VHS Service', screenshot: '/vhs-home.jpg' },
 ]
 

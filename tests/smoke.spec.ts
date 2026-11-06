@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { baseCompile } from '@intlify/message-compiler'
 import { expect, test, type Page } from '@playwright/test'
-import { nl, ROUTES } from './routes'
+import { MOVED, nl, ROUTES } from './routes'
 import { measureCurrentSlide, SLIDES } from './slides'
 
 /**
@@ -11,10 +11,13 @@ import { measureCurrentSlide, SLIDES } from './slides'
  */
 
 // Untranslated vue-i18n keys leak through as "namespace.someKey". Domains such
-// as "scan2talk.be" and file names like "privacy.md" look similar, so those
-// endings are excluded.
+// as "scan2talk.be" and "drupal.org" and file names like "privacy.md" look
+// similar, so those endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|aria|chat|error|footer|privacy|repo)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
+
+/** Pages without images. */
+const TEXT_ONLY = ['/privacy', '/drupal']
 
 /**
  * Blocks third-party requests (analytics) so tests are deterministic and never
@@ -95,7 +98,7 @@ for (const route of ROUTES) {
       const sources = await page.$$eval('#app img', (imgs) =>
         [...new Set(imgs.map((i) => i.getAttribute('src')).filter(Boolean))],
       )
-      if (route !== '/privacy') expect(sources.length).toBeGreaterThan(0) // the only text-only page
+      if (!TEXT_ONLY.includes(route)) expect(sources.length).toBeGreaterThan(0)
       for (const src of sources) {
         const res = await request.get(src!)
         expect(res.status(), src!).toBe(200)
@@ -171,6 +174,8 @@ test('sitemap lists exactly the tested routes', async ({ request }) => {
     (m) => m[1],
   )
   expect(paths.sort()).toEqual([...ROUTES, ...ROUTES.map(nl)].sort())
+  // Old URLs that moved only redirect: not in the sitemap
+  for (const [from] of MOVED) expect(xml).not.toContain(from)
   // every URL points at both language versions
   expect(xml.match(/hreflang="nl"/g)).toHaveLength(ROUTES.length * 2)
 })
@@ -238,7 +243,7 @@ test('projects page links to each project', async ({ page }) => {
   for (const [name, path] of [
     ['Exulta', '/exultadetail'],
     ['Scan2Talk', '/scan2talkdetail'],
-    ['Stal Manager', '/stalmanagerdetail'],
+    ['Stable Manager', '/stablemanagerdetail'],
     ['VHS Service', '/vhsdetail'],
   ]) {
     await open(page, '/projects')
@@ -254,6 +259,76 @@ test('projects page links to each project', async ({ page }) => {
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await expect(page.locator('h1')).toContainText(name)
   }
+})
+
+test('Stable Manager shows its Drupal version, with the public repository and its screenshot', async ({ page }) => {
+  const errors = await guard(page)
+  const repo = 'https://github.com/RobbeSaelens/shared_costs'
+  await open(page, '/stablemanagerdetail')
+  const drupal = page.getByRole('region', { name: 'Also in Drupal' })
+  await expect(drupal.getByRole('link', { name: 'View on GitHub' })).toHaveAttribute('href', repo)
+  // Each repository is labelled; only the public one links to GitHub
+  await expect(page.getByRole('region', { name: 'Repository activity: Next.js app' }).locator('.repo-note-link')).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Repository activity: Drupal version' }).locator('.repo-note-link')).toHaveAttribute('href', repo)
+  // The Drupal screenshot is the third one in the lightbox
+  await drupal.locator('button.shot').click()
+  await expect(page.getByRole('dialog').locator('.lightbox-caption')).toContainText('3 / 3')
+  await page.keyboard.press('Escape')
+
+  await open(page, nl('/stablemanagerdetail'))
+  await expect(page.getByRole('region', { name: 'Ook in Drupal' }).getByRole('link', { name: 'Bekijk op GitHub' })).toHaveAttribute('href', repo)
+  await expect(page.getByRole('region', { name: 'Repository-activiteit: Drupal-versie' })).toBeAttached()
+  expect(errors).toEqual([])
+})
+
+// Old URLs may be linked or indexed: they end up on the new page, in the same
+// language, with the query and hash.
+test.describe('old URLs', () => {
+  const moved = MOVED.flatMap(([from, to]) => [
+    [from, to, 'en'],
+    [nl(from), nl(to), 'nl'],
+  ])
+
+  for (const [from, to, lang] of moved) {
+    test(`${from} ends up on ${to}`, async ({ page }) => {
+      const errors = await guard(page)
+      await page.goto(`${from}?ref=old#drupal-title`)
+      await expect(page).toHaveURL(new RegExp(`${to}\\?ref=old#drupal-title$`))
+      await expect(page.locator('#main-content')).toBeVisible()
+      await expect(page.locator('html')).toHaveAttribute('lang', lang)
+      await expect(page.locator('h1')).toContainText('Stable Manager')
+      expect(errors).toEqual([])
+    })
+
+    test(`${from} redirects without JavaScript too, and stays out of search`, async ({ request }) => {
+      // Raw HTML: what GitHub Pages serves at the old URL, with and without the slash
+      for (const url of [from, `${from}/`]) {
+        const res = await request.get(url)
+        expect(res.status(), url).toBe(200)
+        const html = await res.text()
+        expect(html, url).toContain(`<html lang="${lang}">`)
+        expect(html, url).toContain(`<meta http-equiv="refresh" content="0; url=${to}" />`)
+        expect(html, url).toContain(`<link rel="canonical" href="https://robbesaelens.github.io${to}" />`)
+        expect(html, url).toContain('<meta name="robots" content="noindex, follow" />')
+        expect(html, url).toContain(`<a href="${to}">Stable Manager`)
+      }
+    })
+  }
+
+  test('the router sends them on inside the app as well', async ({ page }) => {
+    const errors = await guard(page)
+    for (const [from, to] of moved) {
+      await open(page, '/projects')
+      // A client-side navigation, as an old link inside the app would make
+      await page.evaluate((url) => {
+        history.pushState(null, '', url)
+        dispatchEvent(new PopStateEvent('popstate'))
+      }, from)
+      await expect(page).toHaveURL(new RegExp(`${to}$`))
+      await expect(page.locator('h1')).toContainText('Stable Manager')
+    }
+    expect(errors).toEqual([])
+  })
 })
 
 test.describe('project slides', () => {
@@ -313,7 +388,7 @@ test.describe('project slides', () => {
       await page.mouse.click((left + right) / 2, box.y + box.height * 0.4)
     }
 
-    for (const name of ['Stal Manager', 'Scan2Talk', 'Exulta']) {
+    for (const name of ['Stable Manager', 'Scan2Talk', 'Exulta']) {
       await clickVisible(name)
       await expect(current).toContainText(name)
       await expect(page).toHaveURL(/\/projects$/)
@@ -347,8 +422,8 @@ test.describe('project slides', () => {
 
   test('the current MacBook is open; the others are half closed and turned towards it', async ({ page }) => {
     await open(page, '/projects')
-    await page.getByRole('button', { name: 'Stal Manager', exact: true }).click()
-    await expect(page.locator('.car-slide.is-current')).toContainText('Stal Manager')
+    await page.getByRole('button', { name: 'Stable Manager', exact: true }).click()
+    await expect(page.locator('.car-slide.is-current')).toContainText('Stable Manager')
     const p = await poses(page)
     expect(p.map((x) => x.lid)).toEqual([-38, -38, 14, -38])
     // Before the current one they turn right (towards it), after it left
@@ -412,7 +487,7 @@ test.describe('project slides', () => {
 })
 
 test.describe('project page animations', () => {
-  const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stalmanagerdetail', '/vhsdetail']
+  const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail']
 
   for (const route of DETAILS) {
     test(`${route} rises in like the other pages, and the rest as you scroll to it`, async ({ page }) => {
@@ -494,11 +569,13 @@ test.describe('repository activity', () => {
   const PAGES = [
     ['/exultadetail', 'exulta'],
     ['/scan2talkdetail', 'scan2talk'],
-    ['/stalmanagerdetail', 'stalManager'],
+    ['/stablemanagerdetail', 'stableManager'],
     ['/vhsdetail', 'vhs'],
+    // The Drupal version, on the Stable Manager page
+    ['/stablemanagerdetail', 'sharedCosts'],
   ] as const
 
-  // The repos are private: counts and dates only.
+  // Most repos are private: counts and dates only.
   test('the stats cover every project and hold no personal data', () => {
     for (const [, key] of PAGES) expect(data.projects[key], key).toBeTruthy()
     const text = JSON.stringify(data)
@@ -507,11 +584,11 @@ test.describe('repository activity', () => {
   })
 
   for (const [route, key] of PAGES) {
-    test(`${route} shows the repository numbers`, async ({ page }) => {
+    test(`${route} shows the numbers of ${key}`, async ({ page }) => {
       const errors = await guard(page)
       const stats = data.projects[key]
       await open(page, route)
-      const section = page.locator('.repo--inline')
+      const section = page.locator(`.repo--inline:has(#repo-title-${key}-inline)`)
       await section.scrollIntoViewIfNeeded()
       await expect(section).toBeVisible()
       await expect(section.locator('.repo-number dd').first()).toHaveText(stats.commits.toLocaleString('en-GB'))
@@ -543,11 +620,140 @@ test.describe('repository activity', () => {
     await expect(page.locator('.repo--inline')).toBeVisible()
   })
 
+  test('with two repositories, only the first floats; the other stays on the page', async ({ page }) => {
+    await guard(page)
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    await open(page, '/stablemanagerdetail')
+    await expect(page.getByRole('complementary')).toHaveCount(1)
+    await expect(page.getByRole('complementary', { name: 'Repository activity: Next.js app' })).toBeVisible()
+    await expect(page.locator('#repo-title-stableManager-inline')).toBeHidden()
+    const drupal = page.getByRole('region', { name: 'Repository activity: Drupal version' })
+    await drupal.scrollIntoViewIfNeeded()
+    await expect(drupal).toBeVisible()
+  })
+
   test('in Dutch on /nl', async ({ page }) => {
     await guard(page)
     await open(page, '/nl/vhsdetail')
     await expect(page.getByRole('region', { name: 'Repository-activiteit' })).toBeAttached()
     await expect(page.locator('.repo-number dt').nth(1)).toHaveText('in de laatste 30 dagen')
+  })
+})
+
+test.describe('Drupal contributions', () => {
+  const data = JSON.parse(readFileSync(new URL('../src/data/drupal.json', import.meta.url), 'utf8'))
+  const LISTS = [
+    ['Credited contributions', 'Bijdragen met credit', data.credits],
+    ['Merge requests', 'Merge requests', data.mergeRequests],
+    ['Issues I opened', 'Issues die ik aanmaakte', data.issuesCreated],
+    ['Issues I took part in', 'Issues waaraan ik meewerkte', data.issuesJoined],
+  ] as const
+  const merged = data.mergeRequests.filter((mr: { state: string }) => mr.state === 'merged').length
+
+  // Public metadata only (npm run drupal): no comment text, no e-mail addresses.
+  test('the data holds titles, projects, statuses, dates and links only', () => {
+    const text = JSON.stringify(data)
+    expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.-]+/)
+    expect(text).not.toMatch(/"(body|comment_body|comments?|description|notes?|email|mail|author|uid)"/i)
+    for (const [name, , items] of LISTS) {
+      for (const item of items) expect(item.url, name).toMatch(/^https:\/\/(www\.drupal\.org|git\.drupalcode\.org)\//)
+    }
+    expect(data.credits.length + data.issuesCreated.length).toBeGreaterThan(0)
+  })
+
+  test('lists every contribution, each linking to drupal.org or git.drupalcode.org', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/drupal')
+    for (const [name, , items] of LISTS) {
+      const list = page.getByRole('region', { name, exact: true })
+      await list.scrollIntoViewIfNeeded()
+      const links = list.getByRole('link')
+      await expect(links, name).toHaveCount(items.length)
+      for (const [i, item] of items.entries()) {
+        await expect(links.nth(i)).toHaveAttribute('href', item.url)
+        await expect(links.nth(i)).toHaveAttribute('target', '_blank')
+        await expect(links.nth(i)).toHaveAttribute('rel', 'noopener noreferrer')
+        await expect(links.nth(i)).toContainText(item.title)
+        await expect(links.nth(i).locator('.badge')).not.toBeEmpty()
+      }
+    }
+    // The numbers are the lists' lengths, in the lists' order
+    await expect(page.locator('.stats-number dd')).toHaveText(
+      [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
+    )
+    // The projects he contributed to: one chip per project in the lists, linking to its drupal.org page
+    const used = new Set<string>([
+      ...data.credits.map((c) => c.project),
+      ...data.mergeRequests.map((mr) => mr.project),
+      ...data.issuesCreated.map((i) => i.project),
+      ...data.issuesJoined.map((i) => i.project),
+    ])
+    const chips = page.locator('.drupal-projects .chip')
+    await expect(chips).toHaveCount(used.size)
+    for (const [i, project] of (await chips.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).entries()) {
+      expect(project, `chip ${i}`).toMatch(/^https:\/\/www\.drupal\.org\/project\//)
+    }
+    const asOf = new Date(data.generatedAt).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'Europe/Brussels',
+    })
+    await expect(page.locator('.stats-note')).toContainText(asOf)
+    await expect(page.getByRole('link', { name: 'drupal.org profile' })).toHaveAttribute(
+      'href',
+      'https://www.drupal.org/u/robbesaelens',
+    )
+    expect(errors).toEqual([])
+  })
+
+  test('in Dutch on /nl/drupal', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/nl/drupal')
+    await expect(page.locator('h1')).toContainText('drupal-bijdragen')
+    for (const [, name, items] of LISTS) {
+      await expect(page.getByRole('region', { name, exact: true }).getByRole('link')).toHaveCount(items.length)
+    }
+    // Dates in Dutch; statuses keep drupal.org's English terms
+    const opened = page.getByRole('region', { name: 'Issues die ik aanmaakte' })
+    await expect(opened.locator('.row-meta').first()).toContainText('aangemaakt op')
+    await expect(opened.locator('.badge').first()).toHaveText(/^(Active|Needs work|Needs review|RTBC|Fixed|Postponed|Closed)/)
+    expect(errors).toEqual([])
+  })
+
+  test('rises in, and the lists as you scroll to them', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 })
+    const errors = await guard(page)
+    await open(page, '/drupal')
+    for (const el of [page.locator('h1'), page.locator('.stats')]) {
+      const names = await el.evaluate((e) => e.getAnimations().map((a) => (a as CSSAnimation).animationName))
+      expect(names).toContain('hero-rise')
+    }
+    const last = page.locator('.reveal').last()
+    await page.waitForTimeout(2000)
+    await expect(last).not.toHaveClass(/is-visible/)
+    await last.scrollIntoViewIfNeeded()
+    await expect(last).toHaveClass(/is-visible/)
+    await expect.poll(() => last.evaluate((e) => getComputedStyle(e).opacity)).toBe('1')
+    expect(errors).toEqual([])
+  })
+
+  test('is linked from the about page and the Stable Manager page, in both languages', async ({ page }) => {
+    const errors = await guard(page)
+    for (const [about, label, target] of [
+      ['/contact', 'My Drupal contributions', '/drupal'],
+      ['/nl/contact', 'Mijn Drupal-bijdragen', '/nl/drupal'],
+    ]) {
+      await open(page, about)
+      await page.getByRole('link', { name: label }).click()
+      await expect(page).toHaveURL(new RegExp(`${target}$`))
+      await expect(page.locator('h1')).toContainText(target.startsWith('/nl') ? 'drupal-bijdragen' : 'drupal contributions')
+    }
+    await open(page, '/stablemanagerdetail')
+    await expect(
+      page.getByRole('region', { name: 'Also in Drupal' }).getByRole('link', { name: 'My Drupal contributions' }),
+    ).toHaveAttribute('href', '/drupal')
+    expect(errors).toEqual([])
   })
 })
 

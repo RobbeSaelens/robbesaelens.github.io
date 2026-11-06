@@ -1,6 +1,7 @@
 {
   "nav": {
     "projects": "Projects",
+    "drupal": "Drupal contributions",
     "aboutMe": "About me",
     "home": "Home"
   },
@@ -27,9 +28,10 @@
     "educationText2": "After MIT I went on to the bachelor's degree in Multimedia & Creative Technology, in the {link} track.",
     "experience": "Experience",
     "experienceText1": "In February 2023 I started as an intern at {link1}. After my internship they hired me as a {role}.",
-    "experienceText2": "Today I work at {link2} as a {role}, and I'm keen to bring that experience to new projects.",
+    "experienceText2": "Today I work at {link2} as a {role}, and I'm keen to bring that experience to new projects. {drupal}",
     "phpMagentoDev": "PHP & Magento developer",
     "backendDev": "backend developer",
+    "drupalLink": "My Drupal contributions",
     "competing": "Horse riding",
     "competingText": "Alongside my job I ride at a competitive level. I take part in regional competitions and have also ridden national ones with our own horse. Show jumping is my big passion, along with everything that comes with it."
   },
@@ -47,7 +49,7 @@
       "vhs": {
         "tagline": "Website for an equestrian arena builder"
       },
-      "stal-manager": {
+      "stable-manager": {
         "tagline": "Cost tracking for horse owners, works offline"
       },
       "coming-soon": {
@@ -113,14 +115,14 @@
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Not live yet"
   },
-  "stalManager": {
-    "title": "Stal Manager",
-    "alt": "Stal Manager dashboard with horse costs",
+  "stableManager": {
+    "title": "Stable Manager",
+    "alt": "Stable Manager dashboard with horse costs",
     "privateBadge": "Live",
     "privateNote": "Private app, login only",
     "overview": "Project Overview",
     "about": "About",
-    "aboutText": "Stal Manager keeps track of what two horses cost: one of our own and one boarding horse. Every cost is booked with a date, category and quantity, and split between the horses by percentage. There's a desktop dashboard with monthly charts and reports, and a mobile app built for adding costs in the stable itself, even without a connection. It's a private app: sign-up is closed and accounts are created from the command line.",
+    "aboutText": "Stable Manager keeps track of what two horses cost: one of our own and one boarding horse. Every cost is booked with a date, category and quantity, and split between the horses by percentage. There's a desktop dashboard with monthly charts and reports, and a mobile app built for adding costs in the stable itself, even without a connection. It's a private app: sign-up is closed and accounts are created from the command line.",
     "featuresTitle": "What's in it",
     "featureSplit": "Cost splitting",
     "featureSplitText": "Each cost is allocated to one horse or split across both by percentage, so per-horse totals stay correct even for shared hay or a farrier visit.",
@@ -136,6 +138,24 @@
     "featureQualityText": "Vitest unit tests plus database tests against a real Postgres, and a public health endpoint for uptime checks.",
     "languages": "Languages & Frameworks",
     "tools": "Tools & Services",
+    "drupalTitle": "Also in Drupal",
+    "drupalName": "Shared Costs · Drupal 11 module",
+    "drupalIntro": "Shared Costs is the Drupal version of Stable Manager, open source on GitHub: a Drupal 11 module, plus four recipes and a theme that rebuild the app with configuration only. Working offline, which the Next.js app does as a PWA, isn't part of it.",
+    "drupalAlt": "Stable Manager dashboard in Drupal, built with the Shared Costs module and its recipes",
+    "openSourceBadge": "Open source",
+    "viewOnGithub": "View on GitHub",
+    "drupalContributions": "My Drupal contributions",
+    "drupalField": "Splits to the cent",
+    "drupalFieldText": "A field type splits each cost over the horses, equally or by percentage, in whole cents: 12.35 over two horses is 6.18 + 6.17, never 6.18 + 6.18. Views adds the parts up per horse and per month.",
+    "drupalRecipes": "Four recipes, no custom code",
+    "drupalRecipesText": "The app itself (stable_manager), a JSON:API for apps like the mobile one (stable_manager_api), a demo with a year of example costs (stable_manager_demo) and a Dutch translation (stable_manager_nl), on a theme generated from core's Starterkit.",
+    "drupalApp": "From dashboard to CSV",
+    "drupalAppText": "Charts, a monthly overview, a printable statement per horse, private receipts, a CSV download and \"add as expense\" from the inventory, with HTMX navigation and dark mode.",
+    "drupalQuality": "Tested & checked",
+    "drupalQualityText": "PHPUnit (Unit, Kernel, Functional and in the browser) with an axe scan of every page, visual regression tests with Playwright, PHPStan level 8 and about 95% coverage.",
+    "drupalStack": "Drupal stack",
+    "repoApp": "Next.js app",
+    "repoDrupal": "Drupal version",
     "viewOther": "View other projects"
   },
   "scan2talk": {
@@ -191,11 +211,12 @@
     "welcome": "Hey! I'm Robbe's virtual assistant. Ask me about his skills, projects, experience, or how to get in touch!",
     "greeting": "Hi there! How can I help you? You can ask about my projects, skills, experience, or how to reach me.",
     "skills": "Robbe is a full-stack web developer working with Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, Tailwind CSS, Node.js and more. He also has experience with Adobe XD, After Effects and LottieFiles for design and prototyping. His current focus is Drupal backend development at Dynamate.",
-    "projects": "Robbe has built 4 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based wellbeing check-ins for students, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — private app for tracking horse costs, works offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — trilingual site for a riding arena builder, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nCheck them out on the Projects page!",
+    "projects": "Robbe has built 4 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based wellbeing check-ins for students, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stable Manager — private app for tracking horse costs, works offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — trilingual site for a riding arena builder, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nCheck them out on the Projects page!",
     "project-exulta": "Exulta is the second version of the Exulta stretch tent rental website, live at exulta.be. Built with Laravel 13 and React 19 over Inertia, with a Filament 5 admin panel, a product catalog, an interactive tent calculator, realisations and a blog. Automated CI/CD via GitHub Actions with database backups and rollback on failure, plus Playwright and Lighthouse checks.",
     "project-scan2talk": "Scan2Talk is a PWA for schools: students scan a QR code and go through a short, guided check-in about how they feel (thermometer → theme → feelings → help request). Teachers get an overview dashboard with Chart.js charts. Built with Laravel 13, Vue.js 3, Inertia.js, PostgreSQL, Spatie Permissions and Simple QR Code.",
-    "project-stalmanager": "Stal Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests.",
+    "project-stablemanager": "Stable Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests. There's also an open-source Drupal version, Shared Costs (github.com/RobbeSaelens/shared_costs): a Drupal 11 module that splits costs to the cent, with recipes and a theme that rebuild the app with configuration only, tested with PHPUnit, Playwright and PHPStan.",
     "project-vhs": "VHS Service builds and renovates riding arenas in Geluwe, West Flanders. I built their new site on Next.js 16 and React 19: an editorial design built around large photography, with GSAP and Motion scroll animation and Lenis smooth scrolling, in Dutch, French and English. Quote forms go through Resend, and the site is tuned for local SEO. It's being rebranded and isn't public yet.",
+    "drupal": "Robbe works at Dynamate as a backend developer on Drupal projects, and contributes back on drupal.org: he reports the bugs he runs into in Drupal core and contributed modules, takes part in other people's issues and sends fixes as merge requests. The maintainers of Queue UI, Teamleader Integration and Resend registration / welcome email credited him for adding support for OOP hooks. It's all on the Drupal contributions page: robbesaelens.github.io/drupal",
     "contact": "You can reach Robbe via email at robbe.saelens{'@'}telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens), and Facebook. The portfolio is hosted at robbesaelens.github.io.",
     "experience": "Robbe currently works at Dynamate as a Drupal backend developer. Before that he worked at Your Mind Our Work (2023) as a PHP & Magento developer: he started as an intern and was then hired full-time. He has also been an equestrian instructor since 2017, so his career combines technical work with the people skills he gained from teaching.",
     "education": "Robbe holds a bachelor's degree in Multimedia & Creative Technology (Next Web Developer track) from Howest. Before that, from 2018, he followed the associate degree in Multimedia & Information Technologies, where he learned the fundamentals of programming and web development. He lives in Geluwe, Belgium.",
@@ -204,7 +225,7 @@
     "hobbies": "Besides coding, Robbe has been an equestrian instructor since 2017 and rides show jumping competitions. He enjoys teaching people and working with horses — that's where he built his people skills, alongside his technical career.",
     "thanks": "You're welcome! Let me know if you have any other questions.",
     "bye": "Bye! Feel free to get in touch anytime. Have a great day!",
-    "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, Stal Manager, VHS Service. Just type what you'd like to know!",
+    "help": "Available topics: skills, projects, experience, Drupal contributions, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, Stable Manager, VHS Service. Just type what you'd like to know!",
     "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me! Type 'help' for a list of topics.",
     "reset": "Session terminated. All systems restored to default.\n\nType 'help' if you need guidance.",
     "quickReplies": [
@@ -313,6 +334,70 @@
       "toc": "On this page"
     }
   },
+  "drupal": {
+    "title": "Drupal contributions",
+    "intro": "As a backend developer at {dynamate} I work with Drupal every day and contribute to it with passion.",
+    "profile": "drupal.org profile",
+    "gitlab": "git.drupalcode.org",
+    "projectsTitle": "Projects I contributed to",
+    "projectIssues": "no issues | 1 issue | {n} issues",
+    "statsTitle": "In numbers",
+    "stats": {
+      "opened": "issues opened",
+      "joined": "issues contributed to",
+      "credits": "credits",
+      "merged": "merge requests merged"
+    },
+    "asOf": "Fetched from drupal.org and git.drupalcode.org at every deploy, last on {date}",
+    "credits": "Credited contributions",
+    "creditsText": "Issues where the maintainers credited me for the work.",
+    "credited": "Credited",
+    "mergeRequests": "Merge requests",
+    "mergeRequestsText": "Code I proposed on git.drupalcode.org.",
+    "issuesOpened": "Issues I opened",
+    "issuesOpenedText": "Bugs and tasks I reported.",
+    "issuesJoined": "Issues I took part in",
+    "issuesJoinedText": "Other people's issues I commented on or worked on.",
+    "empty": "Nothing here yet.",
+    "opened": "opened {date}",
+    "updated": "updated {date}",
+    "merged": "merged {date}",
+    "mrState": {
+      "merged": "Merged",
+      "opened": "Open",
+      "closed": "Closed",
+      "locked": "Locked"
+    },
+    "status": {
+      "active": "Active",
+      "needs-work": "Needs work",
+      "needs-review": "Needs review",
+      "rtbc": "RTBC",
+      "patch-to-be-ported": "Patch (to be ported)",
+      "fixed": "Fixed",
+      "postponed": "Postponed",
+      "postponed-needs-info": "Postponed (needs info)",
+      "closed": "Closed",
+      "closed-fixed": "Closed (fixed)",
+      "closed-duplicate": "Closed (duplicate)",
+      "closed-wont-fix": "Closed (won't fix)",
+      "closed-works-as-designed": "Closed (works as designed)",
+      "closed-outdated": "Closed (outdated)",
+      "closed-cannot-reproduce": "Closed (cannot reproduce)"
+    },
+    "category": {
+      "bug": "Bug report",
+      "task": "Task",
+      "feature": "Feature request",
+      "support": "Support request",
+      "plan": "Plan"
+    },
+    "priority": {
+      "critical": "Critical priority",
+      "major": "Major priority"
+    },
+    "viewProjects": "View my projects"
+  },
   "repo": {
     "title": "Repository activity",
     "commits": "commits",
@@ -322,6 +407,7 @@
     "weekly": "Commits per week, last 6 months",
     "weeklySummary": "Bar chart: {total} commits in the last 6 months, at most {max} in one week",
     "weekBar": "no commits | 1 commit | {n} commits",
-    "private": "Private repository: numbers as of {date}"
+    "private": "Private repository: numbers as of {date}",
+    "public": "Public repository on {link}: numbers as of {date}"
   }
 }

@@ -1,19 +1,25 @@
 <template>
-  <!-- Activity of the project's (private) repository, from src/data/repo-stats.json (npm run stats).
-       A section on the page; on screens with room beside the content, a panel there instead. -->
+  <!-- Activity of the project's repository (private, unless `repository` links to it), from
+       src/data/repo-stats.json (npm run stats).
+       A section on the page; on screens with room beside the content, a panel there instead
+       (unless `float` is off: there is room for one panel per page). -->
   <component
     :is="variant === 'aside' ? 'aside' : 'section'"
     v-if="stats"
     class="repo"
-    :class="variant === 'aside' ? 'repo--aside' : 'repo--inline reveal'"
+    :class="variant === 'aside' ? 'repo--aside' : ['repo--inline', 'reveal', { 'repo--floats': float }]"
     :aria-labelledby="titleId"
   >
     <!-- In body: a transformed page ancestor would break position: fixed -->
-    <Teleport v-if="variant !== 'aside'" to="body">
-      <RepoActivity :project="project" variant="aside" />
+    <Teleport v-if="variant !== 'aside' && float" to="body">
+      <RepoActivity :project="project" :repository="repository" :label="label" variant="aside" />
     </Teleport>
 
-    <h2 :id="titleId" class="repo-heading">{{ $t('repo.title') }}</h2>
+    <!-- Read out as "Repository activity: Next.js app" -->
+    <h2 :id="titleId" class="repo-heading" :aria-label="label ? `${$t('repo.title')}: ${label}` : undefined">
+      {{ $t('repo.title') }}
+      <span v-if="label" class="repo-label">{{ label }}</span>
+    </h2>
 
     <div class="repo-card">
       <dl class="repo-numbers">
@@ -49,7 +55,16 @@
         <figcaption>{{ $t('repo.weekly') }}</figcaption>
       </figure>
 
-      <p class="repo-note">
+      <p v-if="repository" class="repo-note">
+        <Github class="repo-note-icon" aria-hidden="true" />
+        <i18n-t keypath="repo.public" tag="span">
+          <template #link>
+            <a class="repo-note-link" :href="repository" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </template>
+          <template #date>{{ day(data.generatedAt) }}</template>
+        </i18n-t>
+      </p>
+      <p v-else class="repo-note">
         <Lock class="repo-note-icon" aria-hidden="true" />
         {{ $t('repo.private', { date: day(data.generatedAt) }) }}
       </p>
@@ -60,7 +75,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Lock } from 'lucide-vue-next'
+import { Github, Lock } from 'lucide-vue-next'
 import data from '../data/repo-stats.json'
 
 interface RepoStats {
@@ -72,8 +87,17 @@ interface RepoStats {
 }
 
 const props = withDefaults(
-  defineProps<{ project: 'exulta' | 'scan2talk' | 'stalManager' | 'vhs'; variant?: 'inline' | 'aside' }>(),
-  { variant: 'inline' },
+  defineProps<{
+    project: 'exulta' | 'scan2talk' | 'stableManager' | 'vhs' | 'sharedCosts'
+    /** The repository's public URL, for an open-source project */
+    repository?: string
+    /** Which repository this is, on a page that shows more than one */
+    label?: string
+    variant?: 'inline' | 'aside'
+    /** Moves into the panel beside the content where there is room; one per page */
+    float?: boolean
+  }>(),
+  { variant: 'inline', float: true },
 )
 const titleId = computed(() => `repo-title-${props.project}-${props.variant}`)
 
@@ -111,6 +135,10 @@ function ago(iso: string) {
   margin-bottom: 2.5rem;
 }
 .repo-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
   font-family: var(--font-mono);
   font-size: 1.5rem;
   font-weight: 700;
@@ -121,6 +149,17 @@ function ago(iso: string) {
   .repo-heading {
     font-size: 2rem;
   }
+}
+/* Which repository, when a page shows more than one */
+.repo-label {
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border-glow);
 }
 
 .repo-card {
@@ -235,6 +274,11 @@ function ago(iso: string) {
   height: 0.85rem;
   flex-shrink: 0;
 }
+.repo-note-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
 /* ── Side panel: in the free space right of the 1280px content, fixed while
    scrolling. Only where it fits; the section on the page makes way for it. ── */
@@ -242,7 +286,7 @@ function ago(iso: string) {
   display: none;
 }
 @media (min-width: 1840px) and (min-height: 760px) {
-  .repo--inline {
+  .repo--floats {
     display: none;
   }
   .repo--aside {
@@ -261,6 +305,10 @@ function ago(iso: string) {
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-accent);
+  }
+  .repo--aside .repo-label {
+    padding: 0.1rem 0.5rem;
+    font-size: 0.625rem;
   }
   .repo--aside .repo-card {
     padding: 1.25rem;

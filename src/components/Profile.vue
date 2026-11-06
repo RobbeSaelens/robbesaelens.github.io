@@ -127,6 +127,17 @@
             <Github class="social-icon" />
           </a>
         </li>
+        <li>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.drupal.org/u/robbesaelens"
+            aria-label="View my drupal.org profile"
+            class="social-link"
+          >
+            <DrupalIcon class="social-icon" />
+          </a>
+        </li>
       </ul>
     </div>
   </div>
@@ -144,10 +155,12 @@ import {
   GraduationCap,
 } from 'lucide-vue-next'
 import PlaceMap from './PlaceMap.vue'
+import DrupalIcon from './DrupalIcon.vue'
 
 export default {
   components: {
     PlaceMap,
+    DrupalIcon,
     Instagram,
     Linkedin,
     Facebook,

@@ -63,6 +63,13 @@
                   >Dynamate</a
                 >
               </template>
+              <!-- At the end of the text, so it costs no height where the last line has room -->
+              <template #drupal>
+                <router-link class="card-more" :to="$lp('/drupal')">
+                  <span class="card-more-prompt" aria-hidden="true">./</span>{{ $t('about.drupalLink') }}
+                  <ArrowRight class="card-more-arrow" aria-hidden="true" />
+                </router-link>
+              </template>
             </i18n-t>
           </div>
         </article>
@@ -114,13 +121,14 @@
 </template>
 
 <script lang="ts">
-import { Briefcase, GraduationCap, BookOpen, Trophy } from 'lucide-vue-next'
+import { ArrowRight, Briefcase, GraduationCap, BookOpen, Trophy } from 'lucide-vue-next'
 import TerminalHeader from '../components/TerminalHeader.vue'
 
 export default {
   name: 'About',
 
   components: {
+    ArrowRight,
     Briefcase,
     GraduationCap,
     BookOpen,
@@ -446,6 +454,34 @@ export default {
 .card-text strong {
   color: var(--color-text-primary);
   font-weight: 600;
+}
+
+/* To the Drupal contributions page, at the end of the experience text */
+.card-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  border-radius: 0.25rem;
+  outline: none;
+}
+.card-more:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+.card-more-prompt {
+  opacity: 0.6;
+}
+.card-more-arrow {
+  width: 0.95rem;
+  height: 0.95rem;
+  transition: transform 0.2s ease;
+}
+.card-more:hover .card-more-arrow {
+  transform: translateX(3px);
 }
 
 @media (min-width: 1400px) {

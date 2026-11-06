@@ -29,6 +29,17 @@
         </ul>
       </div>
 
+      <router-link
+        :to="lp(DRUPAL_LINK.to)"
+        class="nav-icon-btn nav-drupal"
+        :class="{ 'is-current': isCurrent(DRUPAL_LINK) }"
+        :aria-label="$t(DRUPAL_LINK.label)"
+        :title="$t(DRUPAL_LINK.label)"
+        :aria-current="isCurrent(DRUPAL_LINK) ? 'page' : undefined"
+      >
+        <DrupalIcon class="h-[1.15rem] w-[1.15rem]" />
+      </router-link>
+
       <span class="nav-divider" aria-hidden="true"></span>
 
       <div class="nav-tools">
@@ -147,6 +158,7 @@ import { Sun, Moon, Phone, Mail, X, ArrowRight } from 'lucide-vue-next'
 import { stripLocale, useLocalePath } from '../../localePath'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
 import BrandLogo from '../../components/BrandLogo.vue'
+import DrupalIcon from '../../components/DrupalIcon.vue'
 import { useEasterEgg } from '../../composables/useEasterEgg'
 
 interface NavLink {
@@ -161,8 +173,11 @@ const LINKS: NavLink[] = [
   { to: '/contact', label: 'nav.aboutMe' },
 ]
 
+/** The Drupal contributions: a link of its own, its logo next to the others. */
+const DRUPAL_LINK: NavLink = { to: '/drupal', label: 'nav.drupal' }
+
 export default {
-  components: { Sun, Moon, Phone, Mail, X, ArrowRight, LanguageSwitcher, BrandLogo },
+  components: { Sun, Moon, Phone, Mail, X, ArrowRight, LanguageSwitcher, BrandLogo, DrupalIcon },
 
   setup() {
     const route = useRoute()
@@ -171,7 +186,7 @@ export default {
     const { handleLogoClick, secretCode, showSecretCode } = useEasterEgg()
 
     const links = LINKS
-    const mobileLinks: NavLink[] = [{ to: '/', label: 'nav.home' }, ...LINKS]
+    const mobileLinks: NavLink[] = [{ to: '/', label: 'nav.home' }, ...LINKS, DRUPAL_LINK]
 
     const { lp } = useLocalePath()
     // Compare without the /nl prefix: /nl/projects is the projects page too.
@@ -300,6 +315,7 @@ export default {
     return {
       links,
       mobileLinks,
+      DRUPAL_LINK,
       isCurrent,
       lp,
       linkList,
@@ -359,7 +375,8 @@ export default {
 .nav-logo-menu {
   height: 1.3rem;
 }
-@media (min-width: 640px) {
+/* The full name from 768px; between 640 and 768 the mark leaves room for the links. */
+@media (min-width: 768px) {
   .nav-logo-full {
     display: block;
   }
@@ -417,6 +434,7 @@ export default {
 .nav-link {
   position: relative;
   display: inline-flex;
+  white-space: nowrap;
   align-items: center;
   gap: 0.35rem;
   min-height: 2.25rem;
@@ -447,6 +465,10 @@ export default {
 .nav-link.is-current .nav-link-prompt {
   width: 0.6em;
   opacity: 1;
+}
+.nav-drupal.is-current {
+  border-color: var(--color-border-glow);
+  background: var(--color-accent-soft);
 }
 
 .nav-divider {
