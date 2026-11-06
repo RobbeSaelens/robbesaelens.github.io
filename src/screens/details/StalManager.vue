@@ -118,7 +118,7 @@
                   <ExternalLink class="h-3.5 w-3.5" aria-hidden="true" />
                 </a>
                 <router-link class="live-link" :to="$lp('/drupal')">
-                  <Droplet class="h-3.5 w-3.5" aria-hidden="true" />
+                  <DrupalIcon class="h-3.5 w-3.5" />
                   {{ $t('stalManager.drupalContributions') }}
                   <ArrowRight class="h-3.5 w-3.5" aria-hidden="true" />
                 </router-link>
@@ -201,6 +201,7 @@
 import { defineComponent, markRaw } from 'vue'
 import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
+import DrupalIcon from '../../components/DrupalIcon.vue'
 import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
@@ -212,7 +213,6 @@ import {
   FlaskConical,
   ChefHat,
   Coins,
-  Droplet,
   ExternalLink,
   Github,
   LayoutDashboard,
@@ -223,7 +223,7 @@ import {
 const DRUPAL_REPO = 'https://github.com/RobbeSaelens/shared_costs'
 
 export default defineComponent({
-  components: { ArrowRight, Droplet, ExternalLink, Github, Lock, ImageLightbox, RepoActivity },
+  components: { ArrowRight, DrupalIcon, ExternalLink, Github, Lock, ImageLightbox, RepoActivity },
 
   data() {
     return {

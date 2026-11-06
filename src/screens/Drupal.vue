@@ -11,18 +11,10 @@
             >
           </template>
         </i18n-t>
-        <i18n-t keypath="drupal.sharedCosts" tag="p" class="drupal-text">
-          <template #github>
-            <a class="text-link" :href="SHARED_COSTS_REPO" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </template>
-          <template #stalManager>
-            <router-link class="text-link" :to="$lp('/stalmanagerdetail')">Stal Manager</router-link>
-          </template>
-        </i18n-t>
 
         <div class="drupal-profiles">
           <a class="pill-link" :href="PROFILE" target="_blank" rel="noopener noreferrer">
-            <Droplet class="pill-icon" aria-hidden="true" />
+            <DrupalIcon class="pill-icon" />
             {{ $t('drupal.profile') }}
             <ExternalLink class="pill-icon" aria-hidden="true" />
           </a>
@@ -40,7 +32,10 @@
         <dl class="stats-numbers">
           <div v-for="stat in stats" :key="stat.key" class="stats-number">
             <dt>{{ $t(`drupal.stats.${stat.key}`) }}</dt>
-            <dd>{{ stat.value }}</dd>
+            <dd>
+              <component :is="stat.icon" class="stats-icon" aria-hidden="true" />
+              {{ stat.value }}
+            </dd>
           </div>
         </dl>
         <p class="stats-note">
@@ -55,33 +50,35 @@
     </div>
 
     <div class="drupal-lists">
-      <section
-        v-for="list in lists"
-        :key="list.key"
-        class="panel reveal"
-        :aria-labelledby="`drupal-${list.key}-title`"
-      >
-        <header class="panel-head">
-          <component :is="list.icon" class="panel-icon" aria-hidden="true" />
-          <h2 :id="`drupal-${list.key}-title`" class="panel-title">{{ $t(`drupal.${list.key}`) }}</h2>
-          <span class="panel-count" aria-hidden="true">{{ list.rows.length }}</span>
-        </header>
-        <p class="panel-intro">{{ $t(`drupal.${list.key}Text`) }}</p>
+      <div v-for="(column, c) in columns" :key="c" class="drupal-column">
+        <section
+          v-for="list in column"
+          :key="list.key"
+          class="panel reveal"
+          :aria-labelledby="`drupal-${list.key}-title`"
+        >
+          <header class="panel-head">
+            <component :is="list.icon" class="panel-icon" aria-hidden="true" />
+            <h2 :id="`drupal-${list.key}-title`" class="panel-title">{{ $t(`drupal.${list.key}`) }}</h2>
+            <span class="panel-count" aria-hidden="true">{{ list.rows.length }}</span>
+          </header>
+          <p class="panel-intro">{{ $t(`drupal.${list.key}Text`) }}</p>
 
-        <ul v-if="list.rows.length" class="rows">
-          <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${i * 70}ms` }">
-            <a class="row" :href="row.url" target="_blank" rel="noopener noreferrer">
-              <span class="badge" :class="`badge--${row.tone}`">{{ row.badge }}</span>
-              <span class="row-main">
-                <span class="row-title">{{ row.title }}</span>
-                <span class="row-meta">{{ row.meta }}</span>
-              </span>
-              <ExternalLink class="row-arrow" aria-hidden="true" />
-            </a>
-          </li>
-        </ul>
-        <p v-else class="panel-empty">{{ $t('drupal.empty') }}</p>
-      </section>
+          <ul v-if="list.rows.length" class="rows">
+            <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${i * 70}ms` }">
+              <a class="row" :href="row.url" target="_blank" rel="noopener noreferrer">
+                <span class="badge" :class="`badge--${row.tone}`">{{ row.badge }}</span>
+                <span class="row-main">
+                  <span class="row-title">{{ row.title }}</span>
+                  <span class="row-meta">{{ row.meta }}</span>
+                </span>
+                <ExternalLink class="row-arrow" aria-hidden="true" />
+              </a>
+            </li>
+          </ul>
+          <p v-else class="panel-empty">{{ $t('drupal.empty') }}</p>
+        </section>
+      </div>
     </div>
 
     <div class="reveal mt-10 inline-block">
@@ -108,7 +105,6 @@ import {
   ArrowRight,
   Award,
   CircleDot,
-  Droplet,
   ExternalLink,
   GitMerge,
   Gitlab,
@@ -118,6 +114,7 @@ import {
 import { useHead } from '@unhead/vue'
 import { useRoute } from 'vue-router'
 import TerminalHeader from '../components/TerminalHeader.vue'
+import DrupalIcon from '../components/DrupalIcon.vue'
 import { watchReveal } from '../reveal'
 import { drupalCreditsJsonLd } from '../seo/jsonld'
 import { SITE_URL } from '../site'
@@ -139,7 +136,6 @@ interface Issue {
 
 const PROFILE = `https://www.drupal.org/u/${data.user}`
 const GITLAB_PROFILE = `https://git.drupalcode.org/${data.user}`
-const SHARED_COSTS_REPO = 'https://github.com/RobbeSaelens/shared_costs'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 
@@ -179,11 +175,16 @@ function tone(status: string): Tone {
   return 'open'
 }
 
+// In the order of the lists below, with their icons.
 const stats = computed(() => [
-  { key: 'opened', value: created.length },
-  { key: 'joined', value: joined.length },
-  { key: 'credits', value: data.credits.length },
-  { key: 'merged', value: data.mergeRequests.filter((mr) => mr.state === 'merged').length },
+  { key: 'opened', icon: markRaw(CircleDot) as Component, value: created.length },
+  { key: 'credits', icon: markRaw(Award) as Component, value: data.credits.length },
+  {
+    key: 'merged',
+    icon: markRaw(GitMerge) as Component,
+    value: data.mergeRequests.filter((mr) => mr.state === 'merged').length,
+  },
+  { key: 'joined', icon: markRaw(MessageSquare) as Component, value: joined.length },
 ])
 
 interface Row {
@@ -213,6 +214,7 @@ function issueRow(issue: Issue, when: 'opened' | 'updated'): Row {
 }
 
 const lists = computed(() => [
+  { key: 'issuesOpened', icon: markRaw(CircleDot) as Component, rows: created.map((i) => issueRow(i, 'opened')) },
   {
     key: 'credits',
     icon: markRaw(Award) as Component,
@@ -243,9 +245,13 @@ const lists = computed(() => [
       }),
     ),
   },
-  { key: 'issuesOpened', icon: markRaw(CircleDot) as Component, rows: created.map((i) => issueRow(i, 'opened')) },
   { key: 'issuesJoined', icon: markRaw(MessageSquare) as Component, rows: joined.map((i) => issueRow(i, 'updated')) },
 ])
+
+// Two columns that stack on their own, so a short panel leaves no gap
+// under it: the issues opened and the credits, then the merge requests and
+// the issues taken part in (the same order as on a phone).
+const columns = computed(() => [lists.value.slice(0, 2), lists.value.slice(2)])
 
 const root = ref<HTMLElement | null>(null)
 let stopReveal = () => {}
@@ -271,11 +277,12 @@ onBeforeUnmount(() => stopReveal())
   gap: 2rem;
   margin-bottom: 3rem;
 }
+/* Wide: the intro and a compact card of numbers side by side. */
 @media (min-width: 1024px) {
   .drupal-top {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 32rem);
-    align-items: start;
-    gap: clamp(3rem, 6vw, 7rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
+    align-items: center;
+    gap: clamp(3rem, 6vw, 6rem);
   }
 }
 
@@ -287,11 +294,6 @@ onBeforeUnmount(() => stopReveal())
   font-size: 1.125rem;
   line-height: 1.7;
   color: var(--color-text-primary);
-}
-.drupal-text {
-  margin: 0;
-  line-height: 1.7;
-  color: var(--color-text-secondary);
 }
 .text-link {
   color: var(--color-accent);
@@ -377,7 +379,7 @@ onBeforeUnmount(() => stopReveal())
     gap: 0;
   }
   .stats-number + .stats-number {
-    padding-left: 1.5rem;
+    padding-left: 2rem;
     border-left: 1px solid var(--color-border);
   }
 }
@@ -389,6 +391,9 @@ onBeforeUnmount(() => stopReveal())
   min-width: 0;
 }
 .stats-number dd {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   margin: 0;
   font-family: var(--font-mono);
   font-size: 2rem;
@@ -400,6 +405,12 @@ onBeforeUnmount(() => stopReveal())
   .stats-number dd {
     font-size: 2.25rem;
   }
+}
+.stats-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
 }
 .stats-number dt {
   font-size: 0.8125rem;
@@ -427,9 +438,11 @@ onBeforeUnmount(() => stopReveal())
 /* =============================================
    The lists: two columns from 1024px
    ============================================= */
-.drupal-lists {
+.drupal-lists,
+.drupal-column {
   display: grid;
   gap: 1.5rem;
+  align-content: start;
 }
 @media (min-width: 1024px) {
   .drupal-lists {

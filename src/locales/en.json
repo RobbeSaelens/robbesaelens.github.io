@@ -1,6 +1,7 @@
 {
   "nav": {
     "projects": "Projects",
+    "drupal": "Drupal contributions",
     "aboutMe": "About me",
     "home": "Home"
   },
@@ -335,14 +336,13 @@
   },
   "drupal": {
     "title": "Drupal contributions",
-    "intro": "I work at {dynamate} as a backend developer on Drupal projects. When I run into a bug in Drupal core or a contributed module, I report it on drupal.org, and I help out on other people's issues with comments and merge requests.",
-    "sharedCosts": "My own Drupal module, Shared Costs, isn't on drupal.org yet: it's open source on {github}, and the {stalManager} page shows what it does.",
+    "intro": "As a backend developer at {dynamate} I work with Drupal every day and contribute to it with passion.",
     "profile": "drupal.org profile",
     "gitlab": "git.drupalcode.org",
     "statsTitle": "In numbers",
     "stats": {
       "opened": "issues opened",
-      "joined": "other issues taken part in",
+      "joined": "issues contributed to",
       "credits": "credits",
       "merged": "merge requests merged"
     },

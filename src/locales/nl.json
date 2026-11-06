@@ -1,6 +1,7 @@
 {
   "nav": {
     "projects": "Projecten",
+    "drupal": "Drupal-bijdragen",
     "aboutMe": "Over mij",
     "home": "Home"
   },
@@ -335,14 +336,13 @@
   },
   "drupal": {
     "title": "Drupal-bijdragen",
-    "intro": "Ik werk bij {dynamate} als backend developer op Drupal-projecten. Kom ik een bug tegen in Drupal core of in een contributed module, dan meld ik die op drupal.org, en in issues van anderen help ik mee met reacties en merge requests.",
-    "sharedCosts": "Mijn eigen Drupal-module, Shared Costs, staat nog niet op drupal.org: ze is open source op {github}, en op de pagina van {stalManager} zie je wat ze doet.",
+    "intro": "Als backend developer bij {dynamate} werk ik elke dag met Drupal en ik draag er met passie aan bij.",
     "profile": "Profiel op drupal.org",
     "gitlab": "git.drupalcode.org",
     "statsTitle": "In cijfers",
     "stats": {
-      "opened": "issues aangemaakt",
-      "joined": "andere issues waaraan ik meewerkte",
+      "opened": "issues gemeld",
+      "joined": "issues meegewerkt",
       "credits": "credits",
       "merged": "merge requests gemerged"
     },

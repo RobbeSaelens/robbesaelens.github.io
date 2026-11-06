@@ -625,9 +625,9 @@ test.describe('Drupal contributions', () => {
         await expect(links.nth(i).locator('.badge')).not.toBeEmpty()
       }
     }
-    // The numbers are the lists' lengths
+    // The numbers are the lists' lengths, in the lists' order
     await expect(page.locator('.stats-number dd')).toHaveText(
-      [data.issuesCreated.length, data.issuesJoined.length, data.credits.length, merged].map(String),
+      [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
     )
     const asOf = new Date(data.generatedAt).toLocaleDateString('en-GB', {
       day: 'numeric',
@@ -639,11 +639,6 @@ test.describe('Drupal contributions', () => {
     await expect(page.getByRole('link', { name: 'drupal.org profile' })).toHaveAttribute(
       'href',
       'https://www.drupal.org/u/robbesaelens',
-    )
-    // Shared Costs isn't on drupal.org: the page points at the Stal Manager page
-    await expect(page.locator('.drupal-intro').getByRole('link', { name: 'Stal Manager' })).toHaveAttribute(
-      'href',
-      '/stalmanagerdetail',
     )
     expect(errors).toEqual([])
   })
@@ -659,10 +654,6 @@ test.describe('Drupal contributions', () => {
     const opened = page.getByRole('region', { name: 'Issues die ik aanmaakte' })
     await expect(opened.locator('.row-meta').first()).toContainText('aangemaakt op')
     await expect(opened.locator('.badge').first()).toHaveText(/^(Active|Needs work|Needs review|RTBC|Fixed|Postponed|Closed)/)
-    await expect(page.locator('.drupal-intro').getByRole('link', { name: 'Stal Manager' })).toHaveAttribute(
-      'href',
-      '/nl/stalmanagerdetail',
-    )
     expect(errors).toEqual([])
   })
 
