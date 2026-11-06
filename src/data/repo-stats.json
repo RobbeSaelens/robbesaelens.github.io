@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-06T15:21:31.381Z",
+  "generatedAt": "2026-11-06T16:14:53.676Z",
   "projects": {
     "exulta": {
       "commits": 378,
@@ -138,10 +138,10 @@
       ]
     },
     "sharedCosts": {
-      "commits": 2,
-      "commitsLast30Days": 2,
+      "commits": 10,
+      "commitsLast30Days": 10,
       "firstCommit": "2026-11-06T13:28:13+01:00",
-      "lastCommit": "2026-11-06T13:34:16+01:00",
+      "lastCommit": "2026-11-06T17:14:23+01:00",
       "commitsPerWeek": [
         0,
         0,
@@ -168,7 +168,7 @@
         0,
         0,
         0,
-        2
+        10
       ]
     }
   }
