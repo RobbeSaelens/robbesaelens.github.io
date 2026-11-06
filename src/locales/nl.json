@@ -339,6 +339,8 @@
     "intro": "Als backend developer bij {dynamate} werk ik elke dag met Drupal en ik draag er met passie aan bij.",
     "profile": "Profiel op drupal.org",
     "gitlab": "git.drupalcode.org",
+    "projectsTitle": "Projecten waaraan ik bijdroeg",
+    "projectIssues": "geen issues | 1 issue | {n} issues",
     "statsTitle": "In cijfers",
     "stats": {
       "opened": "issues gemeld",

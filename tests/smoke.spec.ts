@@ -681,6 +681,18 @@ test.describe('Drupal contributions', () => {
     await expect(page.locator('.stats-number dd')).toHaveText(
       [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
     )
+    // The projects he contributed to: one chip per project in the lists, linking to its drupal.org page
+    const used = new Set<string>([
+      ...data.credits.map((c) => c.project),
+      ...data.mergeRequests.map((mr) => mr.project),
+      ...data.issuesCreated.map((i) => i.project),
+      ...data.issuesJoined.map((i) => i.project),
+    ])
+    const chips = page.locator('.drupal-projects .chip')
+    await expect(chips).toHaveCount(used.size)
+    for (const [i, project] of (await chips.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).entries()) {
+      expect(project, `chip ${i}`).toMatch(/^https:\/\/www\.drupal\.org\/project\//)
+    }
     const asOf = new Date(data.generatedAt).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',

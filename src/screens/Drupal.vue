@@ -47,6 +47,27 @@
           </i18n-t>
         </p>
       </section>
+
+      <!-- Where the contributions went: under the intro on wide screens -->
+      <section class="drupal-projects hero-in" style="--i: 4" aria-labelledby="drupal-projects-title">
+        <h2 id="drupal-projects-title" class="drupal-projects-title">{{ $t('drupal.projectsTitle') }}</h2>
+        <ul class="drupal-chips">
+          <li v-for="project in projectChips" :key="project.id">
+            <a
+              class="chip"
+              :href="project.url"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="chip-name">{{ project.name }}</span>
+              <span class="chip-count"
+                ><span aria-hidden="true">{{ project.count }}</span
+                ><span class="sr-only">, {{ $t('drupal.projectIssues', project.count) }}</span></span
+              >
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
 
     <div class="drupal-lists">
@@ -158,6 +179,19 @@ const projects = data.projects as Record<string, { name: string; url: string } |
 const projectName = (id: string) => projects[id]?.name ?? id
 const created = data.issuesCreated as Issue[]
 const joined = data.issuesJoined as Issue[]
+
+// The projects he contributed to, most first: the issues he opened, took part in,
+// was credited for or sent a merge request for (each issue counts once).
+const projectChips = (() => {
+  const issues: Record<string, Set<number>> = {}
+  const add = (project: string, issue: number) => (issues[project] ??= new Set()).add(issue)
+  for (const credit of data.credits) add(credit.project, credit.issue)
+  for (const mr of data.mergeRequests) add(mr.project, mr.issue)
+  for (const issue of [...created, ...joined]) add(issue.project, issue.id)
+  return Object.entries(issues)
+    .map(([id, set]) => ({ id, name: projectName(id), url: projects[id]?.url ?? PROFILE, count: set.size }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+})()
 
 // Dates as in Belgium, also when prerendered on a server elsewhere
 const tag = () => (locale.value === 'nl' ? 'nl-BE' : 'en-GB')
@@ -277,13 +311,86 @@ onBeforeUnmount(() => stopReveal())
   gap: 2rem;
   margin-bottom: 3rem;
 }
-/* Wide: the intro and a compact card of numbers side by side. */
+/* Wide: the intro and the projects on the left, the card of numbers next to them. */
 @media (min-width: 1024px) {
   .drupal-top {
     grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
-    align-items: center;
-    gap: clamp(3rem, 6vw, 6rem);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'intro stats'
+      'projects stats';
+    align-items: start;
+    column-gap: clamp(3rem, 6vw, 6rem);
   }
+  .drupal-intro {
+    grid-area: intro;
+  }
+  .stats {
+    grid-area: stats;
+  }
+  .drupal-projects {
+    grid-area: projects;
+  }
+}
+
+/* ── The projects he contributed to ── */
+.drupal-projects {
+  max-width: 70ch;
+}
+.drupal-projects-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+}
+.drupal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.4rem 0.25rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.chip:hover {
+  border-color: var(--color-border-glow);
+  background: var(--color-surface-hover);
+  transform: translateY(-1px);
+}
+.chip:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.chip-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
 }
 
 .drupal-intro {
