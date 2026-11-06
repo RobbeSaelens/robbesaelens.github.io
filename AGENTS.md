@@ -76,5 +76,8 @@ fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
 - Statistics are Cloudflare Web Analytics: cookieless, so there is no cookie banner.
   Don't add anything that sets cookies or tracks visitors without revisiting the privacy page.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).
-- Screenshots of projects are real ones from the live sites, never mockups.
+- Screenshots of projects are real ones from the live sites, never mockups. The project
+  slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
+  (`src/components/MacBook3D.vue`, posed by `Projects.vue`): a new screenshot is all it
+  takes to update one.
 - No secrets or private tooling in this repo: it is public.
