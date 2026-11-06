@@ -655,10 +655,10 @@ test.describe('Drupal contributions', () => {
     for (const [, name, items] of LISTS) {
       await expect(page.getByRole('region', { name, exact: true }).getByRole('link')).toHaveCount(items.length)
     }
-    // Statuses and dates in Dutch too
+    // Dates in Dutch; statuses keep drupal.org's English terms
     const opened = page.getByRole('region', { name: 'Issues die ik aanmaakte' })
     await expect(opened.locator('.row-meta').first()).toContainText('aangemaakt op')
-    await expect(opened.locator('.badge').first()).not.toHaveText(/^(Active|Needs work|Closed)/)
+    await expect(opened.locator('.badge').first()).toHaveText(/^(Active|Needs work|Needs review|RTBC|Fixed|Postponed|Closed)/)
     await expect(page.locator('.drupal-intro').getByRole('link', { name: 'Stal Manager' })).toHaveAttribute(
       'href',
       '/nl/stalmanagerdetail',
