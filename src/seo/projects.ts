@@ -38,7 +38,7 @@ export const PROJECTS: SeoProject[] = [
     sourceCode: {
       name: 'Shared Costs',
       description:
-        'Open-source Drupal 11 module: a field type that splits an amount over other entities, equally or by percentage, stored to the cent, with Views integration. Three recipes and a Starterkit theme rebuild Stable Manager in Drupal.',
+        'Open-source Drupal 11 module: a field type that splits an amount over other entities, equally or by percentage, stored to the cent, with Views integration. Four recipes and a Starterkit theme rebuild Stable Manager in Drupal.',
       repository: 'https://github.com/RobbeSaelens/shared_costs',
       language: 'PHP',
       platform: 'Drupal 11',

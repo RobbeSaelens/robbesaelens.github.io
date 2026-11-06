@@ -128,7 +128,7 @@
               </p>
             </div>
 
-            <!-- A real screenshot of the demo site (the stal_manager_demo recipe) -->
+            <!-- A real screenshot of the demo site (the stable_manager_demo recipe) -->
             <button
               type="button"
               class="reveal shot shot-drupal"
