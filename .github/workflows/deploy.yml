@@ -3,6 +3,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Every morning, so the Drupal contributions follow drupal.org without a push
+  # (the build fetches them, see "Refresh Drupal contributions"). Scheduled runs
+  # use the default branch.
+  schedule:
+    - cron: '17 5 * * *'
+  # The "Run workflow" button on the Actions tab: deploy again, refreshing the
+  # Drupal contributions.
+  workflow_dispatch:
 
 permissions:
   contents: read

@@ -66,5 +66,10 @@ The sitemap picks the origin up from `src/site.ts` automatically.
 ## Deployment
 
 `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
-`main`. Before the build it refreshes the Drupal contributions (`npm run drupal`); when
-drupal.org doesn't answer, it deploys the committed `src/data/drupal.json`.
+`main`, every morning (05:17 UTC) and when you press **Run workflow** on the Actions tab.
+Before the build it refreshes the Drupal contributions (`npm run drupal`); when
+drupal.org doesn't answer, it deploys the committed `src/data/drupal.json`. The scheduled
+and manual runs commit nothing: they build `main` as it is, with fresh Drupal data. The
+repository numbers (`src/data/repo-stats.json`) can't be fetched in CI (private repos):
+refresh them with `npm run stats`, or with the "Refresh data" button in Project Updater,
+and merge to `main`.

@@ -69,15 +69,16 @@ When you change a page's URL, keep the old one working: add it to `REDIRECTS` in
   description in `meta.nl`.
 - The "Repository activity" block on each project page reads `src/data/repo-stats.json`.
   The project repos are private, so neither the browser nor CI can fetch it: run
-  `npm run stats` locally before a deploy (needs the clones next to this repo) and
-  commit the JSON. It holds counts and dates only, never commit
+  `npm run stats` locally before a deploy (needs the clones next to this repo; the
+  "Refresh data" button in Project Updater does it, with review) and commit the JSON. It holds counts and dates only, never commit
   messages, names or e-mail addresses.
 - The Drupal contributions page (`/drupal`) reads `src/data/drupal.json`, written by
   `npm run drupal` (`scripts/drupal-stats.mjs`) from the public drupal.org and
   git.drupalcode.org APIs. drupal.org asks API users for a descriptive User-Agent, one
   request at a time and cached results, so the browser never calls it: the script runs
-  before every deploy (`deploy.yml`, keeping the committed JSON when it fails), and the
-  JSON is committed like repo-stats.json. Public metadata only: titles, projects,
+  before every deploy (`deploy.yml`, keeping the committed JSON when it fails; deploys
+  also run every morning and from the "Run workflow" button, so the page follows
+  drupal.org without a push), and the JSON is committed like repo-stats.json. Public metadata only: titles, projects,
   statuses, dates, links. Never comment text or e-mail addresses.
 - Errors go to Sentry (`src/sentry.ts`, project `portfolio`, EU region), only from the live
   site. Errors only: no tracing, session replay or session pings, and `dataCollection`
