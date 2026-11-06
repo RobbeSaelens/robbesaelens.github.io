@@ -59,6 +59,25 @@ fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
 When you change a page's URL, keep the old one working: add it to `REDIRECTS` in
 `src/bootstrap/router.ts` and to `MOVED` in `tests/routes.ts`.
 
+## Content changes: keep the chatbot in step
+
+The chatbot answers from four places. When content on the site changes and is
+relevant to a visitor's questions (a project is added, renamed, finished or gets a
+new feature; a page is added or moves; skills, experience, education or contact
+details change; the Drupal contributions change in kind), update the ones that apply
+in the same change:
+
+| What | Where | Notes |
+|---|---|---|
+| What the AI answers from | `public/llms.txt` | The `status-worker` fetches `/llms.txt` live and caches it for an hour, so it follows the site after a deploy, without a worker deploy. Keep it factual and short: the worker only reads the first 12,000 characters. |
+| Built-in answers (used when the AI is off, rate-limited or down) | `src/components/ChatBot.vue` (keywords) and the `chat.*` strings in both `src/locales/en.json` and `nl.json` | New project: a keyword entry plus a `chat.project-<name>` answer, and the project count and names in `chat.projects` and `chat.help`. A renamed project keeps its old name as an extra keyword. |
+| The worker's fallback facts | `../status-worker/src/knowledge.ts` (`FALLBACK_FACTS`) | Only used when `llms.txt` can't be fetched, so it may lag. Update it for renames and new projects, run its tests, and deploy it from that repo with `npm run deploy` (needs a Cloudflare login). |
+| Tests | `tests/chat.spec.ts` | Add or adjust the case for the new answer, in English and Dutch. |
+
+Not relevant: layout, styling and copy tweaks that don't change facts. After changing
+`llms.txt`, ask the live chatbot a question about the change once the site has
+deployed (a plain `POST /chat`, see the `status-worker` README) to check the answer.
+
 ## Conventions
 
 - Every visible string exists in both `src/locales/en.json` and `src/locales/nl.json`;
