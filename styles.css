@@ -62,3 +62,25 @@ html.js.intro-done .hero-in {
     animation: none;
   }
 }
+
+/* =============================================
+   Scroll reveal (src/reveal.ts, the project pages)
+   The same rise as the entrance, when an element scrolls into view. An animation
+   rather than a transition, so it leaves the element's own transitions (hover)
+   alone, and it only fills backwards: once done, the element's styles apply again.
+   ============================================= */
+.reveal-armed:not(.is-visible) {
+  opacity: 0;
+}
+.reveal-armed.is-visible {
+  animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-armed:not(.is-visible) {
+    opacity: 1;
+  }
+  .reveal-armed.is-visible {
+    animation: none;
+  }
+}

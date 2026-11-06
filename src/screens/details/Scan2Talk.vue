@@ -3,16 +3,16 @@
     <div class="mx-auto max-w-screen-xl px-4 pt-10 sm:px-6">
       <!-- Header -->
       <header class="text-center">
-        <h1 class="terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl">
+        <h1 class="hero-in terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl" style="--i: 0">
           <span class="terminal-prompt">&gt;</span>
           <span class="terminal-text">{{ $t('scan2talk.title') }}</span>
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
-        <p class="terminal-subtitle mt-3 text-sm tracking-wide md:text-base">
+        <p class="hero-in terminal-subtitle mt-3 text-sm tracking-wide md:text-base" style="--i: 1">
           <span class="opacity-50">$</span> cat ./scan2talk-project.md
         </p>
 
-        <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <div class="hero-in mt-5 flex flex-wrap items-center justify-center gap-2" style="--i: 2">
           <span class="live-badge">
             <span class="live-dot" aria-hidden="true"></span>
             {{ $t('scan2talk.liveBadge') }}
@@ -28,16 +28,16 @@
           </a>
         </div>
 
-        <div class="mt-5 flex flex-wrap justify-center gap-2">
+        <div class="hero-in mt-5 flex flex-wrap justify-center gap-2" style="--i: 3">
           <span v-for="tag in heroTags" :key="tag" class="tag-pill">{{ tag }}</span>
         </div>
       </header>
 
       <!-- Real screenshots of the live site at scan2talk.be -->
-      <div class="shots">
+      <div class="hero-in shots" style="--i: 4">
         <button
           type="button"
-          class="shot shot-desktop reveal"
+          class="shot shot-desktop"
           :aria-label="`Open ${shotList[0].caption} screenshot full screen`"
           @click="lightboxIndex = 0">
           <span class="shot-bar" aria-hidden="true">
@@ -57,7 +57,7 @@
 
         <button
           type="button"
-          class="shot shot-phone reveal"
+          class="shot shot-phone"
           :aria-label="`Open ${shotList[1].caption} screenshot full screen`"
           @click="lightboxIndex = 1">
           <span class="shot-notch" aria-hidden="true"></span>
@@ -73,8 +73,8 @@
 
       <div class="mx-5 pt-4 md:mx-10">
         <!-- Overview -->
-        <h2 class="section-heading">{{ $t('scan2talk.overview') }}</h2>
-        <div class="overview-card mb-14 px-6 py-8 md:px-8">
+        <h2 class="section-heading reveal">{{ $t('scan2talk.overview') }}</h2>
+        <div class="reveal overview-card mb-14 px-6 py-8 md:px-8">
           <h3 class="overview-label">{{ $t('scan2talk.about') }}</h3>
           <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
             {{ $t('scan2talk.aboutText') }}
@@ -82,7 +82,7 @@
         </div>
 
         <!-- Flow -->
-        <h2 class="section-heading">{{ $t('scan2talk.flowTitle') }}</h2>
+        <h2 class="section-heading reveal">{{ $t('scan2talk.flowTitle') }}</h2>
         <div class="flow-wrap mb-14">
           <!-- A real check-in, recorded in the app's demo mode (nothing is saved).
                Plays only while on screen; never on its own for reduced-motion users. -->
@@ -118,7 +118,7 @@
 
 
         <!-- Features -->
-        <h2 class="section-heading">{{ $t('scan2talk.featuresTitle') }}</h2>
+        <h2 class="section-heading reveal">{{ $t('scan2talk.featuresTitle') }}</h2>
         <div class="feature-grid mb-14">
           <article v-for="f in features" :key="f.title" class="feature-card reveal">
             <component :is="f.icon" class="feature-icon" />
@@ -129,13 +129,13 @@
 
         <!-- Stack -->
         <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div class="overview-card px-6 py-8">
+          <div class="reveal overview-card px-6 py-8">
             <h3 class="overview-label">{{ $t('scan2talk.languages') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackLanguages" :key="t" class="tag-pill">{{ t }}</span>
             </div>
           </div>
-          <div class="overview-card px-6 py-8">
+          <div class="reveal overview-card px-6 py-8">
             <h3 class="overview-label">{{ $t('scan2talk.tools') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackTools" :key="t" class="tag-pill">{{ t }}</span>
@@ -145,7 +145,7 @@
 
         <RepoActivity project="scan2talk" />
 
-        <div class="mt-4 inline-block">
+        <div class="reveal mt-4 inline-block">
           <router-link class="group flex items-center gap-2" :to="$lp('/projects')">
             <span class="text-sm" style="color: var(--color-accent); opacity: 0.6">./</span>
             <span
@@ -170,6 +170,7 @@
 import { defineComponent, markRaw } from 'vue'
 import ImageLightbox from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
+import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
   ExternalLink,
@@ -187,10 +188,9 @@ export default defineComponent({
   data() {
     return {
       lightboxIndex: null as number | null,
-      observer: null as IntersectionObserver | null,
+      stopReveal: () => {},
       videoObserver: null as IntersectionObserver | null,
       reduceMotion: false,
-      revealFallback: 0 as unknown as ReturnType<typeof setTimeout>,
       heroTags: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PostgreSQL', 'Chart.js'],
       stackLanguages: [
         'PHP 8.3',
@@ -249,41 +249,11 @@ export default defineComponent({
   mounted() {
     this.watchFlowVideo()
 
-    const targets = [...this.$el.querySelectorAll('.reveal')] as Element[]
-
-    // Content is visible by default and only hidden once the observer is armed,
-    // so a missing or suspended IntersectionObserver can never leave it blank.
-    if (typeof IntersectionObserver === 'undefined') {
-      targets.forEach((el) => el.classList.add('is-visible'))
-      return
-    }
-
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-            this.observer?.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.15 },
-    )
-
-    targets.forEach((el) => {
-      el.classList.add('reveal-armed')
-      this.observer?.observe(el)
-    })
-
-    // Safety net for background tabs where callbacks never arrive.
-    this.revealFallback = setTimeout(() => {
-      targets.forEach((el) => el.classList.add('is-visible'))
-    }, 1600)
+    this.stopReveal = watchReveal(this.$el)
   },
 
   beforeUnmount() {
-    clearTimeout(this.revealFallback)
-    this.observer?.disconnect()
+    this.stopReveal()
     this.videoObserver?.disconnect()
   },
 
@@ -745,26 +715,10 @@ button.shot-phone {
   color: var(--color-text-secondary);
 }
 
-/* Scroll reveal */
-/* Only hidden once JS has armed the observer — see mounted(). */
-.reveal.reveal-armed {
-  opacity: 0;
-  transform: translateY(18px);
-}
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .terminal-cursor,
   .live-dot {
     animation: none;
-  }
-  .reveal,
-  .reveal.reveal-armed {
-    opacity: 1;
-    transform: none;
   }
 }
 </style>

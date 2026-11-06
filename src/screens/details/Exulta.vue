@@ -2,15 +2,15 @@
   <article class="detail-page pb-10 fade-out">
     <div class="mx-auto max-w-screen-xl px-4 pt-10 sm:px-6">
       <header class="text-center">
-        <h1 class="terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl">
+        <h1 class="hero-in terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl" style="--i: 0">
           <span class="terminal-prompt">&gt;</span>
           <span class="terminal-text">{{ $t('exulta.title') }}</span>
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
-        <p class="terminal-subtitle mt-3 text-sm tracking-wide md:text-base">
+        <p class="hero-in terminal-subtitle mt-3 text-sm tracking-wide md:text-base" style="--i: 1">
           <span class="opacity-50">$</span> cat ./exulta-project.md
         </p>
-        <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <div class="hero-in mt-5 flex flex-wrap items-center justify-center gap-2" style="--i: 2">
           <span class="live-badge">
             <span class="live-dot" aria-hidden="true"></span>
             {{ $t('exulta.liveBadge') }}
@@ -21,15 +21,15 @@
           </a>
         </div>
 
-        <div class="mt-5 flex flex-wrap justify-center gap-2">
+        <div class="hero-in mt-5 flex flex-wrap justify-center gap-2" style="--i: 3">
           <span v-for="tag in heroTags" :key="tag" class="tag-pill">{{ tag }}</span>
         </div>
       </header>
       <!-- Real screenshots of the running v2.0 site -->
-      <div class="shots">
+      <div class="hero-in shots" style="--i: 4">
         <button
           type="button"
-          class="shot shot-desktop reveal"
+          class="shot shot-desktop"
           :aria-label="`Open ${shotList[0].caption} screenshot full screen`"
           @click="lightboxIndex = 0">
           <span class="shot-bar" aria-hidden="true">
@@ -49,7 +49,7 @@
 
         <button
           type="button"
-          class="shot shot-phone reveal"
+          class="shot shot-phone"
           :aria-label="`Open ${shotList[1].caption} screenshot full screen`"
           @click="lightboxIndex = 1">
           <span class="shot-notch" aria-hidden="true"></span>
@@ -70,7 +70,7 @@
         </div>
 
         <div class="mb-8 flex flex-col gap-8 md:flex-row">
-          <div class="overview-card flex-1 px-6 py-8 md:px-8">
+          <div class="reveal overview-card flex-1 px-6 py-8 md:px-8">
             <h3 class="overview-label">{{ $t('exulta.about') }}</h3>
             <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
               {{ $t('exulta.aboutText') }}
@@ -79,7 +79,7 @@
         </div>
 
         <!-- Features -->
-        <h2 class="section-heading">{{ $t('exulta.featuresTitle') }}</h2>
+        <h2 class="section-heading reveal">{{ $t('exulta.featuresTitle') }}</h2>
         <div class="feature-grid mb-14">
           <article v-for="f in features" :key="f.title" class="feature-card reveal">
             <component :is="f.icon" class="feature-icon" />
@@ -101,13 +101,13 @@
         </div>
 
         <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div class="overview-card px-6 py-8">
+          <div class="reveal overview-card px-6 py-8">
             <h3 class="overview-label">{{ $t('exulta.languages') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackLanguages" :key="t" class="tag-pill">{{ t }}</span>
             </div>
           </div>
-          <div class="overview-card px-6 py-8">
+          <div class="reveal overview-card px-6 py-8">
             <h3 class="overview-label">{{ $t('exulta.tools') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackTools" :key="t" class="tag-pill">{{ t }}</span>
@@ -142,6 +142,7 @@
 import { defineComponent, markRaw } from 'vue'
 import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
+import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
   ExternalLink,
@@ -159,8 +160,7 @@ export default defineComponent({
   data() {
     return {
       lightboxIndex: null as number | null,
-      observer: null as IntersectionObserver | null,
-      revealFallback: 0 as unknown as ReturnType<typeof setTimeout>,
+      stopReveal: () => {},
       heroTags: ['Laravel 13', 'React 19', 'Inertia.js', 'Filament 5', 'Tailwind CSS 4', 'MySQL'],
       stackLanguages: [
         'PHP 8.4',
@@ -212,41 +212,11 @@ export default defineComponent({
   },
 
   mounted() {
-    const targets = [...this.$el.querySelectorAll('.reveal')] as Element[]
-    if (!targets.length) return
-
-    // Visible by default; only hidden once the observer is armed, so a missing
-    // or suspended IntersectionObserver can never leave the page blank.
-    if (typeof IntersectionObserver === 'undefined') {
-      targets.forEach((el) => el.classList.add('is-visible'))
-      return
-    }
-
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-            this.observer?.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.15 },
-    )
-
-    targets.forEach((el) => {
-      el.classList.add('reveal-armed')
-      this.observer?.observe(el)
-    })
-
-    this.revealFallback = setTimeout(() => {
-      targets.forEach((el) => el.classList.add('is-visible'))
-    }, 1600)
+    this.stopReveal = watchReveal(this.$el)
   },
 
   beforeUnmount() {
-    clearTimeout(this.revealFallback)
-    this.observer?.disconnect()
+    this.stopReveal()
   },
 })
 </script>
@@ -460,24 +430,6 @@ export default defineComponent({
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--color-text-secondary);
-}
-
-/* Scroll reveal — hidden only once JS arms the observer (see mounted()). */
-.reveal.reveal-armed {
-  opacity: 0;
-  transform: translateY(18px);
-}
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .reveal.reveal-armed {
-    opacity: 1;
-    transform: none;
-  }
 }
 
 /* =============================================

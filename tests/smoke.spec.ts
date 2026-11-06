@@ -411,6 +411,63 @@ test.describe('project slides', () => {
   })
 })
 
+test.describe('project page animations', () => {
+  const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stalmanagerdetail', '/vhsdetail']
+
+  for (const route of DETAILS) {
+    test(`${route} rises in like the other pages, and the rest as you scroll to it`, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 })
+      const errors = await guard(page)
+      await open(page, route)
+
+      // The header and the screenshots: the shared entrance (styles.css)
+      for (const el of [page.locator('h1'), page.locator('.shots')]) {
+        await expect(el).toHaveClass(/hero-in/)
+        const names = await el.evaluate((e) => e.getAnimations().map((a) => (a as CSSAnimation).animationName))
+        expect(names).toContain('hero-rise')
+      }
+
+      // Below the fold stays hidden until scrolled to (no timer that shows it anyway)
+      const last = page.locator('.reveal').last()
+      await page.waitForTimeout(2000)
+      await expect(last).toHaveClass(/reveal-armed/)
+      await expect(last).not.toHaveClass(/is-visible/)
+      expect(await last.evaluate((e) => getComputedStyle(e).opacity)).toBe('0')
+
+      // ...and rises in when it scrolls into view
+      await last.scrollIntoViewIfNeeded()
+      await expect(last).toHaveClass(/is-visible/)
+      await expect.poll(() => last.evaluate((e) => getComputedStyle(e).opacity)).toBe('1')
+      expect(errors).toEqual([])
+    })
+  }
+
+  test('things that come into view together follow each other', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await open(page, '/exultadetail')
+    const cards = page.locator('.feature-card')
+    await cards.first().scrollIntoViewIfNeeded()
+    await expect(cards.nth(2)).toHaveClass(/is-visible/)
+    const delays = await cards.evaluateAll((els) =>
+      els.slice(0, 3).map((e) => parseFloat(getComputedStyle(e).getPropertyValue('--reveal-delay') || '0')),
+    )
+    // Left to right, each a little later than the one before
+    expect(delays[1]).toBeGreaterThan(delays[0])
+    expect(delays[2]).toBeGreaterThan(delays[1])
+  })
+
+  test('nothing is hidden or animated with reduced motion', async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    await open(page, '/exultadetail')
+    const opacities = await page.locator('.reveal, .hero-in').evaluateAll((els) => els.map((e) => getComputedStyle(e).opacity))
+    expect(opacities.every((o) => o === '1')).toBe(true)
+    const animated = await page.locator('.reveal, .hero-in').evaluateAll((els) => els.filter((e) => e.getAnimations().length).length)
+    expect(animated).toBe(0)
+    await context.close()
+  })
+})
+
 test('lightbox opens, steps through the screenshots, and closes', async ({ page }) => {
   const errors = await guard(page)
   await open(page, '/exultadetail')
