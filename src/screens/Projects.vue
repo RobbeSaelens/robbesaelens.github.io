@@ -58,34 +58,31 @@
         v-for="(project, index) in projects"
         :key="project.id"
         class="car-slide"
-        :class="{ 'is-current': index === current, 'is-soon': !project.route }"
+        :class="{
+          'is-current': index === current,
+          'is-before': index < current,
+          'is-after': index > current,
+          'is-soon': !project.route,
+        }"
+        @click.capture="onCardClick($event, index)"
       >
         <component
           :is="project.route ? 'router-link' : 'div'"
           :to="project.route ? { name: $ln(project.route) } : undefined"
           class="car-card"
           draggable="false"
-          @click="onCardClick($event, index)"
         >
-          <!-- Mockup: the desktop screenshot in a browser window. -->
-          <div class="car-stage">
-            <div v-if="project.image" class="car-mock">
-              <div class="car-browser">
-                <div class="car-chrome" aria-hidden="true">
-                  <span class="car-chrome-dots"><i></i><i></i><i></i></span>
-                  <span class="car-chrome-url">{{ project.host }}</span>
-                </div>
-                <img
-                  class="car-shot"
-                  :src="project.image"
-                  :alt="`${project.name} project screenshot`"
-                  width="1600"
-                  height="1000"
-                  draggable="false"
-                  :loading="index < 2 ? 'eager' : 'lazy'"
-                />
-              </div>
-            </div>
+          <!-- The real screenshot on a 3D MacBook. It opens and turns to face you when
+               its slide becomes the current one, and follows the mouse. -->
+          <div class="car-stage" @pointermove="tilt($event, index)" @pointerleave="untilt">
+            <MacBook3D
+              v-if="project.screenshot"
+              :src="project.screenshot"
+              :alt="$t('projects.mockupAlt', { name: project.name })"
+              :active="index === current"
+              :loading="index < 2 ? 'eager' : 'lazy'"
+              :fetchpriority="index === 0 ? 'high' : undefined"
+            />
             <div v-else class="car-soon" aria-hidden="true">+</div>
           </div>
 
@@ -133,15 +130,15 @@
 
 <script lang="ts">
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-vue-next'
+import MacBook3D from '../components/MacBook3D.vue'
 
 type Status = 'live' | 'private' | 'rebranding' | 'soon'
 
 interface Project {
   id: string
   name: string
-  /** Shown in the mockup's address bar. */
-  host?: string
-  image?: string
+  /** Shown on the MacBook's screen: a real 16:10 screenshot of the site */
+  screenshot?: string
   route?: string
   status: Status
 }
@@ -151,32 +148,28 @@ const PROJECTS: Project[] = [
   {
     id: 'exulta',
     name: 'Exulta',
-    host: 'exulta.be',
-    image: '/exulta-home.jpg',
+    screenshot: '/exulta-home.jpg',
     route: 'ExultaDetail',
     status: 'live',
   },
   {
     id: 'scan2talk',
     name: 'Scan2Talk',
-    host: 'scan2talk.be',
-    image: '/scan2talk-home.jpg',
+    screenshot: '/scan2talk-home.jpg',
     route: 'Scan2TalkDetail',
     status: 'live',
   },
   {
     id: 'stal-manager',
     name: 'Stal Manager',
-    host: 'stal-manager',
-    image: '/stal-manager-home.jpg',
+    screenshot: '/stal-manager-home.jpg',
     route: 'StalManagerDetail',
     status: 'private',
   },
   {
     id: 'vhs',
     name: 'VHS Service',
-    host: 'vhs-service',
-    image: '/vhs-home.jpg',
+    screenshot: '/vhs-home.jpg',
     route: 'VHSDetail',
     status: 'rebranding',
   },
@@ -192,7 +185,7 @@ const STATUS_KEYS: Record<Status, string> = {
 
 export default {
   name: 'ProjectsScreen',
-  components: { ArrowLeft, ArrowRight, ArrowUpRight },
+  components: { ArrowLeft, ArrowRight, ArrowUpRight, MacBook3D },
 
   data() {
     return {
@@ -205,13 +198,27 @@ export default {
       startLeft: 0,
       wheelLocked: false,
       wheelTimer: 0,
+      /** The slide go() is scrolling to, until it gets there. */
+      goingTo: null as number | null,
+      goingTimer: 0,
+      canTilt: false,
+      tiltEl: null as HTMLElement | null,
+      tiltNow: { x: 0, y: 0 },
+      tiltTarget: { x: 0, y: 0 },
+      tiltFrame: 0,
     }
+  },
+
+  mounted() {
+    this.canTilt = window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches
   },
 
   beforeUnmount() {
     window.removeEventListener('pointermove', this.dragMove)
     window.removeEventListener('pointerup', this.dragEnd)
     clearTimeout(this.wheelTimer)
+    clearTimeout(this.goingTimer)
+    cancelAnimationFrame(this.tiltFrame)
   },
 
   methods: {
@@ -221,31 +228,92 @@ export default {
     track(): HTMLElement {
       return this.$refs.track as HTMLElement
     },
-    go(index: number) {
-      const i = Math.max(0, Math.min(this.projects.length - 1, index))
+    /**
+     * Where the track scrolls to for a slide: the slide in the middle, as far as the
+     * track can scroll. When slides are narrow (short screens), the first ones can't
+     * reach the middle and share the start position.
+     */
+    scrollTarget(i: number) {
       const t = this.track()
       const slide = t.children[i] as HTMLElement
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      t.scrollTo({
-        left: slide.offsetLeft - (t.clientWidth - slide.offsetWidth) / 2,
-        behavior: reduced ? 'auto' : 'smooth',
-      })
+      const max = t.scrollWidth - t.clientWidth
+      return Math.max(0, Math.min(max, slide.offsetLeft - (t.clientWidth - slide.offsetWidth) / 2))
     },
-    /** The slide closest to the middle of the track is the current one. */
+    go(index: number) {
+      const i = Math.max(0, Math.min(this.projects.length - 1, index))
+      this.resetTilt()
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      // Current right away; scroll events on the way there don't change it.
+      this.current = i
+      this.goingTo = i
+      clearTimeout(this.goingTimer)
+      this.goingTimer = window.setTimeout(() => (this.goingTo = null), 1200)
+      this.track().scrollTo({ left: this.scrollTarget(i), behavior: reduced ? 'auto' : 'smooth' })
+    },
+    /**
+     * After a swipe or drag: the slide whose scroll position is closest is the current
+     * one. Slides that share a position (see scrollTarget) keep the one picked.
+     */
     onScroll() {
-      const t = this.track()
-      const center = t.scrollLeft + t.clientWidth / 2
-      let best = 0
-      let bestDist = Infinity
-      ;[...t.children].forEach((child, i) => {
-        const el = child as HTMLElement
-        const dist = Math.abs(el.offsetLeft + el.offsetWidth / 2 - center)
-        if (dist < bestDist) {
-          bestDist = dist
-          best = i
-        }
-      })
-      this.current = best
+      const left = this.track().scrollLeft
+      if (this.goingTo !== null) {
+        if (Math.abs(left - this.scrollTarget(this.goingTo)) < 2) this.goingTo = null
+        return
+      }
+      const dist = this.projects.map((_, i) => Math.abs(this.scrollTarget(i) - left))
+      const min = Math.min(...dist)
+      const closest = dist.flatMap((d, i) => (d - min < 1 ? [i] : []))
+      this.current = closest.includes(this.current) ? this.current : closest[0]
+    },
+    /**
+     * The current slide's MacBook turns towards the mouse (not with reduced motion).
+     * The pointer sets a target; ease() moves towards it a little every frame.
+     */
+    tilt(event: PointerEvent, index: number) {
+      if (index !== this.current || event.pointerType !== 'mouse' || this.dragging || !this.canTilt) return
+      const el = event.currentTarget as HTMLElement
+      const r = el.getBoundingClientRect()
+      const x = (event.clientX - r.left) / r.width - 0.5
+      const y = (event.clientY - r.top) / r.height - 0.5
+      if (this.tiltEl !== el) this.resetTilt()
+      this.tiltEl = el
+      this.tiltTarget = { x: -y * 14, y: x * 36 }
+      el.classList.add('is-tilted')
+      this.ease()
+    },
+    untilt() {
+      this.tiltTarget = { x: 0, y: 0 }
+      this.ease()
+    },
+    ease() {
+      if (this.tiltFrame) return
+      const step = () => {
+        const el = this.tiltEl
+        if (!el) return (this.tiltFrame = 0)
+        const now = this.tiltNow
+        now.x += (this.tiltTarget.x - now.x) * 0.08
+        now.y += (this.tiltTarget.y - now.y) * 0.08
+        el.style.setProperty('--tx', `${now.x.toFixed(3)}deg`)
+        el.style.setProperty('--ty', `${now.y.toFixed(3)}deg`)
+        const settled = Math.abs(this.tiltTarget.x - now.x) < 0.02 && Math.abs(this.tiltTarget.y - now.y) < 0.02
+        if (settled && this.tiltTarget.x === 0 && this.tiltTarget.y === 0) return this.resetTilt()
+        this.tiltFrame = settled ? 0 : requestAnimationFrame(step)
+      }
+      this.tiltFrame = requestAnimationFrame(step)
+    },
+    /** Back to rest: no tilt, the sway carries on. */
+    resetTilt() {
+      cancelAnimationFrame(this.tiltFrame)
+      this.tiltFrame = 0
+      const el = this.tiltEl
+      if (el) {
+        el.classList.remove('is-tilted')
+        el.style.removeProperty('--tx')
+        el.style.removeProperty('--ty')
+      }
+      this.tiltEl = null
+      this.tiltNow = { x: 0, y: 0 }
+      this.tiltTarget = { x: 0, y: 0 }
     },
     /** The page doesn't scroll vertically, so a vertical wheel gesture steps one slide. */
     onWheel(event: WheelEvent) {
@@ -263,6 +331,7 @@ export default {
       if (event.pointerType !== 'mouse' || event.button !== 0) return
       this.dragging = true
       this.moved = false
+      this.goingTo = null
       this.startX = event.clientX
       this.startLeft = this.track().scrollLeft
       window.addEventListener('pointermove', this.dragMove)
@@ -279,7 +348,11 @@ export default {
       window.removeEventListener('pointerup', this.dragEnd)
       if (this.moved) this.go(this.current)
     },
-    /** A drag isn't a click, and clicking a peeking slide brings it to the middle first. */
+    /**
+     * A drag isn't a click, and clicking a peeking slide brings it to the middle
+     * instead of opening it. Runs while the click is on its way down to the link
+     * (capture), so it stops the link before the router acts on it.
+     */
     onCardClick(event: MouseEvent, index: number) {
       if (this.moved) {
         event.preventDefault()
@@ -415,20 +488,35 @@ export default {
   outline-offset: 4px;
 }
 
-/* Slide width follows the track height (minus the caption), capped by the track width.
-   The mockup always fills the slide's width (see .car-mock). */
+/* Slide width follows the track height (minus the caption), capped by the track width. */
 .car-slide {
-  flex: 0 0 min(82cqw, calc((100cqh - 6.5rem) * 1.8));
+  flex: 0 0 min(84cqw, calc((100cqh - 6.5rem) * 1.6));
   scroll-snap-align: center;
-  opacity: 0.45;
-  transform: scale(0.92);
+  opacity: 0.5;
+  transform: scale(0.9);
   transition:
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.6s ease;
+    transform 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.8s ease;
+  /* The MacBook's pose (MacBook3D.vue): half closed, turned towards the current one */
+  --rx: -14deg;
+  --lid: -38deg;
 }
+.car-slide.is-before {
+  --ry: 42deg;
+}
+.car-slide.is-after {
+  --ry: -42deg;
+}
+/* The current one: open, at three quarters, every other one from the other side */
 .car-slide.is-current {
   opacity: 1;
   transform: none;
+  --rx: -18deg;
+  --lid: 14deg;
+  --ry: -24deg;
+}
+.car-slide.is-current:nth-child(even) {
+  --ry: 24deg;
 }
 
 .car-card {
@@ -440,104 +528,22 @@ export default {
   outline: none;
 }
 
-/* Stage: no frame of its own, it sizes the mockup and lines it up with the caption. */
+/* Stage: the MacBook's room, a size container it scales itself to. While the mouse
+   is over it, the sway pauses and tilt() turns the MacBook. */
 .car-stage {
   container-type: size;
   position: relative;
   display: flex;
   flex: 1;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   min-height: 0;
-  border-radius: 1.5rem;
+  border-radius: 1.25rem;
 }
-
-/* The browser spans the stage, from the caption's left edge to its right edge. It is
-   16:10 plus its bar; on a stage too short for that it gets wider than 16:10 and
-   shows less of the page, so it still lines up. */
-.car-mock {
-  width: 100cqw;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.car-browser {
-  display: flex;
-  flex-direction: column;
-  height: min(calc(100cqw / 1.6 + 1.9rem), 100cqh);
-  overflow: hidden;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow:
-    0 2px 4px rgba(8, 40, 38, 0.06),
-    0 24px 50px -24px rgba(8, 40, 38, 0.45);
-  transition: box-shadow 0.6s ease;
-}
-/* The current slide gets a teal glow underneath. */
-.car-slide.is-current .car-browser {
-  box-shadow:
-    0 2px 4px rgba(8, 40, 38, 0.08),
-    0 24px 50px -24px rgba(8, 40, 38, 0.45),
-    0 40px 80px -40px color-mix(in srgb, var(--color-accent) 55%, transparent);
-}
-.dark .car-browser {
-  box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.9);
-}
-.dark .car-slide.is-current .car-browser {
-  box-shadow:
-    0 24px 50px -24px rgba(0, 0, 0, 0.9),
-    0 40px 90px -40px color-mix(in srgb, var(--color-accent) 40%, transparent);
-}
-.car-chrome {
-  flex-shrink: 0;
-  display: grid;
-  grid-template-columns: 2.5rem 1fr 2.5rem;
-  align-items: center;
-  height: 1.9rem;
-  padding: 0 0.7rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface-hover);
-}
-.car-chrome-dots {
-  display: flex;
-  gap: 0.3rem;
-}
-.car-chrome-dots i {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 9999px;
-  background: #ef4444;
-}
-.car-chrome-dots i:nth-child(2) {
-  background: #f59e0b;
-}
-.car-chrome-dots i:nth-child(3) {
-  background: #22c55e;
-}
-.car-chrome-url {
-  justify-self: center;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0.1rem 0.9rem;
-  border-radius: 9999px;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--color-text-muted);
-  background: var(--color-accent-soft);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.car-shot {
-  display: block;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  object-fit: cover;
-  object-position: top;
+.car-stage.is-tilted {
+  --sway: paused;
 }
 @media (hover: hover) {
-  .car-slide.is-current .car-card:hover .car-mock {
-    transform: translateY(-4px);
-  }
   .car-slide.is-current .car-card:hover .car-cta {
     background: var(--color-accent-soft);
     box-shadow: 0 0 16px var(--color-border-glow);
@@ -558,6 +564,7 @@ export default {
   background: var(--color-surface);
 }
 .car-slide.is-soon .car-stage {
+  align-items: center;
   justify-content: center;
   border: 2px dashed var(--color-border-glow);
   box-shadow: none;
@@ -692,8 +699,13 @@ export default {
   .car-slide {
     flex-basis: 84cqw;
   }
+  /* A 5:4 stage, centred with its caption, instead of one as tall as the screen */
+  .car-card {
+    justify-content: center;
+  }
   .car-stage {
-    border-radius: 1.25rem;
+    flex: 0 1 auto;
+    aspect-ratio: 5 / 4;
   }
   .car-caption {
     flex-direction: column;
@@ -707,7 +719,6 @@ export default {
     animation: none;
   }
   .car-slide,
-  .car-mock,
   .car-caption > *,
   .car-dot span {
     transition: none;

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { FIT_ROUTES, nl, ROUTES } from './routes'
+import { measureCurrentSlide } from './slides'
 
 /**
  * Responsive check: every page at every breakpoint that matters, plus dark mode
@@ -72,6 +73,18 @@ for (const base of ROUTES) {
       expect(size.sideways, 'scrolls sideways').toBeLessThanOrEqual(1)
       if (FIT_ROUTES.includes(base) && height >= FIT_MIN_HEIGHT) {
         expect(size.vertical, 'one-screen page scrolls vertically').toBeLessThanOrEqual(1)
+      }
+
+      // The project slides: the stage spans its slide, edge to edge with the caption,
+      // with the whole 3D MacBook in it
+      if (base === '/projects') {
+        await page.waitForTimeout(800) // the lid opening
+        const slide = await measureCurrentSlide(page)
+        expect(slide.loaded, 'screenshot on the MacBook loaded').toBe(true)
+        expect(Math.abs(slide.left), "stage's left edge vs the caption").toBeLessThanOrEqual(1)
+        expect(Math.abs(slide.right), "stage's right edge vs the caption").toBeLessThanOrEqual(1)
+        expect(slide.inside, 'the whole MacBook is shown, clear of the caption').toBe(true)
+        expect(slide.share, 'the MacBook fills its stage').toBeGreaterThan(0.85)
       }
 
       await page.screenshot({

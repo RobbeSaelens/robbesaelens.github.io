@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { baseCompile } from '@intlify/message-compiler'
 import { expect, test, type Page } from '@playwright/test'
 import { nl, ROUTES } from './routes'
+import { measureCurrentSlide, SLIDES } from './slides'
 
 /**
  * Smoke tests: every public page renders without errors in both languages and
@@ -46,6 +47,20 @@ async function open(page: Page, route: string) {
   await page.goto(route)
   await expect(page.locator('#main-content')).toBeVisible()
   await page.waitForLoadState('networkidle')
+}
+
+/** Waits until the project carousel has stopped scrolling. */
+async function settled(page: Page) {
+  const position = () => page.locator('.car-track').evaluate((el) => el.scrollLeft)
+  let last = -1
+  await expect
+    .poll(async () => {
+      const now = await position()
+      const still = now === last
+      last = now
+      return still
+    }, { intervals: [150] })
+    .toBe(true)
 }
 
 /** On small screens the nav controls live in the hamburger menu. */
@@ -230,11 +245,170 @@ test('projects page links to each project', async ({ page }) => {
     // Bring the slide to the middle with its page dot, then follow its (real, crawlable) link.
     await page.getByRole('button', { name, exact: true }).click()
     const current = page.locator('.car-slide.is-current')
-    await expect(current).toContainText(name) // the carousel has scrolled there
-    await current.locator('a.car-card').click()
+    await expect(current).toContainText(name)
+    await settled(page) // the carousel has scrolled there
+    // Click where it is on screen: locator.click() would first scroll the link into
+    // view, and moving the carousel makes another slide the current one
+    const box = (await current.locator('a.car-card').boundingBox())!
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await expect(page.locator('h1')).toContainText(name)
   }
+})
+
+test.describe('project slides', () => {
+  /** The pose a slide gives its MacBook (custom properties read by MacBook3D.vue) */
+  const poses = (page: Page) =>
+    page.locator('.car-slide').evaluateAll((slides) =>
+      slides
+        .filter((el) => el.querySelector('.mb-scene'))
+        .map((el) => {
+          const style = getComputedStyle(el.querySelector('.mb-scene')!)
+          return { lid: parseFloat(style.getPropertyValue('--lid')), ry: parseFloat(style.getPropertyValue('--ry')) }
+        }),
+    )
+
+  for (const route of ['/projects', nl('/projects')]) {
+    test(`every slide shows its screenshot on a 3D MacBook, lined up with its caption (${route})`, async ({ page }) => {
+      const errors = await guard(page)
+      await open(page, route)
+      const alt = route === '/projects' ? 'on a MacBook' : 'op een MacBook'
+      await expect(page.locator('.mb-scene')).toHaveCount(SLIDES.length)
+
+      for (const { name, screenshot } of SLIDES) {
+        await page.getByRole('button', { name, exact: true }).click()
+        const current = page.locator('.car-slide.is-current')
+        await expect(current).toContainText(name)
+        await expect(page.getByRole('button', { name, exact: true })).toHaveAttribute('aria-current', 'true')
+        await expect(current.locator('img.mb-shot')).toHaveAttribute('alt', `${name} ${alt}`)
+
+        // Let the scroll, the turn and the lid settle before measuring
+        await expect.poll(async () => (await measureCurrentSlide(page)).loaded).toBe(true)
+        await page.waitForTimeout(1500)
+        const m = await measureCurrentSlide(page)
+        expect(m.screenshot).toBe(screenshot)
+        expect(Math.abs(m.left), `${name}: stage's left edge vs the caption`).toBeLessThanOrEqual(1)
+        expect(Math.abs(m.right), `${name}: stage's right edge vs the caption`).toBeLessThanOrEqual(1)
+        expect(m.inside, `${name}: the whole MacBook is shown, clear of the caption`).toBe(true)
+        expect(m.share, `${name}: the MacBook fills its stage`).toBeGreaterThan(0.85)
+      }
+      expect(errors).toEqual([])
+    })
+  }
+
+  test('clicking the slide beside the current one brings it to the middle; clicking the current one opens it', async ({ page }) => {
+    await open(page, '/projects')
+    await page.getByRole('button', { name: 'Scan2Talk', exact: true }).click()
+    const current = page.locator('.car-slide.is-current')
+    await expect(current).toContainText('Scan2Talk')
+    await settled(page)
+
+    /** Clicks a slide where it shows on screen (part of it is off the edge) */
+    const clickVisible = async (name: string) => {
+      const slide = page.locator('.car-slide', { hasText: name })
+      const box = (await slide.boundingBox())!
+      const view = page.viewportSize()!
+      const left = Math.max(box.x, 0)
+      const right = Math.min(box.x + box.width, view.width)
+      await page.mouse.click((left + right) / 2, box.y + box.height * 0.4)
+    }
+
+    for (const name of ['Stal Manager', 'Scan2Talk', 'Exulta']) {
+      await clickVisible(name)
+      await expect(current).toContainText(name)
+      await expect(page).toHaveURL(/\/projects$/)
+      await settled(page)
+    }
+
+    // The current one opens its project page
+    await clickVisible('Exulta')
+    await expect(page).toHaveURL(/\/exultadetail$/)
+  })
+
+  test('the arrows, keys and dots reach every slide, also the narrow ones on short screens', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 620 })
+    await open(page, '/projects')
+    const counter = page.locator('.car-count-now')
+    const next = page.getByRole('button', { name: 'Next project' })
+    if (await next.isVisible()) {
+      for (const n of ['02', '03', '04', '05']) {
+        await next.click()
+        await expect(counter).toHaveText(n)
+      }
+    }
+    await page.locator('.car-track').focus()
+    for (const n of ['04', '03', '02', '01']) {
+      await page.keyboard.press('ArrowLeft')
+      await expect(counter).toHaveText(n)
+    }
+    await page.getByRole('button', { name: 'Scan2Talk', exact: true }).click()
+    await expect(page.locator('.car-slide.is-current')).toContainText('Scan2Talk')
+  })
+
+  test('the current MacBook is open; the others are half closed and turned towards it', async ({ page }) => {
+    await open(page, '/projects')
+    await page.getByRole('button', { name: 'Stal Manager', exact: true }).click()
+    await expect(page.locator('.car-slide.is-current')).toContainText('Stal Manager')
+    const p = await poses(page)
+    expect(p.map((x) => x.lid)).toEqual([-38, -38, 14, -38])
+    // Before the current one they turn right (towards it), after it left
+    expect(p[0].ry).toBeGreaterThan(0)
+    expect(p[1].ry).toBeGreaterThan(0)
+    expect(p[3].ry).toBeLessThan(0)
+    // Every other current MacBook is seen from the other side
+    await page.getByRole('button', { name: 'VHS Service', exact: true }).click()
+    await expect(page.locator('.car-slide.is-current')).toContainText('VHS Service')
+    expect(Math.sign((await poses(page))[3].ry)).toBe(-Math.sign(p[2].ry))
+  })
+
+  test('the lid is closed until the intro has played, then it opens', async ({ page }) => {
+    await open(page, '/projects')
+    const lid = () =>
+      page.locator('.car-slide.is-current .mb-scene').evaluate((el) => parseFloat(getComputedStyle(el).getPropertyValue('--lid')))
+    expect(await lid()).toBe(14)
+    await page.evaluate(() => document.documentElement.classList.remove('intro-done'))
+    expect(await lid()).toBe(-90)
+    await page.evaluate(() => document.documentElement.classList.add('intro-done'))
+    expect(await lid()).toBe(14)
+  })
+
+  test('the current MacBook sways, and turns towards the mouse', async ({ page, isMobile }) => {
+    await open(page, '/projects')
+    const swaying = () =>
+      page.locator('.mb-sway').evaluateAll((els) =>
+        els.map((el) => el.getAnimations().some((a) => a.playState === 'running')),
+      )
+    expect(await swaying()).toEqual([true, false, false, false])
+    test.skip(isMobile, 'mouse only')
+
+    const stage = page.locator('.car-slide.is-current .car-stage')
+    const box = (await stage.boundingBox())!
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.1)
+    await expect(stage).toHaveClass(/is-tilted/)
+    // Eased towards the mouse frame by frame
+    const tilt = () => stage.evaluate((el) => [el.style.getPropertyValue('--tx'), el.style.getPropertyValue('--ty')].map(parseFloat))
+    await expect.poll(async () => (await tilt())[0], { message: 'tips back at the top' }).toBeGreaterThan(3)
+    await expect.poll(async () => (await tilt())[1], { message: 'turns right on the right' }).toBeGreaterThan(8)
+    expect(await swaying(), 'the sway pauses under the mouse').toEqual([false, false, false, false])
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height + 200)
+    await expect(stage).not.toHaveClass(/is-tilted/)
+  })
+
+  test('no swaying, turning or tilting with reduced motion', async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    await open(page, '/projects')
+    const animations = await page.locator('.mb-sway').evaluateAll((els) => els.flatMap((el) => el.getAnimations()).length)
+    expect(animations).toBe(0)
+    // The site's reduced-motion rule (styles.css) leaves transitions at 0.01 ms at most
+    const transition = await page.locator('.mb-pose').first().evaluate((el) => getComputedStyle(el).transitionDuration)
+    expect(parseFloat(transition)).toBeLessThan(0.001)
+    const stage = page.locator('.car-slide.is-current .car-stage')
+    const box = (await stage.boundingBox())!
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.1)
+    await expect(stage).not.toHaveClass(/is-tilted/)
+    await context.close()
+  })
 })
 
 test('lightbox opens, steps through the screenshots, and closes', async ({ page }) => {

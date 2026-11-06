@@ -57,6 +57,7 @@
     "private": "live · private",
     "comingSoon": "Coming soon",
     "inProgress": "in progress",
+    "mockupAlt": "{name} on a MacBook",
     "viewCase": "View project",
     "prev": "Previous project",
     "next": "Next project"
