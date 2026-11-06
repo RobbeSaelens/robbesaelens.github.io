@@ -155,6 +155,11 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
     ],
     responseKey: 'chat.project-stalmanager',
   },
+  // Work on drupal.org; "drupal module" is answered above, with Shared Costs
+  {
+    keys: ['drupal.org', 'contribut', 'bijdrage', 'credit', 'merge request', 'drupal'],
+    responseKey: 'chat.drupal',
+  },
   // General projects
   {
     keys: ['project', 'projects', 'projecten', 'built', 'made', 'gemaakt', 'portfolio'],

@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-11-06T18:22:48.476Z",
+  "user": "robbesaelens",
+  "credits": [
+    {
+      "title": "Support OOP hooks",
+      "project": "queue_ui",
+      "url": "https://www.drupal.org/project/queue_ui/issues/3519846",
+      "issue": 3519846,
+      "date": "2025-09-18T21:24:02.000Z"
+    },
+    {
+      "title": "Support OOP hooks",
+      "project": "teamleader",
+      "url": "https://git.drupalcode.org/project/teamleader/-/work_items/3519849",
+      "issue": 3519849,
+      "date": "2025-09-10T12:04:02.000Z"
+    },
+    {
+      "title": "Support OOP hooks",
+      "project": "resend_register_mail",
+      "url": "https://git.drupalcode.org/project/resend_register_mail/-/work_items/3519847",
+      "issue": 3519847,
+      "date": "2025-05-21T11:59:02.000Z"
+    }
+  ],
+  "mergeRequests": [
+    {
+      "title": "Support OOP hooks",
+      "ref": "!9",
+      "project": "teamleader",
+      "state": "merged",
+      "url": "https://git.drupalcode.org/project/teamleader/-/merge_requests/9",
+      "issue": 3519849,
+      "created": "2025-04-18T12:57:53.077Z",
+      "merged": "2025-08-27T12:00:39.804Z"
+    },
+    {
+      "title": "Support OOP hooks",
+      "ref": "!10",
+      "project": "resend_register_mail",
+      "state": "merged",
+      "url": "https://git.drupalcode.org/project/resend_register_mail/-/merge_requests/10",
+      "issue": 3519847,
+      "created": "2025-04-18T12:08:55.987Z",
+      "merged": "2025-05-07T11:59:11.110Z"
+    },
+    {
+      "title": "Support OOP hooks",
+      "ref": "!59",
+      "project": "queue_ui",
+      "state": "merged",
+      "url": "https://git.drupalcode.org/project/queue_ui/-/merge_requests/59",
+      "issue": 3519846,
+      "created": "2025-04-18T11:02:49.278Z",
+      "merged": "2025-09-04T21:17:03.890Z"
+    }
+  ],
+  "issuesCreated": [
+    {
+      "id": 3635887,
+      "title": "Default content import keeps a multi-value field's default items beyond the imported ones",
+      "url": "https://www.drupal.org/project/drupal/issues/3635887",
+      "project": "drupal",
+      "status": "active",
+      "priority": "normal",
+      "category": "bug",
+      "version": "main",
+      "created": "2026-11-06T16:38:27.000Z",
+      "updated": "2026-11-06T16:38:27.000Z"
+    },
+    {
+      "id": 3635886,
+      "title": "Charts render empty on Drupal 12: template_preprocess_charts_chart() is no longer called, use 'initial preprocess'",
+      "url": "https://www.drupal.org/project/charts/issues/3635886",
+      "project": "charts",
+      "status": "active",
+      "priority": "major",
+      "category": "bug",
+      "version": "5.2.x-dev",
+      "created": "2026-11-06T16:37:41.000Z",
+      "updated": "2026-11-06T16:37:41.000Z"
+    },
+    {
+      "id": 3635885,
+      "title": "Chart views fail strict config schema: path and chart_settings.library_type_options have no schema",
+      "url": "https://www.drupal.org/project/charts/issues/3635885",
+      "project": "charts",
+      "status": "active",
+      "priority": "normal",
+      "category": "bug",
+      "version": "5.2.x-dev",
+      "created": "2026-11-06T16:36:54.000Z",
+      "updated": "2026-11-06T16:36:54.000Z"
+    },
+    {
+      "id": 3514720,
+      "title": "Uncaught Error: noUiSlider: Slider was already initialized - when using multiple 'Range NoUiSliders' on the same Search API view",
+      "url": "https://www.drupal.org/project/facets_range_nouislider/issues/3514720",
+      "project": "facets_range_nouislider",
+      "status": "needs-work",
+      "priority": "normal",
+      "category": "bug",
+      "version": "1.0.1",
+      "created": "2025-03-21T18:01:38.000Z",
+      "updated": "2025-04-25T12:40:46.000Z"
+    }
+  ],
+  "issuesJoined": [
+    {
+      "id": 3481342,
+      "title": "Selection of menu when adding a group menu block",
+      "url": "https://www.drupal.org/project/group_content_menu/issues/3481342",
+      "project": "group_content_menu",
+      "status": "active",
+      "priority": "normal",
+      "category": "task",
+      "version": "3.0.x-dev",
+      "created": "2024-10-17T02:30:20.000Z",
+      "updated": "2025-12-11T08:54:57.000Z"
+    },
+    {
+      "id": 3519846,
+      "title": "Support OOP hooks",
+      "url": "https://www.drupal.org/project/queue_ui/issues/3519846",
+      "project": "queue_ui",
+      "status": "closed-fixed",
+      "priority": "normal",
+      "category": "task",
+      "version": "3.2.x-dev",
+      "created": "2025-04-18T08:05:22.000Z",
+      "updated": "2025-09-18T21:24:02.000Z"
+    },
+    {
+      "id": 3519849,
+      "title": "Support OOP hooks",
+      "url": "https://git.drupalcode.org/project/teamleader/-/work_items/3519849",
+      "project": "teamleader",
+      "status": "closed",
+      "priority": "normal",
+      "category": "task",
+      "version": "4.0.x-dev",
+      "created": "2025-04-18T08:12:39.000Z",
+      "updated": "2025-09-10T12:04:02.000Z"
+    },
+    {
+      "id": 3519847,
+      "title": "Support OOP hooks",
+      "url": "https://git.drupalcode.org/project/resend_register_mail/-/work_items/3519847",
+      "project": "resend_register_mail",
+      "status": "closed",
+      "priority": "normal",
+      "category": "task",
+      "version": "1.0.x-dev",
+      "created": "2025-04-18T08:06:26.000Z",
+      "updated": "2025-05-21T11:59:02.000Z"
+    }
+  ],
+  "projects": {
+    "charts": {
+      "name": "Charts",
+      "url": "https://www.drupal.org/project/charts"
+    },
+    "drupal": {
+      "name": "Drupal core",
+      "url": "https://www.drupal.org/project/drupal"
+    },
+    "facets_range_nouislider": {
+      "name": "Facets range NoUiSlider",
+      "url": "https://www.drupal.org/project/facets_range_nouislider"
+    },
+    "group_content_menu": {
+      "name": "Group Content Menu",
+      "url": "https://www.drupal.org/project/group_content_menu"
+    },
+    "queue_ui": {
+      "name": "Queue UI",
+      "url": "https://www.drupal.org/project/queue_ui"
+    },
+    "resend_register_mail": {
+      "name": "Resend registration / welcome email",
+      "url": "https://www.drupal.org/project/resend_register_mail"
+    },
+    "teamleader": {
+      "name": "Teamleader Integration",
+      "url": "https://www.drupal.org/project/teamleader"
+    }
+  }
+}

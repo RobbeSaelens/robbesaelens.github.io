@@ -11,6 +11,7 @@
     "prerender": "node scripts/prerender.mjs",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "stats": "node scripts/repo-stats.mjs",
+    "drupal": "node scripts/drupal-stats.mjs",
     "preview": "vite preview",
     "test": "playwright test --project=desktop --project=mobile",
     "test:responsive": "playwright test --project=responsive"

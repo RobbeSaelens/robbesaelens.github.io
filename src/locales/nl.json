@@ -27,9 +27,10 @@
     "educationText2": "Na MIT volgde ik de bacheloropleiding Multimedia en Creatieve Technologie, in het traject {link}.",
     "experience": "Ervaring",
     "experienceText1": "In februari 2023 begon ik als stagiair bij {link1}. Na mijn stage mocht ik er blijven als {role}.",
-    "experienceText2": "Vandaag werk ik bij {link2} als {role}, en ik zet die ervaring graag in voor nieuwe projecten.",
+    "experienceText2": "Vandaag werk ik bij {link2} als {role}, en ik zet die ervaring graag in voor nieuwe projecten. {drupal}",
     "phpMagentoDev": "PHP- en Magento-ontwikkelaar",
     "backendDev": "backend developer",
+    "drupalLink": "Mijn Drupal-bijdragen",
     "competing": "Paardrijden",
     "competingText": "Naast mijn job rijd ik op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Mijn grote passie is jumping, met alles wat daarbij komt kijken."
   },
@@ -142,6 +143,7 @@
     "drupalAlt": "Dashboard van Stal Manager in Drupal, gebouwd met de module Shared Costs en haar recipes",
     "openSourceBadge": "Open source",
     "viewOnGithub": "Bekijk op GitHub",
+    "drupalContributions": "Mijn Drupal-bijdragen",
     "drupalField": "Tot op de cent",
     "drupalFieldText": "Een veldtype verdeelt elke kost over de paarden, gelijk of procentueel, in hele centen: 12,35 over twee paarden is 6,18 + 6,17, nooit 6,18 + 6,18. Views telt de delen op per paard en per maand.",
     "drupalRecipes": "Drie recipes, geen eigen code",
@@ -213,6 +215,7 @@
     "project-scan2talk": "Scan2Talk is een PWA voor scholen: leerlingen scannen een QR-code en doorlopen een korte, begeleide check-in over hoe ze zich voelen (thermometer → thema → gevoelens → hulpvraag). Leerkrachten krijgen een overzichtsdashboard met Chart.js-grafieken. Gebouwd met Laravel 13, Vue.js 3, Inertia.js, PostgreSQL, Spatie Permissions en Simple QR Code.",
     "project-stalmanager": "Stal Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests. Er is ook een open-source Drupal-versie, Shared Costs (github.com/RobbeSaelens/shared_costs): een Drupal 11-module die kosten tot op de cent verdeelt, met recipes en een thema die de app nabouwen met enkel configuratie, getest met PHPUnit, Playwright en PHPStan.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun nieuwe site op Next.js 16 en React 19: een redactioneel design rond grote foto's, met scroll-animaties in GSAP en Motion en vloeiend scrollen met Lenis, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. De site krijgt een rebranding en is nog niet publiek.",
+    "drupal": "Robbe werkt bij Dynamate als backend developer voor Drupal-projecten en draagt ook bij op drupal.org: hij meldt de bugs die hij tegenkomt in Drupal core en contributed modules, helpt mee in issues van anderen en stuurt fixes in als merge requests. De maintainers van Queue UI, Teamleader Integration en Resend registration / welcome email gaven hem credit voor ondersteuning van OOP-hooks. Je vindt alles op de pagina Drupal-bijdragen: robbesaelens.github.io/nl/drupal",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens{'@'}telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens) en Facebook. Het portfolio staat op robbesaelens.github.io.",
     "experience": "Robbe werkt momenteel bij Dynamate als backend developer voor Drupal-projecten. Daarvoor werkte hij bij Your Mind Our Work (2023) als PHP- en Magento-developer: hij begon er als stagiair en werd daarna voltijds aangenomen. Sinds 2017 is hij ook instructeur in de paardensport, dus zijn loopbaan combineert technisch werk met de mensenkennis die hij opdeed als lesgever.",
     "education": "Robbe heeft een bachelordiploma in Multimedia en Creatieve Technologie (traject Next Web Developer) van Howest. Daarvoor volgde hij vanaf 2018 de graduaatsopleiding Multimedia & Informatietechnologieën, waar hij de basis van programmeren en webontwikkeling leerde. Hij woont in Geluwe, België.",
@@ -221,7 +224,7 @@
     "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur in de paardensport en rijdt hij jumpingwedstrijden. Hij brengt mensen graag iets bij en werkt graag met paarden — zo ontwikkelde hij zijn sociale vaardigheden, naast zijn technische loopbaan.",
     "thanks": "Graag gedaan! Laat gerust weten als je nog vragen hebt.",
     "bye": "Tot ziens! Neem gerust contact op wanneer je wil. Nog een fijne dag!",
-    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service. Typ gewoon wat je wil weten!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, Drupal-bijdragen, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Vraag me eens naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen staan terug op standaard.\n\nTyp 'help' als je hulp nodig hebt.",
     "quickReplies": [
@@ -329,6 +332,69 @@
       "status": "cookies --count",
       "toc": "Op deze pagina"
     }
+  },
+  "drupal": {
+    "title": "Drupal-bijdragen",
+    "intro": "Ik werk bij {dynamate} als backend developer op Drupal-projecten. Kom ik een bug tegen in Drupal core of in een contributed module, dan meld ik die op drupal.org, en in issues van anderen help ik mee met reacties en merge requests.",
+    "sharedCosts": "Mijn eigen Drupal-module, Shared Costs, staat nog niet op drupal.org: ze is open source op {github}, en op de pagina van {stalManager} zie je wat ze doet.",
+    "profile": "Profiel op drupal.org",
+    "gitlab": "git.drupalcode.org",
+    "statsTitle": "In cijfers",
+    "stats": {
+      "opened": "issues aangemaakt",
+      "joined": "andere issues waaraan ik meewerkte",
+      "credits": "credits",
+      "merged": "merge requests gemerged"
+    },
+    "asOf": "Opgehaald van drupal.org en git.drupalcode.org bij elke deploy, laatst op {date}",
+    "credits": "Bijdragen met credit",
+    "creditsText": "Issues waarvoor de maintainers me credit gaven.",
+    "credited": "Credit",
+    "mergeRequests": "Merge requests",
+    "mergeRequestsText": "Code die ik voorstelde op git.drupalcode.org.",
+    "issuesOpened": "Issues die ik aanmaakte",
+    "issuesOpenedText": "Bugs en taken die ik meldde.",
+    "issuesJoined": "Issues waaraan ik meewerkte",
+    "issuesJoinedText": "Issues van anderen waarin ik reageerde of meewerkte.",
+    "empty": "Hier staat nog niets.",
+    "opened": "aangemaakt op {date}",
+    "updated": "bijgewerkt op {date}",
+    "merged": "gemerged op {date}",
+    "mrState": {
+      "merged": "Gemerged",
+      "opened": "Open",
+      "closed": "Gesloten",
+      "locked": "Vergrendeld"
+    },
+    "status": {
+      "active": "Actief",
+      "needs-work": "Werk nodig",
+      "needs-review": "Wacht op review",
+      "rtbc": "RTBC",
+      "patch-to-be-ported": "Patch (over te zetten)",
+      "fixed": "Opgelost",
+      "postponed": "Uitgesteld",
+      "postponed-needs-info": "Uitgesteld (info nodig)",
+      "closed": "Gesloten",
+      "closed-fixed": "Gesloten (opgelost)",
+      "closed-duplicate": "Gesloten (dubbel)",
+      "closed-wont-fix": "Gesloten (niet opgelost)",
+      "closed-works-as-designed": "Gesloten (werkt zoals bedoeld)",
+      "closed-outdated": "Gesloten (verouderd)",
+      "closed-cannot-reproduce": "Gesloten (niet reproduceerbaar)"
+    },
+    "category": {
+      "bug": "Bugmelding",
+      "task": "Taak",
+      "feature": "Featureverzoek",
+      "support": "Supportvraag",
+      "plan": "Plan"
+    },
+    "priority": {
+      "critical": "Kritieke prioriteit",
+      "major": "Hoge prioriteit"
+    },
+    "viewProjects": "Bekijk mijn projecten"
   },
   "repo": {
     "title": "Repository-activiteit",

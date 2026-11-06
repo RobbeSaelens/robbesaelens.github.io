@@ -14,6 +14,8 @@ at <https://robbesaelens.github.io>.
 | `npm run prerender`    | Writes static HTML per route into `dist/`                          |
 | `npm run sitemap`      | Regenerates `dist/sitemap.xml` from the router (`sitemapRoutes`)   |
 | `npm run preview`      | Serves the built `dist/`                                          |
+| `npm run stats`        | Refreshes the repository numbers (`src/data/repo-stats.json`)     |
+| `npm run drupal`       | Refreshes the Drupal contributions (`src/data/drupal.json`)       |
 
 ## How SEO works here
 
@@ -59,4 +61,5 @@ The sitemap picks the origin up from `src/site.ts` automatically.
 ## Deployment
 
 `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
-`main`.
+`main`. Before the build it refreshes the Drupal contributions (`npm run drupal`); when
+drupal.org doesn't answer, it deploys the committed `src/data/drupal.json`.

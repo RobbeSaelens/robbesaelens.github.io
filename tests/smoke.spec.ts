@@ -11,10 +11,13 @@ import { measureCurrentSlide, SLIDES } from './slides'
  */
 
 // Untranslated vue-i18n keys leak through as "namespace.someKey". Domains such
-// as "scan2talk.be" and file names like "privacy.md" look similar, so those
-// endings are excluded.
+// as "scan2talk.be" and "drupal.org" and file names like "privacy.md" look
+// similar, so those endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|stalManager|aria|chat|error|footer|privacy|repo)\.(?!(?:be|com|dev|app|io|md)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|stalManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
+
+/** Pages without images. */
+const TEXT_ONLY = ['/privacy', '/drupal']
 
 /**
  * Blocks third-party requests (analytics) so tests are deterministic and never
@@ -95,7 +98,7 @@ for (const route of ROUTES) {
       const sources = await page.$$eval('#app img', (imgs) =>
         [...new Set(imgs.map((i) => i.getAttribute('src')).filter(Boolean))],
       )
-      if (route !== '/privacy') expect(sources.length).toBeGreaterThan(0) // the only text-only page
+      if (!TEXT_ONLY.includes(route)) expect(sources.length).toBeGreaterThan(0)
       for (const src of sources) {
         const res = await request.get(src!)
         expect(res.status(), src!).toBe(200)
@@ -582,6 +585,120 @@ test.describe('repository activity', () => {
     await open(page, '/nl/vhsdetail')
     await expect(page.getByRole('region', { name: 'Repository-activiteit' })).toBeAttached()
     await expect(page.locator('.repo-number dt').nth(1)).toHaveText('in de laatste 30 dagen')
+  })
+})
+
+test.describe('Drupal contributions', () => {
+  const data = JSON.parse(readFileSync(new URL('../src/data/drupal.json', import.meta.url), 'utf8'))
+  const LISTS = [
+    ['Credited contributions', 'Bijdragen met credit', data.credits],
+    ['Merge requests', 'Merge requests', data.mergeRequests],
+    ['Issues I opened', 'Issues die ik aanmaakte', data.issuesCreated],
+    ['Issues I took part in', 'Issues waaraan ik meewerkte', data.issuesJoined],
+  ] as const
+  const merged = data.mergeRequests.filter((mr: { state: string }) => mr.state === 'merged').length
+
+  // Public metadata only (npm run drupal): no comment text, no e-mail addresses.
+  test('the data holds titles, projects, statuses, dates and links only', () => {
+    const text = JSON.stringify(data)
+    expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.-]+/)
+    expect(text).not.toMatch(/"(body|comment_body|comments?|description|notes?|email|mail|author|uid)"/i)
+    for (const [name, , items] of LISTS) {
+      for (const item of items) expect(item.url, name).toMatch(/^https:\/\/(www\.drupal\.org|git\.drupalcode\.org)\//)
+    }
+    expect(data.credits.length + data.issuesCreated.length).toBeGreaterThan(0)
+  })
+
+  test('lists every contribution, each linking to drupal.org or git.drupalcode.org', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/drupal')
+    for (const [name, , items] of LISTS) {
+      const list = page.getByRole('region', { name, exact: true })
+      await list.scrollIntoViewIfNeeded()
+      const links = list.getByRole('link')
+      await expect(links, name).toHaveCount(items.length)
+      for (const [i, item] of items.entries()) {
+        await expect(links.nth(i)).toHaveAttribute('href', item.url)
+        await expect(links.nth(i)).toHaveAttribute('target', '_blank')
+        await expect(links.nth(i)).toHaveAttribute('rel', 'noopener noreferrer')
+        await expect(links.nth(i)).toContainText(item.title)
+        await expect(links.nth(i).locator('.badge')).not.toBeEmpty()
+      }
+    }
+    // The numbers are the lists' lengths
+    await expect(page.locator('.stats-number dd')).toHaveText(
+      [data.issuesCreated.length, data.issuesJoined.length, data.credits.length, merged].map(String),
+    )
+    const asOf = new Date(data.generatedAt).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'Europe/Brussels',
+    })
+    await expect(page.locator('.stats-note')).toContainText(asOf)
+    await expect(page.getByRole('link', { name: 'drupal.org profile' })).toHaveAttribute(
+      'href',
+      'https://www.drupal.org/u/robbesaelens',
+    )
+    // Shared Costs isn't on drupal.org: the page points at the Stal Manager page
+    await expect(page.locator('.drupal-intro').getByRole('link', { name: 'Stal Manager' })).toHaveAttribute(
+      'href',
+      '/stalmanagerdetail',
+    )
+    expect(errors).toEqual([])
+  })
+
+  test('in Dutch on /nl/drupal', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/nl/drupal')
+    await expect(page.locator('h1')).toContainText('drupal-bijdragen')
+    for (const [, name, items] of LISTS) {
+      await expect(page.getByRole('region', { name, exact: true }).getByRole('link')).toHaveCount(items.length)
+    }
+    // Statuses and dates in Dutch too
+    const opened = page.getByRole('region', { name: 'Issues die ik aanmaakte' })
+    await expect(opened.locator('.row-meta').first()).toContainText('aangemaakt op')
+    await expect(opened.locator('.badge').first()).not.toHaveText(/^(Active|Needs work|Closed)/)
+    await expect(page.locator('.drupal-intro').getByRole('link', { name: 'Stal Manager' })).toHaveAttribute(
+      'href',
+      '/nl/stalmanagerdetail',
+    )
+    expect(errors).toEqual([])
+  })
+
+  test('rises in, and the lists as you scroll to them', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 })
+    const errors = await guard(page)
+    await open(page, '/drupal')
+    for (const el of [page.locator('h1'), page.locator('.stats')]) {
+      const names = await el.evaluate((e) => e.getAnimations().map((a) => (a as CSSAnimation).animationName))
+      expect(names).toContain('hero-rise')
+    }
+    const last = page.locator('.reveal').last()
+    await page.waitForTimeout(2000)
+    await expect(last).not.toHaveClass(/is-visible/)
+    await last.scrollIntoViewIfNeeded()
+    await expect(last).toHaveClass(/is-visible/)
+    await expect.poll(() => last.evaluate((e) => getComputedStyle(e).opacity)).toBe('1')
+    expect(errors).toEqual([])
+  })
+
+  test('is linked from the about page and the Stal Manager page, in both languages', async ({ page }) => {
+    const errors = await guard(page)
+    for (const [about, label, target] of [
+      ['/contact', 'My Drupal contributions', '/drupal'],
+      ['/nl/contact', 'Mijn Drupal-bijdragen', '/nl/drupal'],
+    ]) {
+      await open(page, about)
+      await page.getByRole('link', { name: label }).click()
+      await expect(page).toHaveURL(new RegExp(`${target}$`))
+      await expect(page.locator('h1')).toContainText(target.startsWith('/nl') ? 'drupal-bijdragen' : 'drupal contributions')
+    }
+    await open(page, '/stalmanagerdetail')
+    await expect(
+      page.getByRole('region', { name: 'Also in Drupal' }).getByRole('link', { name: 'My Drupal contributions' }),
+    ).toHaveAttribute('href', '/drupal')
+    expect(errors).toEqual([])
   })
 })
 

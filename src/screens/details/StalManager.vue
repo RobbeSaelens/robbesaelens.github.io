@@ -117,6 +117,11 @@
                   {{ $t('stalManager.viewOnGithub') }}
                   <ExternalLink class="h-3.5 w-3.5" aria-hidden="true" />
                 </a>
+                <router-link class="live-link" :to="$lp('/drupal')">
+                  <Droplet class="h-3.5 w-3.5" aria-hidden="true" />
+                  {{ $t('stalManager.drupalContributions') }}
+                  <ArrowRight class="h-3.5 w-3.5" aria-hidden="true" />
+                </router-link>
               </div>
               <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
                 {{ $t('stalManager.drupalIntro') }}
@@ -207,6 +212,7 @@ import {
   FlaskConical,
   ChefHat,
   Coins,
+  Droplet,
   ExternalLink,
   Github,
   LayoutDashboard,
@@ -217,7 +223,7 @@ import {
 const DRUPAL_REPO = 'https://github.com/RobbeSaelens/shared_costs'
 
 export default defineComponent({
-  components: { ArrowRight, ExternalLink, Github, Lock, ImageLightbox, RepoActivity },
+  components: { ArrowRight, Droplet, ExternalLink, Github, Lock, ImageLightbox, RepoActivity },
 
   data() {
     return {

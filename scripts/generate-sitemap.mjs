@@ -37,6 +37,7 @@ const PRIORITY = {
   '/': '1.0',
   '/projects': '0.9',
   '/contact': '0.8',
+  '/drupal': '0.7',
 }
 
 // Same rules as src/localePath.ts: English at the root, Dutch under /nl.

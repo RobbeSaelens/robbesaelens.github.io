@@ -41,6 +41,22 @@ const pages: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'drupal',
+    name: 'Drupal',
+    component: () => import('../screens/Drupal.vue'),
+    meta: {
+      title: 'Drupal contributions',
+      description:
+        'Drupal contributions by Robbe Saelens, backend developer at Dynamate: credited fixes, merge requests and issues he opened or took part in on drupal.org.',
+      image: '/pf2.jpg',
+      nl: {
+        title: 'Drupal-bijdragen',
+        description:
+          'Drupal-bijdragen van Robbe Saelens, backend developer bij Dynamate: credits, merge requests en issues op drupal.org die hij aanmaakte of waaraan hij meewerkte.',
+      },
+    },
+  },
+  {
     path: 'privacy',
     name: 'Privacy',
     component: () => import('../screens/Privacy.vue'),

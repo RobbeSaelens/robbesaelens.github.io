@@ -248,6 +248,26 @@ for (const path of ['/', '/nl']) {
   })
 }
 
+for (const [path, question, url] of [
+  ['/', 'Does he contribute to drupal.org?', 'robbesaelens.github.io/drupal'],
+  ['/nl', 'Drupal-bijdragen?', 'robbesaelens.github.io/nl/drupal'],
+]) {
+  test(`without the AI, Drupal contributions get their own answer, pointing at the page (${path})`, async ({ page }) => {
+    await setup(page)
+    await page.route('https://chat.invalid/chat', (r) => r.abort())
+    await openChat(page, path)
+    await page.locator('#chat-input').fill(question)
+    await page.locator('#chat-input').press('Enter')
+    await waitForAnswer(page, 2)
+    await expect(page.locator('.msg--bot').last()).toContainText(url)
+    // "drupal module" still means Shared Costs
+    await page.locator('#chat-input').fill('drupal module')
+    await page.locator('#chat-input').press('Enter')
+    await waitForAnswer(page, 3)
+    await expect(page.locator('.msg--bot').last()).toContainText('Shared Costs')
+  })
+}
+
 test('AI replies are shown as text, never as HTML', async ({ page }) => {
   await setup(page)
   await fakeAi(page, () => ({ status: 200, json: { reply: '<img src=x onerror="window.pwned=1">hi', suggestions: ['<b>x</b>'] } }))
