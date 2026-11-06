@@ -55,6 +55,14 @@ sidesteps hydration mismatches entirely at the cost of a re-render on load.
 Changing the domain means editing `src/site.ts`, `public/robots.txt` and `public/llms.txt`.
 The sitemap picks the origin up from `src/site.ts` automatically.
 
+### The chatbot
+
+The AI chatbot answers from `public/llms.txt` (fetched live by the `status-worker`, cached
+for an hour), with built-in answers in `src/components/ChatBot.vue` and the `chat.*`
+locale strings as a fallback. When the site's content changes in a way a visitor might ask
+about, update them too: [AGENTS.md](AGENTS.md#content-changes-keep-the-chatbot-in-step)
+lists what and where.
+
 ### Known limitations
 
 - **One URL per page for both languages.** English and Dutch are a client-side toggle, so
