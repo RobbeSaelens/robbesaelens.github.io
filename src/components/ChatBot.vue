@@ -137,9 +137,13 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
   { keys: ['exulta'], responseKey: 'chat.project-exulta' },
   { keys: ['scan2talk', 'scan', 'qr'], responseKey: 'chat.project-scan2talk' },
   { keys: ['vhs', 'vhs service', 'paardenpistes', 'manegebodems'], responseKey: 'chat.project-vhs' },
-  // Shared Costs is the Drupal version of Stal Manager: its answer covers both
+  // Shared Costs is the Drupal version of Stable Manager: its answer covers both
   {
     keys: [
+      'stable manager',
+      'stablemanager',
+      'stable',
+      // Its old name, Stal Manager, still finds it ("stal" is also Dutch for stable)
       'stal manager',
       'stalmanager',
       'stal',
@@ -153,7 +157,7 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
       'drupal-module',
       'recipe',
     ],
-    responseKey: 'chat.project-stalmanager',
+    responseKey: 'chat.project-stablemanager',
   },
   // Work on drupal.org; "drupal module" is answered above, with Shared Costs
   {

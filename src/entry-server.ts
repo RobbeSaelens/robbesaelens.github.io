@@ -7,20 +7,34 @@ import { createHead } from '@unhead/vue/server'
 import { renderSSRHead } from '@unhead/vue/server'
 import { renderToString } from 'vue/server-renderer'
 import App from './App.vue'
-import { createAppRouter, routes } from './bootstrap/router'
+import { createAppRouter, redirects, routes } from './bootstrap/router'
 import i18n, { localeLinks } from './i18n'
+import { absoluteUrl } from './site'
 
 const staticRoutes = routes
   .flatMap((route) => route.children ?? [route])
-  .filter((route) => !route.path.includes(':'))
+  .filter((route) => !route.path.includes(':') && !route.redirect)
 
 const toUrlPath = (path: string): string => (path.startsWith('/') ? path : `/${path}`)
 
 /**
  * Every static route; each one is written to dist/ as real HTML and listed in
- * sitemap.xml. The noindex 404 is the catch-all, which is not a static route.
+ * sitemap.xml. The noindex 404 is the catch-all, which is not a static route,
+ * and the old URLs that redirect are not pages of their own.
  */
 export const prerenderRoutes: string[] = staticRoutes.map((route) => toUrlPath(route.path))
+
+/**
+ * Old URLs that moved, in both languages: the prerenderer writes a page for each
+ * that sends visitors and crawlers on to `to`. Never in the sitemap.
+ */
+export const redirectRoutes: { from: string; to: string; canonical: string; title: string }[] = redirects.map(
+  ({ from, to }) => {
+    const target = staticRoutes.find((route) => toUrlPath(route.path) === to)
+    if (!target) throw new Error(`[redirects] ${from} points at ${to}, which is not a page`)
+    return { from, to, canonical: absoluteUrl(to), title: String(target.meta?.title ?? '') }
+  },
+)
 
 export async function render(
   url: string,

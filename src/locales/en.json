@@ -49,7 +49,7 @@
       "vhs": {
         "tagline": "Website for an equestrian arena builder"
       },
-      "stal-manager": {
+      "stable-manager": {
         "tagline": "Cost tracking for horse owners, works offline"
       },
       "coming-soon": {
@@ -115,14 +115,14 @@
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Not live yet"
   },
-  "stalManager": {
-    "title": "Stal Manager",
-    "alt": "Stal Manager dashboard with horse costs",
+  "stableManager": {
+    "title": "Stable Manager",
+    "alt": "Stable Manager dashboard with horse costs",
     "privateBadge": "Live",
     "privateNote": "Private app, login only",
     "overview": "Project Overview",
     "about": "About",
-    "aboutText": "Stal Manager keeps track of what two horses cost: one of our own and one boarding horse. Every cost is booked with a date, category and quantity, and split between the horses by percentage. There's a desktop dashboard with monthly charts and reports, and a mobile app built for adding costs in the stable itself, even without a connection. It's a private app: sign-up is closed and accounts are created from the command line.",
+    "aboutText": "Stable Manager keeps track of what two horses cost: one of our own and one boarding horse. Every cost is booked with a date, category and quantity, and split between the horses by percentage. There's a desktop dashboard with monthly charts and reports, and a mobile app built for adding costs in the stable itself, even without a connection. It's a private app: sign-up is closed and accounts are created from the command line.",
     "featuresTitle": "What's in it",
     "featureSplit": "Cost splitting",
     "featureSplitText": "Each cost is allocated to one horse or split across both by percentage, so per-horse totals stay correct even for shared hay or a farrier visit.",
@@ -140,8 +140,8 @@
     "tools": "Tools & Services",
     "drupalTitle": "Also in Drupal",
     "drupalName": "Shared Costs · Drupal 11 module",
-    "drupalIntro": "Shared Costs is the Drupal version of Stal Manager, open source on GitHub: a Drupal 11 module, plus three recipes and a theme that rebuild the app with configuration only. Working offline, which the Next.js app does as a PWA, isn't part of it.",
-    "drupalAlt": "Stal Manager dashboard in Drupal, built with the Shared Costs module and its recipes",
+    "drupalIntro": "Shared Costs is the Drupal version of Stable Manager, open source on GitHub: a Drupal 11 module, plus three recipes and a theme that rebuild the app with configuration only. Working offline, which the Next.js app does as a PWA, isn't part of it.",
+    "drupalAlt": "Stable Manager dashboard in Drupal, built with the Shared Costs module and its recipes",
     "openSourceBadge": "Open source",
     "viewOnGithub": "View on GitHub",
     "drupalContributions": "My Drupal contributions",
@@ -211,10 +211,10 @@
     "welcome": "Hey! I'm Robbe's virtual assistant. Ask me about his skills, projects, experience, or how to get in touch!",
     "greeting": "Hi there! How can I help you? You can ask about my projects, skills, experience, or how to reach me.",
     "skills": "Robbe is a full-stack web developer working with Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, Tailwind CSS, Node.js and more. He also has experience with Adobe XD, After Effects and LottieFiles for design and prototyping. His current focus is Drupal backend development at Dynamate.",
-    "projects": "Robbe has built 4 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based wellbeing check-ins for students, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — private app for tracking horse costs, works offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — trilingual site for a riding arena builder, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nCheck them out on the Projects page!",
+    "projects": "Robbe has built 4 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based wellbeing check-ins for students, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stable Manager — private app for tracking horse costs, works offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — trilingual site for a riding arena builder, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nCheck them out on the Projects page!",
     "project-exulta": "Exulta is the second version of the Exulta stretch tent rental website, live at exulta.be. Built with Laravel 13 and React 19 over Inertia, with a Filament 5 admin panel, a product catalog, an interactive tent calculator, realisations and a blog. Automated CI/CD via GitHub Actions with database backups and rollback on failure, plus Playwright and Lighthouse checks.",
     "project-scan2talk": "Scan2Talk is a PWA for schools: students scan a QR code and go through a short, guided check-in about how they feel (thermometer → theme → feelings → help request). Teachers get an overview dashboard with Chart.js charts. Built with Laravel 13, Vue.js 3, Inertia.js, PostgreSQL, Spatie Permissions and Simple QR Code.",
-    "project-stalmanager": "Stal Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests. There's also an open-source Drupal version, Shared Costs (github.com/RobbeSaelens/shared_costs): a Drupal 11 module that splits costs to the cent, with recipes and a theme that rebuild the app with configuration only, tested with PHPUnit, Playwright and PHPStan.",
+    "project-stablemanager": "Stable Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests. There's also an open-source Drupal version, Shared Costs (github.com/RobbeSaelens/shared_costs): a Drupal 11 module that splits costs to the cent, with recipes and a theme that rebuild the app with configuration only, tested with PHPUnit, Playwright and PHPStan.",
     "project-vhs": "VHS Service builds and renovates riding arenas in Geluwe, West Flanders. I built their new site on Next.js 16 and React 19: an editorial design built around large photography, with GSAP and Motion scroll animation and Lenis smooth scrolling, in Dutch, French and English. Quote forms go through Resend, and the site is tuned for local SEO. It's being rebranded and isn't public yet.",
     "drupal": "Robbe works at Dynamate as a backend developer on Drupal projects, and contributes back on drupal.org: he reports the bugs he runs into in Drupal core and contributed modules, takes part in other people's issues and sends fixes as merge requests. The maintainers of Queue UI, Teamleader Integration and Resend registration / welcome email credited him for adding support for OOP hooks. It's all on the Drupal contributions page: robbesaelens.github.io/drupal",
     "contact": "You can reach Robbe via email at robbe.saelens{'@'}telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens), and Facebook. The portfolio is hosted at robbesaelens.github.io.",
@@ -225,7 +225,7 @@
     "hobbies": "Besides coding, Robbe has been an equestrian instructor since 2017 and rides show jumping competitions. He enjoys teaching people and working with horses — that's where he built his people skills, alongside his technical career.",
     "thanks": "You're welcome! Let me know if you have any other questions.",
     "bye": "Bye! Feel free to get in touch anytime. Have a great day!",
-    "help": "Available topics: skills, projects, experience, Drupal contributions, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, Stal Manager, VHS Service. Just type what you'd like to know!",
+    "help": "Available topics: skills, projects, experience, Drupal contributions, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, Stable Manager, VHS Service. Just type what you'd like to know!",
     "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me! Type 'help' for a list of topics.",
     "reset": "Session terminated. All systems restored to default.\n\nType 'help' if you need guidance.",
     "quickReplies": [

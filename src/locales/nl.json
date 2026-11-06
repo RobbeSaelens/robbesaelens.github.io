@@ -49,7 +49,7 @@
       "vhs": {
         "tagline": "Website voor een aannemer van paardenpistes"
       },
-      "stal-manager": {
+      "stable-manager": {
         "tagline": "Kostenbeheer voor paardeneigenaars, werkt offline"
       },
       "coming-soon": {
@@ -115,14 +115,14 @@
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Nog niet live"
   },
-  "stalManager": {
-    "title": "Stal Manager",
-    "alt": "Dashboard van Stal Manager met de kosten van de paarden",
+  "stableManager": {
+    "title": "Stable Manager",
+    "alt": "Dashboard van Stable Manager met de kosten van de paarden",
     "privateBadge": "Live",
     "privateNote": "Privé-app, enkel met login",
     "overview": "Projectoverzicht",
     "about": "Over",
-    "aboutText": "Stal Manager houdt bij wat twee paarden kosten: een eigen paard en een pensionpaard. Elke kost wordt geboekt met datum, categorie en hoeveelheid, en procentueel verdeeld over de paarden. Er is een desktopdashboard met maandgrafieken en overzichten, en een mobiele app om kosten meteen in de stal in te geven, ook zonder verbinding. Het is een privé-app: registreren kan niet, accounts worden via de command line aangemaakt.",
+    "aboutText": "Stable Manager houdt bij wat twee paarden kosten: een eigen paard en een pensionpaard. Elke kost wordt geboekt met datum, categorie en hoeveelheid, en procentueel verdeeld over de paarden. Er is een desktopdashboard met maandgrafieken en overzichten, en een mobiele app om kosten meteen in de stal in te geven, ook zonder verbinding. Het is een privé-app: registreren kan niet, accounts worden via de command line aangemaakt.",
     "featuresTitle": "Wat erin zit",
     "featureSplit": "Kosten verdelen",
     "featureSplitText": "Elke kost gaat naar één paard of wordt procentueel over beide verdeeld, zodat de totalen per paard kloppen, ook voor gedeeld hooi of de hoefsmid.",
@@ -140,8 +140,8 @@
     "tools": "Tools & diensten",
     "drupalTitle": "Ook in Drupal",
     "drupalName": "Shared Costs · Drupal 11-module",
-    "drupalIntro": "Shared Costs is de Drupal-versie van Stal Manager, open source op GitHub: een Drupal 11-module, plus drie recipes en een thema die de app nabouwen met enkel configuratie. Offline werken, wat de Next.js-app als PWA doet, zit er niet in.",
-    "drupalAlt": "Dashboard van Stal Manager in Drupal, gebouwd met de module Shared Costs en haar recipes",
+    "drupalIntro": "Shared Costs is de Drupal-versie van Stable Manager, open source op GitHub: een Drupal 11-module, plus drie recipes en een thema die de app nabouwen met enkel configuratie. Offline werken, wat de Next.js-app als PWA doet, zit er niet in.",
+    "drupalAlt": "Dashboard van Stable Manager in Drupal, gebouwd met de module Shared Costs en haar recipes",
     "openSourceBadge": "Open source",
     "viewOnGithub": "Bekijk op GitHub",
     "drupalContributions": "Mijn Drupal-bijdragen",
@@ -211,10 +211,10 @@
     "welcome": "Hoi! Ik ben de virtuele assistent van Robbe. Vraag me naar zijn vaardigheden, projecten, ervaring of hoe je hem kan bereiken!",
     "greeting": "Hallo! Hoe kan ik je helpen? Je kan me vragen stellen over projecten, vaardigheden, ervaring of contactgegevens.",
     "skills": "Robbe is een full-stack webdeveloper die werkt met Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, Tailwind CSS, Node.js en meer. Hij heeft ook ervaring met Adobe XD, After Effects en LottieFiles voor design en prototyping. Momenteel focust hij op backendontwikkeling in Drupal bij Dynamate.",
-    "projects": "Robbe bouwde onder meer deze 4 projecten:\n\n• Exulta — website voor stretchtentverhuur, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — check-ins over het welbevinden van leerlingen via QR-code, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — privé-app om de kosten van paarden bij te houden, werkt offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nBekijk ze op de pagina Projecten!",
+    "projects": "Robbe bouwde onder meer deze 4 projecten:\n\n• Exulta — website voor stretchtentverhuur, live op exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — check-ins over het welbevinden van leerlingen via QR-code, live op scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stable Manager — privé-app om de kosten van paarden bij te houden, werkt offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — drietalige site voor een aannemer van paardenpistes, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nBekijk ze op de pagina Projecten!",
     "project-exulta": "Exulta is de tweede versie van de website van Exulta, dat stretchtenten verhuurt, live op exulta.be. Gebouwd met Laravel 13 en React 19 via Inertia, met een Filament 5-adminpaneel, een productcatalogus, een interactieve tentcalculator, realisaties en een blog. Geautomatiseerde CI/CD via GitHub Actions met databaseback-ups en een rollback bij fouten, plus Playwright- en Lighthouse-checks.",
     "project-scan2talk": "Scan2Talk is een PWA voor scholen: leerlingen scannen een QR-code en doorlopen een korte, begeleide check-in over hoe ze zich voelen (thermometer → thema → gevoelens → hulpvraag). Leerkrachten krijgen een overzichtsdashboard met Chart.js-grafieken. Gebouwd met Laravel 13, Vue.js 3, Inertia.js, PostgreSQL, Spatie Permissions en Simple QR Code.",
-    "project-stalmanager": "Stal Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests. Er is ook een open-source Drupal-versie, Shared Costs (github.com/RobbeSaelens/shared_costs): een Drupal 11-module die kosten tot op de cent verdeelt, met recipes en een thema die de app nabouwen met enkel configuratie, getest met PHPUnit, Playwright en PHPStan.",
+    "project-stablemanager": "Stable Manager is een privé-app die ik bouwde om bij te houden wat onze twee paarden kosten: elke kost procentueel verdeeld per paard, een desktopdashboard met grafieken, en een mobiele app die offline werkt in de stal. Next.js 16, React 19, Prisma 7, PostgreSQL en Better Auth, met Vitest- en databasetests. Er is ook een open-source Drupal-versie, Shared Costs (github.com/RobbeSaelens/shared_costs): een Drupal 11-module die kosten tot op de cent verdeelt, met recipes en een thema die de app nabouwen met enkel configuratie, getest met PHPUnit, Playwright en PHPStan.",
     "project-vhs": "VHS Service legt paardenpistes aan en renoveert ze in Geluwe, West-Vlaanderen. Ik bouwde hun nieuwe site op Next.js 16 en React 19: een redactioneel design rond grote foto's, met scroll-animaties in GSAP en Motion en vloeiend scrollen met Lenis, in het Nederlands, Frans en Engels. Offerteformulieren lopen via Resend en de site is afgestemd op lokale SEO. De site krijgt een rebranding en is nog niet publiek.",
     "drupal": "Robbe werkt bij Dynamate als backend developer voor Drupal-projecten en draagt ook bij op drupal.org: hij meldt de bugs die hij tegenkomt in Drupal core en contributed modules, helpt mee in issues van anderen en stuurt fixes in als merge requests. De maintainers van Queue UI, Teamleader Integration en Resend registration / welcome email gaven hem credit voor ondersteuning van OOP-hooks. Je vindt alles op de pagina Drupal-bijdragen: robbesaelens.github.io/nl/drupal",
     "contact": "Je kan Robbe bereiken via e-mail op robbe.saelens{'@'}telenet.be of telefonisch op 0471 95 81 95. Hij is ook te vinden op LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens) en Facebook. Het portfolio staat op robbesaelens.github.io.",
@@ -225,7 +225,7 @@
     "hobbies": "Naast programmeren is Robbe sinds 2017 instructeur in de paardensport en rijdt hij jumpingwedstrijden. Hij brengt mensen graag iets bij en werkt graag met paarden — zo ontwikkelde hij zijn sociale vaardigheden, naast zijn technische loopbaan.",
     "thanks": "Graag gedaan! Laat gerust weten als je nog vragen hebt.",
     "bye": "Tot ziens! Neem gerust contact op wanneer je wil. Nog een fijne dag!",
-    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, Drupal-bijdragen, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stal Manager, VHS Service. Typ gewoon wat je wil weten!",
+    "help": "Beschikbare onderwerpen: vaardigheden, projecten, ervaring, Drupal-bijdragen, opleiding, contact, over, locatie, hobby's. Je kan ook vragen naar specifieke projecten: Exulta, Scan2Talk, Stable Manager, VHS Service. Typ gewoon wat je wil weten!",
     "fallback": "Daar weet ik niet veel over. Vraag me eens naar vaardigheden, projecten, ervaring, opleiding of contactgegevens! Typ 'help' voor een lijst met onderwerpen.",
     "reset": "Sessie beëindigd. Alle systemen staan terug op standaard.\n\nTyp 'help' als je hulp nodig hebt.",
     "quickReplies": [

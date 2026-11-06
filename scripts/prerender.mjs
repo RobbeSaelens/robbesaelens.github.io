@@ -17,7 +17,7 @@ if (!existsSync(ssrEntry)) {
   process.exit(1)
 }
 
-const { render, prerenderRoutes } = await import(ssrEntry)
+const { render, prerenderRoutes, redirectRoutes } = await import(ssrEntry)
 
 const template = readFileSync(join(distDir, 'index.html'), 'utf-8')
 
@@ -41,6 +41,55 @@ function injectApp(html, appHtml, bodyTags) {
   return out
 }
 
+/** Dutch pages (/nl/...) declare lang="nl" in the HTML search engines read. */
+const langOf = (route) => (route === '/nl' || route.startsWith('/nl/') ? 'nl' : 'en')
+
+function writeRoute(route, html) {
+  if (route === '/') {
+    writeFileSync(join(distDir, 'index.html'), html)
+    return
+  }
+  const slug = route.slice(1)
+  // Written twice on purpose: `<slug>/index.html` serves "/slug/" and
+  // `<slug>.html` serves "/slug" directly, so GitHub Pages never has to issue
+  // a 301 between the two. Both declare the same canonical URL.
+  const dirFile = join(distDir, slug, 'index.html')
+  mkdirSync(dirname(dirFile), { recursive: true })
+  writeFileSync(dirFile, html)
+  writeFileSync(join(distDir, `${slug}.html`), html)
+}
+
+const escapeHtml = (text) =>
+  text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+
+/**
+ * An old URL that moved. GitHub Pages can't send a 301, so this page does what
+ * one would: the canonical link names the new URL, the script (which keeps the
+ * query and hash) and the instant meta refresh go there, and noindex keeps the
+ * old URL out of search results.
+ */
+function redirectPage({ from, to, canonical, title }) {
+  const href = escapeHtml(to)
+  const name = escapeHtml(title)
+  return `<!doctype html>
+<html lang="${langOf(from)}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>${name} | Robbe Saelens</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="${escapeHtml(canonical)}" />
+    <meta http-equiv="refresh" content="0; url=${href}" />
+    <script>location.replace(${JSON.stringify(to)} + location.search + location.hash)</script>
+  </head>
+  <body>
+    <p><a href="${href}">${name}</a></p>
+  </body>
+</html>
+`
+}
+
 const written = []
 
 for (const route of prerenderRoutes) {
@@ -52,28 +101,17 @@ for (const route of prerenderRoutes) {
     process.exit(1)
   }
 
-  // Dutch pages (/nl/...) declare lang="nl" in the HTML search engines read.
-  const lang = route === '/nl' || route.startsWith('/nl/') ? 'nl' : 'en'
   const html = injectApp(
-    injectHead(baseTemplate.replace('<html lang="en">', `<html lang="${lang}">`), rendered.head),
+    injectHead(baseTemplate.replace('<html lang="en">', `<html lang="${langOf(route)}">`), rendered.head),
     rendered.html,
     rendered.bodyTags,
   )
-
-  if (route === '/') {
-    writeFileSync(join(distDir, 'index.html'), html)
-  } else {
-    const slug = route.slice(1)
-    // Written twice on purpose: `<slug>/index.html` serves "/slug/" and
-    // `<slug>.html` serves "/slug" directly, so GitHub Pages never has to issue
-    // a 301 between the two. Both declare the same canonical URL.
-    const dirFile = join(distDir, slug, 'index.html')
-    mkdirSync(dirname(dirFile), { recursive: true })
-    writeFileSync(dirFile, html)
-    writeFileSync(join(distDir, `${slug}.html`), html)
-  }
-
+  writeRoute(route, html)
   written.push(route)
+}
+
+for (const redirect of redirectRoutes) {
+  writeRoute(redirect.from, redirectPage(redirect))
 }
 
 // SPA fallback for any unknown deep link on GitHub Pages. Rendered from the
@@ -86,3 +124,4 @@ writeFileSync(
 )
 
 console.log(`[prerender] wrote ${written.length} routes: ${written.join(', ')}`)
+console.log(`[prerender] wrote ${redirectRoutes.length} redirects: ${redirectRoutes.map((r) => `${r.from} → ${r.to}`).join(', ')}`)

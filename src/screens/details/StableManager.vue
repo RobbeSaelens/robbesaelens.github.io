@@ -5,18 +5,18 @@
       <header class="text-center">
         <h1 class="hero-in terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl" style="--i: 0">
           <span class="terminal-prompt">&gt;</span>
-          <span class="terminal-text">{{ $t('stalManager.title') }}</span>
+          <span class="terminal-text">{{ $t('stableManager.title') }}</span>
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
         <p class="hero-in terminal-subtitle mt-3 text-sm tracking-wide md:text-base" style="--i: 1">
-          <span class="opacity-50">$</span> cat ./stal-manager-project.md
+          <span class="opacity-50">$</span> cat ./stable-manager-project.md
         </p>
 
         <div class="hero-in mt-5 flex flex-wrap items-center justify-center gap-2" style="--i: 2">
-          <span class="status-badge">{{ $t('stalManager.privateBadge') }}</span>
+          <span class="status-badge">{{ $t('stableManager.privateBadge') }}</span>
           <span class="status-note">
             <Lock class="h-3.5 w-3.5" aria-hidden="true" />
-            {{ $t('stalManager.privateNote') }}
+            {{ $t('stableManager.privateNote') }}
           </span>
         </div>
 
@@ -36,11 +36,11 @@
             <span class="shot-dot"></span>
             <span class="shot-dot"></span>
             <span class="shot-dot"></span>
-            <span class="shot-url">Stal Manager</span>
+            <span class="shot-url">Stable Manager</span>
           </span>
           <img
-            src="/stal-manager-home.jpg"
-            :alt="$t('stalManager.alt')"
+            src="/stable-manager-home.jpg"
+            :alt="$t('stableManager.alt')"
             width="1600"
             height="1000"
             loading="lazy"
@@ -54,8 +54,8 @@
           @click="lightboxIndex = 1">
           <span class="shot-notch" aria-hidden="true"></span>
           <img
-            src="/stal-manager-mobile.jpg"
-            :alt="$t('stalManager.alt')"
+            src="/stable-manager-mobile.jpg"
+            :alt="$t('stableManager.alt')"
             width="470"
             height="800"
             loading="lazy"
@@ -65,16 +65,16 @@
 
       <div class="mx-5 pt-4 md:mx-10">
         <!-- Overview -->
-        <h2 class="section-heading reveal">{{ $t('stalManager.overview') }}</h2>
+        <h2 class="section-heading reveal">{{ $t('stableManager.overview') }}</h2>
         <div class="reveal overview-card mb-14 px-6 py-8 md:px-8">
-          <h3 class="overview-label">{{ $t('stalManager.about') }}</h3>
+          <h3 class="overview-label">{{ $t('stableManager.about') }}</h3>
           <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
-            {{ $t('stalManager.aboutText') }}
+            {{ $t('stableManager.aboutText') }}
           </p>
         </div>
 
         <!-- Features -->
-        <h2 class="section-heading reveal">{{ $t('stalManager.featuresTitle') }}</h2>
+        <h2 class="section-heading reveal">{{ $t('stableManager.featuresTitle') }}</h2>
         <div class="feature-grid mb-14">
           <article v-for="f in features" :key="f.title" class="feature-card reveal">
             <component :is="f.icon" class="feature-icon" />
@@ -88,43 +88,43 @@
         <!-- Stack -->
         <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div class="reveal overview-card px-6 py-8">
-            <h3 class="overview-label">{{ $t('stalManager.languages') }}</h3>
+            <h3 class="overview-label">{{ $t('stableManager.languages') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackLanguages" :key="t" class="tag-pill">{{ t }}</span>
             </div>
           </div>
           <div class="reveal overview-card px-6 py-8">
-            <h3 class="overview-label">{{ $t('stalManager.tools') }}</h3>
+            <h3 class="overview-label">{{ $t('stableManager.tools') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in stackTools" :key="t" class="tag-pill">{{ t }}</span>
             </div>
           </div>
         </div>
 
-        <RepoActivity project="stalManager" :label="$t('stalManager.repoApp')" />
+        <RepoActivity project="stableManager" :label="$t('stableManager.repoApp')" />
 
         <!-- The Drupal version: an open-source module, and recipes that rebuild this app with it -->
         <section class="mb-14" aria-labelledby="drupal-title">
-          <h2 id="drupal-title" class="section-heading reveal">{{ $t('stalManager.drupalTitle') }}</h2>
+          <h2 id="drupal-title" class="section-heading reveal">{{ $t('stableManager.drupalTitle') }}</h2>
 
           <div class="drupal-intro mb-6">
             <div class="reveal overview-card px-6 py-8 md:px-8">
-              <h3 class="overview-label">{{ $t('stalManager.drupalName') }}</h3>
+              <h3 class="overview-label">{{ $t('stableManager.drupalName') }}</h3>
               <div class="mb-5 flex flex-wrap items-center gap-2">
-                <span class="status-badge">{{ $t('stalManager.openSourceBadge') }}</span>
+                <span class="status-badge">{{ $t('stableManager.openSourceBadge') }}</span>
                 <a class="live-link" :href="DRUPAL_REPO" target="_blank" rel="noopener noreferrer">
                   <Github class="h-3.5 w-3.5" aria-hidden="true" />
-                  {{ $t('stalManager.viewOnGithub') }}
+                  {{ $t('stableManager.viewOnGithub') }}
                   <ExternalLink class="h-3.5 w-3.5" aria-hidden="true" />
                 </a>
                 <router-link class="live-link" :to="$lp('/drupal')">
                   <DrupalIcon class="h-3.5 w-3.5" />
-                  {{ $t('stalManager.drupalContributions') }}
+                  {{ $t('stableManager.drupalContributions') }}
                   <ArrowRight class="h-3.5 w-3.5" aria-hidden="true" />
                 </router-link>
               </div>
               <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
-                {{ $t('stalManager.drupalIntro') }}
+                {{ $t('stableManager.drupalIntro') }}
               </p>
             </div>
 
@@ -138,11 +138,11 @@
                 <span class="shot-dot"></span>
                 <span class="shot-dot"></span>
                 <span class="shot-dot"></span>
-                <span class="shot-url">Stal Manager in Drupal</span>
+                <span class="shot-url">Stable Manager in Drupal</span>
               </span>
               <img
                 src="/shared-costs-home.jpg"
-                :alt="$t('stalManager.drupalAlt')"
+                :alt="$t('stableManager.drupalAlt')"
                 width="1600"
                 height="1000"
                 loading="lazy"
@@ -161,7 +161,7 @@
           </ul>
 
           <div class="reveal overview-card px-6 py-8">
-            <h3 class="overview-label">{{ $t('stalManager.drupalStack') }}</h3>
+            <h3 class="overview-label">{{ $t('stableManager.drupalStack') }}</h3>
             <div class="flex flex-wrap gap-2">
               <span v-for="t in drupalStack" :key="t" class="tag-pill">{{ t }}</span>
             </div>
@@ -172,7 +172,7 @@
         <RepoActivity
           project="sharedCosts"
           :repository="DRUPAL_REPO"
-          :label="$t('stalManager.repoDrupal')"
+          :label="$t('stableManager.repoDrupal')"
           :float="false"
         />
 
@@ -182,7 +182,7 @@
             <span
               class="font-medium transition-colors"
               style="color: var(--color-accent); font-family: var(--font-mono)"
-              >{{ $t('stalManager.viewOther') }}</span
+              >{{ $t('stableManager.viewOther') }}</span
             >
             <ArrowRight
               class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
@@ -261,12 +261,12 @@ export default defineComponent({
   computed: {
     shotList(): LightboxImage[] {
       return [
-        { src: '/stal-manager-home.jpg', alt: this.$t('stalManager.alt') as string, caption: 'Stal Manager — desktop' },
-        { src: '/stal-manager-mobile.jpg', alt: this.$t('stalManager.alt') as string, caption: 'Stal Manager — mobile' },
+        { src: '/stable-manager-home.jpg', alt: this.$t('stableManager.alt') as string, caption: 'Stable Manager — desktop' },
+        { src: '/stable-manager-mobile.jpg', alt: this.$t('stableManager.alt') as string, caption: 'Stable Manager — mobile' },
         {
           src: '/shared-costs-home.jpg',
-          alt: this.$t('stalManager.drupalAlt') as string,
-          caption: 'Stal Manager in Drupal — dashboard',
+          alt: this.$t('stableManager.drupalAlt') as string,
+          caption: 'Stable Manager in Drupal — dashboard',
         },
       ]
     },
@@ -280,8 +280,8 @@ export default defineComponent({
       ] as const
       return map.map(([key, icon]) => ({
         icon: markRaw(icon),
-        title: this.$t(`stalManager.drupal${key}`) as string,
-        text: this.$t(`stalManager.drupal${key}Text`) as string,
+        title: this.$t(`stableManager.drupal${key}`) as string,
+        text: this.$t(`stableManager.drupal${key}Text`) as string,
       }))
     },
 
@@ -296,8 +296,8 @@ export default defineComponent({
       ] as const
       return map.map(([key, icon]) => ({
         icon: markRaw(icon),
-        title: this.$t(`stalManager.feature${key}`) as string,
-        text: this.$t(`stalManager.feature${key}Text`) as string,
+        title: this.$t(`stableManager.feature${key}`) as string,
+        text: this.$t(`stableManager.feature${key}Text`) as string,
       }))
     },
   },

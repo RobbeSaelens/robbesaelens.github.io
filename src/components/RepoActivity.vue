@@ -88,7 +88,7 @@ interface RepoStats {
 
 const props = withDefaults(
   defineProps<{
-    project: 'exulta' | 'scan2talk' | 'stalManager' | 'vhs' | 'sharedCosts'
+    project: 'exulta' | 'scan2talk' | 'stableManager' | 'vhs' | 'sharedCosts'
     /** The repository's public URL, for an open-source project */
     repository?: string
     /** Which repository this is, on a page that shows more than one */

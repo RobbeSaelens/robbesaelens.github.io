@@ -56,6 +56,9 @@ dark-mode contrast.
 When you add a page: add it to `tests/routes.ts` (the smoke test's sitemap check
 fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
 
+When you change a page's URL, keep the old one working: add it to `REDIRECTS` in
+`src/bootstrap/router.ts` and to `MOVED` in `tests/routes.ts`.
+
 ## Conventions
 
 - Every visible string exists in both `src/locales/en.json` and `src/locales/nl.json`;

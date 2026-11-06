@@ -19,12 +19,12 @@ const OUT = resolve(ROOT, 'src/data/repo-stats.json')
 
 /**
  * Repository → folder of its clone in PROJECTS_DIR. sharedCosts is the public
- * Drupal version of Stal Manager, shown on the Stal Manager page.
+ * Drupal version of Stable Manager, shown on the Stable Manager page.
  */
 const PROJECTS = {
   exulta: 'exulta-v2.0',
   scan2talk: 'scan2talk',
-  stalManager: 'stal-manager',
+  stableManager: 'stal-manager',
   vhs: 'VHS',
   sharedCosts: 'shared_costs',
 }

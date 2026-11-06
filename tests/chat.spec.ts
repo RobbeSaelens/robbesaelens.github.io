@@ -266,6 +266,18 @@ for (const [path, question, url] of [
     await waitForAnswer(page, 3)
     await expect(page.locator('.msg--bot').last()).toContainText('Shared Costs')
   })
+
+  test(`without the AI, Stable Manager is found by its name and its old one (${path})`, async ({ page }) => {
+    await setup(page)
+    await page.route('https://chat.invalid/chat', (r) => r.abort())
+    await openChat(page, path)
+    for (const [i, name] of ['Stable Manager', 'stal manager'].entries()) {
+      await page.locator('#chat-input').fill(name)
+      await page.locator('#chat-input').press('Enter')
+      await waitForAnswer(page, i + 2)
+      await expect(page.locator('.msg--bot').last()).toContainText('Stable Manager is')
+    }
+  })
 }
 
 test('AI replies are shown as text, never as HTML', async ({ page }) => {

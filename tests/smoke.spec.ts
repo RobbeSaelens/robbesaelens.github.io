@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { baseCompile } from '@intlify/message-compiler'
 import { expect, test, type Page } from '@playwright/test'
-import { nl, ROUTES } from './routes'
+import { MOVED, nl, ROUTES } from './routes'
 import { measureCurrentSlide, SLIDES } from './slides'
 
 /**
@@ -14,7 +14,7 @@ import { measureCurrentSlide, SLIDES } from './slides'
 // as "scan2talk.be" and "drupal.org" and file names like "privacy.md" look
 // similar, so those endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|stalManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
 
 /** Pages without images. */
 const TEXT_ONLY = ['/privacy', '/drupal']
@@ -174,6 +174,8 @@ test('sitemap lists exactly the tested routes', async ({ request }) => {
     (m) => m[1],
   )
   expect(paths.sort()).toEqual([...ROUTES, ...ROUTES.map(nl)].sort())
+  // Old URLs that moved only redirect: not in the sitemap
+  for (const [from] of MOVED) expect(xml).not.toContain(from)
   // every URL points at both language versions
   expect(xml.match(/hreflang="nl"/g)).toHaveLength(ROUTES.length * 2)
 })
@@ -241,7 +243,7 @@ test('projects page links to each project', async ({ page }) => {
   for (const [name, path] of [
     ['Exulta', '/exultadetail'],
     ['Scan2Talk', '/scan2talkdetail'],
-    ['Stal Manager', '/stalmanagerdetail'],
+    ['Stable Manager', '/stablemanagerdetail'],
     ['VHS Service', '/vhsdetail'],
   ]) {
     await open(page, '/projects')
@@ -259,10 +261,10 @@ test('projects page links to each project', async ({ page }) => {
   }
 })
 
-test('Stal Manager shows its Drupal version, with the public repository and its screenshot', async ({ page }) => {
+test('Stable Manager shows its Drupal version, with the public repository and its screenshot', async ({ page }) => {
   const errors = await guard(page)
   const repo = 'https://github.com/RobbeSaelens/shared_costs'
-  await open(page, '/stalmanagerdetail')
+  await open(page, '/stablemanagerdetail')
   const drupal = page.getByRole('region', { name: 'Also in Drupal' })
   await expect(drupal.getByRole('link', { name: 'View on GitHub' })).toHaveAttribute('href', repo)
   // Each repository is labelled; only the public one links to GitHub
@@ -273,10 +275,60 @@ test('Stal Manager shows its Drupal version, with the public repository and its 
   await expect(page.getByRole('dialog').locator('.lightbox-caption')).toContainText('3 / 3')
   await page.keyboard.press('Escape')
 
-  await open(page, nl('/stalmanagerdetail'))
+  await open(page, nl('/stablemanagerdetail'))
   await expect(page.getByRole('region', { name: 'Ook in Drupal' }).getByRole('link', { name: 'Bekijk op GitHub' })).toHaveAttribute('href', repo)
   await expect(page.getByRole('region', { name: 'Repository-activiteit: Drupal-versie' })).toBeAttached()
   expect(errors).toEqual([])
+})
+
+// Old URLs may be linked or indexed: they end up on the new page, in the same
+// language, with the query and hash.
+test.describe('old URLs', () => {
+  const moved = MOVED.flatMap(([from, to]) => [
+    [from, to, 'en'],
+    [nl(from), nl(to), 'nl'],
+  ])
+
+  for (const [from, to, lang] of moved) {
+    test(`${from} ends up on ${to}`, async ({ page }) => {
+      const errors = await guard(page)
+      await page.goto(`${from}?ref=old#drupal-title`)
+      await expect(page).toHaveURL(new RegExp(`${to}\\?ref=old#drupal-title$`))
+      await expect(page.locator('#main-content')).toBeVisible()
+      await expect(page.locator('html')).toHaveAttribute('lang', lang)
+      await expect(page.locator('h1')).toContainText('Stable Manager')
+      expect(errors).toEqual([])
+    })
+
+    test(`${from} redirects without JavaScript too, and stays out of search`, async ({ request }) => {
+      // Raw HTML: what GitHub Pages serves at the old URL, with and without the slash
+      for (const url of [from, `${from}/`]) {
+        const res = await request.get(url)
+        expect(res.status(), url).toBe(200)
+        const html = await res.text()
+        expect(html, url).toContain(`<html lang="${lang}">`)
+        expect(html, url).toContain(`<meta http-equiv="refresh" content="0; url=${to}" />`)
+        expect(html, url).toContain(`<link rel="canonical" href="https://robbesaelens.github.io${to}" />`)
+        expect(html, url).toContain('<meta name="robots" content="noindex, follow" />')
+        expect(html, url).toContain(`<a href="${to}">Stable Manager`)
+      }
+    })
+  }
+
+  test('the router sends them on inside the app as well', async ({ page }) => {
+    const errors = await guard(page)
+    for (const [from, to] of moved) {
+      await open(page, '/projects')
+      // A client-side navigation, as an old link inside the app would make
+      await page.evaluate((url) => {
+        history.pushState(null, '', url)
+        dispatchEvent(new PopStateEvent('popstate'))
+      }, from)
+      await expect(page).toHaveURL(new RegExp(`${to}$`))
+      await expect(page.locator('h1')).toContainText('Stable Manager')
+    }
+    expect(errors).toEqual([])
+  })
 })
 
 test.describe('project slides', () => {
@@ -336,7 +388,7 @@ test.describe('project slides', () => {
       await page.mouse.click((left + right) / 2, box.y + box.height * 0.4)
     }
 
-    for (const name of ['Stal Manager', 'Scan2Talk', 'Exulta']) {
+    for (const name of ['Stable Manager', 'Scan2Talk', 'Exulta']) {
       await clickVisible(name)
       await expect(current).toContainText(name)
       await expect(page).toHaveURL(/\/projects$/)
@@ -370,8 +422,8 @@ test.describe('project slides', () => {
 
   test('the current MacBook is open; the others are half closed and turned towards it', async ({ page }) => {
     await open(page, '/projects')
-    await page.getByRole('button', { name: 'Stal Manager', exact: true }).click()
-    await expect(page.locator('.car-slide.is-current')).toContainText('Stal Manager')
+    await page.getByRole('button', { name: 'Stable Manager', exact: true }).click()
+    await expect(page.locator('.car-slide.is-current')).toContainText('Stable Manager')
     const p = await poses(page)
     expect(p.map((x) => x.lid)).toEqual([-38, -38, 14, -38])
     // Before the current one they turn right (towards it), after it left
@@ -435,7 +487,7 @@ test.describe('project slides', () => {
 })
 
 test.describe('project page animations', () => {
-  const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stalmanagerdetail', '/vhsdetail']
+  const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail']
 
   for (const route of DETAILS) {
     test(`${route} rises in like the other pages, and the rest as you scroll to it`, async ({ page }) => {
@@ -517,10 +569,10 @@ test.describe('repository activity', () => {
   const PAGES = [
     ['/exultadetail', 'exulta'],
     ['/scan2talkdetail', 'scan2talk'],
-    ['/stalmanagerdetail', 'stalManager'],
+    ['/stablemanagerdetail', 'stableManager'],
     ['/vhsdetail', 'vhs'],
-    // The Drupal version, on the Stal Manager page
-    ['/stalmanagerdetail', 'sharedCosts'],
+    // The Drupal version, on the Stable Manager page
+    ['/stablemanagerdetail', 'sharedCosts'],
   ] as const
 
   // Most repos are private: counts and dates only.
@@ -571,10 +623,10 @@ test.describe('repository activity', () => {
   test('with two repositories, only the first floats; the other stays on the page', async ({ page }) => {
     await guard(page)
     await page.setViewportSize({ width: 1920, height: 1080 })
-    await open(page, '/stalmanagerdetail')
+    await open(page, '/stablemanagerdetail')
     await expect(page.getByRole('complementary')).toHaveCount(1)
     await expect(page.getByRole('complementary', { name: 'Repository activity: Next.js app' })).toBeVisible()
-    await expect(page.locator('#repo-title-stalManager-inline')).toBeHidden()
+    await expect(page.locator('#repo-title-stableManager-inline')).toBeHidden()
     const drupal = page.getByRole('region', { name: 'Repository activity: Drupal version' })
     await drupal.scrollIntoViewIfNeeded()
     await expect(drupal).toBeVisible()
@@ -674,7 +726,7 @@ test.describe('Drupal contributions', () => {
     expect(errors).toEqual([])
   })
 
-  test('is linked from the about page and the Stal Manager page, in both languages', async ({ page }) => {
+  test('is linked from the about page and the Stable Manager page, in both languages', async ({ page }) => {
     const errors = await guard(page)
     for (const [about, label, target] of [
       ['/contact', 'My Drupal contributions', '/drupal'],
@@ -685,7 +737,7 @@ test.describe('Drupal contributions', () => {
       await expect(page).toHaveURL(new RegExp(`${target}$`))
       await expect(page.locator('h1')).toContainText(target.startsWith('/nl') ? 'drupal-bijdragen' : 'drupal contributions')
     }
-    await open(page, '/stalmanagerdetail')
+    await open(page, '/stablemanagerdetail')
     await expect(
       page.getByRole('region', { name: 'Also in Drupal' }).getByRole('link', { name: 'My Drupal contributions' }),
     ).toHaveAttribute('href', '/drupal')

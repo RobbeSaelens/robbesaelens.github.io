@@ -32,6 +32,11 @@ Each route is written twice — `slug/index.html` and `slug.html` — so GitHub 
 serve both `/slug` and `/slug/` without a redirect. The catch-all route is rendered
 separately to `404.html` as a real, `noindex` 404 page.
 
+Old URLs of pages that moved (`REDIRECTS` in `src/bootstrap/router.ts`) keep working.
+GitHub Pages can't send a 301, so the router redirects them in the app, and the
+prerenderer writes a `noindex` page for each with a canonical link and an instant meta
+refresh to the new URL. They are not in the sitemap.
+
 The client does **not** hydrate; it mounts a fresh app over the prerendered markup. That
 sidesteps hydration mismatches entirely at the cost of a re-render on load.
 

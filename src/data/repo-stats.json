@@ -69,7 +69,7 @@
         8
       ]
     },
-    "stalManager": {
+    "stableManager": {
       "commits": 103,
       "commitsLast30Days": 9,
       "firstCommit": "2026-06-22T21:15:17+02:00",
