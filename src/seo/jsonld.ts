@@ -77,7 +77,19 @@ function projectNode(site: string, path: string) {
     url: `${site}${path}`,
     image: `${site}${project.image}`,
     keywords: project.tech.join(', '),
-    ...(project.repository ? { sameAs: project.repository } : {}),
+    ...(project.sourceCode
+      ? {
+          hasPart: {
+            '@type': 'SoftwareSourceCode',
+            name: project.sourceCode.name,
+            description: project.sourceCode.description,
+            codeRepository: project.sourceCode.repository,
+            programmingLanguage: project.sourceCode.language,
+            runtimePlatform: project.sourceCode.platform,
+            author: { '@id': `${site}/${PERSON_ID}` },
+          },
+        }
+      : {}),
     creator: { '@id': `${site}/${PERSON_ID}` },
     author: { '@id': `${site}/${PERSON_ID}` },
     isPartOf: { '@id': `${site}/${WEBSITE_ID}` },

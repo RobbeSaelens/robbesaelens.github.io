@@ -7,8 +7,14 @@ export interface SeoProject {
   description: string
   tech: string[]
   image: string
-  /** Public source code, for projects whose repository is open. */
-  repository?: string
+  /** Open-source code that is part of the project. */
+  sourceCode?: {
+    name: string
+    description: string
+    repository: string
+    language: string
+    platform: string
+  }
 }
 
 export const PROJECTS: SeoProject[] = [
@@ -26,9 +32,17 @@ export const PROJECTS: SeoProject[] = [
     name: 'Stal Manager',
     headline: 'Private app for tracking horse costs',
     description:
-      'A private app that tracks what two horses cost, with every cost split per horse by percentage. A desktop dashboard with charts and reports, and a mobile app that keeps working offline. Built with Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth.',
-    tech: ['Next.js', 'React', 'TypeScript', 'Prisma', 'PostgreSQL', 'PWA'],
+      'A private app that tracks what two horses cost, with every cost split per horse by percentage. A desktop dashboard with charts and reports, and a mobile app that keeps working offline. Built with Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth. Also rebuilt in Drupal: Shared Costs, an open-source Drupal 11 module that splits costs to the cent, with recipes and a Starterkit theme that rebuild the app with configuration only.',
+    tech: ['Next.js', 'React', 'TypeScript', 'Prisma', 'PostgreSQL', 'PWA', 'Drupal', 'PHP', 'HTMX'],
     image: '/stal-manager-home.jpg',
+    sourceCode: {
+      name: 'Shared Costs',
+      description:
+        'Open-source Drupal 11 module: a field type that splits an amount over other entities, equally or by percentage, stored to the cent, with Views integration. Three recipes and a Starterkit theme rebuild Stal Manager in Drupal.',
+      repository: 'https://github.com/RobbeSaelens/shared_costs',
+      language: 'PHP',
+      platform: 'Drupal 11',
+    },
   },
   {
     path: '/vhsdetail',
@@ -47,26 +61,6 @@ export const PROJECTS: SeoProject[] = [
       'A wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster and share how they feel in under a minute; educators get trends over time and an anonymous chat with students who ask for help. Built with Laravel, Vue.js and Inertia.js.',
     tech: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PHP', 'PostgreSQL', 'Chart.js'],
     image: '/scan2talk-home.jpg',
-  },
-  {
-    path: '/sharedcostsdetail',
-    name: 'Shared Costs for Drupal',
-    headline: 'Open-source Drupal module that splits costs to the cent',
-    description:
-      "An open-source Drupal 11 module: a field type that splits an amount over other entities, such as a stable's expenses over its horses, equally or by percentage, stored as cent-exact amounts with a live HTMX preview and Views integration. Three Drupal recipes and a Starterkit theme rebuild the Stal Manager app in Drupal with configuration only.",
-    tech: [
-      'Drupal',
-      'PHP',
-      'HTMX',
-      'Views',
-      'Drupal recipes',
-      'Twig',
-      'Chart.js',
-      'PHPUnit',
-      'GitHub Actions',
-    ],
-    image: '/shared-costs-home.jpg',
-    repository: 'https://github.com/RobbeSaelens/shared_costs',
   },
 ]
 

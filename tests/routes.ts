@@ -10,7 +10,6 @@ export const ROUTES = [
   '/scan2talkdetail',
   '/stalmanagerdetail',
   '/vhsdetail',
-  '/sharedcostsdetail',
   '/privacy',
 ]
 

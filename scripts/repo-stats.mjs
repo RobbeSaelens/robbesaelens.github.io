@@ -1,6 +1,6 @@
 // Repository activity for the project detail pages.
 //
-// Why a script: the project repos are private, so the static site can't ask
+// Why a script: most project repos are private, so the static site can't ask
 // GitHub itself, and CI has no access to them. Run `npm run stats` before a
 // deploy: it reads the local clones next to this repo with git and writes
 // src/data/repo-stats.json, which is committed and imported by the detail pages.
@@ -17,7 +17,10 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const PROJECTS_DIR = process.env.PROJECTS_DIR ?? resolve(ROOT, '..')
 const OUT = resolve(ROOT, 'src/data/repo-stats.json')
 
-/** Detail page → folder of its clone in PROJECTS_DIR. */
+/**
+ * Repository → folder of its clone in PROJECTS_DIR. sharedCosts is the public
+ * Drupal version of Stal Manager, shown on the Stal Manager page.
+ */
 const PROJECTS = {
   exulta: 'exulta-v2.0',
   scan2talk: 'scan2talk',

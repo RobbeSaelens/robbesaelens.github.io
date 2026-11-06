@@ -6,7 +6,6 @@ export const SLIDES = [
   { name: 'Scan2Talk', screenshot: '/scan2talk-home.jpg' },
   { name: 'Stal Manager', screenshot: '/stal-manager-home.jpg' },
   { name: 'VHS Service', screenshot: '/vhs-home.jpg' },
-  { name: 'Shared Costs', screenshot: '/shared-costs-home.jpg' },
 ]
 
 /**

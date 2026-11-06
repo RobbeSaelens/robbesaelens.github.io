@@ -50,12 +50,11 @@
       "stal-manager": {
         "tagline": "Cost tracking for horse owners, works offline"
       },
-      "shared-costs": {
-        "tagline": "Drupal module that splits costs to the cent"
+      "coming-soon": {
+        "tagline": "Something new is in the works"
       }
     },
     "private": "live · private",
-    "openSource": "open source",
     "comingSoon": "Coming soon",
     "inProgress": "in progress",
     "mockupAlt": "{name} on a MacBook",
@@ -137,6 +136,23 @@
     "featureQualityText": "Vitest unit tests plus database tests against a real Postgres, and a public health endpoint for uptime checks.",
     "languages": "Languages & Frameworks",
     "tools": "Tools & Services",
+    "drupalTitle": "Also in Drupal",
+    "drupalName": "Shared Costs · Drupal 11 module",
+    "drupalIntro": "Shared Costs is the Drupal version of Stal Manager, open source on GitHub: a Drupal 11 module, plus three recipes and a theme that rebuild the app with configuration only. Working offline, which the Next.js app does as a PWA, isn't part of it.",
+    "drupalAlt": "Stal Manager dashboard in Drupal, built with the Shared Costs module and its recipes",
+    "openSourceBadge": "Open source",
+    "viewOnGithub": "View on GitHub",
+    "drupalField": "Splits to the cent",
+    "drupalFieldText": "A field type splits each cost over the horses, equally or by percentage, in whole cents: 12.35 over two horses is 6.18 + 6.17, never 6.18 + 6.18. Views adds the parts up per horse and per month.",
+    "drupalRecipes": "Three recipes, no custom code",
+    "drupalRecipesText": "The app itself (stal_manager), a demo with a year of example costs (stal_manager_demo) and a Dutch translation (stal_manager_nl), on a theme generated from core's Starterkit.",
+    "drupalApp": "From dashboard to CSV",
+    "drupalAppText": "Charts, a monthly overview, a printable statement per horse, private receipts, a CSV download and \"add as expense\" from the inventory, with HTMX navigation and dark mode.",
+    "drupalQuality": "Tested & checked",
+    "drupalQualityText": "PHPUnit (Unit, Kernel, Functional and in the browser) with an axe scan of every page, visual regression tests with Playwright, PHPStan level 8 and about 95% coverage.",
+    "drupalStack": "Drupal stack",
+    "repoApp": "Next.js app",
+    "repoDrupal": "Drupal version",
     "viewOther": "View other projects"
   },
   "scan2talk": {
@@ -172,34 +188,6 @@
     "tools": "Tools & Services",
     "viewOther": "View other projects"
   },
-  "sharedCosts": {
-    "title": "Shared Costs for Drupal",
-    "alt": "Stal Manager dashboard in Drupal, built with the Shared Costs module and its recipes",
-    "openSourceBadge": "Open source",
-    "viewOnGithub": "View on GitHub",
-    "overview": "Project Overview",
-    "about": "About",
-    "aboutText": "Shared Costs is a Drupal 11 module, set up like a contrib project and public on GitHub. It adds one field type that splits an amount over other entities, such as a stable's expense over its horses, equally or by percentage, and stores each part as an exact amount in cents. Views then adds the parts up per horse and per month. Three recipes and a front-end theme build a complete cost tracker on top of it.",
-    "relationTitle": "Stal Manager, in Drupal",
-    "relationText": "This is the Drupal version of {link}, my Next.js app for the costs of our horses. The recipes rebuild that app with configuration only: content types, views, charts, a role and translations, on top of this one small module. Working offline, which the Next.js app does as a PWA, is not part of it.",
-    "featuresTitle": "What's in it",
-    "featureField": "A field that splits costs",
-    "featureFieldText": "Pick who shares a cost in a table, with a checkbox and an optional percentage each; whoever has no percentage gets an equal part of what's left. The amounts update live while you type, through Drupal core's HTMX, without custom JavaScript.",
-    "featureCents": "Cent-exact amounts",
-    "featureCentsText": "Every part is stored in whole cents with the largest-remainder method: 12.35 over two horses is 6.18 + 6.17, never 6.18 + 6.18. Validation keeps the percentages at 100% at most, and nobody shares a cost twice.",
-    "featureViews": "Views integration",
-    "featureViewsText": "Relationships to and from the sharers, amounts you can sum, and a year-and-month field and argument, so costs add up per horse and per month. Core's content export takes the sharers along by UUID.",
-    "featureRecipes": "Three recipes",
-    "featureRecipesText": "Configuration only, no custom code. stal_manager: the content model with private receipts, a dashboard with Chart.js charts, a monthly overview, a printable statement per horse, the expenses with a CSV download, \"add as expense\" from the inventory and a Stable manager role. stal_manager_demo: a demo site with a year of example costs. stal_manager_nl: all of it in Dutch.",
-    "featureTheme": "A theme that works like an app",
-    "featureThemeText": "Generated from core's Starterkit: a collapsible sidebar, a tab bar on phones, HTMX navigation that swaps only the main content with view transitions, live filters, stat cards that count up, charts in the theme's colors and dark mode. Built with single-directory components and autowired #[Hook] classes; Gin and Admin Toolbar for the admin pages.",
-    "featureQuality": "Tested & checked",
-    "featureQualityText": "Unit, Kernel, Functional and in-browser tests (Selenium), with an axe accessibility scan of every page in light and dark mode, and screenshots of every page compared on each push (visual regression). Kernel tests on MariaDB, PostgreSQL and SQLite; PHPStan level 8, Drupal's coding standards, stylelint and ESLint in GitHub Actions. About 95% of the PHP lines are covered.",
-    "tryDemo": "Try the demo recipe on GitHub",
-    "languages": "Languages & Frameworks",
-    "tools": "Tools & Services",
-    "viewOther": "View other projects"
-  },
   "error": {
     "defaultTitle": "Something went wrong",
     "defaultDescription": "An unexpected error occurred. Please try again later.",
@@ -220,12 +208,11 @@
     "welcome": "Hey! I'm Robbe's virtual assistant. Ask me about his skills, projects, experience, or how to get in touch!",
     "greeting": "Hi there! How can I help you? You can ask about my projects, skills, experience, or how to reach me.",
     "skills": "Robbe is a full-stack web developer working with Vue.js, TypeScript, React, Laravel, Next.js, Drupal, PHP, NestJS, GraphQL, Inertia.js, Prisma, PostgreSQL, MongoDB, MySQL, Tailwind CSS, Node.js and more. He also has experience with Adobe XD, After Effects and LottieFiles for design and prototyping. His current focus is Drupal backend development at Dynamate.",
-    "projects": "Robbe has built 5 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based wellbeing check-ins for students, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — private app for tracking horse costs, works offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — trilingual site for a riding arena builder, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n• Shared Costs for Drupal — open-source Drupal 11 module that splits costs to the cent, with recipes that rebuild Stal Manager in Drupal (Drupal 11 + HTMX + Views + Recipes)\n\nCheck them out on the Projects page!",
+    "projects": "Robbe has built 4 featured projects:\n\n• Exulta — stretch tent rental website, live at exulta.be (Laravel 13 + React 19 + Inertia.js + Filament 5)\n• Scan2Talk — QR-based wellbeing check-ins for students, live at scan2talk.be (Laravel + Vue.js + Inertia.js + PWA)\n• Stal Manager — private app for tracking horse costs, works offline (Next.js 16 + Prisma + PostgreSQL)\n• VHS Service — trilingual site for a riding arena builder, in rebranding (Next.js 16 + React 19 + GSAP + Motion)\n\nCheck them out on the Projects page!",
     "project-exulta": "Exulta is the second version of the Exulta stretch tent rental website, live at exulta.be. Built with Laravel 13 and React 19 over Inertia, with a Filament 5 admin panel, a product catalog, an interactive tent calculator, realisations and a blog. Automated CI/CD via GitHub Actions with database backups and rollback on failure, plus Playwright and Lighthouse checks.",
     "project-scan2talk": "Scan2Talk is a PWA for schools: students scan a QR code and go through a short, guided check-in about how they feel (thermometer → theme → feelings → help request). Teachers get an overview dashboard with Chart.js charts. Built with Laravel 13, Vue.js 3, Inertia.js, PostgreSQL, Spatie Permissions and Simple QR Code.",
-    "project-stalmanager": "Stal Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests.",
+    "project-stalmanager": "Stal Manager is a private app I built to track what our two horses cost: every cost split per horse by percentage, a desktop dashboard with charts, and a mobile app that works offline in the stable. Next.js 16, React 19, Prisma 7, PostgreSQL and Better Auth, with Vitest and database tests. There's also an open-source Drupal version, Shared Costs (github.com/RobbeSaelens/shared_costs): a Drupal 11 module that splits costs to the cent, with recipes and a theme that rebuild the app with configuration only, tested with PHPUnit, Playwright and PHPStan.",
     "project-vhs": "VHS Service builds and renovates riding arenas in Geluwe, West Flanders. I built their new site on Next.js 16 and React 19: an editorial design built around large photography, with GSAP and Motion scroll animation and Lenis smooth scrolling, in Dutch, French and English. Quote forms go through Resend, and the site is tuned for local SEO. It's being rebranded and isn't public yet.",
-    "project-sharedcosts": "Shared Costs is an open-source Drupal 11 module (github.com/RobbeSaelens/shared_costs): a field type that splits an amount over other entities, equally or by percentage, stored to the cent, with a live HTMX preview and Views integration. Three Drupal recipes rebuild Robbe's Stal Manager app in Drupal with configuration only, and a theme generated from core's Starterkit makes it work like an app. Tested with PHPUnit (Unit, Kernel, Functional and in the browser), PHPStan level 8 and GitHub Actions.",
     "contact": "You can reach Robbe via email at robbe.saelens{'@'}telenet.be or by phone at 0471 95 81 95. He's also on LinkedIn (linkedin.com/in/robbe-saelens-1a14511b8), GitHub (github.com/RobbeSaelens), Instagram ({'@'}robbe.saelens), and Facebook. The portfolio is hosted at robbesaelens.github.io.",
     "experience": "Robbe currently works at Dynamate as a Drupal backend developer. Before that he worked at Your Mind Our Work (2023) as a PHP & Magento developer: he started as an intern and was then hired full-time. He has also been an equestrian instructor since 2017, so his career combines technical work with the people skills he gained from teaching.",
     "education": "Robbe holds a bachelor's degree in Multimedia & Creative Technology (Next Web Developer track) from Howest. Before that, from 2018, he followed the associate degree in Multimedia & Information Technologies, where he learned the fundamentals of programming and web development. He lives in Geluwe, Belgium.",
@@ -234,7 +221,7 @@
     "hobbies": "Besides coding, Robbe has been an equestrian instructor since 2017 and rides show jumping competitions. He enjoys teaching people and working with horses — that's where he built his people skills, alongside his technical career.",
     "thanks": "You're welcome! Let me know if you have any other questions.",
     "bye": "Bye! Feel free to get in touch anytime. Have a great day!",
-    "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, Stal Manager, VHS Service, Shared Costs. Just type what you'd like to know!",
+    "help": "Available topics: skills, projects, experience, education, contact, about, location, hobbies. You can also ask about specific projects: Exulta, Scan2Talk, Stal Manager, VHS Service. Just type what you'd like to know!",
     "fallback": "I'm not sure about that. Try asking about my skills, projects, experience, education, or how to contact me! Type 'help' for a list of topics.",
     "reset": "Session terminated. All systems restored to default.\n\nType 'help' if you need guidance.",
     "quickReplies": [

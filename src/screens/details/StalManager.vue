@@ -101,7 +101,75 @@
           </div>
         </div>
 
-        <RepoActivity project="stalManager" />
+        <RepoActivity project="stalManager" :label="$t('stalManager.repoApp')" />
+
+        <!-- The Drupal version: an open-source module, and recipes that rebuild this app with it -->
+        <section class="mb-14" aria-labelledby="drupal-title">
+          <h2 id="drupal-title" class="section-heading reveal">{{ $t('stalManager.drupalTitle') }}</h2>
+
+          <div class="drupal-intro mb-6">
+            <div class="reveal overview-card px-6 py-8 md:px-8">
+              <h3 class="overview-label">{{ $t('stalManager.drupalName') }}</h3>
+              <div class="mb-5 flex flex-wrap items-center gap-2">
+                <span class="status-badge">{{ $t('stalManager.openSourceBadge') }}</span>
+                <a class="live-link" :href="DRUPAL_REPO" target="_blank" rel="noopener noreferrer">
+                  <Github class="h-3.5 w-3.5" aria-hidden="true" />
+                  {{ $t('stalManager.viewOnGithub') }}
+                  <ExternalLink class="h-3.5 w-3.5" aria-hidden="true" />
+                </a>
+              </div>
+              <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
+                {{ $t('stalManager.drupalIntro') }}
+              </p>
+            </div>
+
+            <!-- A real screenshot of the demo site (the stal_manager_demo recipe) -->
+            <button
+              type="button"
+              class="reveal shot shot-drupal"
+              :aria-label="`Open ${shotList[2].caption} screenshot full screen`"
+              @click="lightboxIndex = 2">
+              <span class="shot-bar" aria-hidden="true">
+                <span class="shot-dot"></span>
+                <span class="shot-dot"></span>
+                <span class="shot-dot"></span>
+                <span class="shot-url">Stal Manager in Drupal</span>
+              </span>
+              <img
+                src="/shared-costs-home.jpg"
+                :alt="$t('stalManager.drupalAlt')"
+                width="1600"
+                height="1000"
+                loading="lazy"
+              />
+            </button>
+          </div>
+
+          <ul class="drupal-points mb-6">
+            <li v-for="point in drupalPoints" :key="point.title" class="drupal-point reveal">
+              <component :is="point.icon" class="drupal-point-icon" aria-hidden="true" />
+              <div>
+                <h3 class="feature-title">{{ point.title }}</h3>
+                <p class="feature-text">{{ point.text }}</p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="reveal overview-card px-6 py-8">
+            <h3 class="overview-label">{{ $t('stalManager.drupalStack') }}</h3>
+            <div class="flex flex-wrap gap-2">
+              <span v-for="t in drupalStack" :key="t" class="tag-pill">{{ t }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stays on the page: the panel beside the content holds the app's -->
+        <RepoActivity
+          project="sharedCosts"
+          :repository="DRUPAL_REPO"
+          :label="$t('stalManager.repoDrupal')"
+          :float="false"
+        />
 
         <div class="reveal mt-4 inline-block">
           <router-link class="group flex items-center gap-2" :to="$lp('/projects')">
@@ -126,7 +194,7 @@
 
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue'
-import ImageLightbox from '../../components/ImageLightbox.vue'
+import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
 import { watchReveal } from '../../reveal'
 import {
@@ -137,13 +205,23 @@ import {
   BarChart3,
   Lock,
   FlaskConical,
+  ChefHat,
+  Coins,
+  ExternalLink,
+  Github,
+  LayoutDashboard,
+  ShieldCheck,
 } from 'lucide-vue-next'
 
+/** The Drupal version, open source */
+const DRUPAL_REPO = 'https://github.com/RobbeSaelens/shared_costs'
+
 export default defineComponent({
-  components: { ArrowRight, Lock, ImageLightbox, RepoActivity },
+  components: { ArrowRight, ExternalLink, Github, Lock, ImageLightbox, RepoActivity },
 
   data() {
     return {
+      DRUPAL_REPO,
       lightboxIndex: null as number | null,
       stopReveal: () => {},
       heroTags: ['Next.js 16', 'React 19', 'TypeScript', 'Prisma 7', 'PostgreSQL', 'PWA'],
@@ -157,15 +235,48 @@ export default defineComponent({
         'Docker',
         'Vercel',
       ],
+      drupalStack: [
+        'Drupal 11',
+        'PHP 8.3+',
+        'HTMX',
+        'Views',
+        'Recipes',
+        'Twig/SDC',
+        'Chart.js',
+        'PHPUnit',
+        'axe-core',
+        'Playwright',
+        'PHPStan',
+        'GitHub Actions',
+      ],
     }
   },
 
   computed: {
-    shotList(): { src: string; alt: string; caption: string }[] {
+    shotList(): LightboxImage[] {
       return [
         { src: '/stal-manager-home.jpg', alt: this.$t('stalManager.alt') as string, caption: 'Stal Manager — desktop' },
         { src: '/stal-manager-mobile.jpg', alt: this.$t('stalManager.alt') as string, caption: 'Stal Manager — mobile' },
+        {
+          src: '/shared-costs-home.jpg',
+          alt: this.$t('stalManager.drupalAlt') as string,
+          caption: 'Stal Manager in Drupal — dashboard',
+        },
       ]
+    },
+
+    drupalPoints(): { icon: unknown; title: string; text: string }[] {
+      const map = [
+        ['Field', Coins],
+        ['Recipes', ChefHat],
+        ['App', LayoutDashboard],
+        ['Quality', ShieldCheck],
+      ] as const
+      return map.map(([key, icon]) => ({
+        icon: markRaw(icon),
+        title: this.$t(`stalManager.drupal${key}`) as string,
+        text: this.$t(`stalManager.drupal${key}Text`) as string,
+      }))
     },
 
     features(): { icon: unknown; title: string; text: string }[] {
@@ -250,7 +361,7 @@ export default defineComponent({
   overflow-x: auto;
 }
 
-/* Status badge */
+/* Status badge, and the link to the Drupal version's repository */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -272,6 +383,32 @@ export default defineComponent({
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--color-text-muted);
+}
+.live-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.live-link:hover {
+  border-color: var(--color-border-glow);
+  background: var(--color-surface-hover);
+  transform: translateY(-1px);
+}
+.live-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
 }
 
 /* =============================================
@@ -400,9 +537,10 @@ button.shot-phone {
   }
 }
 
-/* Touch devices get no hover cue, so mark the desktop capture as zoomable. */
+/* Touch devices get no hover cue, so mark the desktop captures as zoomable. */
 @media (hover: none) {
-  button.shot-desktop::after {
+  button.shot-desktop::after,
+  button.shot-drupal::after {
     content: '\2922';
     position: absolute;
     right: 0.5rem;
@@ -523,6 +661,63 @@ button.shot-phone {
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--color-text-secondary);
+}
+
+/* =============================================
+   Also in Drupal
+   ============================================= */
+/* The text and the screenshot side by side once both have room */
+.drupal-intro {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: center;
+}
+.drupal-intro > .overview-card {
+  justify-self: stretch;
+}
+@media (min-width: 1100px) {
+  .drupal-intro {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: center;
+  }
+}
+.shot-drupal {
+  max-width: 720px;
+}
+@media (min-width: 1100px) {
+  .shot-drupal {
+    max-width: none;
+  }
+}
+
+/* Four points, smaller than the app's feature cards: two by two once there is room */
+.drupal-points {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 640px) {
+  .drupal-points {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.drupal-point {
+  display: flex;
+  gap: 0.875rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.drupal-point-icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.1rem;
+  color: var(--color-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

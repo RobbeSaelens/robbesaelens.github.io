@@ -1,20 +1,25 @@
 <template>
   <!-- Activity of the project's repository (private, unless `repository` links to it), from
        src/data/repo-stats.json (npm run stats).
-       A section on the page; on screens with room beside the content, a panel there instead. -->
+       A section on the page; on screens with room beside the content, a panel there instead
+       (unless `float` is off: there is room for one panel per page). -->
   <component
     :is="variant === 'aside' ? 'aside' : 'section'"
     v-if="stats"
     class="repo"
-    :class="variant === 'aside' ? 'repo--aside' : 'repo--inline reveal'"
+    :class="variant === 'aside' ? 'repo--aside' : ['repo--inline', 'reveal', { 'repo--floats': float }]"
     :aria-labelledby="titleId"
   >
     <!-- In body: a transformed page ancestor would break position: fixed -->
-    <Teleport v-if="variant !== 'aside'" to="body">
-      <RepoActivity :project="project" :repository="repository" variant="aside" />
+    <Teleport v-if="variant !== 'aside' && float" to="body">
+      <RepoActivity :project="project" :repository="repository" :label="label" variant="aside" />
     </Teleport>
 
-    <h2 :id="titleId" class="repo-heading">{{ $t('repo.title') }}</h2>
+    <!-- Read out as "Repository activity: Next.js app" -->
+    <h2 :id="titleId" class="repo-heading" :aria-label="label ? `${$t('repo.title')}: ${label}` : undefined">
+      {{ $t('repo.title') }}
+      <span v-if="label" class="repo-label">{{ label }}</span>
+    </h2>
 
     <div class="repo-card">
       <dl class="repo-numbers">
@@ -86,9 +91,13 @@ const props = withDefaults(
     project: 'exulta' | 'scan2talk' | 'stalManager' | 'vhs' | 'sharedCosts'
     /** The repository's public URL, for an open-source project */
     repository?: string
+    /** Which repository this is, on a page that shows more than one */
+    label?: string
     variant?: 'inline' | 'aside'
+    /** Moves into the panel beside the content where there is room; one per page */
+    float?: boolean
   }>(),
-  { variant: 'inline' },
+  { variant: 'inline', float: true },
 )
 const titleId = computed(() => `repo-title-${props.project}-${props.variant}`)
 
@@ -126,6 +135,10 @@ function ago(iso: string) {
   margin-bottom: 2.5rem;
 }
 .repo-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
   font-family: var(--font-mono);
   font-size: 1.5rem;
   font-weight: 700;
@@ -136,6 +149,17 @@ function ago(iso: string) {
   .repo-heading {
     font-size: 2rem;
   }
+}
+/* Which repository, when a page shows more than one */
+.repo-label {
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border-glow);
 }
 
 .repo-card {
@@ -262,7 +286,7 @@ function ago(iso: string) {
   display: none;
 }
 @media (min-width: 1840px) and (min-height: 760px) {
-  .repo--inline {
+  .repo--floats {
     display: none;
   }
   .repo--aside {
@@ -281,6 +305,10 @@ function ago(iso: string) {
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-accent);
+  }
+  .repo--aside .repo-label {
+    padding: 0.1rem 0.5rem;
+    font-size: 0.625rem;
   }
   .repo--aside .repo-card {
     padding: 1.25rem;
