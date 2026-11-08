@@ -738,6 +738,22 @@ test.describe('Drupal contributions', () => {
     expect(errors).toEqual([])
   })
 
+  test('the mobile menu says "Drupal", on one line like the other links, and still announces it in full', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 })
+    const errors = await guard(page)
+    for (const [path, full] of [['/drupal', 'Drupal contributions'], ['/nl/drupal', 'Drupal-bijdragen']] as const) {
+      await open(page, path)
+      await page.locator('button[aria-controls="mobile-menu"]').click()
+      const link = page.locator('.mobile-link[href$="/drupal"]')
+      await expect(link.locator('.mobile-label')).toHaveText('Drupal')
+      await expect(link).toHaveAccessibleName(full)
+      // A long label wrapped onto two lines and made its row about 40px taller (the first row's border adds 1px).
+      const heights = await page.locator('.mobile-link').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height))
+      expect(Math.max(...heights) - Math.min(...heights), `${path}: every row as tall as the others (${heights})`).toBeLessThan(5)
+    }
+    expect(errors).toEqual([])
+  })
+
   test('is linked from the about page and the Stable Manager page, in both languages', async ({ page }) => {
     const errors = await guard(page)
     for (const [about, label, target] of [

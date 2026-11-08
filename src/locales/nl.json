@@ -2,6 +2,7 @@
   "nav": {
     "projects": "Projecten",
     "drupal": "Drupal-bijdragen",
+    "drupalShort": "Drupal",
     "aboutMe": "Over mij",
     "home": "Home"
   },
