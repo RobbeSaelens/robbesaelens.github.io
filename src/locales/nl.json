@@ -348,7 +348,7 @@
       "credits": "credits",
       "merged": "merge requests gemerged"
     },
-    "asOf": "Opgehaald van drupal.org en git.drupalcode.org bij elke deploy, laatst op {date}",
+    "asOf": "Opgehaald van drupal.org en git.drupalcode.org, laatst op {date}",
     "credits": "Bijdragen met credit",
     "creditsText": "Issues waarvoor de maintainers me credit gaven.",
     "credited": "Credit",
