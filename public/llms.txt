@@ -43,7 +43,7 @@ CMS & cloud: Drupal, Azure, Netlify, Vercel
 - [Home](https://robbesaelens.github.io/): Introduction and profile of Robbe Saelens.
 - [Projects](https://robbesaelens.github.io/projects): Carousel of selected projects, each with its own detail page.
 - [About & contact](https://robbesaelens.github.io/contact): Education, work experience and contact details.
-- [Drupal contributions](https://robbesaelens.github.io/drupal): His work on drupal.org: credited contributions, merge requests, and the issues he opened or took part in, with their status. Fetched from drupal.org and git.drupalcode.org at every deploy.
+- [Drupal contributions](https://robbesaelens.github.io/drupal): His work on drupal.org: credited contributions, merge requests, and the issues he opened or took part in, with their status. Fetched from drupal.org and git.drupalcode.org.
 
 ## Projects
 

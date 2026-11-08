@@ -107,10 +107,11 @@
             class="mobile-link"
             :class="{ 'is-current': isCurrent(link) }"
             :style="{ '--i': i }"
+            :aria-label="link.short ? $t(link.label) : undefined"
             @click="closeMenu"
           >
             <span class="mobile-index" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</span>
-            <span class="mobile-label">{{ $t(link.label) }}</span>
+            <span class="mobile-label">{{ $t(link.short ?? link.label) }}</span>
             <ArrowRight class="mobile-arrow" aria-hidden="true" />
           </router-link>
         </nav>
@@ -164,6 +165,8 @@ import { useEasterEgg } from '../../composables/useEasterEgg'
 interface NavLink {
   to: string
   label: string
+  /** A shorter label for the mobile menu, where a long one wraps onto two lines. */
+  short?: string
   /** Extra paths that count as this section (project detail pages). */
   matches?: (path: string) => boolean
 }
@@ -174,7 +177,7 @@ const LINKS: NavLink[] = [
 ]
 
 /** The Drupal contributions: a link of its own, its logo next to the others. */
-const DRUPAL_LINK: NavLink = { to: '/drupal', label: 'nav.drupal' }
+const DRUPAL_LINK: NavLink = { to: '/drupal', label: 'nav.drupal', short: 'nav.drupalShort' }
 
 export default {
   components: { Sun, Moon, Phone, Mail, X, ArrowRight, LanguageSwitcher, BrandLogo, DrupalIcon },
