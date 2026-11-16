@@ -516,7 +516,7 @@ export default defineComponent({
    Mobile Adjustments
    ============================================= */
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .terminal-content {
     padding: 2rem 1.25rem;
   }

@@ -610,7 +610,7 @@ export default defineComponent({
    Mobile Adjustments
    ============================================= */
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .ee-content {
     padding: 1.5rem 1rem;
   }

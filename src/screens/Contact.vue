@@ -1,6 +1,6 @@
 <template>
   <div class="about-page fade-out">
-    <div class="about-inner mx-auto w-full max-w-screen-2xl px-4 sm:px-6">
+    <div class="about-inner mx-auto w-full max-w-screen-2xl px-6">
       <TerminalHeader :title="$t('about.title').toLowerCase()" subtitle="cat ./about-me.md" />
 
       <div class="about-grid">
@@ -530,10 +530,12 @@ export default {
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    /* Bleed to the screen edges so a swiped card isn't cut by the page padding */
-    margin: 0 -1rem;
-    padding: 0 1rem 0.25rem;
-    scroll-padding: 0 1rem;
+    /* Bleed to the screen edges so a swiped card isn't cut by the page padding
+       (width: auto, not 100%, or the right edge stops short by the padding). */
+    width: auto;
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem 0.25rem;
+    scroll-padding: 0 1.5rem;
   }
   .about-grid::-webkit-scrollbar {
     display: none;

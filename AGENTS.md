@@ -150,7 +150,12 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   router's scroll reset, keyboard scrolling (Space, Page Down), the phone browsers'
   toolbars and the responsive test's full-page screenshots all rely on the window
   scrolling. The one-screen pages are `100dvh` tall (`AppHolder.vue`), not a scroller.
-- Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).
+- Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px), on
+  phones too (`px-6`, not `px-4`). The project pages are a narrower centred column
+  (`max-w-screen-xl px-6`).
+- Phone-only CSS uses `@media (max-width: 639px)`, the exact complement of UnoCSS `sm:`
+  (`min-width: 640px`). Never `max-width: 640px`: at exactly 640 px (a 1280 px laptop at
+  200 % zoom) both apply and a page gets the phone layout under the desktop header.
 - Screenshots of projects are real ones from the live sites, never mockups. The project
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
   (`src/components/MacBook3D.vue`, posed by `Projects.vue`): a new screenshot is all it

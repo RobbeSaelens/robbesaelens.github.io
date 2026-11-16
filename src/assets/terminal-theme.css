@@ -89,7 +89,7 @@
   line-height: 1.2;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .terminal-title {
     gap: 0.25rem;
   }
@@ -242,7 +242,7 @@
     color 0.2s ease;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .tag-pill {
     font-size: 0.65rem;
     padding: 0.175rem 0.5rem;

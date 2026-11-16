@@ -217,7 +217,7 @@ export default defineComponent({
   width: 2.75rem;
   height: 2.75rem;
 }
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .lightbox-nav {
     position: absolute;
     bottom: 1rem;

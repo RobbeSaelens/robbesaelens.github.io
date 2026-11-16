@@ -1,6 +1,6 @@
 <template>
   <article class="detail-page pb-10 fade-out">
-    <div class="mx-auto max-w-screen-xl px-4 pt-10 sm:px-6">
+    <div class="mx-auto max-w-screen-xl px-6 pt-10">
       <header class="text-center">
         <h1 class="hero-in terminal-title justify-center text-2xl font-bold sm:text-3xl lg:text-5xl" style="--i: 0">
           <span class="terminal-prompt">&gt;</span>
@@ -66,7 +66,7 @@
           </ShotGlare>
         </button>
       </div>
-      <div class="mx-5 pt-10 md:mx-10">
+      <div class="pt-10 md:mx-10">
         <div class="mb-10">
           <h2 class="mb-3 text-4xl font-bold md:text-5xl" style="color: var(--color-text-primary)">
             {{ $t('exulta.overview') }}
@@ -235,7 +235,7 @@ export default defineComponent({
   gap: 0.5rem;
   line-height: 1.2;
 }
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .terminal-title {
     gap: 0.25rem;
   }

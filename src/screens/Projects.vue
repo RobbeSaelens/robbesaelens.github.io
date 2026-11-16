@@ -692,10 +692,7 @@ export default {
   background: var(--color-accent);
 }
 
-@media (max-width: 640px) {
-  .car {
-    --gutter: 1rem; /* contact's px-4 on phones: more room for the slides */
-  }
+@media (max-width: 639px) {
   .car-nav,
   .car-comment,
   .car-cta {
