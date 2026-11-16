@@ -11,7 +11,7 @@
         :aria-label="isOpen ? $t(aiEnabled ? 'chat.close' : 'chat.closeBasic') : $t(aiEnabled ? 'chat.open' : 'chat.openBasic')"
         :aria-expanded="isOpen ? 'true' : 'false'"
       >
-        <!-- Pulses until the chat has been opened once this session -->
+        <!-- Pings three times, until the chat has been opened once this session -->
         <span class="fab-ring" aria-hidden="true"></span>
         <MessageCircle class="fab-icon fab-prompt fab-chat" aria-hidden="true" />
         <svg class="fab-icon fab-close" viewBox="0 0 24 24" aria-hidden="true">
@@ -690,7 +690,7 @@ export default {
   transform: none;
 }
 
-/* Soft ping until the visitor has opened the chat once */
+/* A soft ping, three times (then it rests), until the visitor has opened the chat once */
 .fab-ring {
   position: absolute;
   inset: -1px;
@@ -700,7 +700,7 @@ export default {
   pointer-events: none;
 }
 .chatbot-fab.is-new:not(.is-open) .fab-ring {
-  animation: fab-ping 2.8s cubic-bezier(0, 0, 0.2, 1) 2s infinite;
+  animation: fab-ping 2.8s cubic-bezier(0, 0, 0.2, 1) 2s 3;
 }
 
 @keyframes fab-in {
