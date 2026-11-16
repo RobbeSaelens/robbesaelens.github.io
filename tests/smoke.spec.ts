@@ -237,6 +237,15 @@ test('theme toggle switches to dark mode and back', async ({ page }) => {
   await expect(html).not.toHaveClass(/\bdark\b/)
 })
 
+test('with a mouse the custom cursor replaces the pointer, but fields keep the text cursor', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mouse only')
+  await guard(page)
+  await open(page, '/')
+  await page.locator('.chatbot-fab').click()
+  await expect(page.locator('#chat-input')).toHaveCSS('cursor', 'text')
+  await expect(page.locator('.chat-send')).toHaveCSS('cursor', 'none')
+})
+
 test('projects page links to each project', async ({ page }) => {
   await guard(page)
   await open(page, '/projects')
