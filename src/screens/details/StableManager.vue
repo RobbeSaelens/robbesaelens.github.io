@@ -32,19 +32,21 @@
           class="shot shot-desktop"
           :aria-label="`Open ${shotList[0].caption} screenshot full screen`"
           @click="lightboxIndex = 0">
-          <span class="shot-bar" aria-hidden="true">
-            <span class="shot-dot"></span>
-            <span class="shot-dot"></span>
-            <span class="shot-dot"></span>
-            <span class="shot-url">Stable Manager</span>
-          </span>
-          <img
-            src="/stable-manager-home.jpg"
-            :alt="$t('stableManager.alt')"
-            width="1600"
-            height="1000"
-            loading="lazy"
-          />
+          <ShotGlare>
+            <span class="shot-bar" aria-hidden="true">
+              <span class="shot-dot"></span>
+              <span class="shot-dot"></span>
+              <span class="shot-dot"></span>
+              <span class="shot-url">Stable Manager</span>
+            </span>
+            <img
+              src="/stable-manager-home.jpg"
+              :alt="$t('stableManager.alt')"
+              width="1600"
+              height="1000"
+              loading="lazy"
+            />
+          </ShotGlare>
         </button>
 
         <button
@@ -52,14 +54,16 @@
           class="shot shot-phone"
           :aria-label="`Open ${shotList[1].caption} screenshot full screen`"
           @click="lightboxIndex = 1">
-          <span class="shot-notch" aria-hidden="true"></span>
-          <img
-            src="/stable-manager-mobile.jpg"
-            :alt="$t('stableManager.alt')"
-            width="470"
-            height="800"
-            loading="lazy"
-          />
+          <ShotGlare radius="1.25rem">
+            <span class="shot-notch" aria-hidden="true"></span>
+            <img
+              src="/stable-manager-mobile.jpg"
+              :alt="$t('stableManager.alt')"
+              width="470"
+              height="800"
+              loading="lazy"
+            />
+          </ShotGlare>
         </button>
       </div>
 
@@ -76,11 +80,11 @@
         <!-- Features -->
         <h2 class="section-heading reveal">{{ $t('stableManager.featuresTitle') }}</h2>
         <div class="feature-grid mb-14">
-          <article v-for="f in features" :key="f.title" class="feature-card reveal">
+          <GlowCard v-for="f in features" :key="f.title" as="article" class="feature-card reveal">
             <component :is="f.icon" class="feature-icon" />
             <h3 class="feature-title">{{ f.title }}</h3>
             <p class="feature-text">{{ f.text }}</p>
-          </article>
+          </GlowCard>
         </div>
 
 
@@ -134,19 +138,21 @@
               class="reveal shot shot-drupal"
               :aria-label="`Open ${shotList[2].caption} screenshot full screen`"
               @click="lightboxIndex = 2">
-              <span class="shot-bar" aria-hidden="true">
-                <span class="shot-dot"></span>
-                <span class="shot-dot"></span>
-                <span class="shot-dot"></span>
-                <span class="shot-url">Stable Manager in Drupal</span>
-              </span>
-              <img
-                src="/shared-costs-home.jpg"
-                :alt="$t('stableManager.drupalAlt')"
-                width="1600"
-                height="1000"
-                loading="lazy"
-              />
+              <ShotGlare>
+                <span class="shot-bar" aria-hidden="true">
+                  <span class="shot-dot"></span>
+                  <span class="shot-dot"></span>
+                  <span class="shot-dot"></span>
+                  <span class="shot-url">Stable Manager in Drupal</span>
+                </span>
+                <img
+                  src="/shared-costs-home.jpg"
+                  :alt="$t('stableManager.drupalAlt')"
+                  width="1600"
+                  height="1000"
+                  loading="lazy"
+                />
+              </ShotGlare>
             </button>
           </div>
 
@@ -199,9 +205,11 @@
 
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue'
+import GlowCard from '../../components/GlowCard.vue'
 import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
 import DrupalIcon from '../../components/DrupalIcon.vue'
+import ShotGlare from '../../components/ShotGlare.vue'
 import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
@@ -223,7 +231,7 @@ import {
 const DRUPAL_REPO = 'https://github.com/RobbeSaelens/shared_costs'
 
 export default defineComponent({
-  components: { ArrowRight, DrupalIcon, ExternalLink, Github, Lock, ImageLightbox, RepoActivity },
+  components: { ArrowRight, DrupalIcon, ExternalLink, Github, GlowCard, Lock, ImageLightbox, RepoActivity, ShotGlare },
 
   data() {
     return {
