@@ -23,13 +23,14 @@
 
     <div class="repo-card">
       <dl class="repo-numbers">
+        <!-- The counts count up when they come into view (CountUpNumber.vue) -->
         <div class="repo-number">
           <dt>{{ $t('repo.commits') }}</dt>
-          <dd>{{ count(stats.commits) }}</dd>
+          <dd><CountUpNumber :value="stats.commits" :format="count" :delay="countDelay" /></dd>
         </div>
         <div class="repo-number">
           <dt>{{ $t('repo.last30') }}</dt>
-          <dd>{{ count(stats.commitsLast30Days) }}</dd>
+          <dd><CountUpNumber :value="stats.commitsLast30Days" :format="count" :delay="countDelay" /></dd>
         </div>
         <div class="repo-number repo-number--text">
           <dt>{{ $t('repo.since') }}</dt>
@@ -77,6 +78,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Github, Lock } from 'lucide-vue-next'
 import data from '../data/repo-stats.json'
+import CountUpNumber from './CountUpNumber.vue'
 
 interface RepoStats {
   commits: number
@@ -105,6 +107,8 @@ const { locale } = useI18n({ useScope: 'global' })
 const stats = computed(() => (data.projects as Record<string, RepoStats | undefined>)[props.project])
 const weeklyTotal = computed(() => stats.value?.commitsPerWeek.reduce((a, b) => a + b, 0) ?? 0)
 const weeklyMax = computed(() => Math.max(1, ...(stats.value?.commitsPerWeek ?? [])))
+/** The side panel slides in first (repo-aside-in): count along with its bars. */
+const countDelay = computed(() => (props.variant === 'aside' ? 0.6 : 0))
 
 const tag = () => (locale.value === 'nl' ? 'nl-BE' : 'en-GB')
 const count = (n: number) => n.toLocaleString(tag())

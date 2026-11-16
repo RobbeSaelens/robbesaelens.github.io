@@ -9,7 +9,7 @@
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
         <p class="hero-in terminal-subtitle car-intro text-sm tracking-wide md:text-base" style="--i: 1">
-          <span class="opacity-50">$</span> ls ./projects
+          <span class="opacity-50">$</span> <TerminalCommand text="ls ./projects" />{{ ' ' }}
           <span class="car-comment"># {{ $t('projects.intro') }}</span>
         </p>
       </div>

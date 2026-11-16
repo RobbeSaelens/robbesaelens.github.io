@@ -8,7 +8,7 @@
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
         <p class="hero-in terminal-subtitle mt-3 text-sm tracking-wide md:text-base" style="--i: 1">
-          <span class="opacity-50">$</span> cat ./exulta-project.md
+          <span class="opacity-50">$</span> <TerminalCommand text="cat ./exulta-project.md" />
         </p>
         <div class="hero-in mt-5 flex flex-wrap items-center justify-center gap-2" style="--i: 2">
           <span class="live-badge">
