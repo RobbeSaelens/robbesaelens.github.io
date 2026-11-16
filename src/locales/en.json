@@ -34,7 +34,9 @@
     "backendDev": "backend developer",
     "drupalLink": "My Drupal contributions",
     "competing": "Horse riding",
-    "competingText": "Alongside my job I ride at a competitive level. I take part in regional competitions and have also ridden national ones with our own horse. Show jumping is my big passion, along with everything that comes with it."
+    "competingText": "Alongside my job I ride at a competitive level. I take part in regional competitions and have also ridden national ones with our own horse. Show jumping is my big passion, along with everything that comes with it.",
+    "phoneLabel": "Phone:",
+    "emailLabel": "E-mail:"
   },
   "projects": {
     "intro": "Websites and apps I designed and built.",

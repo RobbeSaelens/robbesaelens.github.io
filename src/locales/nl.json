@@ -34,7 +34,9 @@
     "backendDev": "backend developer",
     "drupalLink": "Mijn Drupal-bijdragen",
     "competing": "Paardrijden",
-    "competingText": "Naast mijn job rijd ik op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Mijn grote passie is jumping, met alles wat daarbij komt kijken."
+    "competingText": "Naast mijn job rijd ik op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Mijn grote passie is jumping, met alles wat daarbij komt kijken.",
+    "phoneLabel": "Telefoon:",
+    "emailLabel": "E-mail:"
   },
   "projects": {
     "intro": "Websites en apps die ik ontwierp en bouwde.",

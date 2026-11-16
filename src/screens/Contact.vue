@@ -3,6 +3,20 @@
     <div class="about-inner mx-auto w-full max-w-screen-2xl px-6">
       <TerminalHeader :title="$t('about.title').toLowerCase()" subtitle="cat ./about-me.md" />
 
+      <!-- Phones: the footer is hidden on this one-screen page, so phone and e-mail are here -->
+      <p class="hero-in about-contact" style="--i: 1">
+        <a href="tel:0471958195" class="about-contact-link">
+          <Phone aria-hidden="true" />
+          <span class="sr-only">{{ $t('about.phoneLabel') }}</span>
+          0471 95 81 95
+        </a>
+        <a href="mailto:robbe.saelens@telenet.be" class="about-contact-link">
+          <Mail aria-hidden="true" />
+          <span class="sr-only">{{ $t('about.emailLabel') }}</span>
+          robbe.saelens@telenet.be
+        </a>
+      </p>
+
       <div class="about-grid">
         <!-- Education and experience first, as text; teaching and riding carry the photos. -->
         <GlowCard as="article" class="hero-in about-card about-card--text card-education" style="--i: 2">
@@ -123,7 +137,7 @@
 </template>
 
 <script lang="ts">
-import { ArrowRight, Briefcase, GraduationCap, BookOpen, Trophy } from 'lucide-vue-next'
+import { ArrowRight, Briefcase, GraduationCap, BookOpen, Mail, Phone, Trophy } from 'lucide-vue-next'
 import GlowCard from '../components/GlowCard.vue'
 import PhotoRipple from '../components/PhotoRipple.vue'
 import TerminalHeader from '../components/TerminalHeader.vue'
@@ -134,6 +148,8 @@ export default {
   components: {
     ArrowRight,
     Briefcase,
+    Mail,
+    Phone,
     GlowCard,
     GraduationCap,
     BookOpen,
@@ -522,10 +538,34 @@ export default {
   }
 }
 
+/* Phone and e-mail: only on phones, where the footer is hidden on this page */
+.about-contact {
+  display: none;
+}
+
 /* =============================================
    Phones: one card per screen width, swipe for the next
    ============================================= */
 @media (max-width: 639px) {
+  .about-contact {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1rem;
+    margin: calc(-1 * clamp(0.5rem, 2vh, 1.25rem)) 0 0.25rem;
+  }
+  .about-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.75rem;
+    font-size: 0.8125rem;
+    color: var(--color-accent);
+  }
+  .about-contact-link svg {
+    flex-shrink: 0;
+    width: 0.95rem;
+    height: 0.95rem;
+  }
   .about-grid {
     grid-template-columns: none;
     grid-template-rows: minmax(0, 1fr);
