@@ -8,6 +8,9 @@
   The pull is 1/strength of the mouse's distance from the button's centre, up to
   padding px past its edge: keep both small enough that the button never moves
   onto its neighbours or off screen.
+
+  It lets go faster than it leans (Vue Bits' default return was a slow 0.5 s
+  ease-in-out): when the mouse moves on, the button is back in place at once.
 -->
 <template>
   <Magnet
@@ -15,6 +18,8 @@
     :magnet-strength="strength"
     :disabled="disabled || !canPull"
     :inner-class-name="innerClass"
+    :active-transition="PULL"
+    :inactive-transition="RELEASE"
     wrapper-class-name="button-magnet"
   >
     <slot />
@@ -24,6 +29,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Magnet from './Magnet.vue'
+
+/** Leaning towards the mouse follows it smoothly (Vue Bits' own value)... */
+const PULL = 'transform 0.3s ease-out'
+/** ...letting go is quicker, with the site's ease-out. */
+const RELEASE = 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)'
 
 withDefaults(
   defineProps<{
