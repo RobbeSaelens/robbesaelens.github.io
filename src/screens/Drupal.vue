@@ -308,8 +308,11 @@ onBeforeUnmount(() => stopReveal())
 /* =============================================
    Intro and numbers: side by side from 1024px
    ============================================= */
+/* One column below 1024px. Explicit, so a long project name in a chip wraps inside
+   it instead of widening the column (and the intro and numbers with it). */
 .drupal-top {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 2rem;
   margin-bottom: 3rem;
 }
@@ -359,6 +362,7 @@ onBeforeUnmount(() => stopReveal())
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  max-width: 100%;
   min-height: 2.25rem;
   padding: 0.25rem 0.4rem 0.25rem 0.85rem;
   border-radius: 9999px;
@@ -381,7 +385,13 @@ onBeforeUnmount(() => stopReveal())
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
+/* A project without a name in drupal.json shows its machine name: long, no spaces */
+.chip-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .chip-count {
+  flex-shrink: 0;
   display: inline-grid;
   place-items: center;
   min-width: 1.5rem;
