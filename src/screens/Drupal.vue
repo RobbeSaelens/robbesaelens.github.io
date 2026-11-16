@@ -72,9 +72,10 @@
 
     <div class="drupal-lists">
       <div v-for="(column, c) in columns" :key="c" class="drupal-column">
-        <section
+        <GlowCard
           v-for="list in column"
           :key="list.key"
+          as="section"
           class="panel reveal"
           :aria-labelledby="`drupal-${list.key}-title`"
         >
@@ -98,7 +99,7 @@
             </li>
           </ul>
           <p v-else class="panel-empty">{{ $t('drupal.empty') }}</p>
-        </section>
+        </GlowCard>
       </div>
     </div>
 
@@ -136,6 +137,7 @@ import { useHead } from '@unhead/vue'
 import { useRoute } from 'vue-router'
 import TerminalHeader from '../components/TerminalHeader.vue'
 import DrupalIcon from '../components/DrupalIcon.vue'
+import GlowCard from '../components/GlowCard.vue'
 import { watchReveal } from '../reveal'
 import { drupalCreditsJsonLd } from '../seo/jsonld'
 import { SITE_URL } from '../site'

@@ -1,7 +1,7 @@
 <!--
   The animated background behind every page: DarkVeil (Vue Bits), turned to the
   site's teal. Client-only (it needs WebGL; the prerendered HTML keeps the plain
-  background) and skipped without a GPU (see hasWebGL). It sits behind all content,
+  background) and skipped without a GPU (gpu.ts). It sits behind all content,
   over <html>'s background (App.vue's wrapper has none), and never takes the pointer. With
   reduced motion it holds still.
 
@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { hasGpuWebGL } from '../gpu'
 import DarkVeil from './DarkVeil.vue'
 
 /** Turns the veil's violet to the accent teal (degrees, in the shader's YIQ space). */
@@ -30,28 +31,9 @@ const RESOLUTION = 0.5
 const enabled = ref(false)
 const speed = ref(0.6)
 
-/** Software renderers: Chrome's SwiftShader (also headless Chrome), Mesa's llvmpipe, Windows' fallback. */
-const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software|basic render/i
-
-/**
- * WebGL on a real GPU. Without one (no GPU, a blocklisted driver, many VMs) this
- * full-screen shader runs on the CPU and makes the whole page stutter: those
- * visitors keep the plain background. failIfMajorPerformanceCaveat catches some
- * of them; Chrome still hands out a SwiftShader context, so check the name too.
- * (Read here only, never sent anywhere.)
- */
-const hasWebGL = () => {
-  const canvas = document.createElement('canvas')
-  const gl = canvas.getContext('webgl', { failIfMajorPerformanceCaveat: true })
-  if (!gl) return false
-  const info = gl.getExtension('WEBGL_debug_renderer_info')
-  const renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER))
-  gl.getExtension('WEBGL_lose_context')?.loseContext()
-  return !SOFTWARE_RENDERER.test(renderer)
-}
-
 onMounted(() => {
-  if (!hasWebGL()) return
+  // On the CPU this full-screen shader would make the whole page stutter.
+  if (!hasGpuWebGL()) return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) speed.value = 0
   enabled.value = true
 })

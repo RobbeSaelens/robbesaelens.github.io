@@ -29,19 +29,21 @@
           class="shot shot-desktop"
           :aria-label="`Open ${shotList[0].caption} screenshot full screen`"
           @click="lightboxIndex = 0">
-          <span class="shot-bar" aria-hidden="true">
-            <span class="shot-dot"></span>
-            <span class="shot-dot"></span>
-            <span class="shot-dot"></span>
-            <span class="shot-url">VHS Service</span>
-          </span>
-          <img
-            src="/vhs-home.jpg"
-            :alt="$t('vhs.alt')"
-            width="1600"
-            height="1000"
-            loading="lazy"
-          />
+          <ShotGlare>
+            <span class="shot-bar" aria-hidden="true">
+              <span class="shot-dot"></span>
+              <span class="shot-dot"></span>
+              <span class="shot-dot"></span>
+              <span class="shot-url">VHS Service</span>
+            </span>
+            <img
+              src="/vhs-home.jpg"
+              :alt="$t('vhs.alt')"
+              width="1600"
+              height="1000"
+              loading="lazy"
+            />
+          </ShotGlare>
         </button>
 
         <button
@@ -49,14 +51,16 @@
           class="shot shot-phone"
           :aria-label="`Open ${shotList[1].caption} screenshot full screen`"
           @click="lightboxIndex = 1">
-          <span class="shot-notch" aria-hidden="true"></span>
-          <img
-            src="/vhs-mobile.jpg"
-            :alt="$t('vhs.alt')"
-            width="400"
-            height="800"
-            loading="lazy"
-          />
+          <ShotGlare radius="1.25rem">
+            <span class="shot-notch" aria-hidden="true"></span>
+            <img
+              src="/vhs-mobile.jpg"
+              :alt="$t('vhs.alt')"
+              width="400"
+              height="800"
+              loading="lazy"
+            />
+          </ShotGlare>
         </button>
       </div>
 
@@ -73,11 +77,11 @@
         <!-- Features -->
         <h2 class="section-heading reveal">{{ $t('vhs.featuresTitle') }}</h2>
         <div class="feature-grid mb-14">
-          <article v-for="f in features" :key="f.title" class="feature-card reveal">
+          <GlowCard v-for="f in features" :key="f.title" as="article" class="feature-card reveal">
             <component :is="f.icon" class="feature-icon" />
             <h3 class="feature-title">{{ f.title }}</h3>
             <p class="feature-text">{{ f.text }}</p>
-          </article>
+          </GlowCard>
         </div>
 
 
@@ -123,8 +127,10 @@
 
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue'
+import GlowCard from '../../components/GlowCard.vue'
 import ImageLightbox from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
+import ShotGlare from '../../components/ShotGlare.vue'
 import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
@@ -137,7 +143,7 @@ import {
 } from 'lucide-vue-next'
 
 export default defineComponent({
-  components: { ArrowRight, ImageLightbox, RepoActivity },
+  components: { ArrowRight, GlowCard, ImageLightbox, RepoActivity, ShotGlare },
 
   data() {
     return {

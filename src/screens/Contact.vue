@@ -5,7 +5,7 @@
 
       <div class="about-grid">
         <!-- Education and experience first, as text; teaching and riding carry the photos. -->
-        <article class="hero-in about-card about-card--text card-education" style="--i: 2">
+        <GlowCard as="article" class="hero-in about-card about-card--text card-education" style="--i: 2">
           <GraduationCap class="card-deco" aria-hidden="true" :stroke-width="1" />
           <div class="card-body">
             <span class="card-tag">./education</span>
@@ -26,9 +26,9 @@
               </template>
             </i18n-t>
           </div>
-        </article>
+        </GlowCard>
 
-        <article class="hero-in about-card about-card--text card-experience" style="--i: 3">
+        <GlowCard as="article" class="hero-in about-card about-card--text card-experience" style="--i: 3">
           <Briefcase class="card-deco" aria-hidden="true" :stroke-width="1" />
           <div class="card-body">
             <span class="card-tag">./experience</span>
@@ -72,7 +72,7 @@
               </template>
             </i18n-t>
           </div>
-        </article>
+        </GlowCard>
 
         <article class="hero-in about-card about-card--photo card-teaching" style="--i: 4" tabindex="0">
           <div class="card-media">
@@ -82,6 +82,7 @@
               class="card-image"
               loading="lazy"
             />
+            <PhotoDither src="/about.jpg" area=".about-card" />
             <span class="card-slug">./teaching</span>
           </div>
           <div class="card-body">
@@ -103,6 +104,7 @@
               class="card-image"
               loading="lazy"
             />
+            <PhotoDither src="/horse.jpg" area=".about-card" />
             <span class="card-slug">./riding</span>
           </div>
           <div class="card-body">
@@ -122,6 +124,8 @@
 
 <script lang="ts">
 import { ArrowRight, Briefcase, GraduationCap, BookOpen, Trophy } from 'lucide-vue-next'
+import GlowCard from '../components/GlowCard.vue'
+import PhotoDither from '../components/PhotoDither.vue'
 import TerminalHeader from '../components/TerminalHeader.vue'
 
 export default {
@@ -130,8 +134,10 @@ export default {
   components: {
     ArrowRight,
     Briefcase,
+    GlowCard,
     GraduationCap,
     BookOpen,
+    PhotoDither,
     Trophy,
     TerminalHeader,
   },
@@ -361,6 +367,22 @@ export default {
   object-fit: cover;
   display: block;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The photo as two-colour pixels over the <img> (PhotoDither: mouse and trackpad only).
+   Dimmed with the card like the photo under it, so the caption stays as readable;
+   keyboard focus shows the photo itself, in colour. */
+.photo-dither {
+  transition:
+    opacity 0.3s ease,
+    filter 0.4s ease;
+}
+.about-card--photo:hover .photo-dither,
+.about-card--photo:focus-within .photo-dither {
+  filter: brightness(0.8);
+}
+.about-card--photo:focus-visible .photo-dither {
+  opacity: 0;
 }
 
 /* Light top scrim keeps the slug readable over any photo */

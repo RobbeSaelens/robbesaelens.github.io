@@ -37,6 +37,13 @@
   --color-badge-closed: #4a6d69;
   --color-badge-closed-bg: rgba(74, 109, 105, 0.07);
   --color-badge-closed-border: rgba(74, 109, 105, 0.3);
+  /* The glow that follows the mouse over cards (GlowCard.vue), at 60 % at its centre.
+     It lies under the text: faint, so text on it keeps 4.5:1. */
+  --color-spotlight: rgba(13, 148, 136, 0.14);
+  /* The about page's photos as two-colour pixels (PhotoDither.vue): dark teal on the
+     surface. Hex only (the canvas reads them). */
+  --color-dither-ink: #134e4a;
+  --color-dither-paper: #ffffff;
   --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
 }
 
@@ -71,6 +78,10 @@
   --color-badge-closed: #a3b0c2;
   --color-badge-closed-bg: rgba(148, 163, 184, 0.1);
   --color-badge-closed-border: rgba(148, 163, 184, 0.3);
+  --color-spotlight: rgba(45, 212, 191, 0.2);
+  /* Dark: the surface takes the shadows, the teal the light. */
+  --color-dither-ink: #0e151e;
+  --color-dither-paper: #0f766e;
 }
 
 /* =============================================
