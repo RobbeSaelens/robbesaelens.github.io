@@ -149,7 +149,13 @@ onBeforeUnmount(() => {
     align-items: start;
     gap: clamp(3rem, 6vw, 7rem);
   }
+  /* Only the index stays in view while reading: with the glance card it is taller than
+     a 720px screen, and its last entries would never show. The column runs the whole
+     height of the text, so the index has room to travel. */
   .privacy-aside {
+    align-self: stretch;
+  }
+  .toc {
     position: sticky;
     top: 6rem;
   }
