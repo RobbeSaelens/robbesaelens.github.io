@@ -1,5 +1,5 @@
 <template>
-  <div class="car" @wheel.passive="onWheel">
+  <div class="car" :class="{ 'is-quick': quick }" @wheel.passive="onWheel">
     <header class="car-head">
       <div>
         <!-- Same terminal title as the other pages (TerminalHeader), sized for a one-screen layout. -->
@@ -51,8 +51,8 @@
       :aria-label="$t('nav.projects')"
       @scroll.passive="onScroll"
       @pointerdown="dragStart"
-      @keydown.left.prevent="go(current - 1)"
-      @keydown.right.prevent="go(current + 1)"
+      @keydown.left.prevent="goByKey(-1)"
+      @keydown.right.prevent="goByKey(1)"
     >
       <li
         v-for="(project, index) in projects"
@@ -208,6 +208,9 @@ export default {
       tiltNow: { x: 0, y: 0 },
       tiltTarget: { x: 0, y: 0 },
       tiltFrame: 0,
+      /** Paging with the arrow keys: the moves are quick (.is-quick), see goByKey(). */
+      quick: false,
+      quickTimer: 0,
     }
   },
 
@@ -220,6 +223,7 @@ export default {
     window.removeEventListener('pointerup', this.dragEnd)
     clearTimeout(this.wheelTimer)
     clearTimeout(this.goingTimer)
+    clearTimeout(this.quickTimer)
     cancelAnimationFrame(this.tiltFrame)
   },
 
@@ -241,10 +245,26 @@ export default {
       const max = t.scrollWidth - t.clientWidth
       return Math.max(0, Math.min(max, slide.offsetLeft - (t.clientWidth - slide.offsetWidth) / 2))
     },
-    go(index: number) {
+    /**
+     * The arrow keys page through the slides at once: no smooth scroll, and the same
+     * moves in a quarter of a second instead of the slow turn and lid a click, swipe or
+     * wheel gets (.is-quick). Keyboard paging is repeated quickly, and shouldn't wait.
+     */
+    goByKey(delta: number) {
+      this.quick = true
+      clearTimeout(this.quickTimer)
+      // Transitions keep the timing they started with: dropping the class later is safe
+      this.quickTimer = window.setTimeout(() => (this.quick = false), 400)
+      this.go(this.current + delta, true)
+    },
+    go(index: number, instant = false) {
       const i = Math.max(0, Math.min(this.projects.length - 1, index))
       this.resetTilt()
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (!instant && this.quick) {
+        clearTimeout(this.quickTimer)
+        this.quick = false
+      }
+      const reduced = instant || window.matchMedia('(prefers-reduced-motion: reduce)').matches
       // Current right away; scroll events on the way there don't change it.
       this.current = i
       this.goingTo = i
@@ -758,6 +778,27 @@ export default {
   .car-caption-text {
     flex: none; /* a column here: a 16rem basis would be a height */
   }
+}
+
+/* Paging with the arrow keys (goByKey): the same moves, in a quarter of a second */
+.car.is-quick .car-slide {
+  transition-duration: 0.25s, 0.25s;
+}
+.car.is-quick .car-slide .car-caption > * {
+  transition-duration: 0.2s;
+  transition-delay: 0s;
+}
+.car.is-quick :deep(.mb-pose),
+.car.is-quick :deep(.mb-lid) {
+  transition-duration: 0.25s;
+  transition-delay: 0s;
+}
+.car.is-quick .car-dot span {
+  transition-duration: 0.2s;
+}
+.car.is-quick .count-enter-active,
+.car.is-quick .count-leave-active {
+  transition-duration: 0.1s;
 }
 
 @media (prefers-reduced-motion: reduce) {
