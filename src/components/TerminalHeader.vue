@@ -6,7 +6,7 @@
       <span class="terminal-cursor" aria-hidden="true"></span>
     </h1>
     <p class="hero-in terminal-subtitle text-sm tracking-wide md:text-base" style="--i: 1">
-      <span class="opacity-50">$</span> {{ subtitle }}
+      <span class="opacity-50">$</span> <TerminalCommand :text="subtitle" />
     </p>
   </header>
 </template>
