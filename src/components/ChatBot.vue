@@ -10,16 +10,10 @@
     >
       <!-- Pulses until the chat has been opened once this session -->
       <span class="fab-ring" aria-hidden="true"></span>
-      <!-- The llama when the AI answers (Llama 3.3); the terminal prompt otherwise -->
-      <LlamaIcon v-if="aiEnabled" class="fab-icon fab-prompt fab-llama" />
-      <svg v-else class="fab-icon fab-prompt" viewBox="0 0 24 24" aria-hidden="true">
-        <path class="fab-chevron" d="M5.5 7.5 10 12l-4.5 4.5" />
-        <rect class="fab-cursor" x="12.5" y="15.4" width="6.5" height="2.2" rx="1.1" />
-      </svg>
+      <MessageCircle class="fab-icon fab-prompt fab-chat" aria-hidden="true" />
       <svg class="fab-icon fab-close" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M7.5 7.5l9 9M16.5 7.5l-9 9" />
       </svg>
-      <span v-if="aiEnabled" class="fab-badge" aria-hidden="true">AI</span>
     </button>
 
     <transition name="chat-slide">
@@ -98,7 +92,7 @@
 <script lang="ts">
 import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowUp, RotateCcw, X } from 'lucide-vue-next'
+import { ArrowUp, MessageCircle, RotateCcw, X } from 'lucide-vue-next'
 import LlamaIcon from './LlamaIcon.vue'
 import { useEasterEgg } from '../composables/useEasterEgg'
 import { aiAvailable, askAssistant, type ChatTurn } from '../chatApi'
@@ -268,7 +262,7 @@ const RIDDLE_ANSWERS: Record<number, string[]> = {
 
 export default {
   name: 'ChatBot',
-  components: { ArrowUp, LlamaIcon, RotateCcw, X },
+  components: { ArrowUp, LlamaIcon, MessageCircle, RotateCcw, X },
   setup() {
     const { t, tm, rt, locale } = useI18n({ useScope: 'global' })
     const { unlock, secretCode, clearSecretCode, isEasterEggUnlocked, shouldResetChatbot } = useEasterEgg()
@@ -609,7 +603,7 @@ export default {
   background: rgba(15, 23, 42, 0.95);
 }
 
-/* Icon: a drawn ">_" whose cursor blinks; it turns into an ✕ while open */
+/* Icon: a chat bubble; it turns into an ✕ while open */
 .fab-icon {
   position: absolute;
   width: 1.5rem;
@@ -623,28 +617,17 @@ export default {
     opacity 0.25s ease,
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.fab-chevron {
-  transition: transform 0.25s ease;
+/* A lighter line than the ✕, and a small tilt on hover */
+.fab-chat {
+  width: 1.65rem;
+  height: 1.65rem;
+  stroke-width: 2;
 }
-/* The llama keeps its own thinner line and tilts its head on hover */
-.fab-llama {
-  width: 1.75rem;
-  height: 1.75rem;
-  stroke-width: 1.7;
+.chatbot-fab:hover .fab-chat {
+  transform: rotate(-8deg) scale(1.06);
 }
-.chatbot-fab:hover .fab-llama {
-  transform: rotate(-8deg);
-}
-.chatbot-fab.is-open:hover .fab-llama {
+.chatbot-fab.is-open:hover .fab-chat {
   transform: rotate(90deg) scale(0.6);
-}
-.chatbot-fab:hover .fab-chevron {
-  transform: translateX(1.5px);
-}
-.fab-cursor {
-  fill: currentColor;
-  stroke: none;
-  animation: fab-blink 1.1s step-end infinite;
 }
 .fab-close {
   opacity: 0;
@@ -672,29 +655,6 @@ export default {
   animation: fab-ping 2.8s cubic-bezier(0, 0, 0.2, 1) 2s infinite;
 }
 
-.fab-badge {
-  position: absolute;
-  top: -0.45rem;
-  right: -0.45rem;
-  padding: 0.05rem 0.3rem;
-  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
-  font-size: 0.5625rem;
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-  color: #042f2e;
-  background: #2dd4bf;
-  border: 2px solid var(--color-bg, #0f172a);
-  border-radius: 999px;
-  transition:
-    opacity 0.2s ease,
-    transform 0.25s ease;
-}
-.chatbot-fab.is-open .fab-badge {
-  opacity: 0;
-  transform: scale(0.6);
-}
-
 @keyframes fab-in {
   from {
     opacity: 0;
@@ -703,11 +663,6 @@ export default {
   to {
     opacity: 1;
     transform: none;
-  }
-}
-@keyframes fab-blink {
-  50% {
-    opacity: 0;
   }
 }
 @keyframes fab-ping {
@@ -723,12 +678,10 @@ export default {
 }
 @media (prefers-reduced-motion: reduce) {
   .chatbot-fab,
-  .fab-cursor,
   .fab-ring {
     animation: none !important;
   }
-  .fab-icon,
-  .fab-chevron {
+  .fab-icon {
     transition: none;
   }
 }
