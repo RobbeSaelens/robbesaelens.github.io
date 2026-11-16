@@ -17,7 +17,7 @@
         </a>
       </p>
 
-      <div class="about-grid">
+      <div ref="grid" class="about-grid" @scroll.passive="onScroll">
         <!-- Education and experience first, as text; teaching and riding carry the photos. -->
         <GlowCard as="article" class="hero-in about-card about-card--text card-education" style="--i: 2">
           <GraduationCap class="card-deco" aria-hidden="true" :stroke-width="1" />
@@ -132,6 +132,22 @@
           </div>
         </article>
       </div>
+
+      <!-- Phones: where you are in the swipe row, and a way to jump; like the project dots -->
+      <div class="hero-in about-dots" style="--i: 6">
+        <button
+          v-for="(card, i) in CARDS"
+          :key="card"
+          type="button"
+          class="about-dot"
+          :class="{ 'is-current': i === current }"
+          :aria-label="$t(card)"
+          :aria-current="i === current ? 'true' : undefined"
+          @click="go(i)"
+        >
+          <span></span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -156,6 +172,42 @@ export default {
     PhotoRipple,
     Trophy,
     TerminalHeader,
+  },
+
+  data() {
+    return {
+      /** The card titles, in the order of the row: the dots' names */
+      CARDS: ['about.education', 'about.experience', 'about.teaching', 'about.competing'],
+      current: 0,
+    }
+  },
+
+  methods: {
+    cards(): HTMLElement[] {
+      return [...(this.$refs.grid as HTMLElement).children] as HTMLElement[]
+    },
+    /** Phones: the card nearest the row's start is the current one (the last at the end). */
+    onScroll() {
+      const grid = this.$refs.grid as HTMLElement
+      if (grid.scrollWidth <= grid.clientWidth) return
+      const cards = this.cards()
+      if (grid.scrollLeft >= grid.scrollWidth - grid.clientWidth - 2) {
+        this.current = cards.length - 1
+        return
+      }
+      const start = grid.getBoundingClientRect().left + (parseFloat(getComputedStyle(grid).scrollPaddingLeft) || 0)
+      const dist = cards.map((card) => Math.abs(card.getBoundingClientRect().left - start))
+      this.current = dist.indexOf(Math.min(...dist))
+    },
+    go(i: number) {
+      const grid = this.$refs.grid as HTMLElement
+      const card = this.cards()[i]
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const pad = parseFloat(getComputedStyle(grid).scrollPaddingLeft) || 0
+      const left = grid.scrollLeft + card.getBoundingClientRect().left - grid.getBoundingClientRect().left - pad
+      grid.scrollTo({ left, behavior: reduced ? 'auto' : 'smooth' })
+      this.current = i
+    },
   },
 }
 </script>
@@ -538,8 +590,10 @@ export default {
   }
 }
 
-/* Phone and e-mail: only on phones, where the footer is hidden on this page */
-.about-contact {
+/* Phone and e-mail, and the row's dots: only on phones (the footer is hidden on this
+   page there, and the cards are a swipe row) */
+.about-contact,
+.about-dots {
   display: none;
 }
 
@@ -565,6 +619,37 @@ export default {
     flex-shrink: 0;
     width: 0.95rem;
     height: 0.95rem;
+  }
+
+  /* The dots: 24px targets (44px tall on touch screens), the first one on the content edge */
+  .about-dots {
+    display: flex;
+    margin: 0.25rem 0 0 -0.5rem;
+  }
+  .about-dot {
+    padding: 0.5rem;
+  }
+  .about-dot span {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-border-glow);
+    transition:
+      width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.3s ease;
+  }
+  .about-dot.is-current span,
+  .about-dot:active span {
+    background: var(--color-accent);
+  }
+  .about-dot.is-current span {
+    width: 2rem;
+  }
+  .about-dot:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: 9999px;
   }
   .about-grid {
     grid-template-columns: none;
@@ -606,6 +691,20 @@ export default {
   .card-slug {
     left: 0.75rem;
     top: 0.625rem;
+  }
+}
+
+@media (max-width: 639px) and (pointer: coarse) {
+  .about-dots {
+    margin-top: 0;
+  }
+  .about-dot {
+    padding: 1.125rem 0.5rem;
+  }
+}
+@media (max-width: 639px) and (hover: hover) and (pointer: fine) {
+  .about-dot:hover span {
+    background: var(--color-accent);
   }
 }
 

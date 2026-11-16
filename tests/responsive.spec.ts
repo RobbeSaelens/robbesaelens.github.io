@@ -90,7 +90,7 @@ for (const base of ROUTES) {
 
       // Tap targets: at least 24 × 24 px; the main controls 44 px on a touch phone
       const targets = await page.evaluate(() =>
-        [...document.querySelectorAll<HTMLElement>('.nav-menu-btn, .nav-icon-btn, .lang-switch, .chatbot-fab, .car-dot, .car-btn')]
+        [...document.querySelectorAll<HTMLElement>('.nav-menu-btn, .nav-icon-btn, .lang-switch, .chatbot-fab, .car-dot, .car-btn, .about-dot')]
           .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden')
           .map((el) => {
             const r = el.getBoundingClientRect()
@@ -102,7 +102,7 @@ for (const base of ROUTES) {
         if (width < 640 && ['nav-icon-btn', 'nav-menu-btn', 'chatbot-fab'].includes(t.name)) {
           expect(Math.min(t.w, t.h), `${t.name} on a phone is ${t.w}×${t.h}`).toBeGreaterThanOrEqual(44)
         }
-        if (width < 640 && t.name === 'car-dot') expect(t.h, `car-dot on a phone is ${t.h}px tall`).toBeGreaterThanOrEqual(44)
+        if (width < 640 && ['car-dot', 'about-dot'].includes(t.name)) expect(t.h, `${t.name} on a phone is ${t.h}px tall`).toBeGreaterThanOrEqual(44)
       }
 
       // The project slides: the stage spans its slide, edge to edge with the caption,

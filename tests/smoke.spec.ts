@@ -246,6 +246,25 @@ test('with a mouse the custom cursor replaces the pointer, but fields keep the t
   await expect(page.locator('.chat-send')).toHaveCSS('cursor', 'none')
 })
 
+test('on a phone the about cards are a swipe row, with dots that show and change the card', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phones')
+  await guard(page)
+  await open(page, '/contact')
+  const dots = page.locator('.about-dot')
+  await expect(dots).toHaveCount(4)
+  await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
+  await page.getByRole('button', { name: 'Teaching', exact: true }).click()
+  await expect(dots.nth(2)).toHaveAttribute('aria-current', 'true')
+  await expect(dots.nth(0)).not.toHaveAttribute('aria-current', 'true')
+  await expect.poll(() => page.locator('.about-grid').evaluate((g) => g.scrollLeft)).toBeGreaterThan(0)
+  // Swiping back moves the dot with it
+  await page.locator('.about-grid').evaluate((g) => g.scrollTo({ left: 0 }))
+  await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
+
+  await open(page, '/nl/contact')
+  await expect(page.getByRole('button', { name: 'Paardrijden', exact: true })).toBeVisible()
+})
+
 test('projects page links to each project', async ({ page }) => {
   await guard(page)
   await open(page, '/projects')
