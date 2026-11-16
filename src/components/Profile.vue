@@ -67,15 +67,18 @@
       </ul>
 
       <div class="hero-in hero-actions" style="--i: 4">
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/message"
-          class="hero-btn hero-btn--primary"
-        >
-          {{ $t('home.sayHello') }}
-          <MessageCircle class="hero-btn-icon" aria-hidden="true" />
-        </a>
+        <!-- Leans towards the mouse, at most about half the gap to the next button -->
+        <ButtonMagnet :padding="12" :strength="12" inner-class="flex">
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/message"
+            class="hero-btn hero-btn--primary"
+          >
+            {{ $t('home.sayHello') }}
+            <MessageCircle class="hero-btn-icon" aria-hidden="true" />
+          </a>
+        </ButtonMagnet>
         <router-link :to="$lp('/projects')" class="hero-btn hero-btn--ghost">
           <span class="prompt">$</span> cd ./projects
           <ArrowRight class="hero-btn-icon hero-btn-arrow" aria-hidden="true" />
@@ -157,9 +160,11 @@ import {
 import PlaceMap from './PlaceMap.vue'
 import DrupalIcon from './DrupalIcon.vue'
 import HeroWordmark from './HeroWordmark.vue'
+import ButtonMagnet from './ButtonMagnet.vue'
 
 export default {
   components: {
+    ButtonMagnet,
     PlaceMap,
     DrupalIcon,
     HeroWordmark,

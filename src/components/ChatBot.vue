@@ -1,20 +1,24 @@
 <template>
   <div ref="rootRef" class="chatbot-root">
-    <button
-      ref="fabRef"
-      @click="toggle"
-      class="chatbot-fab"
-      :class="{ 'is-open': isOpen, 'is-new': !seen }"
-      :aria-label="isOpen ? $t(aiEnabled ? 'chat.close' : 'chat.closeBasic') : $t(aiEnabled ? 'chat.open' : 'chat.openBasic')"
-      :aria-expanded="isOpen ? 'true' : 'false'"
-    >
-      <!-- Pulses until the chat has been opened once this session -->
-      <span class="fab-ring" aria-hidden="true"></span>
-      <MessageCircle class="fab-icon fab-prompt fab-chat" aria-hidden="true" />
-      <svg class="fab-icon fab-close" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7.5 7.5l9 9M16.5 7.5l-9 9" />
-      </svg>
-    </button>
+    <!-- Leans towards the mouse, 8px at most: it sits in the corner, 16px from the footer's
+         contact links (AppFooter.vue). Holds still while open. -->
+    <ButtonMagnet :padding="16" :strength="5" :disabled="isOpen">
+      <button
+        ref="fabRef"
+        @click="toggle"
+        class="chatbot-fab"
+        :class="{ 'is-open': isOpen, 'is-new': !seen }"
+        :aria-label="isOpen ? $t(aiEnabled ? 'chat.close' : 'chat.closeBasic') : $t(aiEnabled ? 'chat.open' : 'chat.openBasic')"
+        :aria-expanded="isOpen ? 'true' : 'false'"
+      >
+        <!-- Pulses until the chat has been opened once this session -->
+        <span class="fab-ring" aria-hidden="true"></span>
+        <MessageCircle class="fab-icon fab-prompt fab-chat" aria-hidden="true" />
+        <svg class="fab-icon fab-close" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7.5 7.5l9 9M16.5 7.5l-9 9" />
+        </svg>
+      </button>
+    </ButtonMagnet>
 
     <transition name="chat-slide">
       <section
@@ -51,13 +55,17 @@
 
           <div v-for="(msg, i) in messages" :key="i" class="msg" :class="`msg--${msg.actor}`">
             <span v-if="msg.actor === 'bot'" class="msg-avatar" aria-hidden="true"><LlamaIcon /></span>
-            <!-- AI replies are plain text (never v-html); the rest are translation keys -->
-            <p class="msg-text">{{ msg.actor === 'user' ? msg.key : (msg.text ?? $t(msg.key)) }}</p>
+            <!-- AI replies are plain text (never v-html); the rest are translation keys.
+                 An answer to a question opens with the thinking line, done: a check and the time. -->
+            <p class="msg-text"><span v-if="msg.took != null" class="msg-status msg-status--done" aria-hidden="true"
+                ><ChatThinking :took="msg.took" :animate="i === messages.length - 1" :riddle="riddleStep > 0" /></span
+              >{{ msg.actor === 'user' ? msg.key : (msg.text ?? $t(msg.key)) }}</p>
           </div>
 
+          <!-- Thinking: pulsing dots and a timer (ChatThinking.vue) -->
           <div v-if="isTyping" class="msg msg--bot chat-typing" aria-hidden="true">
             <span class="msg-avatar"><LlamaIcon /></span>
-            <p class="msg-text"><span class="dot-1"></span><span class="dot-2"></span><span class="dot-3"></span></p>
+            <p class="msg-text"><span class="msg-status"><ChatThinking :riddle="riddleStep > 0" /></span></p>
           </div>
 
           <!-- Follow-ups after an AI answer; the starter questions at the beginning -->
@@ -93,6 +101,8 @@
 import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowUp, MessageCircle, RotateCcw, X } from 'lucide-vue-next'
+import ButtonMagnet from './ButtonMagnet.vue'
+import ChatThinking from './ChatThinking.vue'
 import LlamaIcon from './LlamaIcon.vue'
 import { useEasterEgg } from '../composables/useEasterEgg'
 import { aiAvailable, askAssistant, type ChatTurn } from '../chatApi'
@@ -106,6 +116,8 @@ interface Message {
   text?: string
   /** Follow-up questions offered with an AI reply. */
   suggestions?: string[]
+  /** An answer to a question: the seconds it took, shown above it. */
+  took?: number
 }
 
 const KEYWORDS: { keys: string[]; responseKey: string }[] = [
@@ -262,7 +274,7 @@ const RIDDLE_ANSWERS: Record<number, string[]> = {
 
 export default {
   name: 'ChatBot',
-  components: { ArrowUp, LlamaIcon, MessageCircle, RotateCcw, X },
+  components: { ArrowUp, ButtonMagnet, ChatThinking, LlamaIcon, MessageCircle, RotateCcw, X },
   setup() {
     const { t, tm, rt, locale } = useI18n({ useScope: 'global' })
     const { unlock, secretCode, clearSecretCode, isEasterEggUnlocked, shouldResetChatbot } = useEasterEgg()
@@ -305,13 +317,24 @@ export default {
       })
     }
 
+    /** When the question being answered was asked (performance.now()). */
+    let askedAt: number | null = null
+
+    /** For the first bot line after a question: the seconds since it was asked. */
+    const took = (actor: 'bot' | 'user') => {
+      if (actor !== 'bot' || askedAt === null) return undefined
+      const seconds = (performance.now() - askedAt) / 1000
+      askedAt = null
+      return seconds
+    }
+
     const addMessage = (actor: 'bot' | 'user', keyOrText: string) => {
-      messages.value.push({ actor, key: keyOrText })
+      messages.value.push({ actor, key: keyOrText, took: took(actor) })
       scrollToBottom()
     }
 
     const addReply = (text: string, suggestions: string[] = []) => {
-      messages.value.push({ actor: 'bot', key: '', text, suggestions })
+      messages.value.push({ actor: 'bot', key: '', text, suggestions, took: took('bot') })
       scrollToBottom()
     }
 
@@ -400,11 +423,12 @@ export default {
       addMessage('bot', responseKey ?? 'chat.fallback')
     }
 
-    /** Shows the question, then the typing dots until the answer is there. */
+    /** Shows the question, then the thinking line until the answer is there. */
     const ask = (text: string, delay: number) => {
       if (pending.value) return
       pending.value = true
       addMessage('user', text)
+      askedAt = performance.now()
       isTyping.value = true
       scrollToBottom()
       setTimeout(async () => {
@@ -467,6 +491,7 @@ export default {
       riddleStep.value = 0
       clearSecretCode()
       isEasterEggUnlocked.value = false
+      askedAt = null // a fresh start, not an answer
       addMessage('bot', firstLine)
     }
 
@@ -500,7 +525,7 @@ export default {
       }
     })
 
-    // The chips appear only once the typing dots are gone, after the answer
+    // The chips appear only once the thinking line is gone, after the answer
     // itself was scrolled to: scroll again so they aren't cut off.
     watch(() => [chips.value, isTyping.value], scrollToBottom)
 
@@ -872,24 +897,18 @@ export default {
   border-bottom-right-radius: 0.3rem;
 }
 
-/* Typing: three bouncing dots */
-.chat-typing .msg-text {
-  display: inline-flex;
-  gap: 0.25rem;
-  padding: 0.75rem 0.85rem;
+/* The thinking line (ChatThinking.vue): alone in the typing row, then on top of
+   the answer, in the same spot, so the dots seem to settle into the check. */
+.msg-status {
+  display: flex;
+  align-items: center;
+  min-height: 1.35rem;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.chat-typing .msg-text span {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: #5eead4;
-  animation: typing-dot 1.1s ease-in-out infinite;
-}
-.chat-typing .dot-2 {
-  animation-delay: 0.15s !important;
-}
-.chat-typing .dot-3 {
-  animation-delay: 0.3s !important;
+.msg-status--done {
+  margin-bottom: 0.3rem;
 }
 
 /* ── Suggested questions ── */
@@ -1051,22 +1070,9 @@ export default {
     transform: none;
   }
 }
-@keyframes typing-dot {
-  0%,
-  60%,
-  100% {
-    opacity: 0.35;
-    transform: translateY(0);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(-3px);
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .msg,
   .chat-chip,
-  .chat-typing .msg-text span,
   .chatbot-window.riddle-active {
     animation: none;
   }

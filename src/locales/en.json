@@ -256,7 +256,9 @@
     "close": "Close AI chat",
     "openBasic": "Open chat",
     "closeBasic": "Close chat",
-    "suggestions": "Suggested questions"
+    "suggestions": "Suggested questions",
+    "thinking": "Thinking",
+    "answered": "Answered in"
   },
   "aria": {
     "switchToDutch": "Switch to Dutch",

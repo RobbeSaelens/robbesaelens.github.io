@@ -256,7 +256,9 @@
     "close": "AI-chat sluiten",
     "openBasic": "Chat openen",
     "closeBasic": "Chat sluiten",
-    "suggestions": "Voorgestelde vragen"
+    "suggestions": "Voorgestelde vragen",
+    "thinking": "Nadenken",
+    "answered": "Beantwoord in"
   },
   "aria": {
     "switchToDutch": "Schakel naar Nederlands",
