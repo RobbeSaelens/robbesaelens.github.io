@@ -37,12 +37,13 @@
               ></div>
               <div class="mb-lid-front">
                 <div class="mb-screen">
-                  <img
+                  <ShotPicture
                     class="mb-shot"
                     :src="src"
                     :alt="alt"
                     width="1600"
                     height="1000"
+                    :sizes="SIZES"
                     draggable="false"
                     :loading="loading"
                     :fetchpriority="fetchpriority"
@@ -60,12 +61,21 @@
 </template>
 
 <script setup lang="ts">
+import ShotPicture from './ShotPicture.vue'
+
 /** Layers that make up the thickness of the base (0.85em) and of the lid (0.38em) */
 const BASE_LAYERS = 8
 const LID_LAYERS = 2
 
+/**
+ * How wide the screen is, a little over: it follows the carousel's container (about
+ * 220px on a phone, 460px on a tablet, 410px at 1440 × 900, 550px at 1920 × 1080),
+ * which `sizes` can't name, so this is in viewport widths.
+ */
+const SIZES = '(min-width: 1024px) 34vw, 60vw'
+
 defineProps<{
-  /** A 16:10 screenshot (public/<project>-home.jpg) */
+  /** A 16:10 screenshot (public/<project>-home.jpg), shown with its AVIF and WebP copies */
   src: string
   alt: string
   active?: boolean
@@ -239,8 +249,9 @@ defineProps<{
   border-radius: 0.55em 0.55em 0.1em 0.1em;
   background: #000;
 }
-/* macOS keeps full-screen apps below the notch: the rest of the panel is 16:10 */
-.mb-shot {
+/* macOS keeps full-screen apps below the notch: the rest of the panel is 16:10.
+   :deep() because the <img> is inside ShotPicture. */
+.mb-screen :deep(.mb-shot) {
   position: absolute;
   left: 0;
   bottom: 0;

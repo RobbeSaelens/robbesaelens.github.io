@@ -94,10 +94,19 @@ for (const route of ROUTES) {
     test('has every image resolving', async ({ page, request }) => {
       await guard(page)
       await open(page, route)
-      // Many images are lazy-loaded below the fold, so check each source directly.
-      const sources = await page.$$eval('#app img', (imgs) =>
-        [...new Set(imgs.map((i) => i.getAttribute('src')).filter(Boolean))],
-      )
+      // Many images are lazy-loaded below the fold, and a browser fetches only one
+      // candidate of a srcset, so check each source directly: every src, every srcset
+      // candidate (the AVIF and WebP copies of the screenshots) and video posters.
+      const sources = await page.$$eval('#app img, #app picture source, #app video[poster]', (els) => [
+        ...new Set(
+          els
+            .flatMap((el) => [
+              el.getAttribute(el.localName === 'video' ? 'poster' : 'src'),
+              ...(el.getAttribute('srcset') ?? '').split(',').map((candidate) => candidate.trim().split(/\s+/)[0]),
+            ])
+            .filter(Boolean),
+        ),
+      ])
       if (!TEXT_ONLY.includes(route)) expect(sources.length).toBeGreaterThan(0)
       for (const src of sources) {
         const res = await request.get(src!)
@@ -600,6 +609,42 @@ test.describe('project page screenshots', () => {
       for (const img of rest) expect(img).toContain('loading="lazy"')
     })
   }
+
+  // Each screenshot is a <picture>: the AVIF and WebP copies at two widths that the build
+  // makes (scripts/images.mjs), with the JPG as the fallback. Its width and height are the
+  // JPG's own: they hold its room while it loads and give the widths in the srcset.
+  for (const route of ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail', '/projects']) {
+    test(`${route} shows its screenshots as AVIF or WebP, at their JPG's real size`, async ({ page }) => {
+      await open(page, route)
+      const shots = await page.locator('#app picture').evaluateAll((pictures) =>
+        Promise.all(
+          pictures.map(async (picture) => {
+            const img = picture.querySelector('img')!
+            const jpg = new Image()
+            jpg.src = img.getAttribute('src')!
+            await jpg.decode()
+            const sources = [...picture.querySelectorAll('source')]
+            return {
+              src: img.getAttribute('src')!,
+              size: [Number(img.getAttribute('width')), Number(img.getAttribute('height'))],
+              real: [jpg.naturalWidth, jpg.naturalHeight],
+              types: sources.map((s) => s.getAttribute('type')),
+              srcset: sources[0]?.getAttribute('srcset'),
+              sizes: sources[0]?.getAttribute('sizes'),
+            }
+          }),
+        ),
+      )
+      expect(shots.length).toBeGreaterThanOrEqual(route === '/projects' ? 4 : 2)
+      for (const { src, size, real, types, srcset, sizes } of shots) {
+        expect(size, src).toEqual(real)
+        expect(types, src).toEqual(['image/avif', 'image/webp'])
+        const name = src.slice(1, -'.jpg'.length)
+        expect(srcset, src).toBe(`/img/${name}-half.avif ${Math.round(size[0] / 2)}w, /img/${name}.avif ${size[0]}w`)
+        expect(sizes, src).toBeTruthy()
+      }
+    })
+  }
 })
 
 test('lightbox opens, steps through the screenshots, and closes', async ({ page }) => {
@@ -611,9 +656,13 @@ test('lightbox opens, steps through the screenshots, and closes', async ({ page 
   await expect(dialog).toBeVisible()
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
   await expect(dialog.locator('.lightbox-caption')).toContainText('1 / 2')
+  // The full-size copy, AVIF where the browser has it
+  const shown = () => dialog.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.currentSrc)
+  await expect.poll(shown).toMatch(/\/img\/exulta-home\.avif$/)
 
   await page.keyboard.press('ArrowRight')
   await expect(dialog.locator('.lightbox-caption')).toContainText('2 / 2')
+  await expect.poll(shown).toMatch(/\/img\/exulta-mobile\.avif$/)
   await page.keyboard.press('ArrowRight')
   await expect(dialog.locator('.lightbox-caption')).toContainText('1 / 2')
 
@@ -872,7 +921,7 @@ test('the Scan2Talk check-in video has working sources', async ({ request }) => 
   for (const [file, type] of [
     ['/scan2talk-checkin.webm', 'video/webm'],
     ['/scan2talk-checkin.mp4', 'video/mp4'],
-    ['/scan2talk-checkin-poster.jpg', 'image/jpeg'],
+    ['/img/scan2talk-checkin-poster.webp', 'image/webp'],
   ]) {
     const res = await request.get(file, { headers: { Range: 'bytes=0-1023' } })
     expect([200, 206], file).toContain(res.status())

@@ -48,11 +48,12 @@
               <span class="shot-dot"></span>
               <span class="shot-url">scan2talk.be</span>
             </span>
-            <img
+            <ShotPicture
               src="/scan2talk-home.jpg"
               :alt="$t('scan2talk.alt')"
               width="1600"
               height="1000"
+              :sizes="SHOT_SIZES.desktop"
               loading="eager"
               fetchpriority="high"
             />
@@ -66,11 +67,12 @@
           @click="lightboxIndex = 1">
           <ShotGlare radius="1.25rem">
             <span class="shot-notch" aria-hidden="true"></span>
-            <img
+            <ShotPicture
               src="/scan2talk-mobile.jpg"
               :alt="$t('scan2talk.alt')"
-              width="369"
-              height="800"
+              width="738"
+              height="1600"
+              :sizes="SHOT_SIZES.phone"
               loading="eager"
             />
           </ShotGlare>
@@ -91,13 +93,15 @@
         <h2 class="section-heading reveal">{{ $t('scan2talk.flowTitle') }}</h2>
         <div class="flow-wrap mb-14">
           <!-- A real check-in, recorded in the app's demo mode (nothing is saved).
-               Plays only while on screen; never on its own for reduced-motion users. -->
+               Plays only while on screen; never on its own for reduced-motion users.
+               The poster is the WebP copy of scan2talk-checkin-poster.jpg (scripts/images.mjs):
+               a poster takes one URL, and every browser this site supports shows WebP. -->
           <figure class="flow-phone reveal">
             <span class="shot-notch" aria-hidden="true"></span>
             <video
               ref="flowVideo"
               :aria-label="$t('scan2talk.flowVideo')"
-              poster="/scan2talk-checkin-poster.jpg"
+              poster="/img/scan2talk-checkin-poster.webp"
               width="600"
               height="1298"
               muted
@@ -178,6 +182,8 @@ import GlowCard from '../../components/GlowCard.vue'
 import ImageLightbox from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
 import ShotGlare from '../../components/ShotGlare.vue'
+import ShotPicture from '../../components/ShotPicture.vue'
+import { SHOT_SIZES } from '../../images'
 import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
@@ -191,10 +197,11 @@ import {
 } from 'lucide-vue-next'
 
 export default defineComponent({
-  components: { ArrowRight, ExternalLink, GlowCard, ImageLightbox, RepoActivity, ShotGlare },
+  components: { ArrowRight, ExternalLink, GlowCard, ImageLightbox, RepoActivity, ShotGlare, ShotPicture },
 
   data() {
     return {
+      SHOT_SIZES,
       lightboxIndex: null as number | null,
       stopReveal: () => {},
       videoObserver: null as IntersectionObserver | null,

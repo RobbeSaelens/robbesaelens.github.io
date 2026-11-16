@@ -8,9 +8,10 @@ prerendered to static HTML and deployed to GitHub Pages from `main`.
 | | |
 |---|---|
 | `npm run dev` | Dev server. Port 5173 can be taken by ddev's router (Exulta); the `.claude/launch.json` preview uses `127.0.0.1:5180` |
-| `npm run build` | Client build, SSR build, prerender, sitemap |
+| `npm run build` | Screenshot copies (`npm run images`), client build, SSR build, prerender, sitemap |
 | `npm test` | Smoke + accessibility tests (Playwright, desktop + mobile) against the production build |
 | `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
+| `npm run images` | AVIF and WebP copies of the project screenshots (Conventions); `build` and `dev` run it first |
 | `npm run stats` | Refresh the repository numbers on the project pages, from the GitHub API with `REPO_STATS_TOKEN` (below) |
 | `npm run drupal` | Refresh the Drupal contributions page from drupal.org (below) |
 
@@ -238,6 +239,19 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
   (`src/components/MacBook3D.vue`, posed by `Projects.vue`): a new screenshot is all it
   takes to update one.
+- The browser gets smaller copies of the screenshots, made at build time: `scripts/images.mjs`
+  (`npm run images`, with `sharp`; `build` and `dev` run it first) writes an AVIF and a
+  WebP of every `public/*-home.jpg`, `*-mobile.jpg` and `*-poster.jpg`, at full and at half
+  width, into `public/img/` (gitignored; Vite copies it into `dist/`). So a screenshot is
+  still one JPG: replace it and the copies follow. Pages show a screenshot through
+  `ShotPicture.vue` (a `<picture>`: the copies in a `srcset`, the JPG as the fallback),
+  never a bare `<img>`; the JPG stays the `og:image`. Give it the JPG's real `width` and
+  `height` (they hold its room while it loads and give the widths of the copies) and
+  `sizes` (`SHOT_SIZES` in `src/images.ts`, the MacBook's in `MacBook3D.vue`). A phone
+  screenshot of another size needs its new `width` and `height` on the page, or the smoke
+  tests fail. The
+  lightbox shows the full-size copy. The Scan2Talk video's poster is the WebP copy: a
+  poster takes one URL, and every browser this site supports shows WebP.
 - The two screenshots at the top of a project page are the largest thing above the fold
   (the LCP): they load eagerly, the desktop one with `fetchpriority="high"`, so the browser
   fetches them straight from the prerendered HTML. Every image further down stays

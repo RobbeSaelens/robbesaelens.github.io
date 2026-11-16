@@ -40,11 +40,12 @@
               <span class="shot-dot"></span>
               <span class="shot-url">exulta.be</span>
             </span>
-            <img
+            <ShotPicture
               src="/exulta-home.jpg"
               :alt="$t('exulta.alt')"
               width="1600"
               height="1000"
+              :sizes="SHOT_SIZES.desktop"
               loading="eager"
               fetchpriority="high"
             />
@@ -58,11 +59,12 @@
           @click="lightboxIndex = 1">
           <ShotGlare radius="1.25rem">
             <span class="shot-notch" aria-hidden="true"></span>
-            <img
+            <ShotPicture
               src="/exulta-mobile.jpg"
               :alt="$t('exulta.alt')"
-              width="400"
+              width="369"
               height="800"
+              :sizes="SHOT_SIZES.phone"
               loading="eager"
             />
           </ShotGlare>
@@ -144,6 +146,8 @@ import GlowCard from '../../components/GlowCard.vue'
 import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbox.vue'
 import RepoActivity from '../../components/RepoActivity.vue'
 import ShotGlare from '../../components/ShotGlare.vue'
+import ShotPicture from '../../components/ShotPicture.vue'
+import { SHOT_SIZES } from '../../images'
 import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
@@ -157,10 +161,11 @@ import {
 } from 'lucide-vue-next'
 
 export default defineComponent({
-  components: { ArrowRight, ExternalLink, GlowCard, ImageLightbox, RepoActivity, ShotGlare },
+  components: { ArrowRight, ExternalLink, GlowCard, ImageLightbox, RepoActivity, ShotGlare, ShotPicture },
 
   data() {
     return {
+      SHOT_SIZES,
       lightboxIndex: null as number | null,
       stopReveal: () => {},
       heroTags: ['Laravel 13', 'React 19', 'Inertia.js', 'Filament 5', 'Tailwind CSS 4', 'MySQL'],

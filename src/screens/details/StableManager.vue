@@ -40,11 +40,12 @@
               <span class="shot-dot"></span>
               <span class="shot-url">Stable Manager</span>
             </span>
-            <img
+            <ShotPicture
               src="/stable-manager-home.jpg"
               :alt="$t('stableManager.alt')"
               width="1600"
               height="1000"
+              :sizes="SHOT_SIZES.desktop"
               loading="eager"
               fetchpriority="high"
             />
@@ -58,11 +59,12 @@
           @click="lightboxIndex = 1">
           <ShotGlare radius="1.25rem">
             <span class="shot-notch" aria-hidden="true"></span>
-            <img
+            <ShotPicture
               src="/stable-manager-mobile.jpg"
               :alt="$t('stableManager.alt')"
               width="470"
               height="800"
+              :sizes="SHOT_SIZES.phone"
               loading="eager"
             />
           </ShotGlare>
@@ -147,11 +149,12 @@
                   <span class="shot-dot"></span>
                   <span class="shot-url">Stable Manager in Drupal</span>
                 </span>
-                <img
+                <ShotPicture
                   src="/shared-costs-home.jpg"
                   :alt="$t('stableManager.drupalAlt')"
                   width="1600"
                   height="1000"
+                  :sizes="SHOT_SIZES.desktop"
                   loading="lazy"
                 />
               </ShotGlare>
@@ -212,6 +215,8 @@ import ImageLightbox, { type LightboxImage } from '../../components/ImageLightbo
 import RepoActivity from '../../components/RepoActivity.vue'
 import DrupalIcon from '../../components/DrupalIcon.vue'
 import ShotGlare from '../../components/ShotGlare.vue'
+import ShotPicture from '../../components/ShotPicture.vue'
+import { SHOT_SIZES } from '../../images'
 import { watchReveal } from '../../reveal'
 import {
   ArrowRight,
@@ -233,10 +238,11 @@ import {
 const DRUPAL_REPO = 'https://github.com/RobbeSaelens/shared_costs'
 
 export default defineComponent({
-  components: { ArrowRight, DrupalIcon, ExternalLink, Github, GlowCard, Lock, ImageLightbox, RepoActivity, ShotGlare },
+  components: { ArrowRight, DrupalIcon, ExternalLink, Github, GlowCard, Lock, ImageLightbox, RepoActivity, ShotGlare, ShotPicture },
 
   data() {
     return {
+      SHOT_SIZES,
       DRUPAL_REPO,
       lightboxIndex: null as number | null,
       stopReveal: () => {},
