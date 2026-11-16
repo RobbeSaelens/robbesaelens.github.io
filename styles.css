@@ -1,11 +1,16 @@
-/* Hide scrollbar for Chrome, Safari, and Opera */
-::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for Firefox */
-html {
-  scrollbar-width: none;
+/* Scrollbars: with a mouse the page's own is thin and in the theme colour, so a long
+   page shows where you are (the gutter is kept on every page, so nothing shifts when a
+   page is one screen tall). Touch screens keep their own overlay scrollbars. The project
+   carousel and the about swipe row hide theirs: their dots show the position. */
+@media (hover: hover) and (pointer: fine) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(15 118 110 / 0.35) transparent;
+    scrollbar-gutter: stable;
+  }
+  html.dark {
+    scrollbar-color: rgb(45 212 191 / 0.3) transparent;
+  }
 }
 
 /* Same colours as the page wrapper, so overscroll and rubber-banding on mobile
