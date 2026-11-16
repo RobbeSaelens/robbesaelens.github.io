@@ -66,9 +66,11 @@
         }"
         @click.capture="onCardClick($event, index)"
       >
+        <!-- One tab stop: only the current slide's link; the arrow keys change slides -->
         <component
           :is="project.route ? 'router-link' : 'div'"
           :to="project.route ? { name: $ln(project.route) } : undefined"
+          :tabindex="project.route && index !== current ? -1 : undefined"
           class="car-card"
           draggable="false"
         >
@@ -249,6 +251,11 @@ export default {
       clearTimeout(this.goingTimer)
       this.goingTimer = window.setTimeout(() => (this.goingTo = null), 1200)
       this.track().scrollTo({ left: this.scrollTarget(i), behavior: reduced ? 'auto' : 'smooth' })
+      // Focus on a card follows the slide the arrow keys moved to (the old one leaves the tab order)
+      const focused = document.activeElement
+      if (focused instanceof HTMLElement && focused.classList.contains('car-card') && this.track().contains(focused)) {
+        this.$nextTick(() => this.track().children[i]?.querySelector<HTMLElement>('a.car-card')?.focus({ preventScroll: true }))
+      }
     },
     /**
      * After a swipe or drag: the slide whose scroll position is closest is the current
@@ -483,14 +490,19 @@ export default {
   scroll-snap-type: none;
   cursor: grabbing;
 }
-.car-track:focus-visible .car-slide.is-current .car-card {
+/* The ring sits on the current card: when the track has focus (arrow keys) and when
+   the card's own link has it (Tab, Enter opens it). */
+.car-track:focus-visible .car-slide.is-current .car-card,
+.car-card:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 4px;
+  border-radius: 1rem;
 }
 
 /* Slide width follows the track height (minus the caption), capped by the track width. */
 .car-slide {
   flex: 0 0 min(84cqw, calc((100cqh - 6.5rem) * 1.6));
+  min-width: 0;
   scroll-snap-align: center;
   opacity: 0.5;
   transform: scale(0.9);
@@ -572,7 +584,7 @@ export default {
 
 /* Caption under the stage, in the terminal type; it rises in when the slide becomes current.
    The status and the button sit beside the text, or under it on a slide too narrow
-   for both and the project's name on one line (short screens). */
+   to leave the text 16rem (short screens). */
 .car-caption {
   display: flex;
   flex-wrap: wrap;
@@ -597,13 +609,16 @@ export default {
 .car-slide.is-current .car-caption > :nth-child(2) {
   transition-delay: 0.22s;
 }
-/* Takes the room the status and the button leave, but never less than the name */
+/* Takes the room the status and the button leave, but not less than 16rem: below that
+   they wrap under it, instead of squeezing the tagline into a narrow column */
 .car-caption-text {
-  flex: 1 1 0;
+  flex: 1 1 16rem;
+  min-width: 0;
 }
 .car-name {
-  white-space: nowrap;
   display: flex;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
   align-items: baseline;
   gap: 0.6rem;
   font-family: var(--font-mono);
@@ -665,14 +680,23 @@ export default {
 }
 
 /* Page dots double as the progress indicator; they sit in the track's bottom padding. */
+/* Each dot is a 24px target (44px tall on touch screens); the row starts half a target
+   early so the first dot lines up with the content. */
 .car-dots {
   display: flex;
-  gap: 0.25rem;
   margin-top: calc(-1 * clamp(1.25rem, 4vh, 2.25rem));
-  padding: 0 var(--gutter) clamp(0.5rem, 2vh, 1.25rem);
+  padding: 0 var(--gutter) clamp(0.5rem, 2vh, 1.25rem) calc(var(--gutter) - 0.5rem);
 }
 .car-dot {
-  padding: 0.5rem 0.2rem;
+  padding: 0.5rem;
+}
+@media (pointer: coarse) {
+  .car-dots {
+    margin-top: calc(-1 * clamp(1.25rem, 4vh, 2.25rem) - 0.625rem);
+  }
+  .car-dot {
+    padding: 1.125rem 0.5rem;
+  }
 }
 .car-dot span {
   display: block;
@@ -713,6 +737,9 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+  .car-caption-text {
+    flex: none; /* a column here: a 16rem basis would be a height */
   }
 }
 

@@ -420,6 +420,20 @@ test.describe('project slides', () => {
     await expect(page.locator('.car-slide.is-current')).toContainText('Scan2Talk')
   })
 
+  test('Tab reaches only the current slide, shows a focus ring, and follows the arrow keys', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'keyboard')
+    await open(page, '/projects')
+    await page.locator('.car-track').focus()
+    await page.keyboard.press('Tab')
+    const current = page.locator('.car-slide.is-current a.car-card')
+    await expect(current).toBeFocused()
+    expect(await current.evaluate((e) => getComputedStyle(e).outlineStyle)).toBe('solid')
+    await expect(page.locator('.car-slide a.car-card[tabindex="-1"]')).toHaveCount(3)
+    await page.keyboard.press('ArrowRight')
+    await expect(page.locator('.car-count-now')).toHaveText('02')
+    await expect(page.locator('.car-slide.is-current a.car-card')).toBeFocused()
+  })
+
   test('the current MacBook is open; the others are half closed and turned towards it', async ({ page }) => {
     await open(page, '/projects')
     await page.getByRole('button', { name: 'Stable Manager', exact: true }).click()
