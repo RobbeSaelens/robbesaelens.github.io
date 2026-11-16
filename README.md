@@ -14,7 +14,8 @@ at <https://robbesaelens.github.io>.
 | `npm run prerender`    | Writes static HTML per route into `dist/`                          |
 | `npm run sitemap`      | Regenerates `dist/sitemap.xml` from the router (`sitemapRoutes`)   |
 | `npm run preview`      | Serves the built `dist/`                                          |
-| `npm run stats`        | Refreshes the repository numbers (`src/data/repo-stats.json`)     |
+| `npm run stats`        | Refreshes the repository numbers from the local clones           |
+| `npm run stats:github` | The same from the GitHub API (needs `REPO_STATS_TOKEN`, below)   |
 | `npm run drupal`       | Refreshes the Drupal contributions (`src/data/drupal.json`)       |
 
 ## How SEO works here
@@ -75,9 +76,15 @@ lists what and where.
 
 `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
 `main`, every morning (05:17 UTC) and when you press **Run workflow** on the Actions tab.
-Before the build it refreshes the Drupal contributions (`npm run drupal`); when
-drupal.org doesn't answer, it deploys the committed `src/data/drupal.json`. The scheduled
-and manual runs commit nothing: they build `main` as it is, with fresh Drupal data. The
-repository numbers (`src/data/repo-stats.json`) can't be fetched in CI (private repos):
-refresh them with `npm run stats`, or with the "Refresh data" button in Project Updater,
-and merge to `main`.
+Before the build it refreshes the Drupal contributions (`npm run drupal`) and the
+repository numbers (`npm run stats:github`). When drupal.org or GitHub doesn't answer, it
+deploys the committed `src/data/drupal.json` and `src/data/repo-stats.json`. The scheduled
+and manual runs commit nothing: they build `main` as it is, with fresh data.
+
+The repository numbers come from private repositories, so the workflow reads them with
+`REPO_STATS_TOKEN`: a repository secret (Settings → Secrets and variables → Actions)
+holding a fine-grained personal access token with read-only **Contents** access to
+those repositories (and nothing else). Only that step gets it. It expires after at most a
+year: when it does, the step warns and the committed numbers stay until you renew it.
+Without the secret, `npm run stats` (local clones) or the "Refresh data" button in Project
+Updater still works; commit the JSON and merge to `main`.
