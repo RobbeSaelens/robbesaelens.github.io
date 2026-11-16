@@ -1,8 +1,8 @@
 <!--
   The animated background behind every page: DarkVeil (Vue Bits), turned to the
   site's teal. Client-only (it needs WebGL; the prerendered HTML keeps the plain
-  background) and skipped without a GPU (see hasWebGL). It sits behind all content
-  (App.vue isolates the stacking context) and never takes the pointer. With
+  background) and skipped without a GPU (see hasWebGL). It sits behind all content,
+  over <html>'s background (App.vue's wrapper has none), and never takes the pointer. With
   reduced motion it holds still.
 
   The veil is opaque: black with glowing bands. Blending keeps the theme's own

@@ -1,11 +1,11 @@
 <template>
   <!-- Mobile scrolls the document; overflow-x-clip stops sideways overflow without
        turning this div into a scroll container, which would break the sticky header. -->
-  <!-- isolate: the background below sits at z-index -1 inside this div, over its
-       own colour but under every page. -->
-  <div
-    class="bg-light dark:bg-dark isolate overflow-x-clip sm:h-screen sm:overflow-x-hidden sm:overflow-y-auto"
-  >
+  <!-- No background of its own: <html> paints the page colour (styles.css), and the
+       animated background (SiteBackground, z-index -1) sits between the two. A
+       background or a stacking context here would hide it, or trap the custom
+       cursor under overlays teleported to <body> (lightbox, mobile menu). -->
+  <div class="overflow-x-clip sm:h-screen sm:overflow-x-hidden sm:overflow-y-auto">
     <SiteBackground />
     <CustomCursor />
     <router-view> </router-view>
