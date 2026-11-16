@@ -53,7 +53,7 @@ jobs:
       # read-only access (Contents) to them. Only this step gets it. Without the
       # secret, or when the API fails, the committed file is used.
       - name: Refresh repository activity
-        run: npm run stats:github
+        run: npm run stats
         env:
           REPO_STATS_TOKEN: ${{ secrets.REPO_STATS_TOKEN }}
         timeout-minutes: 5
