@@ -3,7 +3,7 @@
   <router-link
     :to="otherPath"
     :hreflang="other"
-    class="lang-switch relative inline-flex min-h-10 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 ease-out bg-teal-500/10 text-teal-800 ring-1 ring-teal-500/20 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/20"
+    class="lang-switch relative inline-flex min-h-10 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold tracking-wider transition-colors duration-200 bg-teal-500/10 text-teal-800 ring-1 ring-teal-500/20 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/20"
     @click="rememberLocale(other)"
   >
     <span class="relative z-10" :class="isEn ? 'font-extrabold' : 'font-normal'">EN</span>

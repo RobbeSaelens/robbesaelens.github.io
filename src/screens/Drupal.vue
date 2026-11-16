@@ -374,7 +374,7 @@ onBeforeUnmount(() => stopReveal())
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .chip:hover {
@@ -462,7 +462,7 @@ onBeforeUnmount(() => stopReveal())
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .pill-link:hover {

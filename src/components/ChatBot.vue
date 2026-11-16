@@ -636,8 +636,10 @@ export default {
     transform: translateY(-2px);
   }
 }
+/* The press snaps (0.12s), like the other buttons; the hover lift above eases */
 .chatbot-fab:active {
-  transform: translateY(0) scale(0.96);
+  transform: translateY(0) scale(0.97);
+  transition-duration: 0.12s, 0.2s, 0.25s;
 }
 .chatbot-fab:focus-visible {
   outline: 2px solid #2dd4bf;
@@ -704,7 +706,7 @@ export default {
 @keyframes fab-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.6);
+    transform: translateY(12px) scale(0.9);
   }
   to {
     opacity: 1;
@@ -1100,9 +1102,10 @@ export default {
   transform-origin: bottom right;
 }
 .chat-slide-leave-active {
+  /* Out fast and decelerating (ease-in would hold it on screen for its first half) */
   transition:
-    opacity 0.18s ease-in,
-    transform 0.18s ease-in;
+    opacity 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
   transform-origin: bottom right;
 }
 .chat-slide-enter-from {

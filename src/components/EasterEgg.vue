@@ -425,11 +425,16 @@ export default defineComponent({
   padding: 0.75rem 1.5rem;
   cursor: pointer;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.12s ease-out;
   min-height: 44px;
   min-width: 44px;
   opacity: 0;
-  animation: ee-fade-in 0.5s ease 1.4s both;
+  /* backwards, not both: a held end state (its transform) would override the :active press */
+  animation: ee-fade-in 0.5s ease 1.4s backwards;
 }
 
 @media (hover: hover) and (pointer: fine) {

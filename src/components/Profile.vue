@@ -483,7 +483,7 @@ export default {
     transform 0.12s ease-out;
 }
 .social-link:active {
-  transform: scale(0.94);
+  transform: scale(0.97);
 }
 
 .dark .social-link {

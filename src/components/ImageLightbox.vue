@@ -197,7 +197,7 @@ export default defineComponent({
   border: 1px solid rgba(255, 255, 255, 0.16);
   transition:
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .lightbox-close:hover,
@@ -208,7 +208,7 @@ export default defineComponent({
 .lightbox-close:active,
 .lightbox-nav:active {
   background: rgba(255, 255, 255, 0.18);
-  transform: scale(0.94);
+  transform: scale(0.97);
 }
 .lightbox-close:focus-visible,
 .lightbox-nav:focus-visible {

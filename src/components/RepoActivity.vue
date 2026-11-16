@@ -49,7 +49,7 @@
             :key="i"
             class="repo-bar"
             :class="{ 'is-empty': n === 0 }"
-            :style="{ height: n ? `${Math.max(8, (n / weeklyMax) * 100)}%` : undefined, '--d': `${i * 18}ms` }"
+            :style="{ height: n ? `${Math.max(8, (n / weeklyMax) * 100)}%` : undefined, '--d': `${i * 8}ms` }"
             :title="$t('repo.weekBar', n)"
           ></span>
         </div>

@@ -535,7 +535,7 @@ export default {
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .nav-icon-btn:hover {
@@ -551,7 +551,7 @@ export default {
   }
 }
 .nav-icon-btn:active {
-  transform: scale(0.94);
+  transform: scale(0.97);
 }
 .nav-icon-btn:focus-visible {
   box-shadow: 0 0 0 2px var(--color-accent);
@@ -704,9 +704,9 @@ export default {
 .menu-enter-active .mobile-link,
 .menu-enter-active .mobile-bottom {
   transition:
-    opacity 0.45s ease,
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--i, 0) * 60ms + 80ms);
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 40ms + 60ms);
 }
 .menu-enter-from .mobile-link,
 .menu-enter-from .mobile-bottom {
@@ -728,7 +728,7 @@ export default {
 /* ── Theme toggle view transition ── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.5s;
+  animation-duration: 0.3s;
 }
 ::view-transition-old(root) {
   animation-name: fade-out;
@@ -781,14 +781,18 @@ export default {
   }
 }
 .code-reveal-enter-active {
-  transition: all 0.3s ease-out;
+  transition:
+    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .code-reveal-leave-active {
-  transition: all 0.5s ease-in;
+  transition:
+    opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .code-reveal-enter-from {
   opacity: 0;
-  transform: translateY(-8px) scale(0.8);
+  transform: translateY(-8px) scale(0.95);
 }
 .code-reveal-leave-to {
   opacity: 0;

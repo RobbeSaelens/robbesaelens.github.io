@@ -183,6 +183,18 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   - Text inputs are 16 px under `(pointer: coarse)`, or iOS zooms the page in on focus.
   - Heights tied to the screen use `dvh` (app-like: the chat panel, the lightbox, the
     one-screen pages) or `svh` (the minimum page height), each after a `vh` fallback line.
+- Motion:
+  - Things that enter or leave use the site's ease-out, `cubic-bezier(0.22, 1, 0.36, 1)`;
+    never `ease-in` (it holds the start back, the moment you watch). Colour and background
+    changes use `ease`, about 0.2s.
+  - A press is `transform: scale(0.97)` at `0.12s ease-out`, on everything you press (it
+    snaps; a hover may ease more slowly).
+  - Interface transitions stay at or under 300 ms; only panels and overlays (chat panel,
+    mobile menu, lightbox) take a little longer.
+  - Name the properties: no `transition: all`. Animate `transform` and `opacity`, not
+    `width`, `height`, `padding`, `top` or `left` (they lay the page out again every frame).
+  - Reduced motion: the global rule in `terminal-theme.css` drops durations and delays;
+    script-driven effects check `prefers-reduced-motion` themselves.
 - Phone-only CSS uses `@media (max-width: 639px)`, the exact complement of UnoCSS `sm:`
   (`min-width: 640px`). Never `max-width: 640px`: at exactly 640 px (a 1280 px laptop at
   200 % zoom) both apply and a page gets the phone layout under the desktop header.
