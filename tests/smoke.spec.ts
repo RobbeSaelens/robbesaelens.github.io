@@ -591,7 +591,8 @@ test.describe('repository activity', () => {
       const section = page.locator(`.repo--inline:has(#repo-title-${key}-inline)`)
       await section.scrollIntoViewIfNeeded()
       await expect(section).toBeVisible()
-      await expect(section.locator('.repo-number dd').first()).toHaveText(stats.commits.toLocaleString('en-GB'))
+      // The count rises to its value (CountUp, about 3.5 s for a few hundred commits, longer as they grow).
+      await expect(section.locator('.repo-number dd').first()).toHaveText(stats.commits.toLocaleString('en-GB'), { timeout: 10_000 })
       await expect(section.locator('.repo-number')).toHaveCount(4)
       await expect(section.locator('.repo-commit')).toHaveCount(0)
       await expect(section.locator('.repo-bar')).toHaveCount(26)
