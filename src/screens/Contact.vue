@@ -167,7 +167,9 @@ export default {
 /* =============================================
    Layout
    Desktop: education and experience stacked on the left, the two photo
-   cards side by side next to them, all filling the screen height.
+   cards side by side next to them, all filling the screen height. Only from
+   760px high: on shorter screens (a 1366px laptop, an iPad in landscape) the
+   texts no longer fit their half height, so these get the tablet layout.
    Tablet: the two text cards on top, the photo cards below.
    Phone: one swipeable row, in reading order.
    ============================================= */
@@ -181,7 +183,7 @@ export default {
   width: 100%;
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1000px) and (min-height: 760px) {
   .about-grid {
     /* The text column is a little wider: fewer lines, so both texts fit its half height. */
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
@@ -268,7 +270,7 @@ export default {
 }
 
 /* Text scales with the screen height on desktop, where the cards have room */
-@media (min-width: 1000px) {
+@media (min-width: 1000px) and (min-height: 760px) {
   .about-card--text .card-title {
     font-size: clamp(1rem, 0.25rem + 1.35vh, 1.5rem);
   }
@@ -506,7 +508,7 @@ export default {
 }
 
 /* Laptop-height screens: a little tighter so both texts fit their half */
-@media (min-width: 1000px) and (max-height: 820px) {
+@media (min-width: 1000px) and (min-height: 760px) and (max-height: 820px) {
   .about-card--text .card-text {
     line-height: 1.5;
   }
