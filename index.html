@@ -120,6 +120,10 @@
       html.dark .intro-mark .d {
         fill: #2dd4bf;
       }
+      /* The splash stays in the page, hidden, once it has played: stop its blink */
+      html.intro-done .intro-mark .d {
+        animation: none;
+      }
       .intro-line {
         margin: 0 0 0.45rem;
         font-size: 0.85rem;

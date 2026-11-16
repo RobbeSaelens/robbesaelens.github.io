@@ -1,7 +1,12 @@
 <!--
-  DarkVeil from Vue Bits (https://vue-bits.dev, https://github.com/DavidHDev/vue-bits),
-  with one fix (uResolution, see resize()). Copyright (c) 2025 David Haz,
-  MIT + Commons Clause License Condition v1.0. Used by SiteBackground.vue.
+  DarkVeil from Vue Bits (https://vue-bits.dev, https://github.com/DavidHDev/vue-bits).
+  Copyright (c) 2025 David Haz, MIT + Commons Clause License Condition v1.0.
+  Used by SiteBackground.vue. Changed from the published version, each marked "Site change":
+  - uResolution is the drawing buffer's size (see resize()).
+  - It draws only when it has to: at most `maxFps` times a second, not at all while
+    `paused` (an opaque overlay covers it), and once when it is still (speed 0, reduced
+    motion). Its clock runs only while it draws, so it carries on where it stopped. The
+    published loop drew every frame for as long as it was mounted.
 -->
 <template>
   <canvas ref="canvasRef" class="w-full h-full block" />
@@ -19,6 +24,9 @@ interface DarkVeilProps {
   scanlineFrequency?: number;
   warpAmount?: number;
   resolutionScale?: number;
+  // Site change: see the header
+  paused?: boolean;
+  maxFps?: number;
 }
 
 const props = withDefaults(defineProps<DarkVeilProps>(), {
@@ -28,7 +36,10 @@ const props = withDefaults(defineProps<DarkVeilProps>(), {
   speed: 0.5,
   scanlineFrequency: 0,
   warpAmount: 0,
-  resolutionScale: 1
+  resolutionScale: 1,
+  // Site change: see the header (0: as often as the screen refreshes)
+  paused: false,
+  maxFps: 0
 });
 
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef');
@@ -109,7 +120,10 @@ let renderer: Renderer | null = null;
 let program: Program | null = null;
 let mesh: Mesh | null = null;
 let frame: number | null = null;
-let start: number = 0;
+// Site change: a clock that runs only while it draws (was performance.now() - start)
+let clock = 0;
+let prevTime = 0;
+let lastDraw = 0;
 
 const cleanup = () => {
   if (frame) {
@@ -133,19 +147,44 @@ const resize = () => {
   // buffer's size. They differ whenever devicePixelRatio × resolutionScale isn't 1,
   // and the field then showed only a corner of itself (as the React original does).
   program.uniforms.uResolution.value.set(renderer.gl.drawingBufferWidth, renderer.gl.drawingBufferHeight);
+  // Site change: resizing clears the canvas, so draw right away (the loop may not run, or
+  // not draw this frame)
+  if (!props.paused) draw();
 };
 
-const loop = () => {
+// Site change: the drawing, out of the loop, so a still veil can be drawn once
+const draw = () => {
   if (!program || !renderer || !mesh) return;
 
-  program.uniforms.uTime.value = ((performance.now() - start) / 1000) * props.speed;
+  program.uniforms.uTime.value = clock * props.speed;
   program.uniforms.uHueShift.value = props.hueShift;
   program.uniforms.uNoise.value = props.noiseIntensity;
   program.uniforms.uScan.value = props.scanlineIntensity;
   program.uniforms.uScanFreq.value = props.scanlineFrequency;
   program.uniforms.uWarp.value = props.warpAmount;
   renderer.render({ scene: mesh });
-  frame = requestAnimationFrame(loop);
+};
+
+// Site change: draws at most maxFps a second, stops while paused or still (see the header)
+const loop = (now: number) => {
+  frame = null;
+  if (!program || !renderer || !mesh || props.paused) {
+    prevTime = 0;
+    return;
+  }
+  clock += prevTime ? Math.min(0.1, (now - prevTime) / 1000) : 0;
+  prevTime = now;
+  if (!props.maxFps || now - lastDraw >= 1000 / props.maxFps - 2) {
+    lastDraw = now;
+    draw();
+  }
+  if (props.speed !== 0) frame = requestAnimationFrame(loop);
+  else prevTime = 0;
+};
+
+// Site change: (re)starts the loop unless it runs, or there is nothing to draw
+const run = () => {
+  if (frame === null && !props.paused) frame = requestAnimationFrame(loop);
 };
 
 onMounted(() => {
@@ -182,9 +221,15 @@ onMounted(() => {
   window.addEventListener('resize', resize);
   resize();
 
-  start = performance.now();
-  loop();
+  // Site change: resize() has drawn the first frame; then the loop (was start = performance.now(); loop())
+  run();
 });
+
+// Site change: carry on when the overlay closes or the veil starts moving again
+watch(
+  () => [props.paused, props.speed],
+  () => run()
+);
 
 onUnmounted(() => {
   cleanup();

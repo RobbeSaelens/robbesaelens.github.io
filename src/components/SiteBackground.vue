@@ -11,22 +11,37 @@
   - light: inverted (white with dark teal bands, the hue rotated back) and
     "multiply", so white drops out and the teal tints.
   Both faintly enough that text over the brightest band keeps its contrast.
+
+  It draws only what can be seen: 30 frames a second, none while an overlay hides the
+  page (covered.ts), and a single one with reduced motion.
 -->
 <template>
   <div v-if="enabled" class="site-veil" aria-hidden="true">
-    <DarkVeil :hue-shift="HUE_SHIFT" :speed="speed" :resolution-scale="RESOLUTION" />
+    <DarkVeil
+      :hue-shift="HUE_SHIFT"
+      :speed="speed"
+      :resolution-scale="RESOLUTION"
+      :max-fps="MAX_FPS"
+      :paused="pageCovered"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { hasGpuWebGL } from '../gpu'
+import { pageCovered } from '../covered'
 import DarkVeil from './DarkVeil.vue'
 
 /** Turns the veil's violet to the accent teal (degrees, in the shader's YIQ space). */
 const HUE_SHIFT = 55
 /** A soft, blurry field: rendering it at half size costs a quarter and looks the same. */
 const RESOLUTION = 0.5
+/**
+ * The field drifts through a cycle in about 35 s, so 30 frames a second look the same
+ * as 60 or 120 and cost half (a quarter on a 120 Hz screen).
+ */
+const MAX_FPS = 30
 
 const enabled = ref(false)
 const speed = ref(0.6)

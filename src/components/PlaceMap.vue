@@ -267,6 +267,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   inset: -0.5rem;
   border-radius: 50%;
   border: 2px solid var(--color-accent);
+}
+/* Pulses only while the card shows (it stays in the page, hidden, when closed) */
+.is-open .place-dot::after {
   animation: place-pulse 1.8s ease-out infinite;
 }
 @keyframes place-pulse {
@@ -321,7 +324,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   .place-card {
     transition: none;
   }
-  .place-dot::after {
+  .is-open .place-dot::after {
     animation: none;
   }
 }

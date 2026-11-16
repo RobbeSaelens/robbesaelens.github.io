@@ -53,6 +53,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
 import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { setCovering } from '../covered'
 
 export interface LightboxImage {
   src: string
@@ -102,6 +103,8 @@ export default defineComponent({
     isOpen(open: boolean) {
       if (typeof document === 'undefined') return
 
+      // The page behind is hidden: its animated background can stop drawing
+      setCovering('lightbox', open)
       if (open) {
         this.lastFocused = document.activeElement as HTMLElement
         document.body.style.overflow = 'hidden'
@@ -120,6 +123,7 @@ export default defineComponent({
 
   beforeUnmount() {
     if (typeof document !== 'undefined') document.body.style.overflow = ''
+    setCovering('lightbox', false)
   },
 
   methods: {

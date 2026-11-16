@@ -7,6 +7,9 @@
   read out) and the canvas, which hangs over it with room for the selection
   frame and its label, takes over. The canvas itself is hidden from screen
   readers, so the name is not read twice.
+
+  Its idle sweep stops while an overlay hides the page (covered.ts): the menu on a
+  phone covers the hero, which is still "in view" for TechText's own observer.
 -->
 <template>
   <span class="wordmark">
@@ -22,6 +25,7 @@
         reveal="letter"
         line-style="dashed"
         :specks="12"
+        :sweep="!pageCovered"
       />
     </span>
   </span>
@@ -30,6 +34,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import TechText from './TechText.vue'
+import { pageCovered } from '../covered'
 
 defineProps<{ text: string }>()
 

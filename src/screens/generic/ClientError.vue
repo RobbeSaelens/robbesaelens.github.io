@@ -248,12 +248,22 @@ export default defineComponent({
   border-radius: 3px;
 }
 
-/* CRT scanline overlay */
+/* CRT scanline overlay. The lines drift down by moving a layer (transform), not the
+   background (which painted the whole terminal again every frame). The layer starts one
+   period (8px) above the top, so no gap shows, and the overlay clips it, so the
+   terminal never gets something to scroll. */
 .crt-overlay {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   pointer-events: none;
   z-index: 10;
+}
+
+.crt-overlay::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0 0 0;
   background: repeating-linear-gradient(
     0deg,
     transparent,
@@ -261,7 +271,14 @@ export default defineComponent({
     rgba(0, 0, 0, 0.03) 2px,
     rgba(0, 0, 0, 0.03) 4px
   );
-  animation: scanlines 8s linear infinite;
+  animation: crt-scroll 8s linear infinite;
+  will-change: transform;
+}
+
+@keyframes crt-scroll {
+  to {
+    transform: translateY(8px);
+  }
 }
 
 /* =============================================
@@ -511,7 +528,7 @@ export default defineComponent({
    ============================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .crt-overlay {
+  .crt-overlay::before {
     animation: none;
   }
 

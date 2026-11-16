@@ -90,8 +90,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue'
+import { defineComponent, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useEasterEgg } from '../composables/useEasterEgg'
+import { setCovering } from '../covered'
 
 const MATRIX_CHARS = '0123456789ABCDEF'
 const CONFETTI_COLORS = ['#2dd4bf', '#fbbf24', '#f472b6', '#60a5fa', '#a78bfa']
@@ -153,8 +154,12 @@ export default defineComponent({
       }, 5000)
     })
 
+    // A full-screen overlay: the animated background behind it can stop drawing
+    watch(isEasterEggUnlocked, (on) => setCovering('easter-egg', on))
+
     onUnmounted(() => {
       if (factInterval) clearInterval(factInterval)
+      setCovering('easter-egg', false)
     })
 
     return {

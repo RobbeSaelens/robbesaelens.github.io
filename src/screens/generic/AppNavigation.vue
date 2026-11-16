@@ -161,6 +161,7 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
 import BrandLogo from '../../components/BrandLogo.vue'
 import DrupalIcon from '../../components/DrupalIcon.vue'
 import { useEasterEgg } from '../../composables/useEasterEgg'
+import { setCovering } from '../../covered'
 
 interface NavLink {
   to: string
@@ -265,6 +266,8 @@ export default {
     const openMenu = () => {
       showMenu.value = true
       document.body.style.overflow = 'hidden'
+      // Opaque and full-screen: the animated background behind can stop drawing
+      setCovering('menu', true)
       nextTick(() => menuPanel.value?.querySelector<HTMLElement>('.mobile-link')?.focus())
     }
 
@@ -272,6 +275,7 @@ export default {
       if (!showMenu.value) return
       showMenu.value = false
       document.body.style.overflow = ''
+      setCovering('menu', false)
       nextTick(() => menuButton.value?.focus())
     }
 
@@ -313,6 +317,7 @@ export default {
     onBeforeUnmount(() => {
       resizeObserver?.disconnect()
       document.body.style.overflow = ''
+      setCovering('menu', false)
     })
 
     return {

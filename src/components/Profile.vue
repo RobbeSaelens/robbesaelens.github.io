@@ -554,6 +554,8 @@ export default {
     transparent
   );
   animation: glow-spin 4s linear infinite;
+  /* It only shows on hover: it turns only then */
+  animation-play-state: paused;
 }
 
 .dark .photo-glow {
@@ -600,6 +602,7 @@ export default {
 @media (hover: hover) and (pointer: fine) {
   .photo-wrapper:hover .photo-glow {
     opacity: 1;
+    animation-play-state: running;
   }
   .photo-wrapper:hover .photo-img {
     transform: scale(1.03);
