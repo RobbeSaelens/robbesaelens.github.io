@@ -153,8 +153,9 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   from `src/covered.ts` (it also sets `is-covered` on `<html>`); the background and the
   hero name's sweep stop until it closes. A new full-screen overlay does the same.
   Tests that read an animated value wait for it to finish: the commit counts take 0.9 s
-  once in view (`CountUpNumber.vue`, a time-based ease-out), and a chat answer also holds the (hidden) "Answered in" line, so match answers
-  with `toContainText` or a pattern. Responsive screenshots may catch a count mid-way.
+  once in view (`CountUpNumber.vue`, a time-based ease-out), and a chat answer also holds
+  the (hidden) "Answered in" line, so match answers with `toContainText` or a pattern.
+  Responsive screenshots may catch a count mid-way.
 - The document scrolls, at every size: the wrapper in `App.vue` only clips sideways
   overflow (`overflow-x-clip`). Don't make a page wrapper a scroll container: the
   router's scroll reset, keyboard scrolling (Space, Page Down), the phone browsers'
@@ -200,6 +201,10 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
     `width`, `height`, `padding`, `top` or `left` (they lay the page out again every frame).
   - Reduced motion: the global rule in `terminal-theme.css` drops durations and delays;
     script-driven effects check `prefers-reduced-motion` themselves.
+  - A page at rest comes to rest: no loop runs for something nobody sees or touches. The
+    custom cursor's loop runs only while its ring catches up with the pointer (and it moves
+    with `transform`, never `left`/`top`); the hero name sweeps twice, then waits for the
+    mouse; an endless CSS animation on something hidden is paused until it shows.
 - Phone-only CSS uses `@media (max-width: 639px)`, the exact complement of UnoCSS `sm:`
   (`min-width: 640px`). Never `max-width: 640px`: at exactly 640 px (a 1280 px laptop at
   200 % zoom) both apply and a page gets the phone layout under the desktop header.
