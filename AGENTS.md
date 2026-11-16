@@ -156,8 +156,16 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   toolbars and the responsive test's full-page screenshots all rely on the window
   scrolling. The one-screen pages are `100dvh` tall (`AppHolder.vue`), not a scroller.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px), on
-  phones too (`px-6`, not `px-4`). The project pages are a narrower centred column
-  (`max-w-screen-xl px-6`).
+  phones too (`px-6`, not `px-4`).
+- The one deliberate exception: the four project pages (`src/screens/details`) are a
+  centred 1280px column (`mx-auto max-w-screen-xl px-6`, the text in it a further
+  `md:mx-10` in), a reading width for long pages with a centred title and screenshots.
+  From 1328px wide their edge no longer meets the header logo, by design. Keep it in
+  step with the "Repository activity" side panel (`RepoActivity.vue`): from 1840 × 760
+  it moves into the free space right of that 1280px column (`right: calc((100vw -
+  1280px) / 2 - 256px)`), so widening the column means moving or dropping the panel.
+  What the four pages share is styled once, in `src/assets/project-page.css` (under
+  `.detail-page`); a page's scoped styles hold only what is its own.
 - Touch screens:
   - Every `:hover` style sits in `@media (hover: hover) and (pointer: fine)`: on a
     touch screen a hover state sticks after the tap. Things you press get an `:active`
