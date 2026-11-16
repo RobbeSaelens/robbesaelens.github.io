@@ -175,8 +175,8 @@ test.describe('the "$ …" line under the page title (DecryptedText)', () => {
     })
     await expect.poll(async () => (await frames()).some((f) => f.animating)).toBe(true)
     const start = (await frames()).find((f) => f.animating)!.t
-    // The line rises after the title (--i: 1, styles.css: 150 ms)
-    expect(start - done).toBeGreaterThan(120)
+    // The line rises after the title (--i: 1, styles.css: 100 ms)
+    expect(start - done).toBeGreaterThan(80)
     await expect.poll(async () => (await frames()).at(-1)?.animating, { timeout: 5000 }).toBe(false)
     await expect(page.locator('.terminal-command')).toHaveText('cat ./privacy.md')
     expect(errors).toEqual([])
