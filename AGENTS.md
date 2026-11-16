@@ -111,14 +111,37 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   `VITE_SENTRY_ENVIRONMENT=local`.
 - Statistics are Cloudflare Web Analytics: cookieless, so there is no cookie banner.
   Don't add anything that sets cookies or tracks visitors without revisiting the privacy page.
-- Two canvases from Vue Bits (https://vue-bits.dev; keep their licence headers): the hero
-  name (`HeroWordmark.vue` around `TechText.vue`; the real text stays underneath for SEO,
-  screen readers and the prerendered HTML) and the animated background behind every page
-  (`SiteBackground.vue` around `DarkVeil.vue`, mounted in `App.vue`). The background is
-  skipped on software WebGL, and headless Chrome is software WebGL, so the Playwright tests
-  and their screenshots never show it: to see it headless, launch Chromium with
-  `--use-angle=metal --enable-gpu`. Text over it must still pass contrast at its brightest
-  band, so keep its opacity low when changing colours.
+- Effects from Vue Bits (https://vue-bits.dev). Each Vue Bits file is kept as published,
+  with its licence header and any site change marked in it, and is used through a small
+  site wrapper:
+
+  | Wrapper | Vue Bits | Where |
+  |---|---|---|
+  | `HeroWordmark.vue` | `TechText.vue` | the hero name |
+  | `SiteBackground.vue` | `DarkVeil.vue` | the animated background behind every page (`App.vue`) |
+  | `TerminalCommand.vue` (registered globally) | `DecryptedText.vue` | the `$ …` line under page titles |
+  | `CountUpNumber.vue` | `CountUp.vue` | the commit counts in `RepoActivity.vue` |
+  | `ChatThinking.vue` | `LatticeLoader.vue` | the chat's thinking line, ending in a check with the time |
+  | `ButtonMagnet.vue` | `Magnet.vue` | the chat button and "Say hello" |
+  | `GlowCard.vue` | `SpotlightCard.vue` | the project, Drupal and About cards |
+  | `ShotGlare.vue` | `GlareHover.vue` | the screenshot buttons on the project pages |
+  | `PhotoDither.vue` | `DitherVeil.vue` | the two About photos |
+
+  Rules they all follow: the real text, numbers and images stay in the prerendered HTML
+  and are what screen readers get (the effect copies are `aria-hidden`); nothing plays with
+  reduced motion; the pointer effects (magnet, glow, glare, dither) need a mouse
+  (`(hover: hover) and (pointer: fine)`). Their tests are `tests/vue-bits-*.spec.ts`.
+  Colours come from theme tokens (`--color-spotlight`, `--color-dither-ink`,
+  `--color-dither-paper` in `terminal-theme.css`).
+
+  The two WebGL ones (background, photos) need a real GPU (`src/gpu.ts`: software WebGL
+  is skipped), and headless Chrome is software WebGL, so the Playwright tests and their
+  screenshots never show them. To see them headless, launch Chromium with
+  `--use-angle=metal --enable-gpu --ignore-gpu-blocklist`. Text over the background must
+  still pass contrast at its brightest band, so keep its opacity low when changing colours.
+  Tests that read an animated value wait for it to finish: the commit counts take a few
+  seconds, and a chat answer also holds the (hidden) "Answered in" line, so match answers
+  with `toContainText` or a pattern. Responsive screenshots may catch a count mid-way.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).
 - Screenshots of projects are real ones from the live sites, never mockups. The project
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
