@@ -33,7 +33,8 @@
         </div>
       </header>
 
-      <!-- Real screenshots of the live site at scan2talk.be -->
+      <!-- Real screenshots of the live site at scan2talk.be.
+           Above the fold, so not lazy: the desktop one is the largest paint (LCP). -->
       <div class="hero-in shots" style="--i: 4">
         <button
           type="button"
@@ -52,7 +53,8 @@
               :alt="$t('scan2talk.alt')"
               width="1600"
               height="1000"
-              loading="lazy"
+              loading="eager"
+              fetchpriority="high"
             />
           </ShotGlare>
         </button>
@@ -69,7 +71,7 @@
               :alt="$t('scan2talk.alt')"
               width="369"
               height="800"
-              loading="lazy"
+              loading="eager"
             />
           </ShotGlare>
         </button>

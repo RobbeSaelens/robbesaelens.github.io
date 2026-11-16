@@ -25,7 +25,8 @@
           <span v-for="tag in heroTags" :key="tag" class="tag-pill">{{ tag }}</span>
         </div>
       </header>
-      <!-- Real screenshots of the running v2.0 site -->
+      <!-- Real screenshots of the running v2.0 site.
+           Above the fold, so not lazy: the desktop one is the largest paint (LCP). -->
       <div class="hero-in shots" style="--i: 4">
         <button
           type="button"
@@ -44,7 +45,8 @@
               :alt="$t('exulta.alt')"
               width="1600"
               height="1000"
-              loading="lazy"
+              loading="eager"
+              fetchpriority="high"
             />
           </ShotGlare>
         </button>
@@ -61,7 +63,7 @@
               :alt="$t('exulta.alt')"
               width="400"
               height="800"
-              loading="lazy"
+              loading="eager"
             />
           </ShotGlare>
         </button>

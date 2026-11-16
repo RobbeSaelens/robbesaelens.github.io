@@ -585,6 +585,23 @@ test.describe('project page animations', () => {
   })
 })
 
+// In the prerendered HTML, where the browser's preload scanner finds them: the two
+// screenshots at the top load straight away, the desktop one (the largest paint) first.
+test.describe('project page screenshots', () => {
+  for (const route of ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail']) {
+    test(`${route} loads its hero screenshots first, and the rest lazily`, async ({ request }) => {
+      const html = await (await request.get(route)).text()
+      const [desktop, phone, ...rest] = html.match(/<img\b[^>]*>/g) ?? []
+      expect(desktop).toMatch(/src="\/[\w-]+-home\.jpg"/)
+      expect(desktop).toContain('fetchpriority="high"')
+      expect(desktop).not.toContain('loading="lazy"')
+      expect(phone).toMatch(/src="\/[\w-]+-mobile\.jpg"/)
+      expect(phone).not.toContain('loading="lazy"')
+      for (const img of rest) expect(img).toContain('loading="lazy"')
+    })
+  }
+})
+
 test('lightbox opens, steps through the screenshots, and closes', async ({ page }) => {
   const errors = await guard(page)
   await open(page, '/exultadetail')

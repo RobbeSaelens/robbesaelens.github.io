@@ -238,4 +238,8 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
   (`src/components/MacBook3D.vue`, posed by `Projects.vue`): a new screenshot is all it
   takes to update one.
+- The two screenshots at the top of a project page are the largest thing above the fold
+  (the LCP): they load eagerly, the desktop one with `fetchpriority="high"`, so the browser
+  fetches them straight from the prerendered HTML. Every image further down stays
+  `loading="lazy"` (the smoke tests check both).
 - No secrets or private tooling in this repo: it is public.
