@@ -3,13 +3,13 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # Every morning, so the Drupal contributions follow drupal.org without a push
-  # (the build fetches them, see "Refresh Drupal contributions"). Scheduled runs
-  # use the default branch.
+  # Every morning, so the Drupal contributions and the repository numbers follow
+  # drupal.org and GitHub without a push (the build fetches them, see "Refresh
+  # Drupal contributions" and "Refresh repository activity"). Scheduled runs use
+  # the default branch.
   schedule:
     - cron: '17 5 * * *'
-  # The "Run workflow" button on the Actions tab: deploy again, refreshing the
-  # Drupal contributions.
+  # The "Run workflow" button on the Actions tab: deploy again, refreshing both.
   workflow_dispatch:
 
 permissions:
@@ -44,6 +44,18 @@ jobs:
       # and the deploy goes on.
       - name: Refresh Drupal contributions
         run: npm run drupal || echo "::warning::Drupal contributions not refreshed, deploying the committed src/data/drupal.json"
+        timeout-minutes: 5
+        continue-on-error: true
+
+      # The repository numbers on the project pages (src/data/repo-stats.json).
+      # Those repositories are private, so this asks the GitHub API with
+      # REPO_STATS_TOKEN: a repository secret holding a fine-grained token with
+      # read-only access (Contents) to them. Only this step gets it. Without the
+      # secret, or when the API fails, the committed file is used.
+      - name: Refresh repository activity
+        run: npm run stats:github
+        env:
+          REPO_STATS_TOKEN: ${{ secrets.REPO_STATS_TOKEN }}
         timeout-minutes: 5
         continue-on-error: true
 
