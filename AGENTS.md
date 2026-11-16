@@ -65,6 +65,32 @@ fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
 When you change a page's URL, keep the old one working: add it to `REDIRECTS` in
 `src/bootstrap/router.ts` and to `MOVED` in `tests/routes.ts`.
 
+## Design and motion changes: use the skills
+
+The site's layout and motion were audited and fixed with these agent skills, and changes
+to either should follow them too. They are installed per user, not in this repo: in
+`~/.claude/skills/`, from [emilkowalski/skills](https://github.com/emilkowalski/skills)
+(MIT) and the layout page of [pbakaus/impeccable](https://github.com/pbakaus/impeccable/blob/main/skill/reference/layout.md)
+(Apache 2.0), installed as `impeccable-layout`. If they are missing, install them from
+there, or read those files directly.
+
+| When you | Use |
+|---|---|
+| add or change an animation, transition or hover/press state | `animate` to build it, `review-animations` to check it against the bar |
+| touch anything that runs every frame (canvas, WebGL, scroll or pointer handlers) | `animation-performance` |
+| coordinate several things moving together (entrances, staggers, slides) | `choreograph` |
+| change a page's structure, spacing or responsive behaviour | `impeccable-layout` |
+| change anything a phone sees (touch, hover, viewport heights, inputs) | `mobile-native` |
+| render data that can be long, empty or huge (lists, chips, counts, chat) | `break-ui` |
+| polish a component's interaction details | `emil-design-eng` |
+| review the motion of the whole site again | `improve-animations`, then `remove-animations` for what can go |
+
+Their rules are already applied here and written down below (Motion, touch and hover,
+the Vue Bits effects). The skills explain the why and the numbers; where a skill and this
+file disagree, this file wins, because it records choices Robbe made (e.g. the strength
+of the background, which effects stay). Taste changes, like removing or toning down an
+effect he asked for, go to him first.
+
 ## Content changes: keep the chatbot in step
 
 The chatbot answers from four places. When content on the site changes and is
