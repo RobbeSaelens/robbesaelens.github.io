@@ -28,7 +28,7 @@ const HUE_SHIFT = 55
 const RESOLUTION = 0.5
 
 const enabled = ref(false)
-const speed = ref(0.3)
+const speed = ref(0.6)
 
 /** Software renderers: Chrome's SwiftShader (also headless Chrome), Mesa's llvmpipe, Windows' fallback. */
 const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software|basic render/i
@@ -66,12 +66,12 @@ onMounted(() => {
   z-index: -1;
   pointer-events: none;
   mix-blend-mode: screen;
-  opacity: 0.35;
+  opacity: 0.5;
 }
 html:not(.dark) .site-veil {
   filter: invert(1) hue-rotate(180deg);
   mix-blend-mode: multiply;
-  opacity: 0.25;
+  opacity: 0.4;
 }
 /* ogl sizes the canvas in px at the reduced resolution: stretch it back. */
 .site-veil canvas {
