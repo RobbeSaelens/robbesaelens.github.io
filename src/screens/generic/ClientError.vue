@@ -457,7 +457,9 @@ export default defineComponent({
   color: var(--color-accent);
   text-decoration: none;
   opacity: 0;
-  animation: fadeIn 0.5s ease 5.3s both;
+  /* Right after the command block: the way home doesn't wait for the typed response
+     (it used to come last, at 5.3 s, invisible but already clickable until then). */
+  animation: fadeIn 0.5s ease 1.1s both;
   transition: color 0.2s ease;
 }
 
@@ -519,6 +521,22 @@ export default defineComponent({
 
   .glitch-target {
     animation: fadeIn 0.6s ease both;
+  }
+
+  /* Everything there from the start, the command already typed */
+  .error-icon,
+  .error-title,
+  .error-description,
+  .command-block,
+  .response-line,
+  .back-link {
+    animation: none;
+    opacity: 1;
+  }
+
+  .typing-wrapper {
+    animation: none;
+    width: auto;
   }
 }
 

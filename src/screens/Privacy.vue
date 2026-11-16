@@ -82,7 +82,9 @@ let observer: IntersectionObserver | null = null
 let frame = 0
 
 function goTo(i: number) {
-  document.getElementById(`privacy-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  // With reduced motion it jumps: a long smooth scroll is the kind of motion it asks to avoid
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  document.getElementById(`privacy-${i}`)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
 }
 
 // Listen in the capture phase: that catches the window's scrolling and any
