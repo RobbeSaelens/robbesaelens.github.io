@@ -1,4 +1,6 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
+import { existsSync, readFileSync } from 'node:fs'
+import { extname, join, resolve } from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import Unocss from 'unocss/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
@@ -8,6 +10,27 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 // Sentry and deleted before publishing.
 const uploadSourceMaps = !!process.env.SENTRY_AUTH_TOKEN
 
+/**
+ * `vite preview` like GitHub Pages: a URL without a prerendered page gets 404.html with
+ * status 404, where vite would fall back to index.html (the home page). The tests run
+ * against the preview, so they see what visitors get.
+ */
+const githubPages404: Plugin = {
+  name: 'github-pages-404',
+  configurePreviewServer(server) {
+    const dist = resolve(server.config.root, server.config.build.outDir)
+    server.middlewares.use((req, res, next) => {
+      const path = decodeURIComponent((req.url ?? '/').split('?')[0]).replace(/\/+$/, '').slice(1)
+      if (req.method !== 'GET' || extname(path)) return next()
+      const pages = path ? [`${path}.html`, `${path}/index.html`] : ['index.html']
+      if (pages.some((page) => existsSync(join(dist, page)))) return next()
+      res.statusCode = 404
+      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      res.end(readFileSync(join(dist, '404.html')))
+    })
+  },
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ isSsrBuild }) => ({
   base: '/',
@@ -16,6 +39,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   plugins: [
     vue(),
+    githubPages404,
     Unocss({
       theme: {
         extend: {
