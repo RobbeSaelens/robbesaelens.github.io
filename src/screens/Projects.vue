@@ -133,8 +133,9 @@
 <script lang="ts">
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-vue-next'
 import MacBook3D from '../components/MacBook3D.vue'
+import { PROJECT_PAGES, type ProjectStatus } from '../projects'
 
-type Status = 'live' | 'private' | 'rebranding' | 'soon'
+type Status = ProjectStatus | 'soon'
 
 interface Project {
   id: string
@@ -145,38 +146,9 @@ interface Project {
   status: Status
 }
 
-// Copy (taglines) lives in the locale files under projects.items.<id>.
-const PROJECTS: Project[] = [
-  {
-    id: 'exulta',
-    name: 'Exulta',
-    screenshot: '/exulta-home.jpg',
-    route: 'ExultaDetail',
-    status: 'live',
-  },
-  {
-    id: 'scan2talk',
-    name: 'Scan2Talk',
-    screenshot: '/scan2talk-home.jpg',
-    route: 'Scan2TalkDetail',
-    status: 'live',
-  },
-  {
-    id: 'stable-manager',
-    name: 'Stable Manager',
-    screenshot: '/stable-manager-home.jpg',
-    route: 'StableManagerDetail',
-    status: 'private',
-  },
-  {
-    id: 'vhs',
-    name: 'VHS Service',
-    screenshot: '/vhs-home.jpg',
-    route: 'VHSDetail',
-    status: 'rebranding',
-  },
-  { id: 'coming-soon', name: 'Coming soon', status: 'soon' },
-]
+// The projects with a page (src/projects.ts, which the pages' "next project" follows),
+// then the one in the works. Copy (taglines) lives in the locale files under projects.items.<id>.
+const PROJECTS: Project[] = [...PROJECT_PAGES, { id: 'coming-soon', name: 'Coming soon', status: 'soon' }]
 
 const STATUS_KEYS: Record<Status, string> = {
   live: 'projects.live',
