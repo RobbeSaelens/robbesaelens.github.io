@@ -256,4 +256,10 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   (the LCP): they load eagerly, the desktop one with `fetchpriority="high"`, so the browser
   fetches them straight from the prerendered HTML. Every image further down stays
   `loading="lazy"` (the smoke tests check both).
+- Each project page's JSON-LD (`src/seo/jsonld.ts`) describes the project itself: a
+  `WebSite` or a `WebApplication` with the page's own title, description and `og:image`,
+  in the page's language, plus what `src/seo/projects.ts` holds (live site, stack,
+  programming languages, and the `repo-stats.json` key whose first commit is its
+  `dateCreated`). A new project page needs an entry there; the smoke tests read the
+  JSON-LD back from the prerendered HTML in both languages.
 - No secrets or private tooling in this repo: it is public.

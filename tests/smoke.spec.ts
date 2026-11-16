@@ -647,6 +647,66 @@ test.describe('project page screenshots', () => {
   }
 })
 
+// The structured data of each project page, as crawlers read it from the prerendered
+// HTML: the site or app itself, with the page's own name, description and image.
+test.describe('project structured data', () => {
+  const stats = JSON.parse(readFileSync(new URL('../src/data/repo-stats.json', import.meta.url), 'utf8'))
+  const PROJECTS = [
+    { route: '/exultadetail', type: 'WebSite', name: 'Exulta', stats: 'exulta', live: 'https://exulta.be' },
+    { route: '/scan2talkdetail', type: 'WebApplication', name: 'Scan2Talk', stats: 'scan2talk', live: 'https://scan2talk.be' },
+    { route: '/stablemanagerdetail', type: 'WebApplication', name: 'Stable Manager', stats: 'stableManager' },
+    { route: '/vhsdetail', type: 'WebSite', name: 'VHS Service', stats: 'vhs' },
+  ]
+  const attr = (html: string, pattern: RegExp) => html.match(pattern)?.[1]?.replace(/&amp;/g, '&').replace(/&#39;/g, "'")
+
+  for (const { route, type, name, stats: key, live } of PROJECTS) {
+    for (const url of [route, nl(route)]) {
+      test(`${url} describes ${name} as a ${type}`, async ({ request }) => {
+        const html = await (await request.get(url)).text()
+        const json = attr(html, /<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)
+        const graph: Record<string, any>[] = JSON.parse(json!)['@graph']
+        const byId = new Map(graph.map((node) => [node['@id'], node]))
+        const canonical = attr(html, /<link rel="canonical" href="([^"]+)"/)
+
+        const project = byId.get(`${canonical}#project`)!
+        expect(project['@type']).toBe(type)
+        expect(project.name).toBe(name)
+        expect(project.description).toBe(attr(html, /<meta name="description" content="([^"]+)"/))
+        expect(project.headline).toBe(attr(html, /<title>([^<]+) \| Robbe Saelens<\/title>/))
+        expect(project.url).toBe(canonical)
+        expect(project.image).toBe(attr(html, /<meta property="og:image" content="([^"]+)"/))
+        expect(project.sameAs).toBe(live)
+        expect(project.dateCreated).toBe(stats.projects[key].firstCommit.slice(0, 10))
+        expect(project.keywords).toMatch(/\w+, \w+/)
+        expect(project.hasPart[0]['@type']).toBe('SoftwareSourceCode')
+        expect(project.hasPart[0].programmingLanguage.length).toBeGreaterThan(0)
+        if (type === 'WebApplication') expect(project.applicationCategory).toMatch(/Application$/)
+
+        // The page is about it; it and its code are Robbe's
+        const page = byId.get(`${canonical}#webpage`)!
+        expect(page['@type']).toBe('ItemPage')
+        expect(page.inLanguage).toBe(url.startsWith('/nl') ? 'nl' : 'en')
+        expect(page.mainEntity['@id']).toBe(project['@id'])
+        expect(project.mainEntityOfPage['@id']).toBe(page['@id'])
+        expect(byId.get(project.author['@id'])['@type']).toBe('Person')
+
+        // Every reference points at a node in the graph
+        const refs: string[] = []
+        const walk = (value: unknown) => {
+          if (Array.isArray(value)) value.forEach(walk)
+          else if (value && typeof value === 'object') {
+            const entries = Object.entries(value)
+            if (entries.length === 1 && entries[0][0] === '@id') refs.push(entries[0][1] as string)
+            else entries.forEach(([, v]) => walk(v))
+          }
+        }
+        graph.forEach((node) => Object.entries(node).forEach(([k, v]) => k !== '@id' && walk(v)))
+        for (const ref of refs) expect(byId.has(ref), ref).toBe(true)
+      })
+    }
+  }
+})
+
 test('lightbox opens, steps through the screenshots, and closes', async ({ page }) => {
   const errors = await guard(page)
   await open(page, '/exultadetail')
