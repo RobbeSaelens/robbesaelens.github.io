@@ -124,7 +124,7 @@
               >{{ $t('exulta.viewOther') }}</span
             >
             <ArrowRight
-              class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+              class="link-arrow h-4 w-4 transition-transform duration-200"
               style="color: var(--color-accent)"
             />
           </router-link>
@@ -282,11 +282,13 @@ export default defineComponent({
     box-shadow 0.3s ease,
     border-color 0.3s ease;
 }
-.overview-card:hover {
-  border-color: var(--color-border-glow);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.04),
-    0 0 0 1px var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .overview-card:hover {
+    border-color: var(--color-border-glow);
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.04),
+      0 0 0 1px var(--color-border-glow);
+  }
 }
 .overview-label {
   font-family: var(--font-mono);
@@ -358,10 +360,16 @@ export default defineComponent({
     background 0.2s ease,
     transform 0.2s ease;
 }
-.live-link:hover {
-  border-color: var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .live-link:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+    transform: translateY(-1px);
+  }
+}
+.live-link:active {
   background: var(--color-surface-hover);
-  transform: translateY(-1px);
+  transform: scale(0.97);
 }
 
 /* =============================================

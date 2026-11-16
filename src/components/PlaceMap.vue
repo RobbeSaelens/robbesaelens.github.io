@@ -105,9 +105,13 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   text-underline-offset: 4px;
   transition: color 0.2s ease;
 }
-.place-name:hover,
 .is-open .place-name {
   color: var(--color-accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .place-name:hover {
+    color: var(--color-accent);
+  }
 }
 .place-name:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -302,10 +306,15 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   white-space: nowrap;
   text-decoration: none;
 }
-.place-credit:hover,
 .place-credit:focus-visible {
   color: var(--color-accent);
   text-decoration: underline;
+}
+@media (hover: hover) and (pointer: fine) {
+  .place-credit:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

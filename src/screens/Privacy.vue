@@ -354,8 +354,10 @@ html.js.intro-done .glance-list li {
   font-size: 0.75rem;
   padding-top: 0.1rem;
 }
-.toc-link:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .toc-link:hover {
+    color: var(--color-text-primary);
+  }
 }
 .toc-link.is-read {
   color: var(--color-text-secondary);

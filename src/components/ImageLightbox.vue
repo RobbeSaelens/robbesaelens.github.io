@@ -162,6 +162,7 @@ export default defineComponent({
 .lightbox-img {
   max-width: 100%;
   max-height: calc(100vh - 8rem);
+  max-height: calc(100dvh - 8rem);
   width: auto;
   height: auto;
   object-fit: contain;
@@ -194,9 +195,16 @@ export default defineComponent({
     background 0.2s ease,
     transform 0.2s ease;
 }
-.lightbox-close:hover,
-.lightbox-nav:hover {
+@media (hover: hover) and (pointer: fine) {
+  .lightbox-close:hover,
+  .lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+}
+.lightbox-close:active,
+.lightbox-nav:active {
   background: rgba(255, 255, 255, 0.18);
+  transform: scale(0.94);
 }
 .lightbox-close:focus-visible,
 .lightbox-nav:focus-visible {
@@ -208,8 +216,8 @@ export default defineComponent({
   position: absolute;
   top: clamp(0.75rem, 3vw, 1.5rem);
   right: clamp(0.75rem, 3vw, 1.5rem);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
 }
 
 .lightbox-nav {

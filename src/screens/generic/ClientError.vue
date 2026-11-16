@@ -457,8 +457,10 @@ export default defineComponent({
   transition: color 0.2s ease;
 }
 
-.back-link:hover {
-  color: var(--color-prompt);
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover {
+    color: var(--color-prompt);
+  }
 }
 
 .back-prompt {
@@ -470,8 +472,10 @@ export default defineComponent({
   transition: color 0.2s ease;
 }
 
-.back-link:hover .back-command {
-  color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover .back-command {
+    color: var(--color-text-primary);
+  }
 }
 
 .back-arrow {
@@ -480,8 +484,10 @@ export default defineComponent({
   transition: transform 0.2s ease;
 }
 
-.back-link:hover .back-arrow {
-  transform: translateX(4px);
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover .back-arrow {
+    transform: translateX(4px);
+  }
 }
 
 /* =============================================

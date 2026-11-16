@@ -454,9 +454,11 @@ export default {
     transform 0.1s ease,
     opacity 0.2s ease;
 }
-.car-btn:hover:not(:disabled) {
-  background: var(--color-accent-soft);
-  box-shadow: 0 0 16px var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .car-btn:hover:not(:disabled) {
+    background: var(--color-accent-soft);
+    box-shadow: 0 0 16px var(--color-border-glow);
+  }
 }
 .car-btn:active:not(:disabled) {
   transform: translateY(2px);
@@ -708,7 +710,12 @@ export default {
     width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
     background 0.3s ease;
 }
-.car-dot:hover span {
+@media (hover: hover) and (pointer: fine) {
+  .car-dot:hover span {
+    background: var(--color-accent);
+  }
+}
+.car-dot:active span {
   background: var(--color-accent);
 }
 .car-dot.is-current span {

@@ -374,9 +374,11 @@ export default {
     color 0.2s ease,
     text-decoration-color 0.2s ease;
 }
-.fact-link:hover {
-  color: var(--color-accent);
-  text-decoration-color: currentColor;
+@media (hover: hover) and (pointer: fine) {
+  .fact-link:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentColor;
+  }
 }
 
 /* =============================================
@@ -400,7 +402,12 @@ export default {
     background 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    transform 0.12s ease-out;
+}
+/* Press feedback, also on touch screens (where hover never comes) */
+.hero-btn:active {
+  transform: scale(0.97);
 }
 .hero-btn:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -411,9 +418,11 @@ export default {
   background: #0f766e; /* teal-700: white text stays above 4.5:1 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
-.hero-btn--primary:hover {
-  background: #115e59;
-  box-shadow: 0 6px 18px -6px rgba(13, 148, 136, 0.55);
+@media (hover: hover) and (pointer: fine) {
+  .hero-btn--primary:hover {
+    background: #115e59;
+    box-shadow: 0 6px 18px -6px rgba(13, 148, 136, 0.55);
+  }
 }
 .hero-btn--ghost {
   font-family: var(--font-mono);
@@ -423,9 +432,11 @@ export default {
   border: 1px solid var(--color-border-glow);
   background: var(--color-surface);
 }
-.hero-btn--ghost:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
+@media (hover: hover) and (pointer: fine) {
+  .hero-btn--ghost:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
 }
 .hero-btn-icon {
   width: 1.125rem;
@@ -434,8 +445,10 @@ export default {
 .hero-btn-arrow {
   transition: transform 0.2s ease;
 }
-.hero-btn--ghost:hover .hero-btn-arrow {
-  transform: translateX(3px);
+@media (hover: hover) and (pointer: fine) {
+  .hero-btn--ghost:hover .hero-btn-arrow {
+    transform: translateX(3px);
+  }
 }
 
 /* =============================================
@@ -462,7 +475,11 @@ export default {
   transition:
     color 0.2s ease,
     border-color 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    transform 0.12s ease-out;
+}
+.social-link:active {
+  transform: scale(0.94);
 }
 
 .dark .social-link {
@@ -474,15 +491,17 @@ export default {
   height: 1.125rem;
 }
 
-.social-link:hover {
-  color: #0d9488;
-  border-color: var(--color-border-glow);
-  background: rgba(13, 148, 136, 0.08);
-}
+@media (hover: hover) and (pointer: fine) {
+  .social-link:hover {
+    color: #0d9488;
+    border-color: var(--color-border-glow);
+    background: rgba(13, 148, 136, 0.08);
+  }
 
-.dark .social-link:hover {
-  color: #2dd4bf;
-  background: rgba(45, 212, 191, 0.1);
+  .dark .social-link:hover {
+    color: #2dd4bf;
+    background: rgba(45, 212, 191, 0.1);
+  }
 }
 
 .social-link:focus-visible {

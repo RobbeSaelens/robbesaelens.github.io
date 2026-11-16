@@ -153,6 +153,18 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px), on
   phones too (`px-6`, not `px-4`). The project pages are a narrower centred column
   (`max-w-screen-xl px-6`).
+- Touch screens:
+  - Every `:hover` style sits in `@media (hover: hover) and (pointer: fine)`: on a
+    touch screen a hover state sticks after the tap. Things you press get an `:active`
+    state instead (a slight `scale(0.97)`, or a background on wide rows). UnoCSS's
+    `hover:` and `group-hover:` utilities compile to a bare `:hover`, so write the rule
+    in the component's style instead (the "./ view my projects" arrow is `.group` on the
+    link and `.link-arrow` on the arrow, from `terminal-theme.css`).
+  - Tap targets are at least 24 × 24 px; the main controls (menu, close, chat, theme,
+    carousel dots) are 44 px under `@media (pointer: coarse)`.
+  - Text inputs are 16 px under `(pointer: coarse)`, or iOS zooms the page in on focus.
+  - Heights tied to the screen use `dvh` (app-like: the chat panel, the lightbox, the
+    one-screen pages) or `svh` (the minimum page height), each after a `vh` fallback line.
 - Phone-only CSS uses `@media (max-width: 639px)`, the exact complement of UnoCSS `sm:`
   (`min-width: 640px`). Never `max-width: 640px`: at exactly 640 px (a 1280 px laptop at
   200 % zoom) both apply and a page gets the phone layout under the desktop header.

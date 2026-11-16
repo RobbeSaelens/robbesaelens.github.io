@@ -427,10 +427,12 @@ export default defineComponent({
   animation: ee-fade-in 0.5s ease 1.4s both;
 }
 
-.ee-close:hover {
-  color: #2dd4bf;
-  border-color: rgba(45, 212, 191, 0.4);
-  background: rgba(45, 212, 191, 0.06);
+@media (hover: hover) and (pointer: fine) {
+  .ee-close:hover {
+    color: #2dd4bf;
+    border-color: rgba(45, 212, 191, 0.4);
+    background: rgba(45, 212, 191, 0.06);
+  }
 }
 
 .ee-close:active {
@@ -443,8 +445,10 @@ export default defineComponent({
   transition: color 0.2s ease;
 }
 
-.ee-close:hover .ee-close-prompt {
-  color: #5eead4;
+@media (hover: hover) and (pointer: fine) {
+  .ee-close:hover .ee-close-prompt {
+    color: #5eead4;
+  }
 }
 
 /* =============================================

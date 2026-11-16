@@ -460,9 +460,11 @@ export default {
     color 0.2s ease,
     border-color 0.2s ease;
 }
-.card-link:hover {
-  color: var(--color-text-primary);
-  border-color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .card-link:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-text-primary);
+  }
 }
 
 .card-text strong {
@@ -494,8 +496,10 @@ export default {
   height: 0.95rem;
   transition: transform 0.2s ease;
 }
-.card-more:hover .card-more-arrow {
-  transform: translateX(3px);
+@media (hover: hover) and (pointer: fine) {
+  .card-more:hover .card-more-arrow {
+    transform: translateX(3px);
+  }
 }
 
 @media (min-width: 1400px) {

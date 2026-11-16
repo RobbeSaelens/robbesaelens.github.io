@@ -11,14 +11,14 @@
         <div class="flex flex-col items-center gap-x-6 gap-y-1 sm:flex-row">
           <a
             href="tel:0471958195"
-            class="flex items-center gap-1.5 whitespace-nowrap transition-colors hover:text-teal-800 dark:hover:text-teal-200"
+            class="footer-contact flex items-center gap-1.5 whitespace-nowrap transition-colors"
           >
             <Phone class="h-4 w-4" />
             0471 95 81 95
           </a>
           <a
             href="mailto:robbe.saelens@telenet.be"
-            class="flex items-center gap-1.5 whitespace-nowrap transition-colors hover:text-teal-800 dark:hover:text-teal-200"
+            class="footer-contact flex items-center gap-1.5 whitespace-nowrap transition-colors"
           >
             <Mail class="h-4 w-4" />
             robbe.saelens@telenet.be
@@ -54,9 +54,28 @@ export default {
   text-underline-offset: 3px;
   transition: text-decoration-color 0.2s ease;
 }
-.footer-link:hover,
 .footer-link:focus-visible {
   text-decoration-color: currentColor;
+}
+/* Hover only with a mouse: on a touch screen it would stick after the tap */
+@media (hover: hover) and (pointer: fine) {
+  .footer-link:hover {
+    text-decoration-color: currentColor;
+  }
+  .footer-contact:hover {
+    color: #115e59; /* teal-800 */
+  }
+  .dark .footer-contact:hover {
+    color: #99f6e4; /* teal-200 */
+  }
+}
+
+/* Phones: the links stack, each a comfortable tap target */
+@media (max-width: 639px) {
+  .footer-link,
+  .footer-contact {
+    padding-block: 0.5rem;
+  }
 }
 
 /* The chat button (fixed, bottom right, 3rem wide at 1.5rem from the edge) must

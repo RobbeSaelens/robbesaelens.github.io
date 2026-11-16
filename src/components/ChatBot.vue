@@ -612,10 +612,13 @@ export default {
     box-shadow 0.25s ease;
   animation: fab-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.9s backwards; /* no end state: keeps :hover working */
 }
-.chatbot-fab:hover {
-  border-color: #2dd4bf;
-  box-shadow: 0 6px 26px rgba(20, 184, 166, 0.35);
-  transform: translateY(-2px);
+/* Hover only with a mouse: on a touch screen it would stick after the tap */
+@media (hover: hover) and (pointer: fine) {
+  .chatbot-fab:hover {
+    border-color: #2dd4bf;
+    box-shadow: 0 6px 26px rgba(20, 184, 166, 0.35);
+    transform: translateY(-2px);
+  }
 }
 .chatbot-fab:active {
   transform: translateY(0) scale(0.96);
@@ -648,11 +651,13 @@ export default {
   height: 1.65rem;
   stroke-width: 2;
 }
-.chatbot-fab:hover .fab-chat {
-  transform: rotate(-8deg) scale(1.06);
-}
-.chatbot-fab.is-open:hover .fab-chat {
-  transform: rotate(90deg) scale(0.6);
+@media (hover: hover) and (pointer: fine) {
+  .chatbot-fab:hover .fab-chat {
+    transform: rotate(-8deg) scale(1.06);
+  }
+  .chatbot-fab.is-open:hover .fab-chat {
+    transform: rotate(90deg) scale(0.6);
+  }
 }
 .fab-close {
   opacity: 0;
@@ -725,6 +730,7 @@ export default {
   width: 25rem;
   max-width: calc(100vw - 3rem);
   height: min(34rem, calc(100vh - 8rem));
+  height: min(34rem, calc(100dvh - 8rem));
   overflow: hidden;
   color: #e2e8f0;
   background: #0d1117;
@@ -746,6 +752,7 @@ export default {
     width: auto;
     max-width: none;
     height: min(75vh, 36rem);
+    height: min(75dvh, 36rem);
   }
 }
 
@@ -823,9 +830,23 @@ export default {
     color 0.2s ease,
     background 0.2s ease;
 }
-.chat-icon-btn:hover {
+@media (hover: hover) and (pointer: fine) {
+  .chat-icon-btn:hover {
+    color: #f1f5f9;
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+.chat-icon-btn:active {
   color: #f1f5f9;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
+}
+/* Touch: 44px targets for clear and close */
+@media (pointer: coarse) {
+  .chat-icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.65rem;
+  }
 }
 .chat-icon-btn svg {
   width: 100%;
@@ -935,9 +956,14 @@ export default {
     background 0.2s ease,
     border-color 0.2s ease;
 }
-.chat-chip:hover {
+@media (hover: hover) and (pointer: fine) {
+  .chat-chip:hover {
+    background: rgba(45, 212, 191, 0.16);
+    border-color: #5eead4;
+  }
+}
+.chat-chip:active {
   background: rgba(45, 212, 191, 0.16);
-  border-color: #5eead4;
 }
 
 /* ── Input ── */
@@ -958,6 +984,12 @@ export default {
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 0.65rem;
   caret-color: #2dd4bf;
+}
+/* Touch: 16px, or iOS zooms the page in when the field gets focus */
+@media (pointer: coarse) {
+  .chat-input input {
+    font-size: 1rem;
+  }
 }
 .chat-input input::placeholder {
   color: #8a97a8;
@@ -982,7 +1014,12 @@ export default {
     opacity 0.2s ease,
     background 0.2s ease;
 }
-.chat-send:hover:not(:disabled) {
+@media (hover: hover) and (pointer: fine) {
+  .chat-send:hover:not(:disabled) {
+    background: #5eead4;
+  }
+}
+.chat-send:active:not(:disabled) {
   background: #5eead4;
 }
 .chat-send:disabled {

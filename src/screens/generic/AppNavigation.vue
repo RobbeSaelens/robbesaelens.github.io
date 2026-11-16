@@ -450,9 +450,13 @@ export default {
   outline: none;
   transition: color 0.2s ease;
 }
-.nav-link:hover,
 .nav-link.is-current {
   color: var(--color-accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover {
+    color: var(--color-accent);
+  }
 }
 .nav-link:focus-visible {
   box-shadow: 0 0 0 2px var(--color-accent);
@@ -505,9 +509,18 @@ export default {
     background 0.2s ease,
     transform 0.2s ease;
 }
-.nav-icon-btn:hover {
-  border-color: var(--color-border-glow);
-  background: var(--color-surface-hover);
+@media (hover: hover) and (pointer: fine) {
+  .nav-icon-btn:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+  }
+}
+/* Touch: 44px targets (menu, close, theme) */
+@media (pointer: coarse) {
+  .nav-icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
 }
 .nav-icon-btn:active {
   transform: scale(0.94);

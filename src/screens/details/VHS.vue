@@ -113,7 +113,7 @@
               >{{ $t('vhs.viewOther') }}</span
             >
             <ArrowRight
-              class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+              class="link-arrow h-4 w-4 transition-transform duration-200"
               style="color: var(--color-accent)"
             />
           </router-link>
@@ -452,11 +452,13 @@ button.shot-phone {
     box-shadow 0.3s ease,
     border-color 0.3s ease;
 }
-.overview-card:hover {
-  border-color: var(--color-border-glow);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.04),
-    0 0 0 1px var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .overview-card:hover {
+    border-color: var(--color-border-glow);
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.04),
+      0 0 0 1px var(--color-border-glow);
+  }
 }
 .overview-label {
   font-family: var(--font-mono);

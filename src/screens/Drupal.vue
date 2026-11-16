@@ -112,7 +112,7 @@
           >{{ $t('drupal.viewProjects') }}</span
         >
         <ArrowRight
-          class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+          class="link-arrow h-4 w-4 transition-transform duration-200"
           style="color: var(--color-accent)"
         />
       </router-link>
@@ -376,10 +376,16 @@ onBeforeUnmount(() => stopReveal())
     background 0.2s ease,
     transform 0.2s ease;
 }
-.chip:hover {
-  border-color: var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+    transform: translateY(-1px);
+  }
+}
+.chip:active {
   background: var(--color-surface-hover);
-  transform: translateY(-1px);
+  transform: scale(0.97);
 }
 .chip:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -422,8 +428,10 @@ onBeforeUnmount(() => stopReveal())
   text-underline-offset: 3px;
   transition: text-decoration-color 0.2s ease;
 }
-.text-link:hover {
-  text-decoration-color: currentColor;
+@media (hover: hover) and (pointer: fine) {
+  .text-link:hover {
+    text-decoration-color: currentColor;
+  }
 }
 .text-link:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -456,10 +464,16 @@ onBeforeUnmount(() => stopReveal())
     background 0.2s ease,
     transform 0.2s ease;
 }
-.pill-link:hover {
-  border-color: var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .pill-link:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+    transform: translateY(-1px);
+  }
+}
+.pill-link:active {
   background: var(--color-surface-hover);
-  transform: translateY(-1px);
+  transform: scale(0.97);
 }
 .pill-link:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -701,7 +715,13 @@ onBeforeUnmount(() => stopReveal())
     margin-top: 0.2rem;
   }
 }
-.row:hover {
+/* A row is wide: on press it lights up rather than shrinks */
+@media (hover: hover) and (pointer: fine) {
+  .row:hover {
+    background: var(--color-surface-hover);
+  }
+}
+.row:active {
   background: var(--color-surface-hover);
 }
 .row:focus-visible {
@@ -722,8 +742,10 @@ onBeforeUnmount(() => stopReveal())
   overflow-wrap: anywhere;
   transition: color 0.2s ease;
 }
-.row:hover .row-title {
-  color: var(--color-accent);
+@media (hover: hover) and (pointer: fine) {
+  .row:hover .row-title {
+    color: var(--color-accent);
+  }
 }
 .row-meta {
   font-family: var(--font-mono);
@@ -743,10 +765,15 @@ onBeforeUnmount(() => stopReveal())
     opacity 0.2s ease,
     transform 0.2s ease;
 }
-.row:hover .row-arrow,
 .row:focus-visible .row-arrow {
   opacity: 1;
   transform: translate(2px, -2px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .row:hover .row-arrow {
+    opacity: 1;
+    transform: translate(2px, -2px);
+  }
 }
 
 /* ── Status badges: colours from the theme tokens (terminal-theme.css) ── */

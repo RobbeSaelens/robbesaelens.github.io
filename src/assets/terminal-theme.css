@@ -221,6 +221,14 @@
   font-family: var(--font-mono);
 }
 
+/* The arrow of a "./ view my projects" link (class .group on the link) leans forward on
+   hover. Mouse only: on a touch screen a hover state sticks after the tap. */
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .link-arrow {
+    transform: translateX(0.25rem);
+  }
+}
+
 /* Single source of truth — this used to be redefined in Projects.vue and every
    detail screen with slightly different metrics, so whichever route chunk
    loaded last silently changed pill size and reflowed the page. */

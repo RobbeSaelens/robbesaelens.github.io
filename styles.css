@@ -23,6 +23,12 @@ body {
   overflow-x: hidden;
 }
 
+/* Touch screens: no grey flash over whatever is tapped; buttons and links have
+   their own :active press state instead. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Custom cursor: hide default */
 @media (hover: hover) and (pointer: fine) {
   * {

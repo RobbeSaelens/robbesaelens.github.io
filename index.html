@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- resizes-content: on Android the keyboard shrinks the layout, so the chat sheet
+         (dvh) stays above it -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
 
     <!-- Title, description, canonical, Open Graph, Twitter and JSON-LD are all
          managed centrally in src/App.vue (via unhead) so that the prerendered
