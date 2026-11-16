@@ -191,6 +191,11 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
     snaps; a hover may ease more slowly).
   - Interface transitions stay at or under 300 ms; only panels and overlays (chat panel,
     mobile menu, lightbox) take a little longer.
+  - Page entrances (`.hero-in`, `.reveal`, `styles.css`) rise in 0.5 s, 60 ms apart (`--i`),
+    so a page is complete within about a second; they play on every page view, so keep
+    them short. The intro (`index.html`) plays once per session and lasts a second. The
+    project slides (`Projects.vue`, the MacBook's turn and lid) are the one slow, showy
+    move, and only on click, swipe and wheel: the arrow keys page in a quarter of a second.
   - Name the properties: no `transition: all`. Animate `transform` and `opacity`, not
     `width`, `height`, `padding`, `top` or `left` (they lay the page out again every frame).
   - Reduced motion: the global rule in `terminal-theme.css` drops durations and delays;

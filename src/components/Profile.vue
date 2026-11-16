@@ -622,7 +622,7 @@ export default {
    ============================================= */
 html.js.intro-done .hero-photo {
   animation-name: hero-photo-in;
-  animation-duration: 1s;
+  animation-duration: 0.6s;
 }
 @keyframes hero-photo-in {
   from {

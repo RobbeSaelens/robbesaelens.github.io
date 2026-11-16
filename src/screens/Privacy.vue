@@ -25,7 +25,7 @@
         <div class="glance">
           <h2 class="glance-title"><span class="glance-prompt">$</span> {{ $t('privacy.glance.title') }}</h2>
           <ul class="glance-list">
-            <li v-for="(item, i) in glanceItems" :key="i" :style="{ '--d': `${i * 90}ms` }">
+            <li v-for="(item, i) in glanceItems" :key="i" :style="{ '--d': `${i * 60}ms` }">
               <span class="glance-check" aria-hidden="true"><Check /></span>
               {{ $rt(item) }}
             </li>
@@ -207,8 +207,8 @@ html.js .reveal {
   opacity: 0;
   transform: translateY(16px);
   transition:
-    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 html.js .reveal.is-visible {
   opacity: 1;
@@ -260,8 +260,8 @@ html.js .reveal.is-visible {
   gap: 0.6rem;
 }
 html.js.intro-done .glance-list li {
-  animation: glance-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--d) + 450ms);
+  animation: glance-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--d) + 300ms);
 }
 .glance-check {
   display: inline-flex;

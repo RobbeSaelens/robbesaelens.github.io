@@ -87,7 +87,7 @@
           <p class="panel-intro">{{ $t(`drupal.${list.key}Text`) }}</p>
 
           <ul v-if="list.rows.length" class="rows">
-            <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${i * 70}ms` }">
+            <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${i * 50}ms` }">
               <a class="row" :href="row.url" target="_blank" rel="noopener noreferrer">
                 <span class="badge" :class="`badge--${row.tone}`">{{ row.badge }}</span>
                 <span class="row-main">
@@ -667,8 +667,8 @@ onBeforeUnmount(() => stopReveal())
 }
 .panel.is-visible .rows-item {
   opacity: 1;
-  animation: row-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  animation-delay: calc(var(--reveal-delay, 0ms) + 250ms + var(--d));
+  animation: row-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--reveal-delay, 0ms) + 150ms + var(--d));
 }
 @keyframes row-in {
   from {

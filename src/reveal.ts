@@ -36,7 +36,7 @@ export function watchReveal(root: HTMLElement): () => void {
           return Math.abs(ra.top - rb.top) > 24 ? ra.top - rb.top : ra.left - rb.left
         })
       seen.forEach((el, i) => {
-        show(el, Math.min(i, 5) * 90)
+        show(el, Math.min(i, 5) * 60)
         observer.unobserve(el)
       })
     },
