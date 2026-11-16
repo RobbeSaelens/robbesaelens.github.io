@@ -212,12 +212,34 @@ export default {
 
     const placeIndicator = () => {
       const current = links.find(isCurrent)
-      const el = current && linkEls.get(current.to)
-      if (!el) {
+      const list = linkList.value?.querySelector<HTMLElement>('.nav-links-list')
+      if (!current || !list || !linkEls.get(current.to)) {
         indicator.value = { ...indicator.value, visible: false }
         return
       }
-      indicator.value = { x: el.offsetLeft, w: el.offsetWidth, visible: true }
+      // A link's ">" prompt animates its width when the link becomes (or stops being)
+      // current, so right after a route change the links are still moving, and the
+      // ResizeObserver calls this again every frame. Each call used to move the indicator
+      // to where the links were that frame, restarting its transition every time: it
+      // chased them and landed late. Place it where the links will end up instead: every
+      // call gives the same answer and the indicator slides once.
+      const gap = parseFloat(getComputedStyle(list).columnGap) || 0
+      let x = linkEls.get(links[0].to)?.offsetLeft ?? 0
+      let target = { x: 0, w: 0 }
+      for (const link of links) {
+        const el = linkEls.get(link.to)
+        if (!el) continue
+        const prompt = el.querySelector<HTMLElement>('.nav-link-prompt')
+        const promptNow = prompt ? prompt.getBoundingClientRect().width : 0
+        const promptEnd = prompt && isCurrent(link) ? parseFloat(getComputedStyle(prompt).fontSize) * 0.6 : 0
+        const w = el.getBoundingClientRect().width - promptNow + promptEnd
+        if (link === current) target = { x, w }
+        x += w + gap
+      }
+      const next = { x: Math.round(target.x * 2) / 2, w: Math.round(target.w * 2) / 2, visible: true }
+      const prev = indicator.value
+      if (prev.visible && prev.x === next.x && prev.w === next.w) return
+      indicator.value = next
     }
 
     const indicatorStyle = computed(() => ({
@@ -433,9 +455,9 @@ export default {
   background: var(--color-accent-soft);
   box-shadow: inset 0 0 0 1px var(--color-border-glow);
   transition:
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.25s ease;
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
   pointer-events: none;
 }
 
@@ -474,6 +496,7 @@ export default {
     width 0.3s ease,
     opacity 0.3s ease;
 }
+/* 0.6em: placeIndicator() counts on this width */
 .nav-link.is-current .nav-link-prompt {
   width: 0.6em;
   opacity: 1;
