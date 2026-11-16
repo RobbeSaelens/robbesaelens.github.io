@@ -10,6 +10,8 @@
     text and takes some of its contrast).
   - Pointer instead of mouse events, touch ignored: a tap fires mouse events too, which
     left the glow on the card where the finger had been.
+  - The glow fades in and out in 200 ms with `ease` (published: 500 ms ease-in-out, slow
+    for a hover).
 -->
 <template>
   <component
@@ -22,8 +24,9 @@
     @pointerleave="handleMouseLeave"
     :class="['relative isolate overflow-hidden', className]"
   >
+    <!-- Site change: duration-200 and ease (was duration-500 ease-in-out) -->
     <div
-      class="pointer-events-none absolute inset-0 -z-1 opacity-0 transition-opacity duration-500 ease-in-out"
+      class="pointer-events-none absolute inset-0 -z-1 opacity-0 transition-opacity duration-200 [transition-timing-function:ease]"
       :style="{
         opacity,
         background: `radial-gradient(circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 80%)`

@@ -202,7 +202,7 @@ test.describe('with a mouse', () => {
       expect(background).toContain(GLOW[theme])
       const [, x, y] = background.match(/circle at ([\d.]+)px ([\d.]+)px/) ?? []
       expect(Math.abs(Number(x) - 60)).toBeLessThanOrEqual(2)
-      expect(Math.abs(Number(y) - 40)).toBeLessThanOrEqual(6) // the card rises 4px on hover
+      expect(Math.abs(Number(y) - 40)).toBeLessThanOrEqual(2)
 
       await page.mouse.move(2, 2)
       await expect.poll(() => style(glow, 'opacity')).toBe('0')

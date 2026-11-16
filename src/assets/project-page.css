@@ -201,14 +201,12 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   transition:
-    .detail-page transform 0.5s ease,
-    .detail-page opacity 0.5s ease,
-    .detail-page border-color 0.3s ease,
-    box-shadow 0.3s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
+/* Not a link, so no lift: the glow under the mouse (GlowCard) and a brighter edge */
 @media (hover: hover) and (pointer: fine) {
   .detail-page .feature-card:hover {
-    transform: translateY(-4px);
     border-color: var(--color-border-glow);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   }
