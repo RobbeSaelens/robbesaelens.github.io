@@ -1,5 +1,6 @@
 <template>
-  <main class="error-page">
+  <!-- Inside the site layout (AppHolder: header, footer, skip link, the <main>) -->
+  <div class="error-page">
     <div class="terminal-window">
       <!-- Title bar -->
       <div class="terminal-chrome">
@@ -19,18 +20,18 @@
 
         <!-- Content -->
         <div class="terminal-content">
-          <!-- Status code number (watermark) -->
-          <div class="status-code glitch-target">{{ statusCodeNumber }}</div>
-
-          <!-- Icon -->
-          <div class="icon-wrapper">
-            <component
-              :is="errorIcon"
-              class="error-icon"
-              :class="errorIconClass"
-              :size="80"
-              :stroke-width="1.2"
-            />
+          <!-- The icon and the status code, side by side, centred -->
+          <div class="status-row">
+            <div class="icon-wrapper">
+              <component
+                :is="errorIcon"
+                class="error-icon"
+                :class="errorIconClass"
+                :size="80"
+                :stroke-width="1.2"
+              />
+            </div>
+            <div class="status-code glitch-target">{{ statusCodeNumber }}</div>
           </div>
 
           <!-- Title / description -->
@@ -74,7 +75,7 @@
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script lang="ts">
@@ -141,13 +142,11 @@ export default defineComponent({
    ============================================= */
 
 .error-page {
-  position: fixed;
-  inset: 0;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  background: var(--color-bg);
+  padding: clamp(1rem, 4vh, 3rem) 1.5rem;
   background-image:
     radial-gradient(ellipse at 50% 0%, var(--color-accent-soft) 0%, transparent 60%),
     radial-gradient(circle at 80% 80%, rgba(13, 148, 136, 0.04) 0%, transparent 40%);
@@ -249,12 +248,22 @@ export default defineComponent({
   border-radius: 3px;
 }
 
-/* CRT scanline overlay */
+/* CRT scanline overlay. The lines drift down by moving a layer (transform), not the
+   background (which painted the whole terminal again every frame). The layer starts one
+   period (8px) above the top, so no gap shows, and the overlay clips it, so the
+   terminal never gets something to scroll. */
 .crt-overlay {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   pointer-events: none;
   z-index: 10;
+}
+
+.crt-overlay::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0 0 0;
   background: repeating-linear-gradient(
     0deg,
     transparent,
@@ -262,7 +271,14 @@ export default defineComponent({
     rgba(0, 0, 0, 0.03) 2px,
     rgba(0, 0, 0, 0.03) 4px
   );
-  animation: scanlines 8s linear infinite;
+  animation: crt-scroll 8s linear infinite;
+  will-change: transform;
+}
+
+@keyframes crt-scroll {
+  to {
+    transform: translateY(8px);
+  }
 }
 
 /* =============================================
@@ -299,9 +315,7 @@ export default defineComponent({
   -webkit-text-fill-color: transparent;
   background-clip: text;
   opacity: 0.12;
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
+  position: relative;
   z-index: 1;
   user-select: none;
 }
@@ -310,10 +324,17 @@ export default defineComponent({
    Icon
    ============================================= */
 
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.75rem, 3vw, 1.5rem);
+  margin-bottom: 1.5rem;
+}
+
 .icon-wrapper {
   position: relative;
   z-index: 2;
-  margin-bottom: 1.5rem;
   animation: float 4s ease-in-out infinite;
 }
 
@@ -453,12 +474,16 @@ export default defineComponent({
   color: var(--color-accent);
   text-decoration: none;
   opacity: 0;
-  animation: fadeIn 0.5s ease 5.3s both;
+  /* Right after the command block: the way home doesn't wait for the typed response
+     (it used to come last, at 5.3 s, invisible but already clickable until then). */
+  animation: fadeIn 0.5s ease 1.1s both;
   transition: color 0.2s ease;
 }
 
-.back-link:hover {
-  color: var(--color-prompt);
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover {
+    color: var(--color-prompt);
+  }
 }
 
 .back-prompt {
@@ -470,8 +495,10 @@ export default defineComponent({
   transition: color 0.2s ease;
 }
 
-.back-link:hover .back-command {
-  color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover .back-command {
+    color: var(--color-text-primary);
+  }
 }
 
 .back-arrow {
@@ -480,8 +507,10 @@ export default defineComponent({
   transition: transform 0.2s ease;
 }
 
-.back-link:hover .back-arrow {
-  transform: translateX(4px);
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover .back-arrow {
+    transform: translateX(4px);
+  }
 }
 
 /* =============================================
@@ -490,8 +519,21 @@ export default defineComponent({
 
 .glitch-target {
   animation:
-    fadeIn 0.6s ease both,
+    fade-in-faint 0.6s ease both,
     glitch-shift 8s step-end 6s infinite;
+}
+
+/* The shared fadeIn ends at full opacity and, filled forwards, would override the
+   status code's own faint 0.12: fade it in to that instead. */
+@keyframes fade-in-faint {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 0.12;
+    transform: translateY(0);
+  }
 }
 
 /* =============================================
@@ -499,7 +541,7 @@ export default defineComponent({
    ============================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .crt-overlay {
+  .crt-overlay::before {
     animation: none;
   }
 
@@ -508,7 +550,23 @@ export default defineComponent({
   }
 
   .glitch-target {
-    animation: fadeIn 0.6s ease both;
+    animation: fade-in-faint 0.6s ease both;
+  }
+
+  /* Everything there from the start, the command already typed */
+  .error-icon,
+  .error-title,
+  .error-description,
+  .command-block,
+  .response-line,
+  .back-link {
+    animation: none;
+    opacity: 1;
+  }
+
+  .typing-wrapper {
+    animation: none;
+    width: auto;
   }
 }
 
@@ -516,7 +574,7 @@ export default defineComponent({
    Mobile Adjustments
    ============================================= */
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .terminal-content {
     padding: 2rem 1.25rem;
   }
@@ -527,8 +585,6 @@ export default defineComponent({
 
   .status-code {
     font-size: clamp(3rem, 15vw, 5rem);
-    top: 1.25rem;
-    right: 1.25rem;
   }
 
   .error-icon {

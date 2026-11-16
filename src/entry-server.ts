@@ -10,6 +10,7 @@ import App from './App.vue'
 import { createAppRouter, redirects, routes } from './bootstrap/router'
 import i18n, { localeLinks } from './i18n'
 import { absoluteUrl } from './site'
+import TerminalCommand from './components/TerminalCommand.vue'
 
 const staticRoutes = routes
   .flatMap((route) => route.children ?? [route])
@@ -42,6 +43,8 @@ export async function render(
   const app = createSSRApp(App)
   const head = createHead()
   const router = createAppRouter(createMemoryHistory())
+  // The "$ …" line under the page titles, global so the pages need no import (also in main.ts)
+  app.component('TerminalCommand', TerminalCommand)
 
   app.use(head)
   app.use(i18n)

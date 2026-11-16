@@ -17,7 +17,14 @@
     "educationLabel": "Bachelor's degree in",
     "sayHello": "Say hello",
     "goToProjects": "Go to my projects",
-    "photoTooltip": "full-stack developer detected"
+    "photoTooltip": "full-stack developer detected",
+    "social": {
+      "instagram": "Follow me on Instagram",
+      "facebook": "Connect on Facebook",
+      "linkedin": "Connect on LinkedIn",
+      "github": "View my GitHub profile",
+      "drupal": "View my drupal.org profile"
+    }
   },
   "about": {
     "title": "About me",
@@ -34,7 +41,9 @@
     "backendDev": "backend developer",
     "drupalLink": "My Drupal contributions",
     "competing": "Horse riding",
-    "competingText": "Alongside my job I ride at a competitive level. I take part in regional competitions and have also ridden national ones with our own horse. Show jumping is my big passion, along with everything that comes with it."
+    "competingText": "Alongside my job I ride at a competitive level. I take part in regional competitions and have also ridden national ones with our own horse. Show jumping is my big passion, along with everything that comes with it.",
+    "phoneLabel": "Phone:",
+    "emailLabel": "E-mail:"
   },
   "projects": {
     "intro": "Websites and apps I designed and built.",
@@ -63,7 +72,10 @@
     "mockupAlt": "{name} on a MacBook",
     "viewCase": "View project",
     "prev": "Previous project",
-    "next": "Next project"
+    "next": "Next project",
+    "shotDesktop": "desktop",
+    "shotMobile": "mobile",
+    "shotDashboard": "dashboard"
   },
   "exulta": {
     "title": "Exulta",
@@ -256,7 +268,9 @@
     "close": "Close AI chat",
     "openBasic": "Open chat",
     "closeBasic": "Close chat",
-    "suggestions": "Suggested questions"
+    "suggestions": "Suggested questions",
+    "thinking": "Thinking",
+    "answered": "Answered in"
   },
   "aria": {
     "switchToDutch": "Switch to Dutch",
@@ -266,7 +280,8 @@
     "toggleNav": "Toggle navigation menu",
     "skipToContent": "Skip to main content",
     "mainNav": "Main navigation",
-    "closeNav": "Close navigation menu"
+    "closeNav": "Close navigation menu",
+    "openScreenshot": "Open {name} screenshot full screen"
   },
   "easter": {
     "title": "DEVELOPER MODE",

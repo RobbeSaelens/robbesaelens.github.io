@@ -3,7 +3,7 @@
     <div class="hero-head">
       <h1 class="hero-in terminal-title hero-title font-bold" style="--i: 0">
         <span class="terminal-prompt">&gt;</span>
-        <span class="terminal-text">robbe saelens</span>
+        <HeroWordmark text="robbe saelens" />
         <span class="terminal-cursor" aria-hidden="true"></span>
       </h1>
       <p class="hero-in hero-role" style="--i: 1">
@@ -67,15 +67,18 @@
       </ul>
 
       <div class="hero-in hero-actions" style="--i: 4">
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/message"
-          class="hero-btn hero-btn--primary"
-        >
-          {{ $t('home.sayHello') }}
-          <MessageCircle class="hero-btn-icon" aria-hidden="true" />
-        </a>
+        <!-- Leans towards the mouse, at most about half the gap to the next button -->
+        <ButtonMagnet :padding="12" :strength="12" inner-class="flex">
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/message"
+            class="hero-btn hero-btn--primary"
+          >
+            {{ $t('home.sayHello') }}
+            <MessageCircle class="hero-btn-icon" aria-hidden="true" />
+          </a>
+        </ButtonMagnet>
         <router-link :to="$lp('/projects')" class="hero-btn hero-btn--ghost">
           <span class="prompt">$</span> cd ./projects
           <ArrowRight class="hero-btn-icon hero-btn-arrow" aria-hidden="true" />
@@ -88,7 +91,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.instagram.com/robbe.saelens/"
-            aria-label="Follow me on Instagram"
+            :aria-label="$t('home.social.instagram')"
             class="social-link"
           >
             <Instagram class="social-icon" />
@@ -99,7 +102,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.facebook.com/profile.php?id=100006223099352"
-            aria-label="Connect on Facebook"
+            :aria-label="$t('home.social.facebook')"
             class="social-link"
           >
             <Facebook class="social-icon" />
@@ -110,7 +113,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/"
-            aria-label="Connect on LinkedIn"
+            :aria-label="$t('home.social.linkedin')"
             class="social-link"
           >
             <Linkedin class="social-icon" />
@@ -121,7 +124,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/RobbeSaelens"
-            aria-label="View my GitHub profile"
+            :aria-label="$t('home.social.github')"
             class="social-link"
           >
             <Github class="social-icon" />
@@ -132,7 +135,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.drupal.org/u/robbesaelens"
-            aria-label="View my drupal.org profile"
+            :aria-label="$t('home.social.drupal')"
             class="social-link"
           >
             <DrupalIcon class="social-icon" />
@@ -156,11 +159,15 @@ import {
 } from 'lucide-vue-next'
 import PlaceMap from './PlaceMap.vue'
 import DrupalIcon from './DrupalIcon.vue'
+import HeroWordmark from './HeroWordmark.vue'
+import ButtonMagnet from './ButtonMagnet.vue'
 
 export default {
   components: {
+    ButtonMagnet,
     PlaceMap,
     DrupalIcon,
+    HeroWordmark,
     Instagram,
     Linkedin,
     Facebook,
@@ -192,7 +199,8 @@ export default {
 /* =============================================
    Layout
    Phones: title, photo, text stacked. From 768px: text left, photo right,
-   the whole hero centred in the screen height.
+   the whole hero centred in the screen height (at the top on portrait tablets,
+   Index.vue).
    ============================================= */
 .hero {
   display: grid;
@@ -367,9 +375,11 @@ export default {
     color 0.2s ease,
     text-decoration-color 0.2s ease;
 }
-.fact-link:hover {
-  color: var(--color-accent);
-  text-decoration-color: currentColor;
+@media (hover: hover) and (pointer: fine) {
+  .fact-link:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentColor;
+  }
 }
 
 /* =============================================
@@ -393,7 +403,12 @@ export default {
     background 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    transform 0.12s ease-out;
+}
+/* Press feedback, also on touch screens (where hover never comes) */
+.hero-btn:active {
+  transform: scale(0.97);
 }
 .hero-btn:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -404,9 +419,11 @@ export default {
   background: #0f766e; /* teal-700: white text stays above 4.5:1 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
-.hero-btn--primary:hover {
-  background: #115e59;
-  box-shadow: 0 6px 18px -6px rgba(13, 148, 136, 0.55);
+@media (hover: hover) and (pointer: fine) {
+  .hero-btn--primary:hover {
+    background: #115e59;
+    box-shadow: 0 6px 18px -6px rgba(13, 148, 136, 0.55);
+  }
 }
 .hero-btn--ghost {
   font-family: var(--font-mono);
@@ -416,9 +433,11 @@ export default {
   border: 1px solid var(--color-border-glow);
   background: var(--color-surface);
 }
-.hero-btn--ghost:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
+@media (hover: hover) and (pointer: fine) {
+  .hero-btn--ghost:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
 }
 .hero-btn-icon {
   width: 1.125rem;
@@ -427,8 +446,10 @@ export default {
 .hero-btn-arrow {
   transition: transform 0.2s ease;
 }
-.hero-btn--ghost:hover .hero-btn-arrow {
-  transform: translateX(3px);
+@media (hover: hover) and (pointer: fine) {
+  .hero-btn--ghost:hover .hero-btn-arrow {
+    transform: translateX(3px);
+  }
 }
 
 /* =============================================
@@ -455,7 +476,11 @@ export default {
   transition:
     color 0.2s ease,
     border-color 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    transform 0.12s ease-out;
+}
+.social-link:active {
+  transform: scale(0.97);
 }
 
 .dark .social-link {
@@ -467,15 +492,17 @@ export default {
   height: 1.125rem;
 }
 
-.social-link:hover {
-  color: #0d9488;
-  border-color: var(--color-border-glow);
-  background: rgba(13, 148, 136, 0.08);
-}
+@media (hover: hover) and (pointer: fine) {
+  .social-link:hover {
+    color: #0d9488;
+    border-color: var(--color-border-glow);
+    background: rgba(13, 148, 136, 0.08);
+  }
 
-.dark .social-link:hover {
-  color: #2dd4bf;
-  background: rgba(45, 212, 191, 0.1);
+  .dark .social-link:hover {
+    color: #2dd4bf;
+    background: rgba(45, 212, 191, 0.1);
+  }
 }
 
 .social-link:focus-visible {
@@ -524,6 +551,8 @@ export default {
     transparent
   );
   animation: glow-spin 4s linear infinite;
+  /* It only shows on hover: it turns only then */
+  animation-play-state: paused;
 }
 
 .dark .photo-glow {
@@ -570,6 +599,7 @@ export default {
 @media (hover: hover) and (pointer: fine) {
   .photo-wrapper:hover .photo-glow {
     opacity: 1;
+    animation-play-state: running;
   }
   .photo-wrapper:hover .photo-img {
     transform: scale(1.03);
@@ -589,7 +619,7 @@ export default {
    ============================================= */
 html.js.intro-done .hero-photo {
   animation-name: hero-photo-in;
-  animation-duration: 1s;
+  animation-duration: 0.6s;
 }
 @keyframes hero-photo-in {
   from {

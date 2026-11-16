@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- resizes-content: on Android the keyboard shrinks the layout, so the chat sheet
+         (dvh) stays above it -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
 
     <!-- Title, description, canonical, Open Graph, Twitter and JSON-LD are all
          managed centrally in src/App.vue (via unhead) so that the prerendered
@@ -62,9 +64,10 @@
           return
         }
         root.classList.add('intro-play')
+        // About a second: a greeting, not a wait (the page behind is already there)
         window.__introTimer = setTimeout(function () {
           root.classList.add('intro-done')
-        }, 1700)
+        }, 1000)
       })()
     </script>
     <style>
@@ -83,9 +86,9 @@
         color: #134e4a;
         font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', ui-monospace, monospace;
         transition:
-          opacity 0.5s ease,
-          transform 0.6s cubic-bezier(0.7, 0, 0.3, 1),
-          visibility 0s linear 0.6s;
+          opacity 0.4s ease,
+          transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0.5s;
       }
       html.dark.intro-play #intro {
         background: #222222;
@@ -105,7 +108,7 @@
         height: 2.25rem;
         width: auto;
         margin-bottom: 1.5rem;
-        animation: intro-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        animation: intro-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
       }
       .intro-mark .i {
         fill: currentColor;
@@ -113,10 +116,14 @@
       /* The full stop doubles as a cursor while the intro runs. */
       .intro-mark .d {
         fill: #0d9488;
-        animation: intro-blink 0.9s steps(1) 0.6s infinite;
+        animation: intro-blink 0.9s steps(1) 0.45s infinite;
       }
       html.dark .intro-mark .d {
         fill: #2dd4bf;
+      }
+      /* The splash stays in the page, hidden, once it has played: stop its blink */
+      html.intro-done .intro-mark .d {
+        animation: none;
       }
       .intro-line {
         margin: 0 0 0.45rem;
@@ -125,16 +132,16 @@
         white-space: nowrap;
         overflow: hidden;
         opacity: 0;
-        animation: intro-line 0.35s ease forwards;
+        animation: intro-line 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
       .intro-line:nth-of-type(1) {
-        animation-delay: 0.15s;
+        animation-delay: 0.1s;
       }
       .intro-line:nth-of-type(2) {
-        animation-delay: 0.5s;
+        animation-delay: 0.3s;
       }
       .intro-line:nth-of-type(3) {
-        animation-delay: 0.85s;
+        animation-delay: 0.5s;
         white-space: normal;
         opacity: 0;
       }
@@ -162,7 +169,7 @@
         height: 100%;
         background: #0d9488;
         transform-origin: left;
-        animation: intro-bar 1.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+        animation: intro-bar 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
       }
       html.dark .intro-bar span {
         background: #2dd4bf;

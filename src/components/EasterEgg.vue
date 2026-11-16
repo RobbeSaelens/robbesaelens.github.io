@@ -90,8 +90,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue'
+import { defineComponent, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useEasterEgg } from '../composables/useEasterEgg'
+import { setCovering } from '../covered'
 
 const MATRIX_CHARS = '0123456789ABCDEF'
 const CONFETTI_COLORS = ['#2dd4bf', '#fbbf24', '#f472b6', '#60a5fa', '#a78bfa']
@@ -153,8 +154,12 @@ export default defineComponent({
       }, 5000)
     })
 
+    // A full-screen overlay: the animated background behind it can stop drawing
+    watch(isEasterEggUnlocked, (on) => setCovering('easter-egg', on))
+
     onUnmounted(() => {
       if (factInterval) clearInterval(factInterval)
+      setCovering('easter-egg', false)
     })
 
     return {
@@ -420,17 +425,24 @@ export default defineComponent({
   padding: 0.75rem 1.5rem;
   cursor: pointer;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.12s ease-out;
   min-height: 44px;
   min-width: 44px;
   opacity: 0;
-  animation: ee-fade-in 0.5s ease 1.4s both;
+  /* backwards, not both: a held end state (its transform) would override the :active press */
+  animation: ee-fade-in 0.5s ease 1.4s backwards;
 }
 
-.ee-close:hover {
-  color: #2dd4bf;
-  border-color: rgba(45, 212, 191, 0.4);
-  background: rgba(45, 212, 191, 0.06);
+@media (hover: hover) and (pointer: fine) {
+  .ee-close:hover {
+    color: #2dd4bf;
+    border-color: rgba(45, 212, 191, 0.4);
+    background: rgba(45, 212, 191, 0.06);
+  }
 }
 
 .ee-close:active {
@@ -443,8 +455,10 @@ export default defineComponent({
   transition: color 0.2s ease;
 }
 
-.ee-close:hover .ee-close-prompt {
-  color: #5eead4;
+@media (hover: hover) and (pointer: fine) {
+  .ee-close:hover .ee-close-prompt {
+    color: #5eead4;
+  }
 }
 
 /* =============================================
@@ -610,7 +624,7 @@ export default defineComponent({
    Mobile Adjustments
    ============================================= */
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .ee-content {
     padding: 1.5rem 1rem;
   }

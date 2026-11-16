@@ -25,7 +25,7 @@
         <div class="glance">
           <h2 class="glance-title"><span class="glance-prompt">$</span> {{ $t('privacy.glance.title') }}</h2>
           <ul class="glance-list">
-            <li v-for="(item, i) in glanceItems" :key="i" :style="{ '--d': `${i * 90}ms` }">
+            <li v-for="(item, i) in glanceItems" :key="i" :style="{ '--d': `${i * 60}ms` }">
               <span class="glance-check" aria-hidden="true"><Check /></span>
               {{ $rt(item) }}
             </li>
@@ -82,11 +82,13 @@ let observer: IntersectionObserver | null = null
 let frame = 0
 
 function goTo(i: number) {
-  document.getElementById(`privacy-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  // With reduced motion it jumps: a long smooth scroll is the kind of motion it asks to avoid
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  document.getElementById(`privacy-${i}`)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
 }
 
-// The page scrolls inside a container on wider screens, not the window, so
-// listen in the capture phase: that catches scrolling of any element.
+// Listen in the capture phase: that catches the window's scrolling and any
+// element's (an index jump, the End key).
 function onScroll() {
   cancelAnimationFrame(frame)
   frame = requestAnimationFrame(() => {
@@ -149,7 +151,13 @@ onBeforeUnmount(() => {
     align-items: start;
     gap: clamp(3rem, 6vw, 7rem);
   }
+  /* Only the index stays in view while reading: with the glance card it is taller than
+     a 720px screen, and its last entries would never show. The column runs the whole
+     height of the text, so the index has room to travel. */
   .privacy-aside {
+    align-self: stretch;
+  }
+  .toc {
     position: sticky;
     top: 6rem;
   }
@@ -199,8 +207,8 @@ html.js .reveal {
   opacity: 0;
   transform: translateY(16px);
   transition:
-    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 html.js .reveal.is-visible {
   opacity: 1;
@@ -252,8 +260,8 @@ html.js .reveal.is-visible {
   gap: 0.6rem;
 }
 html.js.intro-done .glance-list li {
-  animation: glance-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--d) + 450ms);
+  animation: glance-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--d) + 300ms);
 }
 .glance-check {
   display: inline-flex;
@@ -348,8 +356,10 @@ html.js.intro-done .glance-list li {
   font-size: 0.75rem;
   padding-top: 0.1rem;
 }
-.toc-link:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .toc-link:hover {
+    color: var(--color-text-primary);
+  }
 }
 .toc-link.is-read {
   color: var(--color-text-secondary);

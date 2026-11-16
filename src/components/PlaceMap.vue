@@ -105,9 +105,13 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   text-underline-offset: 4px;
   transition: color 0.2s ease;
 }
-.place-name:hover,
 .is-open .place-name {
   color: var(--color-accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .place-name:hover {
+    color: var(--color-accent);
+  }
 }
 .place-name:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -263,6 +267,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   inset: -0.5rem;
   border-radius: 50%;
   border: 2px solid var(--color-accent);
+}
+/* Pulses only while the card shows (it stays in the page, hidden, when closed) */
+.is-open .place-dot::after {
   animation: place-pulse 1.8s ease-out infinite;
 }
 @keyframes place-pulse {
@@ -302,17 +309,22 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   white-space: nowrap;
   text-decoration: none;
 }
-.place-credit:hover,
 .place-credit:focus-visible {
   color: var(--color-accent);
   text-decoration: underline;
+}
+@media (hover: hover) and (pointer: fine) {
+  .place-credit:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .place-card {
     transition: none;
   }
-  .place-dot::after {
+  .is-open .place-dot::after {
     animation: none;
   }
 }

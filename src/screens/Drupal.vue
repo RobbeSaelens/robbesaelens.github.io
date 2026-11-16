@@ -72,9 +72,10 @@
 
     <div class="drupal-lists">
       <div v-for="(column, c) in columns" :key="c" class="drupal-column">
-        <section
+        <GlowCard
           v-for="list in column"
           :key="list.key"
+          as="section"
           class="panel reveal"
           :aria-labelledby="`drupal-${list.key}-title`"
         >
@@ -86,7 +87,7 @@
           <p class="panel-intro">{{ $t(`drupal.${list.key}Text`) }}</p>
 
           <ul v-if="list.rows.length" class="rows">
-            <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${i * 70}ms` }">
+            <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${i * 50}ms` }">
               <a class="row" :href="row.url" target="_blank" rel="noopener noreferrer">
                 <span class="badge" :class="`badge--${row.tone}`">{{ row.badge }}</span>
                 <span class="row-main">
@@ -98,7 +99,7 @@
             </li>
           </ul>
           <p v-else class="panel-empty">{{ $t('drupal.empty') }}</p>
-        </section>
+        </GlowCard>
       </div>
     </div>
 
@@ -111,7 +112,7 @@
           >{{ $t('drupal.viewProjects') }}</span
         >
         <ArrowRight
-          class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+          class="link-arrow h-4 w-4 transition-transform duration-200"
           style="color: var(--color-accent)"
         />
       </router-link>
@@ -136,6 +137,7 @@ import { useHead } from '@unhead/vue'
 import { useRoute } from 'vue-router'
 import TerminalHeader from '../components/TerminalHeader.vue'
 import DrupalIcon from '../components/DrupalIcon.vue'
+import GlowCard from '../components/GlowCard.vue'
 import { watchReveal } from '../reveal'
 import { drupalCreditsJsonLd } from '../seo/jsonld'
 import { SITE_URL } from '../site'
@@ -306,8 +308,11 @@ onBeforeUnmount(() => stopReveal())
 /* =============================================
    Intro and numbers: side by side from 1024px
    ============================================= */
+/* One column below 1024px. Explicit, so a long project name in a chip wraps inside
+   it instead of widening the column (and the intro and numbers with it). */
 .drupal-top {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 2rem;
   margin-bottom: 3rem;
 }
@@ -357,6 +362,7 @@ onBeforeUnmount(() => stopReveal())
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  max-width: 100%;
   min-height: 2.25rem;
   padding: 0.25rem 0.4rem 0.25rem 0.85rem;
   border-radius: 9999px;
@@ -368,18 +374,30 @@ onBeforeUnmount(() => stopReveal())
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
-.chip:hover {
-  border-color: var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+    transform: translateY(-1px);
+  }
+}
+.chip:active {
   background: var(--color-surface-hover);
-  transform: translateY(-1px);
+  transform: scale(0.97);
 }
 .chip:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
+/* A project without a name in drupal.json shows its machine name: long, no spaces */
+.chip-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .chip-count {
+  flex-shrink: 0;
   display: inline-grid;
   place-items: center;
   min-width: 1.5rem;
@@ -410,8 +428,10 @@ onBeforeUnmount(() => stopReveal())
   text-underline-offset: 3px;
   transition: text-decoration-color 0.2s ease;
 }
-.text-link:hover {
-  text-decoration-color: currentColor;
+@media (hover: hover) and (pointer: fine) {
+  .text-link:hover {
+    text-decoration-color: currentColor;
+  }
 }
 .text-link:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -442,12 +462,18 @@ onBeforeUnmount(() => stopReveal())
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
-.pill-link:hover {
-  border-color: var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .pill-link:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+    transform: translateY(-1px);
+  }
+}
+.pill-link:active {
   background: var(--color-surface-hover);
-  transform: translateY(-1px);
+  transform: scale(0.97);
 }
 .pill-link:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -641,8 +667,8 @@ onBeforeUnmount(() => stopReveal())
 }
 .panel.is-visible .rows-item {
   opacity: 1;
-  animation: row-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  animation-delay: calc(var(--reveal-delay, 0ms) + 250ms + var(--d));
+  animation: row-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--reveal-delay, 0ms) + 150ms + var(--d));
 }
 @keyframes row-in {
   from {
@@ -689,7 +715,13 @@ onBeforeUnmount(() => stopReveal())
     margin-top: 0.2rem;
   }
 }
-.row:hover {
+/* A row is wide: on press it lights up rather than shrinks */
+@media (hover: hover) and (pointer: fine) {
+  .row:hover {
+    background: var(--color-surface-hover);
+  }
+}
+.row:active {
   background: var(--color-surface-hover);
 }
 .row:focus-visible {
@@ -710,8 +742,10 @@ onBeforeUnmount(() => stopReveal())
   overflow-wrap: anywhere;
   transition: color 0.2s ease;
 }
-.row:hover .row-title {
-  color: var(--color-accent);
+@media (hover: hover) and (pointer: fine) {
+  .row:hover .row-title {
+    color: var(--color-accent);
+  }
 }
 .row-meta {
   font-family: var(--font-mono);
@@ -731,10 +765,15 @@ onBeforeUnmount(() => stopReveal())
     opacity 0.2s ease,
     transform 0.2s ease;
 }
-.row:hover .row-arrow,
 .row:focus-visible .row-arrow {
   opacity: 1;
   transform: translate(2px, -2px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .row:hover .row-arrow {
+    opacity: 1;
+    transform: translate(2px, -2px);
+  }
 }
 
 /* ── Status badges: colours from the theme tokens (terminal-theme.css) ── */

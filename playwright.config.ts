@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = 4317
+// PW_PORT lets two checkouts (e.g. worktrees) run their tests side by side.
+const PORT = Number(process.env.PW_PORT) || 4317
 
 /**
  * Smoke tests against the real production build: the same prerendered HTML and

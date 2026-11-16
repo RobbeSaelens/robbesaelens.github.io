@@ -1,5 +1,5 @@
 <template>
-  <div class="car" @wheel.passive="onWheel">
+  <div class="car" :class="{ 'is-quick': quick }" @wheel.passive="onWheel">
     <header class="car-head">
       <div>
         <!-- Same terminal title as the other pages (TerminalHeader), sized for a one-screen layout. -->
@@ -9,7 +9,7 @@
           <span class="terminal-cursor" aria-hidden="true"></span>
         </h1>
         <p class="hero-in terminal-subtitle car-intro text-sm tracking-wide md:text-base" style="--i: 1">
-          <span class="opacity-50">$</span> ls ./projects
+          <span class="opacity-50">$</span> <TerminalCommand text="ls ./projects" />{{ ' ' }}
           <span class="car-comment"># {{ $t('projects.intro') }}</span>
         </p>
       </div>
@@ -51,8 +51,8 @@
       :aria-label="$t('nav.projects')"
       @scroll.passive="onScroll"
       @pointerdown="dragStart"
-      @keydown.left.prevent="go(current - 1)"
-      @keydown.right.prevent="go(current + 1)"
+      @keydown.left.prevent="goByKey(-1)"
+      @keydown.right.prevent="goByKey(1)"
     >
       <li
         v-for="(project, index) in projects"
@@ -66,9 +66,11 @@
         }"
         @click.capture="onCardClick($event, index)"
       >
+        <!-- One tab stop: only the current slide's link; the arrow keys change slides -->
         <component
           :is="project.route ? 'router-link' : 'div'"
           :to="project.route ? { name: $ln(project.route) } : undefined"
+          :tabindex="project.route && index !== current ? -1 : undefined"
           class="car-card"
           draggable="false"
         >
@@ -206,6 +208,9 @@ export default {
       tiltNow: { x: 0, y: 0 },
       tiltTarget: { x: 0, y: 0 },
       tiltFrame: 0,
+      /** Paging with the arrow keys: the moves are quick (.is-quick), see goByKey(). */
+      quick: false,
+      quickTimer: 0,
     }
   },
 
@@ -218,6 +223,7 @@ export default {
     window.removeEventListener('pointerup', this.dragEnd)
     clearTimeout(this.wheelTimer)
     clearTimeout(this.goingTimer)
+    clearTimeout(this.quickTimer)
     cancelAnimationFrame(this.tiltFrame)
   },
 
@@ -239,16 +245,37 @@ export default {
       const max = t.scrollWidth - t.clientWidth
       return Math.max(0, Math.min(max, slide.offsetLeft - (t.clientWidth - slide.offsetWidth) / 2))
     },
-    go(index: number) {
+    /**
+     * The arrow keys page through the slides at once: no smooth scroll, and the same
+     * moves in a quarter of a second instead of the slow turn and lid a click, swipe or
+     * wheel gets (.is-quick). Keyboard paging is repeated quickly, and shouldn't wait.
+     */
+    goByKey(delta: number) {
+      this.quick = true
+      clearTimeout(this.quickTimer)
+      // Transitions keep the timing they started with: dropping the class later is safe
+      this.quickTimer = window.setTimeout(() => (this.quick = false), 400)
+      this.go(this.current + delta, true)
+    },
+    go(index: number, instant = false) {
       const i = Math.max(0, Math.min(this.projects.length - 1, index))
       this.resetTilt()
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (!instant && this.quick) {
+        clearTimeout(this.quickTimer)
+        this.quick = false
+      }
+      const reduced = instant || window.matchMedia('(prefers-reduced-motion: reduce)').matches
       // Current right away; scroll events on the way there don't change it.
       this.current = i
       this.goingTo = i
       clearTimeout(this.goingTimer)
       this.goingTimer = window.setTimeout(() => (this.goingTo = null), 1200)
       this.track().scrollTo({ left: this.scrollTarget(i), behavior: reduced ? 'auto' : 'smooth' })
+      // Focus on a card follows the slide the arrow keys moved to (the old one leaves the tab order)
+      const focused = document.activeElement
+      if (focused instanceof HTMLElement && focused.classList.contains('car-card') && this.track().contains(focused)) {
+        this.$nextTick(() => this.track().children[i]?.querySelector<HTMLElement>('a.car-card')?.focus({ preventScroll: true }))
+      }
     },
     /**
      * After a swipe or drag: the slide whose scroll position is closest is the current
@@ -447,9 +474,11 @@ export default {
     transform 0.1s ease,
     opacity 0.2s ease;
 }
-.car-btn:hover:not(:disabled) {
-  background: var(--color-accent-soft);
-  box-shadow: 0 0 16px var(--color-border-glow);
+@media (hover: hover) and (pointer: fine) {
+  .car-btn:hover:not(:disabled) {
+    background: var(--color-accent-soft);
+    box-shadow: 0 0 16px var(--color-border-glow);
+  }
 }
 .car-btn:active:not(:disabled) {
   transform: translateY(2px);
@@ -470,11 +499,20 @@ export default {
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  /* Vertical padding leaves room for the slide shadow, which the scroller would clip. */
-  padding: clamp(1rem, 3vh, 1.75rem) var(--gutter) clamp(2rem, 6vh, 3.5rem);
+  /* Vertical padding leaves room for the slide shadow, which the scroller would clip,
+     and above for the MacBook's lid, which reaches a little past its stage. */
+  padding: clamp(1.5rem, 3vh, 1.75rem) var(--gutter) clamp(2rem, 6vh, 3.5rem);
   scroll-padding: 0 var(--gutter);
   outline: none;
   cursor: grab;
+}
+/* Too short for one screen (fit is off): a fixed height. Flexed, in a page of no fixed
+   height, its container height reads as 0 and the slides (sized in cqh) collapse. */
+@media (max-height: 559px) {
+  .car-track {
+    flex: none;
+    height: 18rem;
+  }
 }
 .car-track::-webkit-scrollbar {
   display: none;
@@ -483,14 +521,19 @@ export default {
   scroll-snap-type: none;
   cursor: grabbing;
 }
-.car-track:focus-visible .car-slide.is-current .car-card {
+/* The ring sits on the current card: when the track has focus (arrow keys) and when
+   the card's own link has it (Tab, Enter opens it). */
+.car-track:focus-visible .car-slide.is-current .car-card,
+.car-card:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 4px;
+  border-radius: 1rem;
 }
 
 /* Slide width follows the track height (minus the caption), capped by the track width. */
 .car-slide {
   flex: 0 0 min(84cqw, calc((100cqh - 6.5rem) * 1.6));
+  min-width: 0;
   scroll-snap-align: center;
   opacity: 0.5;
   transform: scale(0.9);
@@ -572,7 +615,7 @@ export default {
 
 /* Caption under the stage, in the terminal type; it rises in when the slide becomes current.
    The status and the button sit beside the text, or under it on a slide too narrow
-   for both and the project's name on one line (short screens). */
+   to leave the text 16rem (short screens). */
 .car-caption {
   display: flex;
   flex-wrap: wrap;
@@ -597,13 +640,16 @@ export default {
 .car-slide.is-current .car-caption > :nth-child(2) {
   transition-delay: 0.22s;
 }
-/* Takes the room the status and the button leave, but never less than the name */
+/* Takes the room the status and the button leave, but not less than 16rem: below that
+   they wrap under it, instead of squeezing the tagline into a narrow column */
 .car-caption-text {
-  flex: 1 1 0;
+  flex: 1 1 16rem;
+  min-width: 0;
 }
 .car-name {
-  white-space: nowrap;
   display: flex;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
   align-items: baseline;
   gap: 0.6rem;
   font-family: var(--font-mono);
@@ -665,14 +711,23 @@ export default {
 }
 
 /* Page dots double as the progress indicator; they sit in the track's bottom padding. */
+/* Each dot is a 24px target (44px tall on touch screens); the row starts half a target
+   early so the first dot lines up with the content. */
 .car-dots {
   display: flex;
-  gap: 0.25rem;
   margin-top: calc(-1 * clamp(1.25rem, 4vh, 2.25rem));
-  padding: 0 var(--gutter) clamp(0.5rem, 2vh, 1.25rem);
+  padding: 0 var(--gutter) clamp(0.5rem, 2vh, 1.25rem) calc(var(--gutter) - 0.5rem);
 }
 .car-dot {
-  padding: 0.5rem 0.2rem;
+  padding: 0.5rem;
+}
+@media (pointer: coarse) {
+  .car-dots {
+    margin-top: calc(-1 * clamp(1.25rem, 4vh, 2.25rem) - 0.625rem);
+  }
+  .car-dot {
+    padding: 1.125rem 0.5rem;
+  }
 }
 .car-dot span {
   display: block;
@@ -684,7 +739,12 @@ export default {
     width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
     background 0.3s ease;
 }
-.car-dot:hover span {
+@media (hover: hover) and (pointer: fine) {
+  .car-dot:hover span {
+    background: var(--color-accent);
+  }
+}
+.car-dot:active span {
   background: var(--color-accent);
 }
 .car-dot.is-current span {
@@ -692,10 +752,7 @@ export default {
   background: var(--color-accent);
 }
 
-@media (max-width: 640px) {
-  .car {
-    --gutter: 1rem; /* contact's px-4 on phones: more room for the slides */
-  }
+@media (max-width: 639px) {
   .car-nav,
   .car-comment,
   .car-cta {
@@ -704,9 +761,10 @@ export default {
   .car-slide {
     flex-basis: 84cqw;
   }
-  /* A 5:4 stage, centred with its caption, instead of one as tall as the screen */
+  /* A 5:4 stage with its caption right under the title, instead of one as tall as the
+     screen; the room left over goes below, above the page dots */
   .car-card {
-    justify-content: center;
+    justify-content: flex-start;
   }
   .car-stage {
     flex: 0 1 auto;
@@ -717,6 +775,30 @@ export default {
     align-items: flex-start;
     gap: 0.5rem;
   }
+  .car-caption-text {
+    flex: none; /* a column here: a 16rem basis would be a height */
+  }
+}
+
+/* Paging with the arrow keys (goByKey): the same moves, in a quarter of a second */
+.car.is-quick .car-slide {
+  transition-duration: 0.25s, 0.25s;
+}
+.car.is-quick .car-slide .car-caption > * {
+  transition-duration: 0.2s;
+  transition-delay: 0s;
+}
+.car.is-quick :deep(.mb-pose),
+.car.is-quick :deep(.mb-lid) {
+  transition-duration: 0.25s;
+  transition-delay: 0s;
+}
+.car.is-quick .car-dot span {
+  transition-duration: 0.2s;
+}
+.car.is-quick .count-enter-active,
+.car.is-quick .count-leave-active {
+  transition-duration: 0.1s;
 }
 
 @media (prefers-reduced-motion: reduce) {

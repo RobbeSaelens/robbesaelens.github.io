@@ -1,6 +1,6 @@
 <template>
   <a href="#main-content" class="skip-link">{{ $t('aria.skipToContent') }}</a>
-  <div class="app-holder flex min-h-screen flex-col" :class="{ 'is-fit': $route.meta.fit }">
+  <div class="app-holder flex flex-col" :class="{ 'is-fit': $route.meta.fit }">
     <AppHeader />
     <main id="main-content" tabindex="-1" class="flex flex-1 flex-col min-h-0">
       <router-view> </router-view>
@@ -39,6 +39,13 @@ export default {
 }
 .skip-link:focus {
   top: 0.5rem;
+}
+
+/* At least one screen: the smallest viewport (svh), so on phones the footer isn't
+   pushed under the browser bar on load. */
+.app-holder {
+  min-height: 100vh;
+  min-height: 100svh;
 }
 
 /* Pages with meta.fit fill exactly one screen instead of growing; on short screens they scroll as usual. */

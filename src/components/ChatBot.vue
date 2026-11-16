@@ -1,20 +1,24 @@
 <template>
   <div ref="rootRef" class="chatbot-root">
-    <button
-      ref="fabRef"
-      @click="toggle"
-      class="chatbot-fab"
-      :class="{ 'is-open': isOpen, 'is-new': !seen }"
-      :aria-label="isOpen ? $t(aiEnabled ? 'chat.close' : 'chat.closeBasic') : $t(aiEnabled ? 'chat.open' : 'chat.openBasic')"
-      :aria-expanded="isOpen ? 'true' : 'false'"
-    >
-      <!-- Pulses until the chat has been opened once this session -->
-      <span class="fab-ring" aria-hidden="true"></span>
-      <MessageCircle class="fab-icon fab-prompt fab-chat" aria-hidden="true" />
-      <svg class="fab-icon fab-close" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7.5 7.5l9 9M16.5 7.5l-9 9" />
-      </svg>
-    </button>
+    <!-- Leans towards the mouse, 8px at most: it sits in the corner, 16px from the footer's
+         contact links (AppFooter.vue). Holds still while open. -->
+    <ButtonMagnet :padding="16" :strength="5" :disabled="isOpen">
+      <button
+        ref="fabRef"
+        @click="toggle"
+        class="chatbot-fab"
+        :class="{ 'is-open': isOpen, 'is-new': !seen }"
+        :aria-label="isOpen ? $t(aiEnabled ? 'chat.close' : 'chat.closeBasic') : $t(aiEnabled ? 'chat.open' : 'chat.openBasic')"
+        :aria-expanded="isOpen ? 'true' : 'false'"
+      >
+        <!-- Pings three times, until the chat has been opened once this session -->
+        <span class="fab-ring" aria-hidden="true"></span>
+        <MessageCircle class="fab-icon fab-prompt fab-chat" aria-hidden="true" />
+        <svg class="fab-icon fab-close" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7.5 7.5l9 9M16.5 7.5l-9 9" />
+        </svg>
+      </button>
+    </ButtonMagnet>
 
     <transition name="chat-slide">
       <section
@@ -51,13 +55,17 @@
 
           <div v-for="(msg, i) in messages" :key="i" class="msg" :class="`msg--${msg.actor}`">
             <span v-if="msg.actor === 'bot'" class="msg-avatar" aria-hidden="true"><LlamaIcon /></span>
-            <!-- AI replies are plain text (never v-html); the rest are translation keys -->
-            <p class="msg-text">{{ msg.actor === 'user' ? msg.key : (msg.text ?? $t(msg.key)) }}</p>
+            <!-- AI replies are plain text (never v-html); the rest are translation keys.
+                 An answer to a question opens with the thinking line, done: a check and the time. -->
+            <p class="msg-text"><span v-if="msg.took != null" class="msg-status msg-status--done" aria-hidden="true"
+                ><ChatThinking :took="msg.took" :animate="i === messages.length - 1" :riddle="riddleStep > 0" /></span
+              >{{ msg.actor === 'user' ? msg.key : (msg.text ?? $t(msg.key)) }}</p>
           </div>
 
+          <!-- Thinking: pulsing dots and a timer (ChatThinking.vue) -->
           <div v-if="isTyping" class="msg msg--bot chat-typing" aria-hidden="true">
             <span class="msg-avatar"><LlamaIcon /></span>
-            <p class="msg-text"><span class="dot-1"></span><span class="dot-2"></span><span class="dot-3"></span></p>
+            <p class="msg-text"><span class="msg-status"><ChatThinking :riddle="riddleStep > 0" /></span></p>
           </div>
 
           <!-- Follow-ups after an AI answer; the starter questions at the beginning -->
@@ -93,6 +101,8 @@
 import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowUp, MessageCircle, RotateCcw, X } from 'lucide-vue-next'
+import ButtonMagnet from './ButtonMagnet.vue'
+import ChatThinking from './ChatThinking.vue'
 import LlamaIcon from './LlamaIcon.vue'
 import { useEasterEgg } from '../composables/useEasterEgg'
 import { aiAvailable, askAssistant, type ChatTurn } from '../chatApi'
@@ -106,6 +116,8 @@ interface Message {
   text?: string
   /** Follow-up questions offered with an AI reply. */
   suggestions?: string[]
+  /** An answer to a question: the seconds it took, shown above it. */
+  took?: number
 }
 
 const KEYWORDS: { keys: string[]; responseKey: string }[] = [
@@ -262,7 +274,7 @@ const RIDDLE_ANSWERS: Record<number, string[]> = {
 
 export default {
   name: 'ChatBot',
-  components: { ArrowUp, LlamaIcon, MessageCircle, RotateCcw, X },
+  components: { ArrowUp, ButtonMagnet, ChatThinking, LlamaIcon, MessageCircle, RotateCcw, X },
   setup() {
     const { t, tm, rt, locale } = useI18n({ useScope: 'global' })
     const { unlock, secretCode, clearSecretCode, isEasterEggUnlocked, shouldResetChatbot } = useEasterEgg()
@@ -305,13 +317,24 @@ export default {
       })
     }
 
+    /** When the question being answered was asked (performance.now()). */
+    let askedAt: number | null = null
+
+    /** For the first bot line after a question: the seconds since it was asked. */
+    const took = (actor: 'bot' | 'user') => {
+      if (actor !== 'bot' || askedAt === null) return undefined
+      const seconds = (performance.now() - askedAt) / 1000
+      askedAt = null
+      return seconds
+    }
+
     const addMessage = (actor: 'bot' | 'user', keyOrText: string) => {
-      messages.value.push({ actor, key: keyOrText })
+      messages.value.push({ actor, key: keyOrText, took: took(actor) })
       scrollToBottom()
     }
 
     const addReply = (text: string, suggestions: string[] = []) => {
-      messages.value.push({ actor: 'bot', key: '', text, suggestions })
+      messages.value.push({ actor: 'bot', key: '', text, suggestions, took: took('bot') })
       scrollToBottom()
     }
 
@@ -331,7 +354,12 @@ export default {
         )
     }
 
-    const processMessage = async (userText: string) => {
+    /**
+     * Works out the answer and shows it, no sooner than `ready` (the thinking time). The
+     * AI is asked right away, so its answer takes as long as the thinking time or the
+     * network, whichever is longer, not the two added up.
+     */
+    const processMessage = async (userText: string, ready: Promise<unknown>) => {
       const lower = userText.toLowerCase().trim()
 
       // ── Terminal reset / clear ──
@@ -346,11 +374,15 @@ export default {
         'ctrl+c',
         'cmd+c',
       ]
-      if (RESET_COMMANDS.some((cmd) => lower === cmd)) return startOver('chat.reset')
+      if (RESET_COMMANDS.some((cmd) => lower === cmd)) {
+        await ready
+        return startOver('chat.reset')
+      }
 
       // ── Easter egg riddle logic ──
       // Step 0: check if user typed a trigger word
       if (riddleStep.value === 0 && RIDDLE_TRIGGERS.some((k) => lower.includes(k))) {
+        await ready
         riddleStep.value = 1
         addMessage('bot', 'chat.easter.riddle1')
         return
@@ -358,6 +390,7 @@ export default {
 
       // Steps 1 & 3: check against static answers
       if (riddleStep.value === 1 || riddleStep.value === 3) {
+        await ready
         const answers = RIDDLE_ANSWERS[riddleStep.value]
         if (answers && answers.some((a) => lower.replace(/\s/g, '') === a.replace(/\s/g, ''))) {
           riddleStep.value++
@@ -376,6 +409,7 @@ export default {
 
       // Step 2: check against the dynamic secret code from logo triple-click
       if (riddleStep.value === 2) {
+        await ready
         if (secretCode.value && lower === secretCode.value) {
           riddleStep.value = 3
           clearSecretCode()
@@ -395,23 +429,29 @@ export default {
       // "help" lists the built-in topics; everything else goes to the AI first.
       if (responseKey !== 'chat.help') {
         const answer = await askAssistant(conversation(), locale.value === 'nl' ? 'nl' : 'en')
+        await ready
         if (answer) return addReply(answer.reply, answer.suggestions)
       }
+      await ready
       addMessage('bot', responseKey ?? 'chat.fallback')
     }
 
-    /** Shows the question, then the typing dots until the answer is there. */
+    /**
+     * Shows the question, then the thinking line until the answer is there: at least
+     * `delay` ms (a built-in answer would otherwise flash in), longer while the AI works.
+     */
     const ask = (text: string, delay: number) => {
       if (pending.value) return
       pending.value = true
       addMessage('user', text)
+      askedAt = performance.now()
       isTyping.value = true
       scrollToBottom()
-      setTimeout(async () => {
-        await processMessage(text)
+      const ready = new Promise((resolve) => setTimeout(resolve, delay))
+      void processMessage(text, ready).finally(() => {
         isTyping.value = false
         pending.value = false
-      }, delay)
+      })
     }
 
     const send = () => {
@@ -467,6 +507,7 @@ export default {
       riddleStep.value = 0
       clearSecretCode()
       isEasterEggUnlocked.value = false
+      askedAt = null // a fresh start, not an answer
       addMessage('bot', firstLine)
     }
 
@@ -500,7 +541,7 @@ export default {
       }
     })
 
-    // The chips appear only once the typing dots are gone, after the answer
+    // The chips appear only once the thinking line is gone, after the answer
     // itself was scrolled to: scroll again so they aren't cut off.
     watch(() => [chips.value, isTyping.value], scrollToBottom)
 
@@ -587,13 +628,18 @@ export default {
     box-shadow 0.25s ease;
   animation: fab-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.9s backwards; /* no end state: keeps :hover working */
 }
-.chatbot-fab:hover {
-  border-color: #2dd4bf;
-  box-shadow: 0 6px 26px rgba(20, 184, 166, 0.35);
-  transform: translateY(-2px);
+/* Hover only with a mouse: on a touch screen it would stick after the tap */
+@media (hover: hover) and (pointer: fine) {
+  .chatbot-fab:hover {
+    border-color: #2dd4bf;
+    box-shadow: 0 6px 26px rgba(20, 184, 166, 0.35);
+    transform: translateY(-2px);
+  }
 }
+/* The press snaps (0.12s), like the other buttons; the hover lift above eases */
 .chatbot-fab:active {
-  transform: translateY(0) scale(0.96);
+  transform: translateY(0) scale(0.97);
+  transition-duration: 0.12s, 0.2s, 0.25s;
 }
 .chatbot-fab:focus-visible {
   outline: 2px solid #2dd4bf;
@@ -623,11 +669,13 @@ export default {
   height: 1.65rem;
   stroke-width: 2;
 }
-.chatbot-fab:hover .fab-chat {
-  transform: rotate(-8deg) scale(1.06);
-}
-.chatbot-fab.is-open:hover .fab-chat {
-  transform: rotate(90deg) scale(0.6);
+@media (hover: hover) and (pointer: fine) {
+  .chatbot-fab:hover .fab-chat {
+    transform: rotate(-8deg) scale(1.06);
+  }
+  .chatbot-fab.is-open:hover .fab-chat {
+    transform: rotate(90deg) scale(0.6);
+  }
 }
 .fab-close {
   opacity: 0;
@@ -642,7 +690,7 @@ export default {
   transform: none;
 }
 
-/* Soft ping until the visitor has opened the chat once */
+/* A soft ping, three times (then it rests), until the visitor has opened the chat once */
 .fab-ring {
   position: absolute;
   inset: -1px;
@@ -652,13 +700,13 @@ export default {
   pointer-events: none;
 }
 .chatbot-fab.is-new:not(.is-open) .fab-ring {
-  animation: fab-ping 2.8s cubic-bezier(0, 0, 0.2, 1) 2s infinite;
+  animation: fab-ping 2.8s cubic-bezier(0, 0, 0.2, 1) 2s 3;
 }
 
 @keyframes fab-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.6);
+    transform: translateY(12px) scale(0.9);
   }
   to {
     opacity: 1;
@@ -700,6 +748,7 @@ export default {
   width: 25rem;
   max-width: calc(100vw - 3rem);
   height: min(34rem, calc(100vh - 8rem));
+  height: min(34rem, calc(100dvh - 8rem));
   overflow: hidden;
   color: #e2e8f0;
   background: #0d1117;
@@ -721,6 +770,7 @@ export default {
     width: auto;
     max-width: none;
     height: min(75vh, 36rem);
+    height: min(75dvh, 36rem);
   }
 }
 
@@ -798,9 +848,23 @@ export default {
     color 0.2s ease,
     background 0.2s ease;
 }
-.chat-icon-btn:hover {
+@media (hover: hover) and (pointer: fine) {
+  .chat-icon-btn:hover {
+    color: #f1f5f9;
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+.chat-icon-btn:active {
   color: #f1f5f9;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
+}
+/* Touch: 44px targets for clear and close */
+@media (pointer: coarse) {
+  .chat-icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.65rem;
+  }
 }
 .chat-icon-btn svg {
   width: 100%;
@@ -872,24 +936,18 @@ export default {
   border-bottom-right-radius: 0.3rem;
 }
 
-/* Typing: three bouncing dots */
-.chat-typing .msg-text {
-  display: inline-flex;
-  gap: 0.25rem;
-  padding: 0.75rem 0.85rem;
+/* The thinking line (ChatThinking.vue): alone in the typing row, then on top of
+   the answer, in the same spot, so the dots seem to settle into the check. */
+.msg-status {
+  display: flex;
+  align-items: center;
+  min-height: 1.35rem;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.chat-typing .msg-text span {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: #5eead4;
-  animation: typing-dot 1.1s ease-in-out infinite;
-}
-.chat-typing .dot-2 {
-  animation-delay: 0.15s !important;
-}
-.chat-typing .dot-3 {
-  animation-delay: 0.3s !important;
+.msg-status--done {
+  margin-bottom: 0.3rem;
 }
 
 /* ── Suggested questions ── */
@@ -916,9 +974,14 @@ export default {
     background 0.2s ease,
     border-color 0.2s ease;
 }
-.chat-chip:hover {
+@media (hover: hover) and (pointer: fine) {
+  .chat-chip:hover {
+    background: rgba(45, 212, 191, 0.16);
+    border-color: #5eead4;
+  }
+}
+.chat-chip:active {
   background: rgba(45, 212, 191, 0.16);
-  border-color: #5eead4;
 }
 
 /* ── Input ── */
@@ -939,6 +1002,12 @@ export default {
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 0.65rem;
   caret-color: #2dd4bf;
+}
+/* Touch: 16px, or iOS zooms the page in when the field gets focus */
+@media (pointer: coarse) {
+  .chat-input input {
+    font-size: 1rem;
+  }
 }
 .chat-input input::placeholder {
   color: #8a97a8;
@@ -963,7 +1032,12 @@ export default {
     opacity 0.2s ease,
     background 0.2s ease;
 }
-.chat-send:hover:not(:disabled) {
+@media (hover: hover) and (pointer: fine) {
+  .chat-send:hover:not(:disabled) {
+    background: #5eead4;
+  }
+}
+.chat-send:active:not(:disabled) {
   background: #5eead4;
 }
 .chat-send:disabled {
@@ -1028,9 +1102,10 @@ export default {
   transform-origin: bottom right;
 }
 .chat-slide-leave-active {
+  /* Out fast and decelerating (ease-in would hold it on screen for its first half) */
   transition:
-    opacity 0.18s ease-in,
-    transform 0.18s ease-in;
+    opacity 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
   transform-origin: bottom right;
 }
 .chat-slide-enter-from {
@@ -1051,22 +1126,9 @@ export default {
     transform: none;
   }
 }
-@keyframes typing-dot {
-  0%,
-  60%,
-  100% {
-    opacity: 0.35;
-    transform: translateY(0);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(-3px);
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .msg,
   .chat-chip,
-  .chat-typing .msg-text span,
   .chatbot-window.riddle-active {
     animation: none;
   }

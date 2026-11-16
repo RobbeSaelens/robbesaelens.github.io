@@ -23,13 +23,14 @@
 
     <div class="repo-card">
       <dl class="repo-numbers">
+        <!-- The counts count up when they come into view (CountUpNumber.vue) -->
         <div class="repo-number">
           <dt>{{ $t('repo.commits') }}</dt>
-          <dd>{{ count(stats.commits) }}</dd>
+          <dd><CountUpNumber :value="stats.commits" :format="count" :delay="countDelay" /></dd>
         </div>
         <div class="repo-number">
           <dt>{{ $t('repo.last30') }}</dt>
-          <dd>{{ count(stats.commitsLast30Days) }}</dd>
+          <dd><CountUpNumber :value="stats.commitsLast30Days" :format="count" :delay="countDelay" /></dd>
         </div>
         <div class="repo-number repo-number--text">
           <dt>{{ $t('repo.since') }}</dt>
@@ -48,7 +49,7 @@
             :key="i"
             class="repo-bar"
             :class="{ 'is-empty': n === 0 }"
-            :style="{ height: n ? `${Math.max(8, (n / weeklyMax) * 100)}%` : undefined, '--d': `${i * 18}ms` }"
+            :style="{ height: n ? `${Math.max(8, (n / weeklyMax) * 100)}%` : undefined, '--d': `${i * 8}ms` }"
             :title="$t('repo.weekBar', n)"
           ></span>
         </div>
@@ -77,6 +78,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Github, Lock } from 'lucide-vue-next'
 import data from '../data/repo-stats.json'
+import CountUpNumber from './CountUpNumber.vue'
 
 interface RepoStats {
   commits: number
@@ -105,6 +107,8 @@ const { locale } = useI18n({ useScope: 'global' })
 const stats = computed(() => (data.projects as Record<string, RepoStats | undefined>)[props.project])
 const weeklyTotal = computed(() => stats.value?.commitsPerWeek.reduce((a, b) => a + b, 0) ?? 0)
 const weeklyMax = computed(() => Math.max(1, ...(stats.value?.commitsPerWeek ?? [])))
+/** The side panel slides in first (repo-aside-in): count along with its bars. */
+const countDelay = computed(() => (props.variant === 'aside' ? 0.45 : 0))
 
 const tag = () => (locale.value === 'nl' ? 'nl-BE' : 'en-GB')
 const count = (n: number) => n.toLocaleString(tag())
@@ -297,7 +301,7 @@ function ago(iso: string) {
     right: calc((100vw - 1280px) / 2 - 240px - 16px);
     width: 240px;
     margin: 0;
-    animation: repo-aside-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+    animation: repo-aside-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
   }
   .repo--aside .repo-heading {
     margin-bottom: 0.6rem;
@@ -337,7 +341,7 @@ function ago(iso: string) {
     height: 3rem;
   }
   .repo--aside .repo-bar {
-    animation: repo-bar-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) calc(0.6s + var(--d)) both;
+    animation: repo-bar-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) calc(0.45s + var(--d)) both;
   }
   .repo--aside .repo-note {
     align-items: flex-start;

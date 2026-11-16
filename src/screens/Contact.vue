@@ -1,11 +1,25 @@
 <template>
   <div class="about-page fade-out">
-    <div class="about-inner mx-auto w-full max-w-screen-2xl px-4 sm:px-6">
+    <div class="about-inner mx-auto w-full max-w-screen-2xl px-6">
       <TerminalHeader :title="$t('about.title').toLowerCase()" subtitle="cat ./about-me.md" />
 
-      <div class="about-grid">
+      <!-- Phones: the footer is hidden on this one-screen page, so phone and e-mail are here -->
+      <p class="hero-in about-contact" style="--i: 1">
+        <a href="tel:0471958195" class="about-contact-link">
+          <Phone aria-hidden="true" />
+          <span class="sr-only">{{ $t('about.phoneLabel') }}</span>
+          0471 95 81 95
+        </a>
+        <a href="mailto:robbe.saelens@telenet.be" class="about-contact-link">
+          <Mail aria-hidden="true" />
+          <span class="sr-only">{{ $t('about.emailLabel') }}</span>
+          robbe.saelens@telenet.be
+        </a>
+      </p>
+
+      <div ref="grid" class="about-grid" @scroll.passive="onScroll">
         <!-- Education and experience first, as text; teaching and riding carry the photos. -->
-        <article class="hero-in about-card about-card--text card-education" style="--i: 2">
+        <GlowCard as="article" class="hero-in about-card about-card--text card-education" style="--i: 2">
           <GraduationCap class="card-deco" aria-hidden="true" :stroke-width="1" />
           <div class="card-body">
             <span class="card-tag">./education</span>
@@ -26,9 +40,9 @@
               </template>
             </i18n-t>
           </div>
-        </article>
+        </GlowCard>
 
-        <article class="hero-in about-card about-card--text card-experience" style="--i: 3">
+        <GlowCard as="article" class="hero-in about-card about-card--text card-experience" style="--i: 3">
           <Briefcase class="card-deco" aria-hidden="true" :stroke-width="1" />
           <div class="card-body">
             <span class="card-tag">./experience</span>
@@ -72,7 +86,7 @@
               </template>
             </i18n-t>
           </div>
-        </article>
+        </GlowCard>
 
         <article class="hero-in about-card about-card--photo card-teaching" style="--i: 4" tabindex="0">
           <div class="card-media">
@@ -82,6 +96,7 @@
               class="card-image"
               loading="lazy"
             />
+            <PhotoRipple src="/about.jpg" area=".about-card" />
             <span class="card-slug">./teaching</span>
           </div>
           <div class="card-body">
@@ -103,6 +118,7 @@
               class="card-image"
               loading="lazy"
             />
+            <PhotoRipple src="/horse.jpg" area=".about-card" />
             <span class="card-slug">./riding</span>
           </div>
           <div class="card-body">
@@ -116,12 +132,30 @@
           </div>
         </article>
       </div>
+
+      <!-- Phones: where you are in the swipe row, and a way to jump; like the project dots -->
+      <div class="hero-in about-dots" style="--i: 6">
+        <button
+          v-for="(card, i) in CARDS"
+          :key="card"
+          type="button"
+          class="about-dot"
+          :class="{ 'is-current': i === current }"
+          :aria-label="$t(card)"
+          :aria-current="i === current ? 'true' : undefined"
+          @click="go(i)"
+        >
+          <span></span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { ArrowRight, Briefcase, GraduationCap, BookOpen, Trophy } from 'lucide-vue-next'
+import { ArrowRight, Briefcase, GraduationCap, BookOpen, Mail, Phone, Trophy } from 'lucide-vue-next'
+import GlowCard from '../components/GlowCard.vue'
+import PhotoRipple from '../components/PhotoRipple.vue'
 import TerminalHeader from '../components/TerminalHeader.vue'
 
 export default {
@@ -130,10 +164,50 @@ export default {
   components: {
     ArrowRight,
     Briefcase,
+    Mail,
+    Phone,
+    GlowCard,
     GraduationCap,
     BookOpen,
+    PhotoRipple,
     Trophy,
     TerminalHeader,
+  },
+
+  data() {
+    return {
+      /** The card titles, in the order of the row: the dots' names */
+      CARDS: ['about.education', 'about.experience', 'about.teaching', 'about.competing'],
+      current: 0,
+    }
+  },
+
+  methods: {
+    cards(): HTMLElement[] {
+      return [...(this.$refs.grid as HTMLElement).children] as HTMLElement[]
+    },
+    /** Phones: the card nearest the row's start is the current one (the last at the end). */
+    onScroll() {
+      const grid = this.$refs.grid as HTMLElement
+      if (grid.scrollWidth <= grid.clientWidth) return
+      const cards = this.cards()
+      if (grid.scrollLeft >= grid.scrollWidth - grid.clientWidth - 2) {
+        this.current = cards.length - 1
+        return
+      }
+      const start = grid.getBoundingClientRect().left + (parseFloat(getComputedStyle(grid).scrollPaddingLeft) || 0)
+      const dist = cards.map((card) => Math.abs(card.getBoundingClientRect().left - start))
+      this.current = dist.indexOf(Math.min(...dist))
+    },
+    go(i: number) {
+      const grid = this.$refs.grid as HTMLElement
+      const card = this.cards()[i]
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const pad = parseFloat(getComputedStyle(grid).scrollPaddingLeft) || 0
+      const left = grid.scrollLeft + card.getBoundingClientRect().left - grid.getBoundingClientRect().left - pad
+      grid.scrollTo({ left, behavior: reduced ? 'auto' : 'smooth' })
+      this.current = i
+    },
   },
 }
 </script>
@@ -161,7 +235,9 @@ export default {
 /* =============================================
    Layout
    Desktop: education and experience stacked on the left, the two photo
-   cards side by side next to them, all filling the screen height.
+   cards side by side next to them, all filling the screen height. Only from
+   760px high: on shorter screens (a 1366px laptop, an iPad in landscape) the
+   texts no longer fit their half height, so these get the tablet layout.
    Tablet: the two text cards on top, the photo cards below.
    Phone: one swipeable row, in reading order.
    ============================================= */
@@ -175,7 +251,7 @@ export default {
   width: 100%;
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1000px) and (min-height: 760px) {
   .about-grid {
     /* The text column is a little wider: fewer lines, so both texts fit its half height. */
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
@@ -229,7 +305,10 @@ export default {
       0 4px 24px rgba(0, 0, 0, 0.06),
       0 0 0 1px var(--color-border-glow);
   }
-  .about-card:hover .card-image {
+  /* The ripples over the photo (PhotoRipple, a canvas over the <img>) zoom and dim with it
+     here and below, so a ripple lines up with the photo around it. */
+  .about-card:hover .card-image,
+  .about-card:hover .photo-ripple {
     transform: scale(1.04);
   }
 }
@@ -259,7 +338,7 @@ export default {
 }
 
 /* Text scales with the screen height on desktop, where the cards have room */
-@media (min-width: 1000px) {
+@media (min-width: 1000px) and (min-height: 760px) {
   .about-card--text .card-title {
     font-size: clamp(1rem, 0.25rem + 1.35vh, 1.5rem);
   }
@@ -344,13 +423,16 @@ export default {
     grid-template-rows: 1fr;
     opacity: 1;
   }
-  .about-card--photo .card-image {
+  .about-card--photo .card-image,
+  .about-card--photo .photo-ripple {
     transition:
       transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
       filter 0.4s ease;
   }
   .about-card--photo:hover .card-image,
-  .about-card--photo:focus-within .card-image {
+  .about-card--photo:hover .photo-ripple,
+  .about-card--photo:focus-within .card-image,
+  .about-card--photo:focus-within .photo-ripple {
     filter: brightness(0.8);
   }
 }
@@ -446,9 +528,11 @@ export default {
     color 0.2s ease,
     border-color 0.2s ease;
 }
-.card-link:hover {
-  color: var(--color-text-primary);
-  border-color: var(--color-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .card-link:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-text-primary);
+  }
 }
 
 .card-text strong {
@@ -480,8 +564,10 @@ export default {
   height: 0.95rem;
   transition: transform 0.2s ease;
 }
-.card-more:hover .card-more-arrow {
-  transform: translateX(3px);
+@media (hover: hover) and (pointer: fine) {
+  .card-more:hover .card-more-arrow {
+    transform: translateX(3px);
+  }
 }
 
 @media (min-width: 1400px) {
@@ -494,7 +580,7 @@ export default {
 }
 
 /* Laptop-height screens: a little tighter so both texts fit their half */
-@media (min-width: 1000px) and (max-height: 820px) {
+@media (min-width: 1000px) and (min-height: 760px) and (max-height: 820px) {
   .about-card--text .card-text {
     line-height: 1.5;
   }
@@ -504,10 +590,67 @@ export default {
   }
 }
 
+/* Phone and e-mail, and the row's dots: only on phones (the footer is hidden on this
+   page there, and the cards are a swipe row) */
+.about-contact,
+.about-dots {
+  display: none;
+}
+
 /* =============================================
    Phones: one card per screen width, swipe for the next
    ============================================= */
 @media (max-width: 639px) {
+  .about-contact {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1rem;
+    margin: calc(-1 * clamp(0.5rem, 2vh, 1.25rem)) 0 0.25rem;
+  }
+  .about-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.75rem;
+    font-size: 0.8125rem;
+    color: var(--color-accent);
+  }
+  .about-contact-link svg {
+    flex-shrink: 0;
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  /* The dots: 24px targets (44px tall on touch screens), the first one on the content edge */
+  .about-dots {
+    display: flex;
+    margin: 0.25rem 0 0 -0.5rem;
+  }
+  .about-dot {
+    padding: 0.5rem;
+  }
+  .about-dot span {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-border-glow);
+    transition:
+      width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.3s ease;
+  }
+  .about-dot.is-current span,
+  .about-dot:active span {
+    background: var(--color-accent);
+  }
+  .about-dot.is-current span {
+    width: 2rem;
+  }
+  .about-dot:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: 9999px;
+  }
   .about-grid {
     grid-template-columns: none;
     grid-template-rows: minmax(0, 1fr);
@@ -518,10 +661,12 @@ export default {
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    /* Bleed to the screen edges so a swiped card isn't cut by the page padding */
-    margin: 0 -1rem;
-    padding: 0 1rem 0.25rem;
-    scroll-padding: 0 1rem;
+    /* Bleed to the screen edges so a swiped card isn't cut by the page padding
+       (width: auto, not 100%, or the right edge stops short by the padding). */
+    width: auto;
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem 0.25rem;
+    scroll-padding: 0 1.5rem;
   }
   .about-grid::-webkit-scrollbar {
     display: none;
@@ -546,6 +691,20 @@ export default {
   .card-slug {
     left: 0.75rem;
     top: 0.625rem;
+  }
+}
+
+@media (max-width: 639px) and (pointer: coarse) {
+  .about-dots {
+    margin-top: 0;
+  }
+  .about-dot {
+    padding: 1.125rem 0.5rem;
+  }
+}
+@media (max-width: 639px) and (hover: hover) and (pointer: fine) {
+  .about-dot:hover span {
+    background: var(--color-accent);
   }
 }
 

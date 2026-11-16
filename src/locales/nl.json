@@ -17,7 +17,14 @@
     "educationLabel": "Bachelordiploma in",
     "sayHello": "Zeg hallo",
     "goToProjects": "Bekijk mijn projecten",
-    "photoTooltip": "full-stack developer gedetecteerd"
+    "photoTooltip": "full-stack developer gedetecteerd",
+    "social": {
+      "instagram": "Volg me op Instagram",
+      "facebook": "Vind me op Facebook",
+      "linkedin": "Connecteer op LinkedIn",
+      "github": "Bekijk mijn GitHub-profiel",
+      "drupal": "Bekijk mijn drupal.org-profiel"
+    }
   },
   "about": {
     "title": "Over mij",
@@ -34,7 +41,9 @@
     "backendDev": "backend developer",
     "drupalLink": "Mijn Drupal-bijdragen",
     "competing": "Paardrijden",
-    "competingText": "Naast mijn job rijd ik op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Mijn grote passie is jumping, met alles wat daarbij komt kijken."
+    "competingText": "Naast mijn job rijd ik op competitief niveau. Ik neem deel aan regionale wedstrijden en reed ook nationale wedstrijden met ons eigen paard. Mijn grote passie is jumping, met alles wat daarbij komt kijken.",
+    "phoneLabel": "Telefoon:",
+    "emailLabel": "E-mail:"
   },
   "projects": {
     "intro": "Websites en apps die ik ontwierp en bouwde.",
@@ -63,7 +72,10 @@
     "mockupAlt": "{name} op een MacBook",
     "viewCase": "Bekijk project",
     "prev": "Vorig project",
-    "next": "Volgend project"
+    "next": "Volgend project",
+    "shotDesktop": "desktop",
+    "shotMobile": "mobiel",
+    "shotDashboard": "dashboard"
   },
   "exulta": {
     "title": "Exulta",
@@ -256,7 +268,9 @@
     "close": "AI-chat sluiten",
     "openBasic": "Chat openen",
     "closeBasic": "Chat sluiten",
-    "suggestions": "Voorgestelde vragen"
+    "suggestions": "Voorgestelde vragen",
+    "thinking": "Nadenken",
+    "answered": "Beantwoord in"
   },
   "aria": {
     "switchToDutch": "Schakel naar Nederlands",
@@ -266,7 +280,8 @@
     "toggleNav": "Navigatiemenu openen",
     "skipToContent": "Ga naar hoofdinhoud",
     "mainNav": "Hoofdnavigatie",
-    "closeNav": "Navigatiemenu sluiten"
+    "closeNav": "Navigatiemenu sluiten",
+    "openScreenshot": "Open de schermafbeelding van {name} op volledig scherm"
   },
   "easter": {
     "title": "DEVELOPER MODE",

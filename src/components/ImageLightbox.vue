@@ -53,6 +53,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
 import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { setCovering } from '../covered'
 
 export interface LightboxImage {
   src: string
@@ -102,6 +103,8 @@ export default defineComponent({
     isOpen(open: boolean) {
       if (typeof document === 'undefined') return
 
+      // The page behind is hidden: its animated background can stop drawing
+      setCovering('lightbox', open)
       if (open) {
         this.lastFocused = document.activeElement as HTMLElement
         document.body.style.overflow = 'hidden'
@@ -120,6 +123,7 @@ export default defineComponent({
 
   beforeUnmount() {
     if (typeof document !== 'undefined') document.body.style.overflow = ''
+    setCovering('lightbox', false)
   },
 
   methods: {
@@ -162,6 +166,7 @@ export default defineComponent({
 .lightbox-img {
   max-width: 100%;
   max-height: calc(100vh - 8rem);
+  max-height: calc(100dvh - 8rem);
   width: auto;
   height: auto;
   object-fit: contain;
@@ -192,11 +197,18 @@ export default defineComponent({
   border: 1px solid rgba(255, 255, 255, 0.16);
   transition:
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
-.lightbox-close:hover,
-.lightbox-nav:hover {
+@media (hover: hover) and (pointer: fine) {
+  .lightbox-close:hover,
+  .lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+}
+.lightbox-close:active,
+.lightbox-nav:active {
   background: rgba(255, 255, 255, 0.18);
+  transform: scale(0.97);
 }
 .lightbox-close:focus-visible,
 .lightbox-nav:focus-visible {
@@ -208,8 +220,8 @@ export default defineComponent({
   position: absolute;
   top: clamp(0.75rem, 3vw, 1.5rem);
   right: clamp(0.75rem, 3vw, 1.5rem);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
 }
 
 .lightbox-nav {
@@ -217,7 +229,7 @@ export default defineComponent({
   width: 2.75rem;
   height: 2.75rem;
 }
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .lightbox-nav {
     position: absolute;
     bottom: 1rem;

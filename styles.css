@@ -1,11 +1,16 @@
-/* Hide scrollbar for Chrome, Safari, and Opera */
-::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for Firefox */
-html {
-  scrollbar-width: none;
+/* Scrollbars: with a mouse the page's own is thin and in the theme colour, so a long
+   page shows where you are (the gutter is kept on every page, so nothing shifts when a
+   page is one screen tall). Touch screens keep their own overlay scrollbars. The project
+   carousel and the about swipe row hide theirs: their dots show the position. */
+@media (hover: hover) and (pointer: fine) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(15 118 110 / 0.35) transparent;
+    scrollbar-gutter: stable;
+  }
+  html.dark {
+    scrollbar-color: rgb(45 212 191 / 0.3) transparent;
+  }
 }
 
 /* Same colours as the page wrapper, so overscroll and rubber-banding on mobile
@@ -23,25 +28,38 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom cursor: hide default */
+/* Touch screens: no grey flash over whatever is tapped; buttons and links have
+   their own :active press state instead. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom cursor (CustomCursor.vue): it replaces the system pointer, except the text
+   cursor (I-beam) in fields you type in, which shows where the text goes. */
 @media (hover: hover) and (pointer: fine) {
   * {
     cursor: none !important;
   }
+  input:not([type='button'], [type='submit'], [type='reset'], [type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file']),
+  textarea,
+  [contenteditable='true'] {
+    cursor: text !important;
+  }
 }
 
 /* =============================================
-   Page entrance (home, projects, about)
+   Page entrance (every page, on every visit)
    Elements with .hero-in rise into place one after another, in the order of
-   --i. Hidden only when JavaScript runs (html.js, set in index.html) and until
+   --i: 0.5 s each, 60 ms apart, so a page is complete within about a second.
+   Hidden only when JavaScript runs (html.js, set in index.html) and until
    the intro has finished (html.intro-done), so nothing is ever stuck invisible.
    ============================================= */
 html.js .hero-in {
   opacity: 0;
 }
 html.js.intro-done .hero-in {
-  animation: hero-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+  animation: hero-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 40ms);
 }
 @keyframes hero-rise {
   from {
@@ -73,7 +91,7 @@ html.js.intro-done .hero-in {
   opacity: 0;
 }
 .reveal-armed.is-visible {
-  animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: hero-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: var(--reveal-delay, 0ms);
 }
 @media (prefers-reduced-motion: reduce) {

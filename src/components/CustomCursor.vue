@@ -1,10 +1,11 @@
 <template>
-  <div
-    :class="['custom-cursor', { 'is-hover': hover, 'is-visible': visible }]"
-    :style="{ left: x + 'px', top: y + 'px' }"
-  >
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
+  <!-- useCursor.ts moves .cursor-pos with transform: the dot and the ring both sit on
+       the pointer. -->
+  <div :class="['custom-cursor', { 'is-hover': hover, 'is-visible': visible }]" aria-hidden="true">
+    <div ref="posEl" class="cursor-pos">
+      <div class="cursor-dot"></div>
+      <div class="cursor-ring"></div>
+    </div>
   </div>
 </template>
 
@@ -23,11 +24,20 @@ export default defineComponent({
 <style scoped>
 .custom-cursor {
   position: fixed;
+  left: 0;
+  top: 0;
   pointer-events: none;
   z-index: 99999;
-  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.15s ease;
+}
+
+/* A point, placed at the pointer with transform; the dot and ring centre on it */
+.cursor-pos {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
 }
 
 .custom-cursor.is-visible {

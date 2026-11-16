@@ -5,14 +5,18 @@ import App from './App.vue'
 import '@unocss/reset/tailwind.css'
 import 'uno.css'
 import './assets/terminal-theme.css'
+import './assets/project-page.css'
 import { createWebHistory } from 'vue-router'
 import { createAppRouter } from './bootstrap/router'
 import i18n, { localeLinks } from './i18n'
 import { initAnalytics } from './analytics'
 import { initSentry } from './sentry'
+import TerminalCommand from './components/TerminalCommand.vue'
 
 const app: VueApp = createApp(App)
 initSentry(app)
+// The "$ …" line under the page titles, global so the pages need no import (also in entry-server.ts)
+app.component('TerminalCommand', TerminalCommand)
 const head = createHead()
 const router = createAppRouter(createWebHistory())
 

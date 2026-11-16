@@ -1,9 +1,14 @@
 <template>
-  <!-- Mobile scrolls the document; overflow-x-clip stops sideways overflow without
-       turning this div into a scroll container, which would break the sticky header. -->
-  <div
-    class="bg-light dark:bg-dark overflow-x-clip sm:h-screen sm:overflow-x-hidden sm:overflow-y-auto"
-  >
+  <!-- The document scrolls, at every size: the router's scroll reset, keyboard
+       scrolling (Space, Page Down) and the browser's own toolbar handling all
+       work on the window. overflow-x-clip stops sideways overflow without turning
+       this div into a scroll container, which would break the sticky header. -->
+  <!-- No background of its own: <html> paints the page colour (styles.css), and the
+       animated background (SiteBackground, z-index -1) sits between the two. A
+       background or a stacking context here would hide it, or trap the custom
+       cursor under overlays teleported to <body> (lightbox, mobile menu). -->
+  <div class="overflow-x-clip">
+    <SiteBackground />
     <CustomCursor />
     <router-view> </router-view>
     <EasterEgg />
@@ -16,6 +21,7 @@ import { useHead } from '@unhead/vue'
 import { useRoute } from 'vue-router'
 import CustomCursor from './components/CustomCursor.vue'
 import EasterEgg from './components/EasterEgg.vue'
+import SiteBackground from './components/SiteBackground.vue'
 import { SITE_NAME, SITE_TAGLINE, SITE_URL, absoluteUrl } from './site'
 import { localeOfPath, localizedPath, stripLocale } from './localePath'
 import { routeJsonLd } from './seo/jsonld'
@@ -28,6 +34,7 @@ export default defineComponent({
   components: {
     CustomCursor,
     EasterEgg,
+    SiteBackground,
   },
   setup() {
     const route = useRoute()

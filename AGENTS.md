@@ -11,8 +11,7 @@ prerendered to static HTML and deployed to GitHub Pages from `main`.
 | `npm run build` | Client build, SSR build, prerender, sitemap |
 | `npm test` | Smoke + accessibility tests (Playwright, desktop + mobile) against the production build |
 | `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
-| `npm run stats` | Refresh the repository numbers on the project pages (below) |
-| `npm run stats:github` | The same from the GitHub API, with `REPO_STATS_TOKEN` (the deploy workflow runs it) |
+| `npm run stats` | Refresh the repository numbers on the project pages, from the GitHub API with `REPO_STATS_TOKEN` (below) |
 | `npm run drupal` | Refresh the Drupal contributions page from drupal.org (below) |
 
 Run both test suites with `CI=1` so Playwright starts its own server instead of reusing
@@ -43,10 +42,16 @@ It opens every page in `tests/routes.ts` at these sizes:
 | laptop-small | 1280 × 720 | 13" laptops, short screens |
 | laptop | 1440 × 900 | common laptop (also in dark mode) |
 | desktop | 1920 × 1080 | full HD monitor |
+| zoom-200 | 640 × 360 | a 1280 × 720 laptop at 200 % zoom |
+| tablet-landscape-safari | 1024 × 690 | iPad landscape, minus Safari's bars |
+| laptop-short | 1366 × 600 | 1366 × 768 laptop, minus browser and taskbar |
 
 It fails when a page scrolls sideways, or when a one-screen page (`FIT_ROUTES`: the
-projects and about pages) scrolls vertically. It also writes a full-page screenshot per
-case to `test-results/responsive/<page>/<width>x<height>-<theme>.png`.
+projects and about pages) scrolls vertically. It also fails when text is cut off inside
+an about card, and when a tap target is under 24 × 24 px (the menu, chat and close
+buttons and the carousel dots under 44 px on phones). It also writes a full-page screenshot per
+case to `test-results/responsive/<page>/<width>x<height>-<theme>.png` (the whole page,
+top to bottom, because the document is what scrolls; see Conventions).
 
 The assertions can't tell whether a layout looks right. **Open the screenshots of every
 page you touched, at every size**, and check for: text that wraps badly or is cut off,
@@ -59,6 +64,32 @@ fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`.
 
 When you change a page's URL, keep the old one working: add it to `REDIRECTS` in
 `src/bootstrap/router.ts` and to `MOVED` in `tests/routes.ts`.
+
+## Design and motion changes: use the skills
+
+The site's layout and motion were audited and fixed with these agent skills, and changes
+to either should follow them too. They are installed per user, not in this repo: in
+`~/.claude/skills/`, from [emilkowalski/skills](https://github.com/emilkowalski/skills)
+(MIT) and the layout page of [pbakaus/impeccable](https://github.com/pbakaus/impeccable/blob/main/skill/reference/layout.md)
+(Apache 2.0), installed as `impeccable-layout`. If they are missing, install them from
+there, or read those files directly.
+
+| When you | Use |
+|---|---|
+| add or change an animation, transition or hover/press state | `animate` to build it, `review-animations` to check it against the bar |
+| touch anything that runs every frame (canvas, WebGL, scroll or pointer handlers) | `animation-performance` |
+| coordinate several things moving together (entrances, staggers, slides) | `choreograph` |
+| change a page's structure, spacing or responsive behaviour | `impeccable-layout` |
+| change anything a phone sees (touch, hover, viewport heights, inputs) | `mobile-native` |
+| render data that can be long, empty or huge (lists, chips, counts, chat) | `break-ui` |
+| polish a component's interaction details | `emil-design-eng` |
+| review the motion of the whole site again | `improve-animations`, then `remove-animations` for what can go |
+
+Their rules are already applied here and written down below (Motion, touch and hover,
+the Vue Bits effects). The skills explain the why and the numbers; where a skill and this
+file disagree, this file wins, because it records choices Robbe made (e.g. the strength
+of the background, which effects stay). Taste changes, like removing or toning down an
+effect he asked for, go to him first.
 
 ## Content changes: keep the chatbot in step
 
@@ -89,15 +120,14 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   description in `meta.nl`.
 - The "Repository activity" block on each project page reads `src/data/repo-stats.json`.
   The project repos are private, so the browser can't fetch it. The deploy workflow
-  refreshes it before every build with `npm run stats:github`, which asks the GitHub API
-  with `REPO_STATS_TOKEN` (a repository secret: a fine-grained token with read-only
-  Contents access to those repos; it expires within a year, then the step only warns and
-  the committed JSON is used). Deploys also run every morning, so the numbers follow the
-  repos without a push. `npm run stats` does the same from local clones next to this repo
-  (the "Refresh data" button in Project Updater does it, with review); commit the JSON if
-  you want the repo copy fresh too. It holds counts and dates only, never commit messages,
-  names or e-mail addresses, and the script's log names pages, not repositories (CI logs
-  of this public repo are public).
+  refreshes it before every build with `npm run stats`, which asks the GitHub API with
+  `REPO_STATS_TOKEN` (a repository secret: a fine-grained token with read-only Contents
+  access to those repos; it expires within a year, then the step only warns and the
+  committed JSON is used). Deploys also run every morning, so the numbers follow the repos
+  without a push. By hand: `REPO_STATS_TOKEN=$(gh auth token) npm run stats`. The committed
+  JSON is only the fallback when that fails, so it may lag. It holds counts and dates only,
+  never commit messages, names or e-mail addresses, and the script's log names pages, not
+  repositories (CI logs of this public repo are public).
 - The Drupal contributions page (`/drupal`) reads `src/data/drupal.json`, written by
   `npm run drupal` (`scripts/drupal-stats.mjs`) from the public drupal.org and
   git.drupalcode.org APIs. drupal.org asks API users for a descriptive User-Agent, one
@@ -113,7 +143,97 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   `VITE_SENTRY_ENVIRONMENT=local`.
 - Statistics are Cloudflare Web Analytics: cookieless, so there is no cookie banner.
   Don't add anything that sets cookies or tracks visitors without revisiting the privacy page.
-- Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).
+- Effects from Vue Bits (https://vue-bits.dev). Each Vue Bits file is kept as published,
+  with its licence header and any site change marked in it, and is used through a small
+  site wrapper:
+
+  | Wrapper | Vue Bits | Where |
+  |---|---|---|
+  | `HeroWordmark.vue` | `TechText.vue` | the hero name |
+  | `SiteBackground.vue` | `DarkVeil.vue` | the animated background behind every page (`App.vue`) |
+  | `TerminalCommand.vue` (registered globally) | `DecryptedText.vue` | the `$ …` line under page titles |
+  | `CountUpNumber.vue` | `CountUp.vue` | the commit counts in `RepoActivity.vue` |
+  | `ChatThinking.vue` | `LatticeLoader.vue` | the chat's thinking line, ending in a check with the time |
+  | `ButtonMagnet.vue` | `Magnet.vue` | the chat button and "Say hello" |
+  | `GlowCard.vue` | `SpotlightCard.vue` | the project, Drupal and About cards |
+  | `ShotGlare.vue` | `GlareHover.vue` | the screenshot buttons on the project pages |
+  | `PhotoRipple.vue` | `RippleDistortion.vue` | water ripples under the mouse on the two About photos |
+
+  Rules they all follow: the real text, numbers and images stay in the prerendered HTML
+  and are what screen readers get (the effect copies are `aria-hidden`); nothing plays with
+  reduced motion; the pointer effects (magnet, glow, glare, ripples) need a mouse
+  (`(hover: hover) and (pointer: fine)`). Their tests are `tests/vue-bits-*.spec.ts`.
+  Colours come from theme tokens (`--color-spotlight` in `terminal-theme.css`).
+
+  The two WebGL ones (background, photos) need a real GPU (`src/gpu.ts`: software WebGL
+  is skipped), and headless Chrome is software WebGL, so the Playwright tests and their
+  screenshots never show them (the ripple tests pretend a GPU to check how the canvas
+  behaves, not how it looks). To see them headless, launch Chromium with
+  `--use-angle=metal --enable-gpu --ignore-gpu-blocklist`. The ripple canvas lies over the
+  real `<img>`, see-through and hidden between ripples, and draws only while a ripple
+  fades: at rest the photo must look exactly as without it. Text over the background must
+  still pass contrast at its brightest band, so keep its opacity low when changing colours.
+  Nothing draws what can't be seen: the background draws 30 frames a second, once with
+  reduced motion, and not at all while an opaque overlay hides the page. An overlay that
+  covers the whole page (lightbox, mobile menu, easter egg) calls `setCovering(name, open)`
+  from `src/covered.ts` (it also sets `is-covered` on `<html>`); the background and the
+  hero name's sweep stop until it closes. A new full-screen overlay does the same.
+  Tests that read an animated value wait for it to finish: the commit counts take 0.9 s
+  once in view (`CountUpNumber.vue`, a time-based ease-out), and a chat answer also holds
+  the (hidden) "Answered in" line, so match answers with `toContainText` or a pattern.
+  Responsive screenshots may catch a count mid-way.
+- The document scrolls, at every size: the wrapper in `App.vue` only clips sideways
+  overflow (`overflow-x-clip`). Don't make a page wrapper a scroll container: the
+  router's scroll reset, keyboard scrolling (Space, Page Down), the phone browsers'
+  toolbars and the responsive test's full-page screenshots all rely on the window
+  scrolling. The one-screen pages are `100dvh` tall (`AppHolder.vue`), not a scroller.
+- Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px), on
+  phones too (`px-6`, not `px-4`).
+- The one deliberate exception: the four project pages (`src/screens/details`) are a
+  centred 1280px column (`mx-auto max-w-screen-xl px-6`, the text in it a further
+  `md:mx-10` in), a reading width for long pages with a centred title and screenshots.
+  From 1328px wide their edge no longer meets the header logo, by design. Keep it in
+  step with the "Repository activity" side panel (`RepoActivity.vue`): from 1840 × 760
+  it moves into the free space right of that 1280px column (`right: calc((100vw -
+  1280px) / 2 - 256px)`), so widening the column means moving or dropping the panel.
+  What the four pages share is styled once, in `src/assets/project-page.css` (under
+  `.detail-page`); a page's scoped styles hold only what is its own.
+- Touch screens:
+  - Every `:hover` style sits in `@media (hover: hover) and (pointer: fine)`: on a
+    touch screen a hover state sticks after the tap. Things you press get an `:active`
+    state instead (a slight `scale(0.97)`, or a background on wide rows). UnoCSS's
+    `hover:` and `group-hover:` utilities compile to a bare `:hover`, so write the rule
+    in the component's style instead (the "./ view my projects" arrow is `.group` on the
+    link and `.link-arrow` on the arrow, from `terminal-theme.css`).
+  - Tap targets are at least 24 × 24 px; the main controls (menu, close, chat, theme,
+    carousel dots) are 44 px under `@media (pointer: coarse)`.
+  - Text inputs are 16 px under `(pointer: coarse)`, or iOS zooms the page in on focus.
+  - Heights tied to the screen use `dvh` (app-like: the chat panel, the lightbox, the
+    one-screen pages) or `svh` (the minimum page height), each after a `vh` fallback line.
+- Motion:
+  - Things that enter or leave use the site's ease-out, `cubic-bezier(0.22, 1, 0.36, 1)`;
+    never `ease-in` (it holds the start back, the moment you watch). Colour and background
+    changes use `ease`, about 0.2s.
+  - A press is `transform: scale(0.97)` at `0.12s ease-out`, on everything you press (it
+    snaps; a hover may ease more slowly).
+  - Interface transitions stay at or under 300 ms; only panels and overlays (chat panel,
+    mobile menu, lightbox) take a little longer.
+  - Page entrances (`.hero-in`, `.reveal`, `styles.css`) rise in 0.5 s, 60 ms apart (`--i`),
+    so a page is complete within about a second; they play on every page view, so keep
+    them short. The intro (`index.html`) plays once per session and lasts a second. The
+    project slides (`Projects.vue`, the MacBook's turn and lid) are the one slow, showy
+    move, and only on click, swipe and wheel: the arrow keys page in a quarter of a second.
+  - Name the properties: no `transition: all`. Animate `transform` and `opacity`, not
+    `width`, `height`, `padding`, `top` or `left` (they lay the page out again every frame).
+  - Reduced motion: the global rule in `terminal-theme.css` drops durations and delays;
+    script-driven effects check `prefers-reduced-motion` themselves.
+  - A page at rest comes to rest: no loop runs for something nobody sees or touches. The
+    custom cursor has no loop: dot and ring sit on the pointer, moved with `transform` from
+    `mousemove`, never `left`/`top`; the hero name sweeps twice, then waits for the
+    mouse; an endless CSS animation on something hidden is paused until it shows.
+- Phone-only CSS uses `@media (max-width: 639px)`, the exact complement of UnoCSS `sm:`
+  (`min-width: 640px`). Never `max-width: 640px`: at exactly 640 px (a 1280 px laptop at
+  200 % zoom) both apply and a page gets the phone layout under the desktop header.
 - Screenshots of projects are real ones from the live sites, never mockups. The project
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
   (`src/components/MacBook3D.vue`, posed by `Projects.vue`): a new screenshot is all it

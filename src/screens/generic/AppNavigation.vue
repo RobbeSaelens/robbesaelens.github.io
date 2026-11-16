@@ -161,6 +161,7 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue'
 import BrandLogo from '../../components/BrandLogo.vue'
 import DrupalIcon from '../../components/DrupalIcon.vue'
 import { useEasterEgg } from '../../composables/useEasterEgg'
+import { setCovering } from '../../covered'
 
 interface NavLink {
   to: string
@@ -211,12 +212,34 @@ export default {
 
     const placeIndicator = () => {
       const current = links.find(isCurrent)
-      const el = current && linkEls.get(current.to)
-      if (!el) {
+      const list = linkList.value?.querySelector<HTMLElement>('.nav-links-list')
+      if (!current || !list || !linkEls.get(current.to)) {
         indicator.value = { ...indicator.value, visible: false }
         return
       }
-      indicator.value = { x: el.offsetLeft, w: el.offsetWidth, visible: true }
+      // A link's ">" prompt animates its width when the link becomes (or stops being)
+      // current, so right after a route change the links are still moving, and the
+      // ResizeObserver calls this again every frame. Each call used to move the indicator
+      // to where the links were that frame, restarting its transition every time: it
+      // chased them and landed late. Place it where the links will end up instead: every
+      // call gives the same answer and the indicator slides once.
+      const gap = parseFloat(getComputedStyle(list).columnGap) || 0
+      let x = linkEls.get(links[0].to)?.offsetLeft ?? 0
+      let target = { x: 0, w: 0 }
+      for (const link of links) {
+        const el = linkEls.get(link.to)
+        if (!el) continue
+        const prompt = el.querySelector<HTMLElement>('.nav-link-prompt')
+        const promptNow = prompt ? prompt.getBoundingClientRect().width : 0
+        const promptEnd = prompt && isCurrent(link) ? parseFloat(getComputedStyle(prompt).fontSize) * 0.6 : 0
+        const w = el.getBoundingClientRect().width - promptNow + promptEnd
+        if (link === current) target = { x, w }
+        x += w + gap
+      }
+      const next = { x: Math.round(target.x * 2) / 2, w: Math.round(target.w * 2) / 2, visible: true }
+      const prev = indicator.value
+      if (prev.visible && prev.x === next.x && prev.w === next.w) return
+      indicator.value = next
     }
 
     const indicatorStyle = computed(() => ({
@@ -265,6 +288,8 @@ export default {
     const openMenu = () => {
       showMenu.value = true
       document.body.style.overflow = 'hidden'
+      // Opaque and full-screen: the animated background behind can stop drawing
+      setCovering('menu', true)
       nextTick(() => menuPanel.value?.querySelector<HTMLElement>('.mobile-link')?.focus())
     }
 
@@ -272,6 +297,7 @@ export default {
       if (!showMenu.value) return
       showMenu.value = false
       document.body.style.overflow = ''
+      setCovering('menu', false)
       nextTick(() => menuButton.value?.focus())
     }
 
@@ -313,6 +339,7 @@ export default {
     onBeforeUnmount(() => {
       resizeObserver?.disconnect()
       document.body.style.overflow = ''
+      setCovering('menu', false)
     })
 
     return {
@@ -428,9 +455,9 @@ export default {
   background: var(--color-accent-soft);
   box-shadow: inset 0 0 0 1px var(--color-border-glow);
   transition:
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.25s ease;
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
   pointer-events: none;
 }
 
@@ -450,9 +477,13 @@ export default {
   outline: none;
   transition: color 0.2s ease;
 }
-.nav-link:hover,
 .nav-link.is-current {
   color: var(--color-accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover {
+    color: var(--color-accent);
+  }
 }
 .nav-link:focus-visible {
   box-shadow: 0 0 0 2px var(--color-accent);
@@ -465,6 +496,7 @@ export default {
     width 0.3s ease,
     opacity 0.3s ease;
 }
+/* 0.6em: placeIndicator() counts on this width */
 .nav-link.is-current .nav-link-prompt {
   width: 0.6em;
   opacity: 1;
@@ -503,14 +535,23 @@ export default {
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.12s ease-out;
 }
-.nav-icon-btn:hover {
-  border-color: var(--color-border-glow);
-  background: var(--color-surface-hover);
+@media (hover: hover) and (pointer: fine) {
+  .nav-icon-btn:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+  }
+}
+/* Touch: 44px targets (menu, close, theme) */
+@media (pointer: coarse) {
+  .nav-icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
 }
 .nav-icon-btn:active {
-  transform: scale(0.94);
+  transform: scale(0.97);
 }
 .nav-icon-btn:focus-visible {
   box-shadow: 0 0 0 2px var(--color-accent);
@@ -663,9 +704,9 @@ export default {
 .menu-enter-active .mobile-link,
 .menu-enter-active .mobile-bottom {
   transition:
-    opacity 0.45s ease,
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--i, 0) * 60ms + 80ms);
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 40ms + 60ms);
 }
 .menu-enter-from .mobile-link,
 .menu-enter-from .mobile-bottom {
@@ -687,7 +728,7 @@ export default {
 /* ── Theme toggle view transition ── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.5s;
+  animation-duration: 0.3s;
 }
 ::view-transition-old(root) {
   animation-name: fade-out;
@@ -740,14 +781,18 @@ export default {
   }
 }
 .code-reveal-enter-active {
-  transition: all 0.3s ease-out;
+  transition:
+    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .code-reveal-leave-active {
-  transition: all 0.5s ease-in;
+  transition:
+    opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .code-reveal-enter-from {
   opacity: 0;
-  transform: translateY(-8px) scale(0.8);
+  transform: translateY(-8px) scale(0.95);
 }
 .code-reveal-leave-to {
   opacity: 0;

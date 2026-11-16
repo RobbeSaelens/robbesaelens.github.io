@@ -237,6 +237,34 @@ test('theme toggle switches to dark mode and back', async ({ page }) => {
   await expect(html).not.toHaveClass(/\bdark\b/)
 })
 
+test('with a mouse the custom cursor replaces the pointer, but fields keep the text cursor', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mouse only')
+  await guard(page)
+  await open(page, '/')
+  await page.locator('.chatbot-fab').click()
+  await expect(page.locator('#chat-input')).toHaveCSS('cursor', 'text')
+  await expect(page.locator('.chat-send')).toHaveCSS('cursor', 'none')
+})
+
+test('on a phone the about cards are a swipe row, with dots that show and change the card', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phones')
+  await guard(page)
+  await open(page, '/contact')
+  const dots = page.locator('.about-dot')
+  await expect(dots).toHaveCount(4)
+  await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
+  await page.getByRole('button', { name: 'Teaching', exact: true }).click()
+  await expect(dots.nth(2)).toHaveAttribute('aria-current', 'true')
+  await expect(dots.nth(0)).not.toHaveAttribute('aria-current', 'true')
+  await expect.poll(() => page.locator('.about-grid').evaluate((g) => g.scrollLeft)).toBeGreaterThan(0)
+  // Swiping back moves the dot with it
+  await page.locator('.about-grid').evaluate((g) => g.scrollTo({ left: 0 }))
+  await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true')
+
+  await open(page, '/nl/contact')
+  await expect(page.getByRole('button', { name: 'Paardrijden', exact: true })).toBeVisible()
+})
+
 test('projects page links to each project', async ({ page }) => {
   await guard(page)
   await open(page, '/projects')
@@ -420,6 +448,20 @@ test.describe('project slides', () => {
     await expect(page.locator('.car-slide.is-current')).toContainText('Scan2Talk')
   })
 
+  test('Tab reaches only the current slide, shows a focus ring, and follows the arrow keys', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'keyboard')
+    await open(page, '/projects')
+    await page.locator('.car-track').focus()
+    await page.keyboard.press('Tab')
+    const current = page.locator('.car-slide.is-current a.car-card')
+    await expect(current).toBeFocused()
+    expect(await current.evaluate((e) => getComputedStyle(e).outlineStyle)).toBe('solid')
+    await expect(page.locator('.car-slide a.car-card[tabindex="-1"]')).toHaveCount(3)
+    await page.keyboard.press('ArrowRight')
+    await expect(page.locator('.car-count-now')).toHaveText('02')
+    await expect(page.locator('.car-slide.is-current a.car-card')).toBeFocused()
+  })
+
   test('the current MacBook is open; the others are half closed and turned towards it', async ({ page }) => {
     await open(page, '/projects')
     await page.getByRole('button', { name: 'Stable Manager', exact: true }).click()
@@ -591,7 +633,8 @@ test.describe('repository activity', () => {
       const section = page.locator(`.repo--inline:has(#repo-title-${key}-inline)`)
       await section.scrollIntoViewIfNeeded()
       await expect(section).toBeVisible()
-      await expect(section.locator('.repo-number dd').first()).toHaveText(stats.commits.toLocaleString('en-GB'))
+      // The count rises to its value (CountUp, 0.9 s however many commits).
+      await expect(section.locator('.repo-number dd').first()).toHaveText(stats.commits.toLocaleString('en-GB'), { timeout: 5_000 })
       await expect(section.locator('.repo-number')).toHaveCount(4)
       await expect(section.locator('.repo-commit')).toHaveCount(0)
       await expect(section.locator('.repo-bar')).toHaveCount(26)
@@ -820,13 +863,30 @@ test('the Scan2Talk check-in video has working sources', async ({ request }) => 
   }
 })
 
+test('screenshot buttons and social links are labelled in the page language', async ({ page }) => {
+  await guard(page)
+  await open(page, '/nl/exultadetail')
+  await expect(page.locator('button.shot').nth(1)).toHaveAttribute(
+    'aria-label',
+    'Open de schermafbeelding van exulta.be — mobiel op volledig scherm',
+  )
+  await open(page, '/nl')
+  await expect(page.getByRole('link', { name: 'Volg me op Instagram' })).toBeVisible()
+  await open(page, '/')
+  await expect(page.getByRole('link', { name: 'Follow me on Instagram' })).toBeVisible()
+})
+
 test('unknown pages show the not-found page and are kept out of search', async ({ page }) => {
   await guard(page)
-  // Not wrapped in the app layout, so there is no #main-content to wait for.
-  await page.goto('/this-page-does-not-exist')
-  await page.waitForLoadState('networkidle')
+  await open(page, '/this-page-does-not-exist')
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0)
+  // In the site layout, like every page: header, skip link, footer, one <main>
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found')
+  await expect(page.locator('.site-header')).toBeVisible()
+  await expect(page.locator('footer')).toBeVisible()
+  await expect(page.locator('.skip-link')).toHaveAttribute('href', '#main-content')
+  await expect(page.locator('main')).toHaveCount(1)
 })
 
 test.describe('chatbot', () => {

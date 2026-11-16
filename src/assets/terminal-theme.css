@@ -37,6 +37,9 @@
   --color-badge-closed: #4a6d69;
   --color-badge-closed-bg: rgba(74, 109, 105, 0.07);
   --color-badge-closed-border: rgba(74, 109, 105, 0.3);
+  /* The glow that follows the mouse over cards (GlowCard.vue), at 60 % at its centre.
+     It lies under the text: faint, so text on it keeps 4.5:1. */
+  --color-spotlight: rgba(13, 148, 136, 0.14);
   --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
 }
 
@@ -71,6 +74,7 @@
   --color-badge-closed: #a3b0c2;
   --color-badge-closed-bg: rgba(148, 163, 184, 0.1);
   --color-badge-closed-border: rgba(148, 163, 184, 0.3);
+  --color-spotlight: rgba(45, 212, 191, 0.2);
 }
 
 /* =============================================
@@ -85,7 +89,7 @@
   line-height: 1.2;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .terminal-title {
     gap: 0.25rem;
   }
@@ -159,15 +163,6 @@
   }
 }
 
-@keyframes scanlines {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 8px;
-  }
-}
-
 @keyframes glitch-shift {
   0%,
   100% {
@@ -217,6 +212,14 @@
   font-family: var(--font-mono);
 }
 
+/* The arrow of a "./ view my projects" link (class .group on the link) leans forward on
+   hover. Mouse only: on a touch screen a hover state sticks after the tap. */
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .link-arrow {
+    transform: translateX(0.25rem);
+  }
+}
+
 /* Single source of truth — this used to be redefined in Projects.vue and every
    detail screen with slightly different metrics, so whichever route chunk
    loaded last silently changed pill size and reflowed the page. */
@@ -238,7 +241,7 @@
     color 0.2s ease;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .tag-pill {
     font-size: 0.65rem;
     padding: 0.175rem 0.5rem;
@@ -255,11 +258,15 @@
     opacity: 1;
   }
 
+  /* Delays too: an element that waits for its entrance would otherwise stay hidden for
+     the whole delay and then pop in. */
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }

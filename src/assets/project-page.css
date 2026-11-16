@@ -1,0 +1,383 @@
+/* =============================================
+   Project pages (src/screens/details): the styles the four share
+   One copy, like .tag-pill in terminal-theme.css: these were repeated in each
+   page and drifted apart. Everything sits under .detail-page (the <article> of each
+   project page), so it never reaches another page. A page keeps only what is its
+   own (Scan2Talk's check-in flow, Stable Manager's Drupal section) in its
+   scoped styles. Imported once, in main.ts.
+   ============================================= */
+
+.detail-page .terminal-title {
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.2;
+}
+@media (max-width: 639px) {
+  .detail-page .terminal-title {
+    gap: 0.25rem;
+  }
+  .detail-page .terminal-cursor {
+    width: 0.4em;
+    height: 0.8em;
+  }
+}
+
+.detail-page .terminal-prompt {
+  color: var(--color-prompt);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.detail-page .terminal-text {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-prompt));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.detail-page .terminal-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  background: var(--color-cursor);
+  animation: blink 1s step-end infinite;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+.detail-page .terminal-subtitle {
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  overflow-x: auto;
+}
+
+.detail-page .overview-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .detail-page .overview-card:hover {
+    border-color: var(--color-border-glow);
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.04),
+      0 0 0 1px var(--color-border-glow);
+  }
+}
+.detail-page .overview-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+  margin-bottom: 0.875rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .detail-page .terminal-cursor,
+  .detail-page .live-dot {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* =============================================
+   Status badge
+   ============================================= */
+.detail-page .live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border-glow);
+}
+.detail-page .live-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+}
+.detail-page .live-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.12s ease-out;
+}
+@media (hover: hover) and (pointer: fine) {
+  .detail-page .live-link:hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-surface-hover);
+    transform: translateY(-1px);
+  }
+}
+.detail-page .live-link:active {
+  background: var(--color-surface-hover);
+  transform: scale(0.97);
+}
+
+/* A project that isn't live (Stable Manager, VHS) */
+.detail-page .status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border-glow);
+}
+
+/* =============================================
+   Features
+   ============================================= */
+.detail-page .section-heading {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 1.25rem;
+}
+@media (min-width: 768px) {
+  .detail-page .section-heading {
+    font-size: 2rem;
+  }
+}
+
+.detail-page .feature-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .detail-page .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1100px) {
+  .detail-page .feature-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.detail-page .feature-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+/* Not a link, so no lift: the glow under the mouse (GlowCard) and a brighter edge */
+@media (hover: hover) and (pointer: fine) {
+  .detail-page .feature-card:hover {
+    border-color: var(--color-border-glow);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  }
+}
+.detail-page .feature-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: var(--color-accent);
+  margin-bottom: 0.75rem;
+}
+.detail-page .feature-title {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.4rem;
+}
+.detail-page .feature-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* =============================================
+   Real screenshots
+   ============================================= */
+.detail-page .shots {
+  /* Mobile first: stacked, in the same order as side by side (and as Tab goes): the
+     desktop capture, then the phone. Side by side only once there is room. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 2rem auto 2.5rem;
+}
+@media (min-width: 900px) {
+  .detail-page .shots {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(1rem, 4vw, 2.5rem);
+    margin: 3rem auto 4rem;
+  }
+}
+
+.detail-page .shot {
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+/* The shots are buttons that open the lightbox. */
+.detail-page button.shot {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: zoom-in;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.detail-page button.shot-phone {
+  padding: 0.6rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  .detail-page button.shot:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-border-glow);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
+  }
+}
+.detail-page button.shot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.detail-page .shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Browser chrome */
+.detail-page .shot-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-hover);
+}
+.detail-page .shot-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+}
+.detail-page .shot-dot:nth-child(1) {
+  background: #f87171;
+}
+.detail-page .shot-dot:nth-child(2) {
+  background: #facc15;
+}
+.detail-page .shot-dot:nth-child(3) {
+  background: #4ade80;
+}
+.detail-page .shot-url {
+  margin-left: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.detail-page .shot-desktop {
+  max-width: 720px;
+}
+@media (min-width: 900px) {
+  .detail-page .shot-desktop {
+    flex: 1 1 640px;
+  }
+}
+
+/* Phone frame — shown on mobile too, where it reads better than the desktop
+   capture, and sized so it stays close to life-size. */
+.detail-page .shot-phone {
+  border-radius: 1.75rem;
+}
+.detail-page button.shot-phone {
+  width: min(224px, 62%);
+  padding: 0.6rem;
+}
+@media (min-width: 900px) {
+  .detail-page button.shot-phone {
+    flex: 0 0 190px;
+    width: 190px;
+  }
+}
+
+/* Touch devices get no hover cue, so mark the desktop capture as zoomable. */
+@media (hover: none) {
+  .detail-page button.shot-desktop::after {
+    content: '\2922';
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    line-height: 1;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+  }
+}
+.detail-page .shot-phone img {
+  border-radius: 1.25rem;
+}
+.detail-page .shot-notch {
+  display: block;
+  width: 40%;
+  height: 5px;
+  margin: 0 auto 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-border);
+}
