@@ -55,14 +55,14 @@
   border: 1px solid var(--color-border);
   border-radius: 1rem;
   transition:
-    .detail-page box-shadow 0.3s ease,
+    box-shadow 0.3s ease,
     border-color 0.3s ease;
 }
 @media (hover: hover) and (pointer: fine) {
   .detail-page .overview-card:hover {
     border-color: var(--color-border-glow);
     box-shadow:
-      .detail-page 0 4px 20px rgba(0, 0, 0, 0.04),
+      0 4px 20px rgba(0, 0, 0, 0.04),
       0 0 0 1px var(--color-border-glow);
   }
 }
@@ -272,8 +272,8 @@
   text-align: left;
   cursor: zoom-in;
   transition:
-    .detail-page transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    .detail-page border-color 0.3s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
     box-shadow 0.3s ease;
 }
 .detail-page button.shot-phone {
