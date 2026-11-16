@@ -48,31 +48,37 @@ export default {
   z-index: 40;
   padding: 1rem 0;
   border-bottom: 1px solid transparent;
-  /* Transparent at the top, so the animated background (SiteBackground.vue) runs
-     through it. Once the page scrolls under it, a light frosted backing keeps the
-     nav readable over the content, still thin enough to show the background. */
-  background: transparent;
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease,
-    padding 0.3s ease;
 }
 
-.site-header.is-scrolled {
-  padding: 0.65rem 0;
-  border-bottom-color: var(--color-border);
+/* Transparent at the top, so the animated background (SiteBackground.vue) runs
+   through it. Once the page scrolls under it, a light frosted backing fades in (its
+   opacity only) and keeps the nav readable over the content, still thin enough to
+   show the background. The header keeps its height: animating it laid the whole page
+   out again every frame, and the browser's scroll anchoring undid small scrolls near
+   the top (the header flipped back and forth). */
+.site-header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -1px 0;
+  z-index: -1;
+  pointer-events: none;
+  border-bottom: 1px solid var(--color-border);
   box-shadow: 0 6px 24px -18px rgba(0, 0, 0, 0.35);
   background: rgba(246, 246, 246, 0.6);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
-.dark .site-header.is-scrolled {
+.dark .site-header::before {
   background: rgba(34, 34, 34, 0.6);
+}
+.site-header.is-scrolled::before {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-header {
+  .site-header::before {
     transition: none;
   }
 }
