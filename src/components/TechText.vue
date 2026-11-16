@@ -1,7 +1,11 @@
 <!--
   TechText from Vue Bits (https://vue-bits.dev, https://github.com/DavidHDev/vue-bits),
-  as published. Copyright (c) 2025 David Haz, MIT + Commons Clause License Condition v1.0.
-  Used by HeroWordmark.vue.
+  as published except for the lines marked "Site change". Copyright (c) 2025 David Haz,
+  MIT + Commons Clause License Condition v1.0. Used by HeroWordmark.vue.
+
+  Site change: `sweepPasses`, how many times the idle sweep crosses the word before it
+  rests (0, the default: it never rests, as published). Once it rests, nothing draws
+  until the pointer comes.
 -->
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -40,6 +44,7 @@ interface TechTextProps {
   draggable?: boolean;
   sweep?: boolean;
   speed?: number;
+  sweepPasses?: number; // Site change: see the header
   className?: string;
 }
 
@@ -99,6 +104,7 @@ const props = withDefaults(defineProps<TechTextProps>(), {
   draggable: true,
   sweep: true,
   speed: 1,
+  sweepPasses: 0, // Site change: see the header
   className: ''
 });
 
@@ -128,7 +134,8 @@ watch(
     props.labels,
     props.draggable,
     props.sweep,
-    props.speed
+    props.speed,
+    props.sweepPasses // Site change
   ],
   () => {
     settings = {
@@ -151,7 +158,8 @@ watch(
       labels: props.labels,
       draggable: props.draggable,
       sweep: props.sweep,
-      speed: props.speed
+      speed: props.speed,
+      sweepPasses: props.sweepPasses // Site change
     };
     wake();
   },
@@ -543,7 +551,9 @@ const mountScene = () => {
     last = now;
     const view = ensureLayout(s);
 
-    const sweeping = s.sweep && !reducedMotion && !pointer.inside && dragging < 0;
+    // Site change: a pass is half a period of the cosine below (one edge of the word to the other)
+    const swept = s.sweepPasses > 0 && clock * 0.45 >= s.sweepPasses * Math.PI;
+    const sweeping = s.sweep && !swept && !reducedMotion && !pointer.inside && dragging < 0; // Site change: !swept
     if (sweeping) clock += dt * s.speed;
     pulse += dt;
     let targetX = pointer.x;

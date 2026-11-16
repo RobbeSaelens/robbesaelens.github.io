@@ -8,8 +8,12 @@
   frame and its label, takes over. The canvas itself is hidden from screen
   readers, so the name is not read twice.
 
-  Its idle sweep stops while an overlay hides the page (covered.ts): the menu on a
-  phone covers the hero, which is still "in view" for TechText's own observer.
+  The idle sweep (the selection frame gliding over the letters) crosses the name
+  twice after it appears, there and back, and then rests until the mouse comes: a
+  page that sits open stops drawing. Only with a mouse or trackpad: on a touch
+  screen nothing points at it, so it stays still. It also stops while an overlay
+  hides the page (covered.ts): the menu covers the hero, which is still "in view"
+  for TechText's own observer.
 -->
 <template>
   <span class="wordmark">
@@ -25,7 +29,8 @@
         reveal="letter"
         line-style="dashed"
         :specks="12"
-        :sweep="!pageCovered"
+        :sweep="canSweep && !pageCovered"
+        :sweep-passes="SWEEP_PASSES"
       />
     </span>
   </span>
@@ -38,7 +43,11 @@ import { pageCovered } from '../covered'
 
 defineProps<{ text: string }>()
 
+/** There and back, about 14 s, then it rests. */
+const SWEEP_PASSES = 2
+
 const textRef = ref<HTMLElement | null>(null)
+const canSweep = ref(false)
 const active = ref(false)
 const drawn = ref(false)
 const fontSize = ref(48)
@@ -61,6 +70,7 @@ const readColor = () => {
 onMounted(() => {
   // A browser without these keeps the plain text.
   if (typeof ResizeObserver === 'undefined' || typeof IntersectionObserver === 'undefined') return
+  canSweep.value = window.matchMedia('(hover: hover) and (pointer: fine)').matches
   readSize()
   readColor()
   resizeObserver = new ResizeObserver(readSize)
