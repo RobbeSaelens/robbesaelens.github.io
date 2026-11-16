@@ -354,7 +354,12 @@ export default {
         )
     }
 
-    const processMessage = async (userText: string) => {
+    /**
+     * Works out the answer and shows it, no sooner than `ready` (the thinking time). The
+     * AI is asked right away, so its answer takes as long as the thinking time or the
+     * network, whichever is longer, not the two added up.
+     */
+    const processMessage = async (userText: string, ready: Promise<unknown>) => {
       const lower = userText.toLowerCase().trim()
 
       // ── Terminal reset / clear ──
@@ -369,11 +374,15 @@ export default {
         'ctrl+c',
         'cmd+c',
       ]
-      if (RESET_COMMANDS.some((cmd) => lower === cmd)) return startOver('chat.reset')
+      if (RESET_COMMANDS.some((cmd) => lower === cmd)) {
+        await ready
+        return startOver('chat.reset')
+      }
 
       // ── Easter egg riddle logic ──
       // Step 0: check if user typed a trigger word
       if (riddleStep.value === 0 && RIDDLE_TRIGGERS.some((k) => lower.includes(k))) {
+        await ready
         riddleStep.value = 1
         addMessage('bot', 'chat.easter.riddle1')
         return
@@ -381,6 +390,7 @@ export default {
 
       // Steps 1 & 3: check against static answers
       if (riddleStep.value === 1 || riddleStep.value === 3) {
+        await ready
         const answers = RIDDLE_ANSWERS[riddleStep.value]
         if (answers && answers.some((a) => lower.replace(/\s/g, '') === a.replace(/\s/g, ''))) {
           riddleStep.value++
@@ -399,6 +409,7 @@ export default {
 
       // Step 2: check against the dynamic secret code from logo triple-click
       if (riddleStep.value === 2) {
+        await ready
         if (secretCode.value && lower === secretCode.value) {
           riddleStep.value = 3
           clearSecretCode()
@@ -418,12 +429,17 @@ export default {
       // "help" lists the built-in topics; everything else goes to the AI first.
       if (responseKey !== 'chat.help') {
         const answer = await askAssistant(conversation(), locale.value === 'nl' ? 'nl' : 'en')
+        await ready
         if (answer) return addReply(answer.reply, answer.suggestions)
       }
+      await ready
       addMessage('bot', responseKey ?? 'chat.fallback')
     }
 
-    /** Shows the question, then the thinking line until the answer is there. */
+    /**
+     * Shows the question, then the thinking line until the answer is there: at least
+     * `delay` ms (a built-in answer would otherwise flash in), longer while the AI works.
+     */
     const ask = (text: string, delay: number) => {
       if (pending.value) return
       pending.value = true
@@ -431,11 +447,11 @@ export default {
       askedAt = performance.now()
       isTyping.value = true
       scrollToBottom()
-      setTimeout(async () => {
-        await processMessage(text)
+      const ready = new Promise((resolve) => setTimeout(resolve, delay))
+      void processMessage(text, ready).finally(() => {
         isTyping.value = false
         pending.value = false
-      }, delay)
+      })
     }
 
     const send = () => {
