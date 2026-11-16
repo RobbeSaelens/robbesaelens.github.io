@@ -1,7 +1,10 @@
 <!--
   Magnet from Vue Bits (https://vue-bits.dev, https://github.com/DavidHDev/vue-bits),
-  as published. Copyright (c) 2025 David Haz, MIT + Commons Clause License Condition v1.0.
-  Used by ButtonMagnet.vue.
+  as published except for the line marked "Site change". Copyright (c) 2025 David Haz,
+  MIT + Commons Clause License Condition v1.0. Used by ButtonMagnet.vue.
+
+  Site change: away from the button it only lets go once, instead of setting the
+  position again (a new object, so a re-render) on every mouse move anywhere on the page.
 -->
 <template>
   <div
@@ -71,7 +74,7 @@ const handleMouseMove = (e: MouseEvent) => {
     const offsetX = (e.clientX - centerX) / props.magnetStrength;
     const offsetY = (e.clientY - centerY) / props.magnetStrength;
     position.value = { x: offsetX, y: offsetY };
-  } else {
+  } else if (isActive.value) { // Site change: was `else`, which re-rendered on every move far away
     isActive.value = false;
     position.value = { x: 0, y: 0 };
   }
