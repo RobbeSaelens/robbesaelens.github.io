@@ -1,9 +1,11 @@
 <template>
-  <!-- useCursor.ts moves the two .cursor-pos boxes with transform: the dot on the
-       pointer, the ring trailing it. -->
+  <!-- useCursor.ts moves .cursor-pos with transform: the dot and the ring both sit on
+       the pointer. -->
   <div :class="['custom-cursor', { 'is-hover': hover, 'is-visible': visible }]" aria-hidden="true">
-    <div ref="dotEl" class="cursor-pos"><div class="cursor-dot"></div></div>
-    <div ref="ringEl" class="cursor-pos"><div class="cursor-ring"></div></div>
+    <div ref="posEl" class="cursor-pos">
+      <div class="cursor-dot"></div>
+      <div class="cursor-ring"></div>
+    </div>
   </div>
 </template>
 

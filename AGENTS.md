@@ -202,8 +202,8 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   - Reduced motion: the global rule in `terminal-theme.css` drops durations and delays;
     script-driven effects check `prefers-reduced-motion` themselves.
   - A page at rest comes to rest: no loop runs for something nobody sees or touches. The
-    custom cursor's loop runs only while its ring catches up with the pointer (and it moves
-    with `transform`, never `left`/`top`); the hero name sweeps twice, then waits for the
+    custom cursor has no loop: dot and ring sit on the pointer, moved with `transform` from
+    `mousemove`, never `left`/`top`; the hero name sweeps twice, then waits for the
     mouse; an endless CSS animation on something hidden is paused until it shows.
 - Phone-only CSS uses `@media (max-width: 639px)`, the exact complement of UnoCSS `sm:`
   (`min-width: 640px`). Never `max-width: 640px`: at exactly 640 px (a 1280 px laptop at
