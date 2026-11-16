@@ -193,21 +193,25 @@ export const routes: RouteRecordRaw[] = [
     // One layout for both languages, so switching language doesn't remount it.
     path: '/',
     component: () => import('../components/holders/AppHolder.vue'),
-    children: [...localized('en'), ...localized('nl')],
+    children: [
+      ...localized('en'),
+      ...localized('nl'),
+      // Any other URL: the not-found page, in the same layout (header, footer, skip link)
+      {
+        path: ':pathMatch(.*)*',
+        name: 'ClientError',
+        component: () => import('../screens/generic/ClientError.vue'),
+        meta: {
+          title: 'Page Not Found',
+          description: 'The page you are looking for does not exist.',
+          errorCode: '404',
+          noindex: true,
+        },
+      },
+    ],
   },
   // Query and hash go along with the redirect.
   ...redirects.map(({ from, to }): RouteRecordRaw => ({ path: from, redirect: to })),
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'ClientError',
-    component: () => import('../screens/generic/ClientError.vue'),
-    meta: {
-      title: 'Page Not Found',
-      description: 'The page you are looking for does not exist.',
-      errorCode: '404',
-      noindex: true,
-    },
-  },
 ]
 
 /**

@@ -1,5 +1,6 @@
 <template>
-  <main class="error-page">
+  <!-- Inside the site layout (AppHolder: header, footer, skip link, the <main>) -->
+  <div class="error-page">
     <div class="terminal-window">
       <!-- Title bar -->
       <div class="terminal-chrome">
@@ -19,18 +20,18 @@
 
         <!-- Content -->
         <div class="terminal-content">
-          <!-- Status code number (watermark) -->
-          <div class="status-code glitch-target">{{ statusCodeNumber }}</div>
-
-          <!-- Icon -->
-          <div class="icon-wrapper">
-            <component
-              :is="errorIcon"
-              class="error-icon"
-              :class="errorIconClass"
-              :size="80"
-              :stroke-width="1.2"
-            />
+          <!-- The icon and the status code, side by side, centred -->
+          <div class="status-row">
+            <div class="icon-wrapper">
+              <component
+                :is="errorIcon"
+                class="error-icon"
+                :class="errorIconClass"
+                :size="80"
+                :stroke-width="1.2"
+              />
+            </div>
+            <div class="status-code glitch-target">{{ statusCodeNumber }}</div>
           </div>
 
           <!-- Title / description -->
@@ -74,7 +75,7 @@
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script lang="ts">
@@ -141,13 +142,11 @@ export default defineComponent({
    ============================================= */
 
 .error-page {
-  position: fixed;
-  inset: 0;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  background: var(--color-bg);
+  padding: clamp(1rem, 4vh, 3rem) 1.5rem;
   background-image:
     radial-gradient(ellipse at 50% 0%, var(--color-accent-soft) 0%, transparent 60%),
     radial-gradient(circle at 80% 80%, rgba(13, 148, 136, 0.04) 0%, transparent 40%);
@@ -299,9 +298,7 @@ export default defineComponent({
   -webkit-text-fill-color: transparent;
   background-clip: text;
   opacity: 0.12;
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
+  position: relative;
   z-index: 1;
   user-select: none;
 }
@@ -310,10 +307,17 @@ export default defineComponent({
    Icon
    ============================================= */
 
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.75rem, 3vw, 1.5rem);
+  margin-bottom: 1.5rem;
+}
+
 .icon-wrapper {
   position: relative;
   z-index: 2;
-  margin-bottom: 1.5rem;
   animation: float 4s ease-in-out infinite;
 }
 
@@ -533,8 +537,6 @@ export default defineComponent({
 
   .status-code {
     font-size: clamp(3rem, 15vw, 5rem);
-    top: 1.25rem;
-    right: 1.25rem;
   }
 
   .error-icon {

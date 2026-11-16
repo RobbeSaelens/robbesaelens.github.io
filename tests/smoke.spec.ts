@@ -846,11 +846,15 @@ test('the Scan2Talk check-in video has working sources', async ({ request }) => 
 
 test('unknown pages show the not-found page and are kept out of search', async ({ page }) => {
   await guard(page)
-  // Not wrapped in the app layout, so there is no #main-content to wait for.
-  await page.goto('/this-page-does-not-exist')
-  await page.waitForLoadState('networkidle')
+  await open(page, '/this-page-does-not-exist')
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0)
+  // In the site layout, like every page: header, skip link, footer, one <main>
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found')
+  await expect(page.locator('.site-header')).toBeVisible()
+  await expect(page.locator('footer')).toBeVisible()
+  await expect(page.locator('.skip-link')).toHaveAttribute('href', '#main-content')
+  await expect(page.locator('main')).toHaveCount(1)
 })
 
 test.describe('chatbot', () => {
