@@ -64,9 +64,10 @@
           return
         }
         root.classList.add('intro-play')
+        // About a second: a greeting, not a wait (the page behind is already there)
         window.__introTimer = setTimeout(function () {
           root.classList.add('intro-done')
-        }, 1700)
+        }, 1000)
       })()
     </script>
     <style>
@@ -107,7 +108,7 @@
         height: 2.25rem;
         width: auto;
         margin-bottom: 1.5rem;
-        animation: intro-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        animation: intro-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
       }
       .intro-mark .i {
         fill: currentColor;
@@ -115,7 +116,7 @@
       /* The full stop doubles as a cursor while the intro runs. */
       .intro-mark .d {
         fill: #0d9488;
-        animation: intro-blink 0.9s steps(1) 0.6s infinite;
+        animation: intro-blink 0.9s steps(1) 0.45s infinite;
       }
       html.dark .intro-mark .d {
         fill: #2dd4bf;
@@ -131,16 +132,16 @@
         white-space: nowrap;
         overflow: hidden;
         opacity: 0;
-        animation: intro-line 0.35s ease forwards;
+        animation: intro-line 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
       .intro-line:nth-of-type(1) {
-        animation-delay: 0.15s;
+        animation-delay: 0.1s;
       }
       .intro-line:nth-of-type(2) {
-        animation-delay: 0.5s;
+        animation-delay: 0.3s;
       }
       .intro-line:nth-of-type(3) {
-        animation-delay: 0.85s;
+        animation-delay: 0.5s;
         white-space: normal;
         opacity: 0;
       }
@@ -168,7 +169,7 @@
         height: 100%;
         background: #0d9488;
         transform-origin: left;
-        animation: intro-bar 1.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+        animation: intro-bar 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
       }
       html.dark .intro-bar span {
         background: #2dd4bf;
