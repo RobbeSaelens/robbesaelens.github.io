@@ -82,7 +82,7 @@
               class="card-image"
               loading="lazy"
             />
-            <PhotoDither src="/about.jpg" area=".about-card" />
+            <PhotoRipple src="/about.jpg" area=".about-card" />
             <span class="card-slug">./teaching</span>
           </div>
           <div class="card-body">
@@ -104,7 +104,7 @@
               class="card-image"
               loading="lazy"
             />
-            <PhotoDither src="/horse.jpg" area=".about-card" />
+            <PhotoRipple src="/horse.jpg" area=".about-card" />
             <span class="card-slug">./riding</span>
           </div>
           <div class="card-body">
@@ -125,7 +125,7 @@
 <script lang="ts">
 import { ArrowRight, Briefcase, GraduationCap, BookOpen, Trophy } from 'lucide-vue-next'
 import GlowCard from '../components/GlowCard.vue'
-import PhotoDither from '../components/PhotoDither.vue'
+import PhotoRipple from '../components/PhotoRipple.vue'
 import TerminalHeader from '../components/TerminalHeader.vue'
 
 export default {
@@ -137,7 +137,7 @@ export default {
     GlowCard,
     GraduationCap,
     BookOpen,
-    PhotoDither,
+    PhotoRipple,
     Trophy,
     TerminalHeader,
   },
@@ -235,7 +235,10 @@ export default {
       0 4px 24px rgba(0, 0, 0, 0.06),
       0 0 0 1px var(--color-border-glow);
   }
-  .about-card:hover .card-image {
+  /* The ripples over the photo (PhotoRipple, a canvas over the <img>) zoom and dim with it
+     here and below, so a ripple lines up with the photo around it. */
+  .about-card:hover .card-image,
+  .about-card:hover .photo-ripple {
     transform: scale(1.04);
   }
 }
@@ -350,13 +353,16 @@ export default {
     grid-template-rows: 1fr;
     opacity: 1;
   }
-  .about-card--photo .card-image {
+  .about-card--photo .card-image,
+  .about-card--photo .photo-ripple {
     transition:
       transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
       filter 0.4s ease;
   }
   .about-card--photo:hover .card-image,
-  .about-card--photo:focus-within .card-image {
+  .about-card--photo:hover .photo-ripple,
+  .about-card--photo:focus-within .card-image,
+  .about-card--photo:focus-within .photo-ripple {
     filter: brightness(0.8);
   }
 }
@@ -367,22 +373,6 @@ export default {
   object-fit: cover;
   display: block;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* The photo as two-colour pixels over the <img> (PhotoDither: mouse and trackpad only).
-   Dimmed with the card like the photo under it, so the caption stays as readable;
-   keyboard focus shows the photo itself, in colour. */
-.photo-dither {
-  transition:
-    opacity 0.3s ease,
-    filter 0.4s ease;
-}
-.about-card--photo:hover .photo-dither,
-.about-card--photo:focus-within .photo-dither {
-  filter: brightness(0.8);
-}
-.about-card--photo:focus-visible .photo-dither {
-  opacity: 0;
 }
 
 /* Light top scrim keeps the slug readable over any photo */

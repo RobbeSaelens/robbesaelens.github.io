@@ -125,19 +125,21 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   | `ButtonMagnet.vue` | `Magnet.vue` | the chat button and "Say hello" |
   | `GlowCard.vue` | `SpotlightCard.vue` | the project, Drupal and About cards |
   | `ShotGlare.vue` | `GlareHover.vue` | the screenshot buttons on the project pages |
-  | `PhotoDither.vue` | `DitherVeil.vue` | the two About photos |
+  | `PhotoRipple.vue` | `RippleDistortion.vue` | water ripples under the mouse on the two About photos |
 
   Rules they all follow: the real text, numbers and images stay in the prerendered HTML
   and are what screen readers get (the effect copies are `aria-hidden`); nothing plays with
-  reduced motion; the pointer effects (magnet, glow, glare, dither) need a mouse
+  reduced motion; the pointer effects (magnet, glow, glare, ripples) need a mouse
   (`(hover: hover) and (pointer: fine)`). Their tests are `tests/vue-bits-*.spec.ts`.
-  Colours come from theme tokens (`--color-spotlight`, `--color-dither-ink`,
-  `--color-dither-paper` in `terminal-theme.css`).
+  Colours come from theme tokens (`--color-spotlight` in `terminal-theme.css`).
 
   The two WebGL ones (background, photos) need a real GPU (`src/gpu.ts`: software WebGL
   is skipped), and headless Chrome is software WebGL, so the Playwright tests and their
-  screenshots never show them. To see them headless, launch Chromium with
-  `--use-angle=metal --enable-gpu --ignore-gpu-blocklist`. Text over the background must
+  screenshots never show them (the ripple tests pretend a GPU to check how the canvas
+  behaves, not how it looks). To see them headless, launch Chromium with
+  `--use-angle=metal --enable-gpu --ignore-gpu-blocklist`. The ripple canvas lies over the
+  real `<img>`, see-through and hidden between ripples, and draws only while a ripple
+  fades: at rest the photo must look exactly as without it. Text over the background must
   still pass contrast at its brightest band, so keep its opacity low when changing colours.
   Tests that read an animated value wait for it to finish: the commit counts take a few
   seconds, and a chat answer also holds the (hidden) "Answered in" line, so match answers

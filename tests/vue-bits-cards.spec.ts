@@ -5,11 +5,12 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
  * - GlowCard (SpotlightCard): a teal glow under the text of the project pages' feature
  *   cards, the Drupal panels and the about page's text cards, following the mouse;
  * - ShotGlare (GlareHover): a glass sweep inside the project pages' screenshot buttons;
- * - PhotoDither (DitherVeil): the about photos as two-colour pixels.
+ * - PhotoRipple (RippleDistortion): water ripples under the mouse on the about photos.
  * The cards and buttons keep their tags, classes, text and clicks, the effects only
  * follow a mouse (no touch, no reduced motion), and the about photos stay real images.
- * The headless browser has no GPU, so PhotoDither never draws here: these tests check
- * that it stays out of the way (AGENTS.md says how to see it).
+ * The headless browser has no GPU (its WebGL is SwiftShader, which gpu.ts turns down), so
+ * PhotoRipple stays off; the tests marked "pretend GPU" let it run on SwiftShader to check
+ * how it behaves, not how it looks (AGENTS.md says how to see it).
  */
 
 const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail']
@@ -34,6 +35,36 @@ async function guard(page: Page) {
   })
   return errors
 }
+
+/**
+ * Pretends the headless browser's software WebGL is a GPU (gpu.ts reads the renderer's
+ * name), so the WebGL effects mount, and counts each canvas's draw calls (`__draws`).
+ */
+async function pretendGpu(page: Page) {
+  await page.addInitScript(() => {
+    const UNMASKED_RENDERER_WEBGL = 0x9246
+    const getParameter = WebGLRenderingContext.prototype.getParameter
+    WebGLRenderingContext.prototype.getParameter = function (this: WebGLRenderingContext, name: number) {
+      return name === UNMASKED_RENDERER_WEBGL || name === this.RENDERER ? 'Test GPU' : getParameter.call(this, name)
+    }
+    const draws = new WeakMap<object, number>()
+    Object.assign(window, { __draws: (canvas: object) => draws.get(canvas) ?? 0 })
+    for (const proto of [WebGLRenderingContext.prototype, WebGL2RenderingContext.prototype]) {
+      for (const name of ['drawArrays', 'drawElements', 'drawArraysInstanced', 'drawElementsInstanced']) {
+        const draw = Reflect.get(proto, name)
+        if (typeof draw !== 'function') continue
+        Reflect.set(proto, name, function (this: WebGLRenderingContext, ...args: unknown[]) {
+          draws.set(this.canvas, (draws.get(this.canvas) ?? 0) + 1)
+          return draw.apply(this, args)
+        })
+      }
+    }
+  })
+}
+
+/** How often a canvas has drawn (with pretendGpu). */
+const drawsOf = (canvas: Locator) =>
+  canvas.evaluate((c) => (window as unknown as { __draws: (c: object) => number }).__draws(c))
 
 /** Opens a page once the client app has replaced the prerendered HTML. */
 async function open(page: Page, route: string, theme: 'light' | 'dark' = 'light') {
@@ -236,6 +267,66 @@ test.describe('with a mouse', () => {
     expect(errors).toEqual([])
   })
 
+  test('the about photos ripple under the mouse, and draw only then (pretend GPU)', async ({ page }) => {
+    const errors = await guard(page)
+    await pretendGpu(page)
+    await open(page, '/contact')
+    await expect(page.locator('.site-veil canvas'), 'the pretend GPU works').toHaveCount(1)
+
+    const cards = page.locator('.about-card--photo')
+    for (const card of await cards.all()) {
+      // The canvas lies over the real photo, hidden from screen readers and the pointer,
+      // and is itself hidden until there is a ripple
+      const ripple = card.locator('.photo-ripple')
+      await expect(ripple.locator('canvas')).toHaveCount(1)
+      await expect(ripple).toHaveAttribute('aria-hidden', 'true')
+      expect(await style(ripple, 'pointer-events')).toBe('none')
+      expect(await style(ripple.locator('canvas'), 'visibility')).toBe('hidden')
+      await expect(card.locator('img.card-image')).toBeVisible()
+      await expect(card.locator('img.card-image')).toHaveAttribute('alt', /^Robbe Saelens /)
+    }
+    const teaching = cards.first()
+    const canvas = teaching.locator('canvas')
+    const other = cards.nth(1).locator('canvas')
+    await settle(teaching)
+    await page.waitForTimeout(500)
+    expect(await drawsOf(canvas), 'no drawing at rest').toBe(0)
+
+    // The mouse along the caption, which lies on the photo: ripples there too
+    const title = (await teaching.locator('.card-title').boundingBox())!
+    const box = (await teaching.boundingBox())!
+    const y = title.y + title.height / 2
+    expect(
+      await page.evaluate(([x, y]) => !!document.elementFromPoint(x, y)?.closest('.card-body'), [box.x + 40, y]),
+    ).toBe(true)
+    await page.mouse.move(box.x + 40, y)
+    await page.mouse.move(box.x + box.width - 40, y, { steps: 12 })
+    await expect.poll(() => drawsOf(canvas)).toBeGreaterThan(0)
+    expect(await style(canvas, 'visibility')).toBe('visible')
+    expect(await drawsOf(other), 'only the photo under the mouse').toBe(0)
+
+    // The mouse stops: the ripples fade, then the canvas is hidden and draws no more
+    await expect.poll(() => style(canvas, 'visibility'), { timeout: 20_000 }).toBe('hidden')
+    const stopped = await drawsOf(canvas)
+    await page.waitForTimeout(600)
+    expect(await drawsOf(canvas)).toBe(stopped)
+    expect(errors).toEqual([])
+  })
+
+  test('no ripples on the about photos with reduced motion (pretend GPU)', async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    const errors = await guard(page)
+    await pretendGpu(page)
+    await open(page, '/contact')
+    await expect(page.locator('.site-veil canvas'), 'the pretend GPU works').toHaveCount(1)
+    await page.waitForTimeout(300)
+    await expect(page.locator('.about-card--photo canvas')).toHaveCount(0)
+    await expect(page.locator('.about-card--photo img.card-image')).toHaveCount(2)
+    expect(errors).toEqual([])
+    await context.close()
+  })
+
   test('no glow and no sweep with reduced motion', async ({ browser }) => {
     const context = await browser.newContext({ reducedMotion: 'reduce' })
     const page = await context.newPage()
@@ -268,9 +359,12 @@ test.describe('on a touch screen', () => {
     expect(errors).toEqual([])
   })
 
-  test('the about photos stay plain images, so the cards still swipe', async ({ page }) => {
+  test('the about photos stay plain images, so the cards still swipe (pretend GPU)', async ({ page }) => {
     const errors = await guard(page)
+    await pretendGpu(page)
     await open(page, '/contact')
+    await expect(page.locator('.site-veil canvas'), 'the pretend GPU works').toHaveCount(1)
+    await page.waitForTimeout(300)
     await expect(page.locator('.about-card--photo canvas')).toHaveCount(0)
     await expect(page.locator('.about-card--photo img.card-image')).toHaveCount(2)
     expect(errors).toEqual([])
