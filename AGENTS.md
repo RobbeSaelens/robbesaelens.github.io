@@ -45,7 +45,8 @@ It opens every page in `tests/routes.ts` at these sizes:
 
 It fails when a page scrolls sideways, or when a one-screen page (`FIT_ROUTES`: the
 projects and about pages) scrolls vertically. It also writes a full-page screenshot per
-case to `test-results/responsive/<page>/<width>x<height>-<theme>.png`.
+case to `test-results/responsive/<page>/<width>x<height>-<theme>.png` (the whole page,
+top to bottom, because the document is what scrolls; see Conventions).
 
 The assertions can't tell whether a layout looks right. **Open the screenshots of every
 page you touched, at every size**, and check for: text that wraps badly or is cut off,
@@ -144,6 +145,11 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   Tests that read an animated value wait for it to finish: the commit counts take a few
   seconds, and a chat answer also holds the (hidden) "Answered in" line, so match answers
   with `toContainText` or a pattern. Responsive screenshots may catch a count mid-way.
+- The document scrolls, at every size: the wrapper in `App.vue` only clips sideways
+  overflow (`overflow-x-clip`). Don't make a page wrapper a scroll container: the
+  router's scroll reset, keyboard scrolling (Space, Page Down), the phone browsers'
+  toolbars and the responsive test's full-page screenshots all rely on the window
+  scrolling. The one-screen pages are `100dvh` tall (`AppHolder.vue`), not a scroller.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).
 - Screenshots of projects are real ones from the live sites, never mockups. The project
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D

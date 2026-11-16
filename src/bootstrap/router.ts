@@ -218,8 +218,9 @@ export function createAppRouter(history: RouterHistory): Router {
   const router = createRouter({
     history,
     routes,
-    scrollBehavior() {
-      return { top: 0 }
+    // A new page starts at the top; back and forward return to where you were.
+    scrollBehavior(_to, _from, savedPosition) {
+      return savedPosition ?? { top: 0 }
     },
   })
 

@@ -1,11 +1,13 @@
 <template>
-  <!-- Mobile scrolls the document; overflow-x-clip stops sideways overflow without
-       turning this div into a scroll container, which would break the sticky header. -->
+  <!-- The document scrolls, at every size: the router's scroll reset, keyboard
+       scrolling (Space, Page Down) and the browser's own toolbar handling all
+       work on the window. overflow-x-clip stops sideways overflow without turning
+       this div into a scroll container, which would break the sticky header. -->
   <!-- No background of its own: <html> paints the page colour (styles.css), and the
        animated background (SiteBackground, z-index -1) sits between the two. A
        background or a stacking context here would hide it, or trap the custom
        cursor under overlays teleported to <body> (lightbox, mobile menu). -->
-  <div class="overflow-x-clip sm:h-screen sm:overflow-x-hidden sm:overflow-y-auto">
+  <div class="overflow-x-clip">
     <SiteBackground />
     <CustomCursor />
     <router-view> </router-view>

@@ -85,8 +85,8 @@ function goTo(i: number) {
   document.getElementById(`privacy-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-// The page scrolls inside a container on wider screens, not the window, so
-// listen in the capture phase: that catches scrolling of any element.
+// Listen in the capture phase: that catches the window's scrolling and any
+// element's (an index jump, the End key).
 function onScroll() {
   cancelAnimationFrame(frame)
   frame = requestAnimationFrame(() => {
