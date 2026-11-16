@@ -54,7 +54,7 @@ async function openChat(page: Page, path = '/') {
   await waitForAnswer(page, 1)
 }
 
-/** Waits for `count` bot messages (the typing dots look like one, so not those). */
+/** Waits for `count` bot messages (the thinking row looks like one while it runs, so not that). */
 async function waitForAnswer(page: Page, count: number) {
   await expect(page.locator('.chat-typing')).toHaveCount(0)
   await expect(page.locator('.msg--bot')).toHaveCount(count)
@@ -102,32 +102,45 @@ test('an answer without follow-ups shows no chips', async ({ page }) => {
   await expect(page.locator('.chat-chip')).toHaveCount(0)
 })
 
-test('one question at a time: a second one waits, the typed text is kept', async ({ page }) => {
-  await setup(page)
-  let release!: () => void
-  const gate = new Promise<void>((r) => (release = r))
-  const sent: Sent[] = []
-  await page.route('https://chat.invalid/chat', async (route) => {
-    if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: CORS })
-    sent.push(route.request().postDataJSON() as Sent)
-    await gate
-    await route.fulfill({ status: 200, json: { reply: 'Slow answer', suggestions: [] }, headers: CORS })
+for (const [path, thinking, answered] of [
+  ['/', 'Thinking', 'Answered in'],
+  ['/nl', 'Nadenken', 'Beantwoord in'],
+]) {
+  test(`one question at a time: a second one waits, the typed text is kept (${path})`, async ({ page }) => {
+    await setup(page)
+    let release!: () => void
+    const gate = new Promise<void>((r) => (release = r))
+    const sent: Sent[] = []
+    await page.route('https://chat.invalid/chat', async (route) => {
+      if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: CORS })
+      sent.push(route.request().postDataJSON() as Sent)
+      await gate
+      await route.fulfill({ status: 200, json: { reply: 'Slow answer', suggestions: [] }, headers: CORS })
+    })
+    await openChat(page, path)
+
+    await page.locator('#chat-input').fill('First question')
+    await page.locator('#chat-input').press('Enter')
+    // The thinking line: pulsing dots, the label and a running timer
+    const typing = page.locator('.chat-typing')
+    await expect(typing).toBeVisible()
+    await expect(typing.locator('[data-status="working"] [data-active]')).toHaveText(thinking)
+    await expect(typing.locator('.tabular-nums')).toHaveText(/^\d+\.\ds$/)
+    await page.locator('#chat-input').fill('Second question')
+    await page.locator('#chat-input').press('Enter')
+    await expect(page.locator('.chat-send')).toBeDisabled()
+    await expect(page.locator('#chat-input')).toHaveValue('Second question')
+
+    release()
+    await waitForAnswer(page, 2)
+    // ...done: the answer opens with a check and the time it took
+    const answer = page.locator('.msg--bot').last()
+    await expect(answer).toContainText('Slow answer')
+    await expect(answer.locator('[data-status="done"] [data-active]')).toHaveText(answered)
+    expect(sent).toHaveLength(1)
+    await expect(page.locator('.chat-send')).toBeEnabled()
   })
-  await openChat(page)
-
-  await page.locator('#chat-input').fill('First question')
-  await page.locator('#chat-input').press('Enter')
-  await expect(page.locator('.chat-typing')).toBeVisible()
-  await page.locator('#chat-input').fill('Second question')
-  await page.locator('#chat-input').press('Enter')
-  await expect(page.locator('.chat-send')).toBeDisabled()
-  await expect(page.locator('#chat-input')).toHaveValue('Second question')
-
-  release()
-  await waitForAnswer(page, 2)
-  expect(sent).toHaveLength(1)
-  await expect(page.locator('.chat-send')).toBeEnabled()
-})
+}
 
 test('clear starts over without closing', async ({ page }) => {
   await setup(page)
