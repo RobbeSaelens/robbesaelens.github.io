@@ -280,8 +280,8 @@ export default defineComponent({
    Real screenshots
    ============================================= */
 .shots {
-  /* Mobile first: stack, with the phone shot on top because it is the one that
-     stays legible at this width. Side by side only once there is room. */
+  /* Mobile first: stacked, in the same order as side by side (and as Tab goes): the
+     desktop capture, then the phone. Side by side only once there is room. */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -373,12 +373,10 @@ button.shot:focus-visible {
 
 .shot-desktop {
   max-width: 720px;
-  order: 2;
 }
 @media (min-width: 900px) {
   .shot-desktop {
     flex: 1 1 640px;
-    order: 0;
   }
 }
 
@@ -386,16 +384,12 @@ button.shot:focus-visible {
    capture, and sized so it stays close to life-size. */
 .shot-phone {
   border-radius: 1.75rem;
-  order: 1;
 }
 button.shot-phone {
   width: min(224px, 62%);
   padding: 0.6rem;
 }
 @media (min-width: 900px) {
-  .shot-phone {
-    order: 0;
-  }
   button.shot-phone {
     flex: 0 0 190px;
     width: 190px;

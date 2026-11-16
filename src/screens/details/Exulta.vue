@@ -66,20 +66,14 @@
           </ShotGlare>
         </button>
       </div>
-      <div class="pt-10 md:mx-10">
-        <div class="mb-10">
-          <h2 class="mb-3 text-4xl font-bold md:text-5xl" style="color: var(--color-text-primary)">
-            {{ $t('exulta.overview') }}
-          </h2>
-        </div>
-
-        <div class="mb-8 flex flex-col gap-8 md:flex-row">
-          <div class="reveal overview-card flex-1 px-6 py-8 md:px-8">
-            <h3 class="overview-label">{{ $t('exulta.about') }}</h3>
-            <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
-              {{ $t('exulta.aboutText') }}
-            </p>
-          </div>
+      <div class="pt-4 md:mx-10">
+        <!-- Overview -->
+        <h2 class="section-heading reveal">{{ $t('exulta.overview') }}</h2>
+        <div class="reveal overview-card mb-14 px-6 py-8 md:px-8">
+          <h3 class="overview-label">{{ $t('exulta.about') }}</h3>
+          <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary)">
+            {{ $t('exulta.aboutText') }}
+          </p>
         </div>
 
         <!-- Features -->
@@ -104,7 +98,7 @@
           </a>
         </div>
 
-        <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div class="reveal overview-card px-6 py-8">
             <h3 class="overview-label">{{ $t('exulta.languages') }}</h3>
             <div class="flex flex-wrap gap-2">
@@ -442,8 +436,8 @@ export default defineComponent({
    Real screenshots
    ============================================= */
 .shots {
-  /* Mobile first: stack, with the phone shot on top because it is the one that
-     stays legible at this width. Side by side only once there is room. */
+  /* Mobile first: stacked, in the same order as side by side (and as Tab goes): the
+     desktop capture, then the phone. Side by side only once there is room. */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -535,12 +529,10 @@ button.shot:focus-visible {
 
 .shot-desktop {
   max-width: 720px;
-  order: 2;
 }
 @media (min-width: 900px) {
   .shot-desktop {
     flex: 1 1 640px;
-    order: 0;
   }
 }
 
@@ -548,16 +540,12 @@ button.shot:focus-visible {
    capture, and sized so it stays close to life-size. */
 .shot-phone {
   border-radius: 1.75rem;
-  order: 1;
 }
 button.shot-phone {
   width: min(224px, 62%);
   padding: 0.6rem;
 }
 @media (min-width: 900px) {
-  .shot-phone {
-    order: 0;
-  }
   button.shot-phone {
     flex: 0 0 190px;
     width: 190px;
