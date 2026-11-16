@@ -1,5 +1,5 @@
 <template>
-  <header class="fade-out flex flex-1 items-center">
+  <header class="home fade-out flex flex-1 items-center">
     <Profile />
   </header>
 </template>
@@ -13,3 +13,12 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/* Portrait tablets: the hero at the top, not floating in the middle of a tall screen */
+@media (min-width: 640px) and (orientation: portrait) {
+  .home {
+    align-items: flex-start;
+  }
+}
+</style>
