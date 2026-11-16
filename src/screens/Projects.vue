@@ -479,11 +479,20 @@ export default {
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  /* Vertical padding leaves room for the slide shadow, which the scroller would clip. */
-  padding: clamp(1rem, 3vh, 1.75rem) var(--gutter) clamp(2rem, 6vh, 3.5rem);
+  /* Vertical padding leaves room for the slide shadow, which the scroller would clip,
+     and above for the MacBook's lid, which reaches a little past its stage. */
+  padding: clamp(1.5rem, 3vh, 1.75rem) var(--gutter) clamp(2rem, 6vh, 3.5rem);
   scroll-padding: 0 var(--gutter);
   outline: none;
   cursor: grab;
+}
+/* Too short for one screen (fit is off): a fixed height. Flexed, in a page of no fixed
+   height, its container height reads as 0 and the slides (sized in cqh) collapse. */
+@media (max-height: 559px) {
+  .car-track {
+    flex: none;
+    height: 18rem;
+  }
 }
 .car-track::-webkit-scrollbar {
   display: none;

@@ -11,6 +11,8 @@ import { measureCurrentSlide } from './slides'
  *
  * Run with `npm run test:responsive` (see AGENTS.md).
  */
+// The first seven are the sizes in AGENTS.md; the last three are where things run
+// out of room (and caught real breakage: hidden about text, collapsed project slides).
 const BREAKPOINTS = [
   { name: 'phone-small', width: 360, height: 740 },
   { name: 'phone', width: 390, height: 844 },
@@ -19,6 +21,10 @@ const BREAKPOINTS = [
   { name: 'laptop-small', width: 1280, height: 720 },
   { name: 'laptop', width: 1440, height: 900 },
   { name: 'desktop', width: 1920, height: 1080 },
+  // Short and zoomed screens, where one-screen pages and sticky panels run out of room
+  { name: 'zoom-200', width: 640, height: 360 }, // a 1280 × 720 laptop at 200 % zoom
+  { name: 'tablet-landscape-safari', width: 1024, height: 690 }, // iPad landscape, minus Safari's bars
+  { name: 'laptop-short', width: 1366, height: 600 }, // 1366 × 768 laptop, minus browser and taskbar
 ]
 const DARK = ['phone', 'laptop']
 /** Dutch text runs longer: the Dutch pages get checked at these sizes too. */
@@ -73,6 +79,30 @@ for (const base of ROUTES) {
       expect(size.sideways, 'scrolls sideways').toBeLessThanOrEqual(1)
       if (FIT_ROUTES.includes(base) && height >= FIT_MIN_HEIGHT) {
         expect(size.vertical, 'one-screen page scrolls vertically').toBeLessThanOrEqual(1)
+      }
+
+      // The about cards scroll inside themselves only as a last resort, with no visible
+      // scrollbar: at these sizes all their text must show.
+      if (base === '/contact') {
+        const hidden = await page.locator('.card-body').evaluateAll((els) => els.map((e) => e.scrollHeight - e.clientHeight))
+        expect(Math.max(...hidden), 'text cut off inside an about card').toBeLessThanOrEqual(1)
+      }
+
+      // Tap targets: at least 24 × 24 px; the main controls 44 px on a touch phone
+      const targets = await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>('.nav-menu-btn, .nav-icon-btn, .lang-switch, .chatbot-fab, .car-dot, .car-btn')]
+          .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden')
+          .map((el) => {
+            const r = el.getBoundingClientRect()
+            return { name: el.className.split(' ')[0], w: Math.round(r.width), h: Math.round(r.height) }
+          }),
+      )
+      for (const t of targets) {
+        expect(Math.min(t.w, t.h), `${t.name} is ${t.w}×${t.h}`).toBeGreaterThanOrEqual(24)
+        if (width < 640 && ['nav-icon-btn', 'nav-menu-btn', 'chatbot-fab'].includes(t.name)) {
+          expect(Math.min(t.w, t.h), `${t.name} on a phone is ${t.w}×${t.h}`).toBeGreaterThanOrEqual(44)
+        }
+        if (width < 640 && t.name === 'car-dot') expect(t.h, `car-dot on a phone is ${t.h}px tall`).toBeGreaterThanOrEqual(44)
       }
 
       // The project slides: the stage spans its slide, edge to edge with the caption,

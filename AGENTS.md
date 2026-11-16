@@ -42,9 +42,14 @@ It opens every page in `tests/routes.ts` at these sizes:
 | laptop-small | 1280 × 720 | 13" laptops, short screens |
 | laptop | 1440 × 900 | common laptop (also in dark mode) |
 | desktop | 1920 × 1080 | full HD monitor |
+| zoom-200 | 640 × 360 | a 1280 × 720 laptop at 200 % zoom |
+| tablet-landscape-safari | 1024 × 690 | iPad landscape, minus Safari's bars |
+| laptop-short | 1366 × 600 | 1366 × 768 laptop, minus browser and taskbar |
 
 It fails when a page scrolls sideways, or when a one-screen page (`FIT_ROUTES`: the
-projects and about pages) scrolls vertically. It also writes a full-page screenshot per
+projects and about pages) scrolls vertically. It also fails when text is cut off inside
+an about card, and when a tap target is under 24 × 24 px (the menu, chat and close
+buttons and the carousel dots under 44 px on phones). It also writes a full-page screenshot per
 case to `test-results/responsive/<page>/<width>x<height>-<theme>.png` (the whole page,
 top to bottom, because the document is what scrolls; see Conventions).
 
