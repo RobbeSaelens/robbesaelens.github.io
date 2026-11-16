@@ -111,6 +111,14 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   `VITE_SENTRY_ENVIRONMENT=local`.
 - Statistics are Cloudflare Web Analytics: cookieless, so there is no cookie banner.
   Don't add anything that sets cookies or tracks visitors without revisiting the privacy page.
+- Two canvases from Vue Bits (https://vue-bits.dev; keep their licence headers): the hero
+  name (`HeroWordmark.vue` around `TechText.vue`; the real text stays underneath for SEO,
+  screen readers and the prerendered HTML) and the animated background behind every page
+  (`SiteBackground.vue` around `DarkVeil.vue`, mounted in `App.vue`). The background is
+  skipped on software WebGL, and headless Chrome is software WebGL, so the Playwright tests
+  and their screenshots never show it: to see it headless, launch Chromium with
+  `--use-angle=metal --enable-gpu`. Text over it must still pass contrast at its brightest
+  band, so keep its opacity low when changing colours.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px).
 - Screenshots of projects are real ones from the live sites, never mockups. The project
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
