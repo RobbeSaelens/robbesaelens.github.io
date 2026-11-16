@@ -519,8 +519,21 @@ export default defineComponent({
 
 .glitch-target {
   animation:
-    fadeIn 0.6s ease both,
+    fade-in-faint 0.6s ease both,
     glitch-shift 8s step-end 6s infinite;
+}
+
+/* The shared fadeIn ends at full opacity and, filled forwards, would override the
+   status code's own faint 0.12: fade it in to that instead. */
+@keyframes fade-in-faint {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 0.12;
+    transform: translateY(0);
+  }
 }
 
 /* =============================================
@@ -537,7 +550,7 @@ export default defineComponent({
   }
 
   .glitch-target {
-    animation: fadeIn 0.6s ease both;
+    animation: fade-in-faint 0.6s ease both;
   }
 
   /* Everything there from the start, the command already typed */
