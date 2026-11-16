@@ -741,9 +741,10 @@ export default {
   .car-slide {
     flex-basis: 84cqw;
   }
-  /* A 5:4 stage, centred with its caption, instead of one as tall as the screen */
+  /* A 5:4 stage with its caption right under the title, instead of one as tall as the
+     screen; the room left over goes below, above the page dots */
   .car-card {
-    justify-content: center;
+    justify-content: flex-start;
   }
   .car-stage {
     flex: 0 1 auto;
