@@ -213,11 +213,8 @@ export default {
 }
 
 @media (min-width: 768px) {
-  /* The text column stops at 44rem and the photo follows it, so on wide screens the
-     hero is about 72rem from the logo instead of spreading over the whole width. */
   .hero {
-    grid-template-columns: minmax(0, 44rem) auto;
-    justify-content: start;
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
       'head photo'
       'body photo';
