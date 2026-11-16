@@ -3,7 +3,7 @@
     <div class="hero-head">
       <h1 class="hero-in terminal-title hero-title font-bold" style="--i: 0">
         <span class="terminal-prompt">&gt;</span>
-        <span class="terminal-text">robbe saelens</span>
+        <HeroWordmark text="robbe saelens" />
         <span class="terminal-cursor" aria-hidden="true"></span>
       </h1>
       <p class="hero-in hero-role" style="--i: 1">
@@ -156,11 +156,13 @@ import {
 } from 'lucide-vue-next'
 import PlaceMap from './PlaceMap.vue'
 import DrupalIcon from './DrupalIcon.vue'
+import HeroWordmark from './HeroWordmark.vue'
 
 export default {
   components: {
     PlaceMap,
     DrupalIcon,
+    HeroWordmark,
     Instagram,
     Linkedin,
     Facebook,
