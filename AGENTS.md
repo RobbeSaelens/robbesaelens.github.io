@@ -152,8 +152,8 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   covers the whole page (lightbox, mobile menu, easter egg) calls `setCovering(name, open)`
   from `src/covered.ts` (it also sets `is-covered` on `<html>`); the background and the
   hero name's sweep stop until it closes. A new full-screen overlay does the same.
-  Tests that read an animated value wait for it to finish: the commit counts take a few
-  seconds, and a chat answer also holds the (hidden) "Answered in" line, so match answers
+  Tests that read an animated value wait for it to finish: the commit counts take 0.9 s
+  once in view (`CountUpNumber.vue`, a time-based ease-out), and a chat answer also holds the (hidden) "Answered in" line, so match answers
   with `toContainText` or a pattern. Responsive screenshots may catch a count mid-way.
 - The document scrolls, at every size: the wrapper in `App.vue` only clips sideways
   overflow (`overflow-x-clip`). Don't make a page wrapper a scroll container: the

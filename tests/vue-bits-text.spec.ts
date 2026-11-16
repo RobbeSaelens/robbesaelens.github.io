@@ -215,13 +215,16 @@ test.describe('the commit counts (CountUp)', () => {
       await expect(dd.locator('.sr-only')).toHaveText(final)
 
       await dd.scrollIntoViewIfNeeded()
-      await expect(dd).toHaveText(final, { timeout: 10_000 })
+      await expect(dd).toHaveText(final, { timeout: 5_000 })
       await expect(dd.locator('.sr-only, [aria-hidden]')).toHaveCount(0)
 
       const played = (await frames()).filter((f) => f.animating)
       const shown = played.map((f) => Number(f.shown.replace(/\D/g, '')))
       expect(shown.some((n) => n > 0 && n < stats.exulta.commits), 'counted through the numbers in between').toBe(true)
       expect(shown, 'counts up, never down').toEqual([...shown].sort((a, b) => a - b))
+      // In about 0.9 s (CountUpNumber's DURATION), not the seconds a spring took for the last few
+      const counted = played.filter((f) => Number(f.shown.replace(/\D/g, '')) > 0)
+      expect(counted.at(-1)!.t - counted[0].t, 'counts in about a second').toBeLessThan(1500)
       for (const f of await frames()) expect(f.heard).toBe(final)
       expect(errors).toEqual([])
     })
@@ -232,8 +235,8 @@ test.describe('the commit counts (CountUp)', () => {
     const errors = await guard(page)
     await page.goto('/exultadetail')
     const dd = page.locator('.repo--aside .repo-number dd')
-    await expect(dd.first()).toHaveText(stats.exulta.commits.toLocaleString('en-GB'), { timeout: 10_000 })
-    await expect(dd.nth(1)).toHaveText(stats.exulta.commitsLast30Days.toLocaleString('en-GB'), { timeout: 10_000 })
+    await expect(dd.first()).toHaveText(stats.exulta.commits.toLocaleString('en-GB'), { timeout: 5_000 })
+    await expect(dd.nth(1)).toHaveText(stats.exulta.commitsLast30Days.toLocaleString('en-GB'), { timeout: 5_000 })
     await expect(dd.locator('.sr-only, [aria-hidden]')).toHaveCount(0)
     expect(errors).toEqual([])
   })

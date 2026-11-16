@@ -16,7 +16,7 @@
       <CountUp
         aria-hidden="true"
         :to="value"
-        :duration="0.5"
+        :duration="DURATION"
         :delay="delay"
         :start-when="inView"
         :format="show"
@@ -29,6 +29,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import CountUp from './CountUp.vue'
+
+/** Seconds to count, easing out: long enough to read it climb, short enough not to wait for. */
+const DURATION = 0.9
 
 const props = withDefaults(
   defineProps<{
@@ -48,7 +51,7 @@ let observer: IntersectionObserver | undefined
 
 /**
  * CountUp's formatter. Once it shows the final number, the plain number takes over:
- * CountUp's spring would go on easing towards it for a few more seconds, invisibly.
+ * CountUp would go on easing the last fraction for a moment, invisibly.
  */
 const show = (n: number) => {
   if (n === props.value) stop()
