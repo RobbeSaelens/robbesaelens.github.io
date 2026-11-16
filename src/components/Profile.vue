@@ -91,7 +91,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.instagram.com/robbe.saelens/"
-            aria-label="Follow me on Instagram"
+            :aria-label="$t('home.social.instagram')"
             class="social-link"
           >
             <Instagram class="social-icon" />
@@ -102,7 +102,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.facebook.com/profile.php?id=100006223099352"
-            aria-label="Connect on Facebook"
+            :aria-label="$t('home.social.facebook')"
             class="social-link"
           >
             <Facebook class="social-icon" />
@@ -113,7 +113,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.linkedin.com/in/robbe-saelens-1a14511b8/"
-            aria-label="Connect on LinkedIn"
+            :aria-label="$t('home.social.linkedin')"
             class="social-link"
           >
             <Linkedin class="social-icon" />
@@ -124,7 +124,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/RobbeSaelens"
-            aria-label="View my GitHub profile"
+            :aria-label="$t('home.social.github')"
             class="social-link"
           >
             <Github class="social-icon" />
@@ -135,7 +135,7 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.drupal.org/u/robbesaelens"
-            aria-label="View my drupal.org profile"
+            :aria-label="$t('home.social.drupal')"
             class="social-link"
           >
             <DrupalIcon class="social-icon" />

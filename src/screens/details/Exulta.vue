@@ -30,7 +30,7 @@
         <button
           type="button"
           class="shot shot-desktop"
-          :aria-label="`Open ${shotList[0].caption} screenshot full screen`"
+          :aria-label="$t('aria.openScreenshot', { name: shotList[0].caption })"
           @click="lightboxIndex = 0">
           <ShotGlare>
             <span class="shot-bar" aria-hidden="true">
@@ -52,7 +52,7 @@
         <button
           type="button"
           class="shot shot-phone"
-          :aria-label="`Open ${shotList[1].caption} screenshot full screen`"
+          :aria-label="$t('aria.openScreenshot', { name: shotList[1].caption })"
           @click="lightboxIndex = 1">
           <ShotGlare radius="1.25rem">
             <span class="shot-notch" aria-hidden="true"></span>
@@ -190,7 +190,7 @@ export default defineComponent({
     shotList(): LightboxImage[] {
       return [
         { src: '/exulta-home.jpg', alt: this.$t('exulta.alt') as string, caption: 'exulta.be' },
-        { src: '/exulta-mobile.jpg', alt: this.$t('exulta.alt') as string, caption: 'exulta.be — mobile' },
+        { src: '/exulta-mobile.jpg', alt: this.$t('exulta.alt') as string, caption: `exulta.be — ${this.$t('projects.shotMobile')}` },
       ]
     },
 

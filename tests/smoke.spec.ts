@@ -863,6 +863,19 @@ test('the Scan2Talk check-in video has working sources', async ({ request }) => 
   }
 })
 
+test('screenshot buttons and social links are labelled in the page language', async ({ page }) => {
+  await guard(page)
+  await open(page, '/nl/exultadetail')
+  await expect(page.locator('button.shot').nth(1)).toHaveAttribute(
+    'aria-label',
+    'Open de schermafbeelding van exulta.be — mobiel op volledig scherm',
+  )
+  await open(page, '/nl')
+  await expect(page.getByRole('link', { name: 'Volg me op Instagram' })).toBeVisible()
+  await open(page, '/')
+  await expect(page.getByRole('link', { name: 'Follow me on Instagram' })).toBeVisible()
+})
+
 test('unknown pages show the not-found page and are kept out of search', async ({ page }) => {
   await guard(page)
   await open(page, '/this-page-does-not-exist')

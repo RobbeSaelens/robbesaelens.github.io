@@ -27,7 +27,7 @@
         <button
           type="button"
           class="shot shot-desktop"
-          :aria-label="`Open ${shotList[0].caption} screenshot full screen`"
+          :aria-label="$t('aria.openScreenshot', { name: shotList[0].caption })"
           @click="lightboxIndex = 0">
           <ShotGlare>
             <span class="shot-bar" aria-hidden="true">
@@ -49,7 +49,7 @@
         <button
           type="button"
           class="shot shot-phone"
-          :aria-label="`Open ${shotList[1].caption} screenshot full screen`"
+          :aria-label="$t('aria.openScreenshot', { name: shotList[1].caption })"
           @click="lightboxIndex = 1">
           <ShotGlare radius="1.25rem">
             <span class="shot-notch" aria-hidden="true"></span>
@@ -168,8 +168,8 @@ export default defineComponent({
   computed: {
     shotList(): { src: string; alt: string; caption: string }[] {
       return [
-        { src: '/vhs-home.jpg', alt: this.$t('vhs.alt') as string, caption: 'VHS Service — desktop' },
-        { src: '/vhs-mobile.jpg', alt: this.$t('vhs.alt') as string, caption: 'VHS Service — mobile' },
+        { src: '/vhs-home.jpg', alt: this.$t('vhs.alt') as string, caption: `VHS Service — ${this.$t('projects.shotDesktop')}` },
+        { src: '/vhs-mobile.jpg', alt: this.$t('vhs.alt') as string, caption: `VHS Service — ${this.$t('projects.shotMobile')}` },
       ]
     },
 

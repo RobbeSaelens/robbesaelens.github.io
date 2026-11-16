@@ -30,7 +30,7 @@
         <button
           type="button"
           class="shot shot-desktop"
-          :aria-label="`Open ${shotList[0].caption} screenshot full screen`"
+          :aria-label="$t('aria.openScreenshot', { name: shotList[0].caption })"
           @click="lightboxIndex = 0">
           <ShotGlare>
             <span class="shot-bar" aria-hidden="true">
@@ -52,7 +52,7 @@
         <button
           type="button"
           class="shot shot-phone"
-          :aria-label="`Open ${shotList[1].caption} screenshot full screen`"
+          :aria-label="$t('aria.openScreenshot', { name: shotList[1].caption })"
           @click="lightboxIndex = 1">
           <ShotGlare radius="1.25rem">
             <span class="shot-notch" aria-hidden="true"></span>
@@ -136,7 +136,7 @@
             <button
               type="button"
               class="reveal shot shot-drupal"
-              :aria-label="`Open ${shotList[2].caption} screenshot full screen`"
+              :aria-label="$t('aria.openScreenshot', { name: shotList[2].caption })"
               @click="lightboxIndex = 2">
               <ShotGlare>
                 <span class="shot-bar" aria-hidden="true">
@@ -269,12 +269,12 @@ export default defineComponent({
   computed: {
     shotList(): LightboxImage[] {
       return [
-        { src: '/stable-manager-home.jpg', alt: this.$t('stableManager.alt') as string, caption: 'Stable Manager — desktop' },
-        { src: '/stable-manager-mobile.jpg', alt: this.$t('stableManager.alt') as string, caption: 'Stable Manager — mobile' },
+        { src: '/stable-manager-home.jpg', alt: this.$t('stableManager.alt') as string, caption: `Stable Manager — ${this.$t('projects.shotDesktop')}` },
+        { src: '/stable-manager-mobile.jpg', alt: this.$t('stableManager.alt') as string, caption: `Stable Manager — ${this.$t('projects.shotMobile')}` },
         {
           src: '/shared-costs-home.jpg',
           alt: this.$t('stableManager.drupalAlt') as string,
-          caption: 'Stable Manager in Drupal — dashboard',
+          caption: `Stable Manager in Drupal — ${this.$t('projects.shotDashboard')}`,
         },
       ]
     },

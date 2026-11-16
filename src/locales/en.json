@@ -17,7 +17,14 @@
     "educationLabel": "Bachelor's degree in",
     "sayHello": "Say hello",
     "goToProjects": "Go to my projects",
-    "photoTooltip": "full-stack developer detected"
+    "photoTooltip": "full-stack developer detected",
+    "social": {
+      "instagram": "Follow me on Instagram",
+      "facebook": "Connect on Facebook",
+      "linkedin": "Connect on LinkedIn",
+      "github": "View my GitHub profile",
+      "drupal": "View my drupal.org profile"
+    }
   },
   "about": {
     "title": "About me",
@@ -65,7 +72,10 @@
     "mockupAlt": "{name} on a MacBook",
     "viewCase": "View project",
     "prev": "Previous project",
-    "next": "Next project"
+    "next": "Next project",
+    "shotDesktop": "desktop",
+    "shotMobile": "mobile",
+    "shotDashboard": "dashboard"
   },
   "exulta": {
     "title": "Exulta",
@@ -270,7 +280,8 @@
     "toggleNav": "Toggle navigation menu",
     "skipToContent": "Skip to main content",
     "mainNav": "Main navigation",
-    "closeNav": "Close navigation menu"
+    "closeNav": "Close navigation menu",
+    "openScreenshot": "Open {name} screenshot full screen"
   },
   "easter": {
     "title": "DEVELOPER MODE",

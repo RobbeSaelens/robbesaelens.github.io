@@ -17,7 +17,14 @@
     "educationLabel": "Bachelordiploma in",
     "sayHello": "Zeg hallo",
     "goToProjects": "Bekijk mijn projecten",
-    "photoTooltip": "full-stack developer gedetecteerd"
+    "photoTooltip": "full-stack developer gedetecteerd",
+    "social": {
+      "instagram": "Volg me op Instagram",
+      "facebook": "Vind me op Facebook",
+      "linkedin": "Connecteer op LinkedIn",
+      "github": "Bekijk mijn GitHub-profiel",
+      "drupal": "Bekijk mijn drupal.org-profiel"
+    }
   },
   "about": {
     "title": "Over mij",
@@ -65,7 +72,10 @@
     "mockupAlt": "{name} op een MacBook",
     "viewCase": "Bekijk project",
     "prev": "Vorig project",
-    "next": "Volgend project"
+    "next": "Volgend project",
+    "shotDesktop": "desktop",
+    "shotMobile": "mobiel",
+    "shotDashboard": "dashboard"
   },
   "exulta": {
     "title": "Exulta",
@@ -270,7 +280,8 @@
     "toggleNav": "Navigatiemenu openen",
     "skipToContent": "Ga naar hoofdinhoud",
     "mainNav": "Hoofdnavigatie",
-    "closeNav": "Navigatiemenu sluiten"
+    "closeNav": "Navigatiemenu sluiten",
+    "openScreenshot": "Open de schermafbeelding van {name} op volledig scherm"
   },
   "easter": {
     "title": "DEVELOPER MODE",
