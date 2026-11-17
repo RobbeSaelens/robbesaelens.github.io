@@ -17,13 +17,19 @@ export const FORMATS: { format: ImageFormat; type: string }[] = [
 ]
 
 /**
- * How wide the screenshots on the project pages are shown (`sizes`; the widths are in
- * src/assets/project-page.css): a desktop capture at most 720px, or the page width
- * less its padding; a phone capture about 205px inside its frame.
+ * How wide the screenshots on the project pages are shown (`sizes`; the layout is in
+ * src/components/project/ProjectPage.vue). The page is the header's 1536px column less
+ * its padding (100vw - 3rem below that); from 1024px the screenshots take the right 7/12.
+ * - desktop: the capture at the top, 84% of its stage (the phone overlaps the rest)
+ * - phone: the phone capture over it, about a quarter of the stage, inside its frame
+ * - wide: a capture as wide as its half of a split (Stable Manager's Drupal version)
+ * - next: the next project's capture in the band at the end, cropped to its half
  */
 export const SHOT_SIZES = {
-  desktop: '(min-width: 768px) 720px, calc(100vw - 3rem)',
-  phone: '205px',
+  desktop: '(min-width: 1536px) 690px, (min-width: 1024px) 45vw, calc(84vw - 2.5rem)',
+  phone: '(min-width: 1536px) 180px, (min-width: 1024px) 12vw, 25vw',
+  wide: '(min-width: 1536px) 820px, (min-width: 1024px) 54vw, calc(100vw - 3rem)',
+  next: '(min-width: 1536px) 820px, (min-width: 768px) 55vw, calc(100vw - 3rem)',
 }
 
 /** A copy of a screenshot, or null when `src` is not one that gets copies. */

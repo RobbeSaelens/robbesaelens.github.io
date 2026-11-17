@@ -14,7 +14,7 @@ import { measureCurrentSlide, SLIDES } from './slides'
 // as "scan2talk.be" and "drupal.org" and file names like "privacy.md" look
 // similar, so those endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects?|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
 
 /** Pages without images. */
 const TEXT_ONLY = ['/privacy', '/drupal']
@@ -318,6 +318,169 @@ test('Stable Manager shows its Drupal version, with the public repository and it
   expect(errors).toEqual([])
 })
 
+// The four project pages are one template (src/components/project/ProjectPage.vue) with
+// each page's data: the same sections in the same order, a page's own block in its slot,
+// and at the end the next project in the order of the projects page.
+test.describe('project page template', () => {
+  const PAGES = [
+    { route: '/exultadetail', name: 'Exulta', next: ['Scan2Talk', '/scan2talkdetail'], own: null },
+    { route: '/scan2talkdetail', name: 'Scan2Talk', next: ['Stable Manager', '/stablemanagerdetail'], own: 'How a check-in works' },
+    { route: '/stablemanagerdetail', name: 'Stable Manager', next: ['VHS Service', '/vhsdetail'], own: 'Also in Drupal' },
+    // The last one wraps around to the first
+    { route: '/vhsdetail', name: 'VHS Service', next: ['Exulta', '/exultadetail'], own: null },
+  ] as const
+  const OWN = ['How a check-in works', 'Also in Drupal']
+
+  for (const { route, name, next, own } of PAGES) {
+    test(`${route} has the template's sections in order, and its own block`, async ({ page }) => {
+      const errors = await guard(page)
+      await open(page, route)
+      await expect(page.locator('h1')).toContainText(name)
+
+      // The first screen: tagline, status, overview, and the two screenshots
+      await expect(page.locator('.hero-tagline')).not.toBeEmpty()
+      await expect(page.locator('.hero-status')).not.toBeEmpty()
+      await expect(page.locator('.hero-more .project-text')).not.toBeEmpty()
+      await expect(page.locator('.hero-stage button.shot')).toHaveCount(2)
+
+      // What's in it: six numbered features, each with its text
+      const features = page.getByRole('region', { name: "What's in it" })
+      await expect(features.locator('.index-item')).toHaveCount(6)
+      await expect(features.locator('.index-n').first()).toHaveText('01')
+      for (const text of await features.locator('.index-text').all()) await expect(text).not.toBeEmpty()
+
+      // Built with, beside the repository's activity
+      const built = page.getByRole('region', { name: 'Built with' })
+      expect(await built.locator('.tag-pill').count()).toBeGreaterThan(5)
+      await expect(page.locator('.repo')).toHaveCount(own === 'Also in Drupal' ? 2 : 1)
+
+      // Its own block, if it has one, in its place: the check-in after the first screen,
+      // the Drupal version after the activity
+      for (const block of OWN) {
+        await expect(page.getByRole('region', { name: block, exact: true })).toHaveCount(block === own ? 1 : 0)
+      }
+      const top = async (locator: ReturnType<Page['locator']>) => (await locator.boundingBox())!.y
+      if (own === 'How a check-in works') {
+        const flow = page.getByRole('region', { name: own })
+        await expect(flow.locator('video')).toHaveCount(1)
+        expect(await top(flow)).toBeLessThan(await top(features))
+      }
+      if (own === 'Also in Drupal') {
+        const drupal = page.getByRole('region', { name: own })
+        await expect(drupal.locator('.index-item')).toHaveCount(4)
+        expect(await top(drupal)).toBeGreaterThan(await top(built))
+      }
+
+      // The way on: the next project, with its screenshot, and all projects
+      const end = page.getByRole('navigation', { name: 'Next project' })
+      const link = end.getByRole('link', { name: new RegExp(`Next project.*${next[0]}`) })
+      await expect(link).toHaveAttribute('href', next[1])
+      // Its picture comes only once the band is near (else it would load with the top ones)
+      await expect(link.locator('img')).toHaveCount(0)
+      await link.scrollIntoViewIfNeeded()
+      await expect(link.locator('img')).toHaveAttribute('loading', 'lazy')
+      await expect(end.getByRole('link', { name: 'All projects' })).toHaveAttribute('href', '/projects')
+      expect(await top(end)).toBeGreaterThan(await top(page.locator('.repo').last()))
+      expect(errors).toEqual([])
+    })
+  }
+
+  test('the next project wraps around, from the last to the first, in both languages', async ({ page }) => {
+    const errors = await guard(page)
+    for (const [from, to, label, title] of [
+      ['/vhsdetail', '/exultadetail', 'Next project', 'Exulta'],
+      ['/nl/vhsdetail', '/nl/exultadetail', 'Volgend project', 'Exulta'],
+    ]) {
+      await open(page, from)
+      const link = page.getByRole('navigation', { name: label }).getByRole('link', { name: new RegExp(title) })
+      await link.scrollIntoViewIfNeeded()
+      await link.click()
+      await expect(page).toHaveURL(new RegExp(`${to}$`))
+      await expect(page.locator('h1')).toContainText(title)
+      await expect(page.locator('html')).toHaveAttribute('lang', from.startsWith('/nl') ? 'nl' : 'en')
+    }
+    await expect(page.getByRole('navigation', { name: 'Volgend project' }).getByRole('link', { name: 'Alle projecten' })).toHaveAttribute(
+      'href',
+      '/nl/projects',
+    )
+    expect(errors).toEqual([])
+  })
+
+  // On phones the features fold into rows that open (ProjectIndex.vue): <details>, closed in
+  // the prerendered HTML, so a phone gets them folded before any script runs; from 640px CSS
+  // shows the text of a closed one. The text is in the HTML either way.
+  test('the features come folded on phones in the prerendered HTML, open from 640px', async ({ browser, request }) => {
+    const html = await (await request.get('/exultadetail')).text()
+    const folds = html.match(/<details[^>]*class="index-fold"[^>]*>/g) ?? []
+    expect(folds).toHaveLength(6)
+    for (const fold of folds) expect(fold).not.toMatch(/\sopen\b/)
+    expect(html).toContain('An interactive tool where visitors set a guest count')
+
+    for (const [width, shown] of [
+      [390, false],
+      [1280, true],
+    ] as const) {
+      // No JavaScript: the prerendered page as it arrives
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height: 800 } })
+      const page = await context.newPage()
+      await page.goto('/exultadetail')
+      const texts = page.locator('.index-text')
+      await expect(texts).toHaveCount(6)
+      for (const text of await texts.all()) {
+        if (shown) await expect(text).toBeVisible()
+        else await expect(text).toBeHidden()
+      }
+      await expect(page.locator('.index-title').first()).toBeVisible()
+      await context.close()
+    }
+  })
+
+  test('on a phone a feature opens and closes by keyboard and by tap', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
+    const page = await context.newPage()
+    const errors = await guard(page)
+    await open(page, '/exultadetail')
+    const folds = page.locator('.index-fold')
+    const first = folds.nth(0)
+    await expect(first.locator('.index-text')).toBeHidden()
+
+    // A disclosure: focusable, Enter and Space toggle it, Tab goes on to the next title
+    await first.locator('summary').focus()
+    await page.keyboard.press('Enter')
+    await expect(first).toHaveJSProperty('open', true)
+    await expect(first.locator('.index-text')).toBeVisible()
+    await page.keyboard.press('Space')
+    await expect(first).toHaveJSProperty('open', false)
+    await expect(first.locator('.index-text')).toBeHidden()
+    await page.keyboard.press('Tab')
+    await expect(folds.nth(1).locator('summary')).toBeFocused()
+
+    // And a tap
+    await folds.nth(2).locator('summary').tap()
+    await expect(folds.nth(2).locator('.index-text')).toBeVisible()
+    await expect(folds.nth(3).locator('.index-text')).toBeHidden()
+    expect(errors).toEqual([])
+    await context.close()
+  })
+
+  test('wider screens show every text, and the titles are no toggles', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    const errors = await guard(page)
+    await open(page, '/exultadetail')
+    const folds = page.locator('.index-fold')
+    for (const fold of await folds.all()) {
+      await expect(fold).toHaveJSProperty('open', true)
+      await expect(fold.locator('summary')).toHaveAttribute('tabindex', '-1')
+    }
+    const first = folds.first()
+    await first.scrollIntoViewIfNeeded()
+    await first.locator('summary').click()
+    await expect(first).toHaveJSProperty('open', true)
+    await expect(first.locator('.index-text')).toBeVisible()
+    expect(errors).toEqual([])
+  })
+})
+
 // Old URLs may be linked or indexed: they end up on the new page, in the same
 // language, with the query and hash.
 test.describe('old URLs', () => {
@@ -547,7 +710,7 @@ test.describe('project page animations', () => {
       await open(page, route)
 
       // The header and the screenshots: the shared entrance (styles.css)
-      for (const el of [page.locator('h1'), page.locator('.shots')]) {
+      for (const el of [page.locator('h1'), page.locator('.stage-desktop'), page.locator('.stage-phone')]) {
         await expect(el).toHaveClass(/hero-in/)
         const names = await el.evaluate((e) => e.getAnimations().map((a) => (a as CSSAnimation).animationName))
         expect(names).toContain('hero-rise')
@@ -571,7 +734,7 @@ test.describe('project page animations', () => {
   test('things that come into view together follow each other', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await open(page, '/exultadetail')
-    const cards = page.locator('.feature-card')
+    const cards = page.locator('.index-item')
     await cards.first().scrollIntoViewIfNeeded()
     await expect(cards.nth(2)).toHaveClass(/is-visible/)
     const delays = await cards.evaluateAll((els) =>
@@ -756,7 +919,7 @@ test.describe('repository activity', () => {
       const errors = await guard(page)
       const stats = data.projects[key]
       await open(page, route)
-      const section = page.locator(`.repo--inline:has(#repo-title-${key}-inline)`)
+      const section = page.locator(`.repo:has(#repo-title-${key})`)
       await section.scrollIntoViewIfNeeded()
       await expect(section).toBeVisible()
       // The count rises to its value (CountUp, 0.9 s however many commits).
@@ -768,37 +931,36 @@ test.describe('repository activity', () => {
     })
   }
 
-  test('on wide screens it floats beside the content instead', async ({ page }) => {
+  // One block in the page at every width, beside the stack (no panel fixed at the side):
+  // its numbers in one row where it has 600px of room, two by two where it hasn't.
+  test('stays in the page at every width, laid out by its own width', async ({ page }) => {
     await guard(page)
-    await page.setViewportSize({ width: 1920, height: 1080 })
-    await open(page, '/exultadetail')
-    const aside = page.getByRole('complementary', { name: 'Repository activity' })
-    await expect(aside).toBeVisible()
-    await expect(page.locator('.repo--inline')).toBeHidden()
-    // Right of the 1280px content, and it stays put while scrolling.
-    const content = (await page.locator('.detail-page > div').first().boundingBox())!
-    const before = (await aside.boundingBox())!
-    expect(before.x).toBeGreaterThanOrEqual(content.x + content.width)
-    expect(before.x + before.width).toBeLessThanOrEqual(1920)
-    await page.mouse.wheel(0, 1500)
-    await page.waitForTimeout(300)
-    expect((await aside.boundingBox())!.y).toBeCloseTo(before.y, 0)
-
-    await page.setViewportSize({ width: 1440, height: 900 })
-    await expect(aside).toBeHidden()
-    await expect(page.locator('.repo--inline')).toBeVisible()
-  })
-
-  test('with two repositories, only the first floats; the other stays on the page', async ({ page }) => {
-    await guard(page)
-    await page.setViewportSize({ width: 1920, height: 1080 })
-    await open(page, '/stablemanagerdetail')
-    await expect(page.getByRole('complementary')).toHaveCount(1)
-    await expect(page.getByRole('complementary', { name: 'Repository activity: Next.js app' })).toBeVisible()
-    await expect(page.locator('#repo-title-stableManager-inline')).toBeHidden()
-    const drupal = page.getByRole('region', { name: 'Repository activity: Drupal version' })
-    await drupal.scrollIntoViewIfNeeded()
-    await expect(drupal).toBeVisible()
+    const rows = async (repo: ReturnType<Page['locator']>) => {
+      const tops = await repo.locator('.repo-number').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)))
+      return new Set(tops).size
+    }
+    for (const [width, height, inRow] of [
+      [1920, 1080, true],
+      [1440, 900, true],
+      [1024, 768, false],
+      [390, 844, false],
+    ] as const) {
+      await page.setViewportSize({ width, height })
+      await open(page, '/stablemanagerdetail')
+      await expect(page.getByRole('complementary')).toHaveCount(0)
+      for (const name of ['Repository activity: Next.js app', 'Repository activity: Drupal version']) {
+        const repo = page.getByRole('region', { name })
+        await repo.scrollIntoViewIfNeeded()
+        await expect(repo).toBeVisible()
+        // Inside the page's column, in line with the header
+        const box = (await repo.boundingBox())!
+        const column = (await page.locator('.detail-page > .project-page').boundingBox())!
+        expect(box.x).toBeGreaterThanOrEqual(column.x)
+        expect(box.x + box.width).toBeLessThanOrEqual(column.x + column.width)
+        expect(await rows(repo), `${name} at ${width}px`).toBe(inRow ? 1 : 2)
+        expect(await repo.evaluate((e) => getComputedStyle(e).position)).toBe('static')
+      }
+    }
   })
 
   test('in Dutch on /nl', async ({ page }) => {

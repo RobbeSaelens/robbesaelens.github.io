@@ -77,15 +77,20 @@
     "shotMobile": "mobile",
     "shotDashboard": "dashboard"
   },
+  "project": {
+    "overview": "Project Overview",
+    "featuresTitle": "What's in it",
+    "builtWith": "Built with",
+    "languages": "Languages & Frameworks",
+    "tools": "Tools & Services",
+    "live": "Live",
+    "allProjects": "All projects"
+  },
   "exulta": {
     "title": "Exulta",
     "alt": "Exulta stretch tent rental website",
-    "liveBadge": "Live",
     "visitSite": "Open exulta.be",
-    "overview": "Project Overview",
-    "about": "About",
     "aboutText": "Exulta rents stretch tents for events, and this is the second version of their website, now live at exulta.be. A Laravel 13 back end with a React 19 front end over Inertia, and a Filament 5 admin panel the client runs themselves. It covers the full public site — product catalog, tent calculator, case studies, blog and contact — plus the operational side: media library, roles, backups, cookie consent and an automated deployment pipeline.",
-    "featuresTitle": "What's in it",
     "featureCatalog": "Product catalog",
     "featureCatalogText": "Tents by category with detail pages, images via Spatie Media Library, and case studies ('realisaties') of real events.",
     "featureCalculator": "Tent calculator",
@@ -98,18 +103,12 @@
     "featureSeo": "SEO & AI discovery",
     "featureSeoText": "Server-side rendering, a generated sitemap and robots.txt, structured SEO metadata, plus an llms.txt and an AI product feed so assistants can read the catalog.",
     "featurePerf": "Measured performance",
-    "featurePerfText": "Response caching, and Lighthouse reports per page kept in the repo, so regressions show up as a diff.",
-    "languages": "Languages & Frameworks",
-    "tools": "Tools & Services",
-    "viewOther": "View other projects"
+    "featurePerfText": "Response caching, and Lighthouse reports per page kept in the repo, so regressions show up as a diff."
   },
   "vhs": {
     "title": "VHS Service",
     "alt": "VHS Service website for riding arena construction",
-    "overview": "Project Overview",
-    "about": "About",
     "aboutText": "VHS Service builds and renovates riding arenas in Geluwe, West Flanders, along with the levelling and groundwork that comes with them. I built their new site from scratch on Next.js 16: an editorial design built around large photography and scroll-driven motion, in Dutch, French and English, and tuned for local search.",
-    "featuresTitle": "What's in it",
     "featureMotion": "Motion-led design",
     "featureMotionText": "GSAP and Motion drive the scroll-linked animation, Lenis smooths the scrolling, and a full-screen photo slider opens the homepage.",
     "featureI18n": "Three languages",
@@ -122,21 +121,14 @@
     "featureFormsText": "A quote form sent through Resend, plus cookie consent: analytics only load once the visitor agrees.",
     "featureGallery": "Project gallery",
     "featureGalleryText": "A gallery of finished arenas with a coverflow showcase, a carousel and a lightbox you can use with the keyboard.",
-    "languages": "Languages & Frameworks",
-    "tools": "Tools & Services",
-    "viewOther": "View other projects",
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Not live yet"
   },
   "stableManager": {
     "title": "Stable Manager",
     "alt": "Stable Manager dashboard with horse costs",
-    "privateBadge": "Live",
     "privateNote": "Private app, login only",
-    "overview": "Project Overview",
-    "about": "About",
     "aboutText": "Stable Manager keeps track of what two horses cost: one of our own and one boarding horse. Every cost is booked with a date, category and quantity, and split between the horses by percentage. There's a desktop dashboard with monthly charts and reports, and a mobile app built for adding costs in the stable itself, even without a connection. It's a private app: sign-up is closed and accounts are created from the command line.",
-    "featuresTitle": "What's in it",
     "featureSplit": "Cost splitting",
     "featureSplitText": "Each cost is allocated to one horse or split across both by percentage, so per-horse totals stay correct even for shared hay or a farrier visit.",
     "featureQuick": "Quick add from inventory",
@@ -149,8 +141,6 @@
     "featureAuthText": "Better Auth with username and password, sign-up closed, sessions kept for a month on the phone. Every page and server action checks the session.",
     "featureQuality": "Tested & monitored",
     "featureQualityText": "Vitest unit tests plus database tests against a real Postgres, and a public health endpoint for uptime checks.",
-    "languages": "Languages & Frameworks",
-    "tools": "Tools & Services",
     "drupalTitle": "Also in Drupal",
     "drupalName": "Shared Costs · Drupal 11 module",
     "drupalIntro": "Shared Costs is the Drupal version of Stable Manager, open source on GitHub: a Drupal 11 module, plus four recipes and a theme that rebuild the app with configuration only. Working offline, which the Next.js app does as a PWA, isn't part of it.",
@@ -168,16 +158,12 @@
     "drupalQualityText": "PHPUnit (Unit, Kernel, Functional and in the browser) with an axe scan of every page, visual regression tests with Playwright, PHPStan level 8 and about 95% coverage.",
     "drupalStack": "Drupal stack",
     "repoApp": "Next.js app",
-    "repoDrupal": "Drupal version",
-    "viewOther": "View other projects"
+    "repoDrupal": "Drupal version"
   },
   "scan2talk": {
     "title": "Scan2Talk",
     "alt": "Scan2Talk check-in on a phone",
-    "liveBadge": "Live",
     "visitSite": "Open scan2talk.be",
-    "overview": "Project Overview",
-    "about": "About",
     "aboutText": "Scan2Talk is a wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster in the hallway and share how they feel in under a minute — no account, no app install. Behind it, educators get a dashboard with trends over time and can open a private chat with a student who asks for help.",
     "flowTitle": "How a check-in works",
     "flowStep1": "Scan the QR code",
@@ -187,7 +173,6 @@
     "flowStep3": "Get support",
     "flowStep3Text": "If the student wants, someone gets in touch — in the way and at the moment the student chooses.",
     "flowVideo": "Video: a student checks in on Scan2Talk, from the mood barometer to the thank-you screen",
-    "featuresTitle": "What's in it",
     "featureQr": "Signed QR posters",
     "featureQrText": "Printed posters encode a signed URL that never expires. Without a scan there's no way into the check-in, so links can't be shared or guessed.",
     "featureChat": "Live educator chat",
@@ -199,10 +184,7 @@
     "featurePwa": "Installable PWA",
     "featurePwaText": "Installs to the home screen and is built mobile-first: signed-in staff on a phone go straight to their dashboard.",
     "featurePrivacy": "Privacy by design",
-    "featurePrivacyText": "No student accounts, a dedicated privacy page, and the dashboard and check-in routes excluded from search engines.",
-    "languages": "Languages & Frameworks",
-    "tools": "Tools & Services",
-    "viewOther": "View other projects"
+    "featurePrivacyText": "No student accounts, a dedicated privacy page, and the dashboard and check-in routes excluded from search engines."
   },
   "error": {
     "defaultTitle": "Something went wrong",
