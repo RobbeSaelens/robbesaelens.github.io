@@ -12,6 +12,9 @@ import i18n, { localeLinks } from './i18n'
 import { absoluteUrl } from './site'
 import TerminalCommand from './components/TerminalCommand.vue'
 
+/** /llms.txt, for the chatbot: scripts/llms.mjs writes it into dist/ */
+export { LLMS_MAX_CHARS, llms } from './llms'
+
 const staticRoutes = routes
   .flatMap((route) => route.children ?? [route])
   .filter((route) => !route.path.includes(':') && !route.redirect)

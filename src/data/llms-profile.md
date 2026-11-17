@@ -1,3 +1,16 @@
+<!--
+  The hand-written part of /llms.txt, the text the site's AI chatbot answers from: what
+  the pages don't say. The build (scripts/llms.mjs, src/llms.ts) adds the rest from the
+  site's own data: the pages, every project with its features, stack and repository
+  numbers, and the Drupal contributions. The sections below come first, in this order,
+  except one whose heading matches a generated section ("Drupal contributions"): it
+  opens that section. Empty sections and these comments are left out.
+
+  Budget: the chatbot reads the first 12,000 characters of the result. The Drupal issues
+  fill what is left (latest first, the others are on the Drupal page); beyond that the
+  build fails. `npm run build` prints the size. Write plain Markdown, no HTML.
+-->
+
 # Robbe Saelens
 
 > Robbe Saelens is a full-stack web developer based in Geluwe, West Flanders,
@@ -10,14 +23,38 @@ Canonical site: https://robbesaelens.github.io/
 ## Identity
 
 - Name: Robbe Saelens
+- Born: 2000
 - Role: Full-Stack Web Developer
 - Employer: Dynamate
 - Location: Geluwe, West Flanders, Belgium
-- Languages: Dutch (native), English
+- Languages: Dutch (native), English, a little French
 - GitHub: https://github.com/RobbeSaelens
 - drupal.org: https://www.drupal.org/u/robbesaelens (username robbesaelens)
 - LinkedIn: https://linkedin.com/in/robbe-saelens-1a14511b8
 - Email: robbe.saelens@telenet.be
+
+## Personal
+
+<!--
+  Robbe's own answers to what a visitor may ask the chatbot about him. Only he adds to
+  them: nothing here is to be guessed or filled in by anyone else.
+-->
+
+- Work: employed at Dynamate and happy there. Open to some side projects, not to
+  freelance work.
+- Likes working on: backend and APIs, Drupal, full-stack apps, and projects for the
+  equestrian world.
+- Currently learning: AI/LLM tooling, and mobile/native apps.
+- Driving licence: B.
+- Hobbies: horse riding (see Background) and padel, which he has played for about a
+  year (since 2025).
+
+## Not to share
+
+Robbe doesn't share his exact address (only that he lives in Geluwe), his family or
+relationships, his salary or rates, or his full date of birth (only the year). Asked
+about these, politely decline and point to his contact details (e-mail or LinkedIn,
+under Identity).
 
 ## Background
 
@@ -38,20 +75,6 @@ Backend: Laravel, PHP, NestJS, Node.js, GraphQL, Prisma
 Data: PostgreSQL, MongoDB
 CMS & cloud: Drupal, Azure, Netlify, Vercel
 
-## Pages
-
-- [Home](https://robbesaelens.github.io/): Introduction and profile of Robbe Saelens.
-- [Projects](https://robbesaelens.github.io/projects): Carousel of selected projects, each with its own detail page.
-- [About & contact](https://robbesaelens.github.io/contact): Education, work experience and contact details.
-- [Drupal contributions](https://robbesaelens.github.io/drupal): His work on drupal.org: credited contributions, merge requests, and the issues he opened or took part in, with their status. Fetched from drupal.org and git.drupalcode.org.
-
-## Projects
-
-- [Exulta](https://robbesaelens.github.io/exultadetail): Second version of the Exulta stretch tent rental website, live at exulta.be. Catalog, tent calculator, case studies, blog and FAQ on Laravel 13 + React 19 via Inertia, with a Filament 5 admin panel.
-- [Stable Manager](https://robbesaelens.github.io/stablemanagerdetail): Private app tracking what two horses cost, split per horse, with a dashboard and an offline mobile app. Next.js 16, React 19, Prisma 7, PostgreSQL. Also rebuilt in Drupal as Shared Costs, an open-source Drupal 11 module public at https://github.com/RobbeSaelens/shared_costs: a field type that splits a cost over the horses, equally or by percentage and to the cent, with Views integration, plus four recipes and a Starterkit theme that rebuild the app with configuration only. PHP 8.3+, HTMX, Views, Twig/SDC, PHPUnit, Playwright, PHPStan, GitHub Actions.
-- [VHS Service](https://robbesaelens.github.io/vhsdetail): Trilingual website for VHS Service, an equestrian arena builder in Geluwe, currently in rebranding and not public yet. Next.js 16, React 19, Tailwind CSS 4, GSAP, Motion, Vercel.
-- [Scan2Talk](https://robbesaelens.github.io/scan2talkdetail): Wellbeing check-in tool for schools, live at scan2talk.be. Students scan a printed QR poster to share how they feel; educators get trends and an anonymous chat. Laravel, Vue.js, Inertia.js, PostgreSQL.
-
 ## Drupal contributions
 
 Besides his work on Drupal projects at Dynamate, Robbe contributes to Drupal on
@@ -63,7 +86,3 @@ adding support for OOP hooks, each through a merged merge request. The current
 list, with numbers and statuses, is on https://robbesaelens.github.io/drupal. His
 own Drupal module, Shared Costs, is on GitHub rather than drupal.org (see Stable
 Manager above).
-
-## Optional
-
-- [Sitemap](https://robbesaelens.github.io/sitemap.xml): Machine-readable list of all pages.

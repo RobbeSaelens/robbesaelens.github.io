@@ -31,6 +31,25 @@ const githubPages404: Plugin = {
   },
 }
 
+/**
+ * /llms.txt in `npm run dev`, from the code the build writes it with (src/llms.ts, through
+ * scripts/llms.mjs): always the current profile, texts and data.
+ */
+const llmsDev: Plugin = {
+  name: 'llms-txt-dev',
+  configureServer(server) {
+    server.middlewares.use('/llms.txt', async (_req, res, next) => {
+      try {
+        const { llms } = await server.ssrLoadModule('/src/llms.ts')
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.end(llms().text)
+      } catch (error) {
+        next(error)
+      }
+    })
+  },
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ isSsrBuild }) => ({
   base: '/',
@@ -40,6 +59,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
     vue(),
     githubPages404,
+    llmsDev,
     Unocss({
       theme: {
         extend: {

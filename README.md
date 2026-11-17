@@ -8,11 +8,12 @@ at <https://robbesaelens.github.io>.
 | Command                | What it does                                                     |
 | ---------------------- | ---------------------------------------------------------------- |
 | `npm run dev`          | Vite dev server                                                  |
-| `npm run build`        | Full production build: client → SSR → prerender → sitemap         |
+| `npm run build`        | Full production build: client → SSR → prerender → sitemap → llms.txt |
 | `npm run build:client` | Client bundle only (`dist/`)                                      |
 | `npm run build:ssr`    | Prerender bundle only (`dist-ssr/`)                               |
 | `npm run prerender`    | Writes static HTML per route into `dist/`                          |
 | `npm run sitemap`      | Regenerates `dist/sitemap.xml` from the router (`sitemapRoutes`)   |
+| `npm run llms`         | Writes `dist/llms.txt` (the chatbot's knowledge) from the SSR bundle, and prints its size |
 | `npm run preview`      | Serves the built `dist/`                                          |
 | `npm run stats`        | Refreshes the repository numbers (`src/data/repo-stats.json`) from the GitHub API; needs `REPO_STATS_TOKEN` (below) |
 | `npm run drupal`       | Refreshes the Drupal contributions (`src/data/drupal.json`)       |
@@ -50,15 +51,17 @@ sidesteps hydration mismatches entirely at the cost of a re-render on load.
 | JSON-LD graph (Person, WebSite, projects)     | `src/seo/jsonld.ts`           |
 | Machine-readable project facts                | `src/seo/projects.ts`         |
 | Crawler policy, incl. AI crawlers             | `public/robots.txt`           |
-| LLM-readable site summary                     | `public/llms.txt`             |
+| LLM-readable site summary (`/llms.txt`)       | `src/data/llms-profile.md` (hand-written), `src/llms.ts` (the rest, from the site's data) |
 
-Changing the domain means editing `src/site.ts`, `public/robots.txt` and `public/llms.txt`.
-The sitemap picks the origin up from `src/site.ts` automatically.
+Changing the domain means editing `src/site.ts`, `public/robots.txt` and the URLs in
+`src/data/llms-profile.md`. The sitemap and the rest of `llms.txt` pick the origin up from
+`src/site.ts` automatically.
 
 ### The chatbot
 
-The AI chatbot answers from `public/llms.txt` (fetched live by the `status-worker`, cached
-for an hour), with built-in answers in `src/components/ChatBot.vue` and the `chat.*`
+The AI chatbot answers from `/llms.txt` (fetched live by the `status-worker`, cached for
+an hour), which the build writes from `src/data/llms-profile.md` and the site's own data
+(`src/llms.ts`), with built-in answers in `src/components/ChatBot.vue` and the `chat.*`
 locale strings as a fallback. When the site's content changes in a way a visitor might ask
 about, update them too: [AGENTS.md](AGENTS.md#content-changes-keep-the-chatbot-in-step)
 lists what and where.

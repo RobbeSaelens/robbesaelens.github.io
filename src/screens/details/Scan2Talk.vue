@@ -48,44 +48,13 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProjectPage from '../../components/project/ProjectPage.vue'
-import { indexItems, type ProjectData } from '../../components/project/project'
+import { scan2talk, scan2talkCheckIn } from './data'
 
 const { t } = useI18n({ useScope: 'global' })
 
-const project = computed<ProjectData>(() => ({
-  id: 'scan2talk',
-  name: t('scan2talk.title'),
-  file: 'scan2talk-project.md',
-  status: { kind: 'live', label: t('project.live') },
-  links: [{ label: t('scan2talk.visitSite'), href: 'https://scan2talk.be' }],
-  about: t('scan2talk.aboutText'),
-  tags: ['Laravel', 'Vue.js', 'Inertia.js', 'PWA', 'PostgreSQL', 'Chart.js'],
-  languages: ['PHP 8.3', 'Laravel 13', 'Vue.js 3', 'Inertia.js 2', 'PostgreSQL', 'Tailwind CSS 3', 'Chart.js'],
-  tools: [
-    'Laravel Cloud',
-    'Vite 8',
-    'Laravel Breeze',
-    'Spatie Permissions',
-    'Google2FA',
-    'Simple QR Code',
-    'Ziggy',
-    'Larastan',
-    'Pint',
-  ],
-  url: 'scan2talk.be',
-  desktop: { src: '/scan2talk-home.jpg', width: 1600, height: 1000, alt: t('scan2talk.alt'), caption: 'scan2talk.be' },
-  phone: {
-    src: '/scan2talk-mobile.jpg',
-    width: 738,
-    height: 1600,
-    alt: t('scan2talk.alt'),
-    caption: `scan2talk.be — ${t('projects.shotMobile')}`,
-  },
-  features: indexItems(t, 'scan2talk', 'feature', ['Qr', 'Chat', 'Dashboard', 'Roles', 'Pwa', 'Privacy']),
-  repo: { key: 'scan2talk' },
-}))
+const project = computed(() => scan2talk(t))
 
-const steps = computed(() => indexItems(t, 'scan2talk', 'flowStep', ['1', '2', '3']))
+const steps = computed(() => scan2talkCheckIn(t).steps)
 
 /** Plays the check-in video while it is on screen. */
 const flowVideo = ref<HTMLVideoElement | null>(null)
