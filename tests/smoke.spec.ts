@@ -1110,6 +1110,17 @@ test('hovering Geluwe shows a map, Escape hides it', async ({ page }) => {
   const place = page.getByRole('button', { name: 'Geluwe' })
   const card = page.getByRole('tooltip')
   await expect(card).toBeHidden()
+  // The word rises in with the hero text: hover it once it stands still, or it can
+  // slide out from under the mouse (a mouseleave) on a slow machine.
+  let last = ''
+  await expect
+    .poll(async () => {
+      const box = JSON.stringify(await place.boundingBox())
+      const still = box === last
+      last = box
+      return still
+    }, { intervals: [150] })
+    .toBe(true)
   await place.hover()
   await expect(card).toBeVisible()
   await expect(card.getByRole('img', { name: /Map of Geluwe/ })).toBeVisible()
@@ -1117,9 +1128,16 @@ test('hovering Geluwe shows a map, Escape hides it', async ({ page }) => {
   await expect(card.locator('svg .m-label-main')).toHaveText('Geluwe')
   await page.keyboard.press('Escape')
   await expect(card).toBeHidden()
-  // Also reachable with the keyboard
+  // Also reachable with the keyboard, and it stays while the word has focus,
+  // also when the mouse leaves it (WCAG 1.4.13)
   await place.focus()
   await expect(card).toBeVisible()
+  await page.mouse.move(5, 5)
+  await expect(place).toHaveAttribute('aria-expanded', 'true') // the card fades, so check the state
+  await expect(card).toBeVisible()
+  // Focus leaving the word (back, out of it; Tab would go into the card's link) closes it
+  await page.keyboard.press('Shift+Tab')
+  await expect(card).toBeHidden()
   expect(errors).toEqual([])
 })
 
