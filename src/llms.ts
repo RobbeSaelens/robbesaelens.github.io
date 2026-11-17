@@ -238,6 +238,21 @@ function drupalContributions(issues: string[], shown: number): string {
     .join('\n')
 }
 
+/**
+ * "Born: 2000" gets the age it means at build time ("25 or 26 years old as of November
+ * 2026"): the AI doesn't know today's date, so it can't work that out itself. Deploys run
+ * every morning, so it stays current.
+ */
+function withAge(text: string): string {
+  const now = new Date()
+  const year = Number(now.toLocaleDateString('en-GB', { year: 'numeric', timeZone: 'Europe/Brussels' }))
+  const asOf = now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'Europe/Brussels' })
+  return text.replace(/^- Born: (\d{4})$/m, (line, born) => {
+    const age = year - Number(born)
+    return `${line} (${age - 1} or ${age} years old as of ${asOf})`
+  })
+}
+
 /** The profile without its comments: the part before its first section, and its sections by heading. */
 function profileParts() {
   const [head, ...parts] = profile.replace(/<!--[\s\S]*?-->/g, '').split(/^(?=## )/m)
@@ -281,7 +296,7 @@ export function llms(): Llms {
       const body = [sections.get(heading), generated.get(heading)].filter(Boolean).join('\n\n')
       out.push(`## ${heading}\n\n${body}`)
     }
-    const text = `${out.join('\n\n')}\n`
+    const text = withAge(`${out.join('\n\n')}\n`)
     return { text, size: text.trim().length, issuesShown: shown, issues: issues.length }
   }
 

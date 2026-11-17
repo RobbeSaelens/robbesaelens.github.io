@@ -230,6 +230,8 @@ test.describe('llms.txt', () => {
     ]) {
       expect(text).toContain(fact)
     }
+    // The age the year means, worked out at build time (the AI doesn't know the date)
+    expect(text).toMatch(/- Born: 2000 \(\d+ or \d+ years old as of [A-Z][a-z]+ \d{4}\)/)
   })
 
   test('holds every project, with its pages, features, stack and repository numbers', async ({ request }) => {
