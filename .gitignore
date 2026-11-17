@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# AVIF and WebP copies of the screenshots, made by scripts/images.mjs
+public/img/
 *.local
 
 # Editor directories and files

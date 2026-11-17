@@ -2,6 +2,7 @@
 // page; each route adds the node that best describes it so search engines and
 // LLM crawlers get an explicit, unambiguous entity for "Robbe Saelens".
 import { localizedPath, stripLocale, type Locale } from '../localePath'
+import REPO_STATS from '../data/repo-stats.json'
 import { PROJECTS, SKILLS } from './projects'
 
 const PERSON_ID = '#person'
@@ -67,34 +68,67 @@ export function websiteNode(site: string) {
   }
 }
 
-function projectNode(site: string, path: string) {
+/** The day a repository got its first commit (src/data/repo-stats.json), if it is known. */
+function firstCommitDay(key: string): string | undefined {
+  const stats = (REPO_STATS.projects as Record<string, { firstCommit?: string | null } | undefined>)[key]
+  return stats?.firstCommit?.slice(0, 10) || undefined
+}
+
+/**
+ * The work a project page is about: the site (WebSite) or the app (WebApplication)
+ * itself, in the page's language. Name, headline, description and image are the
+ * page's own (title, meta description, og:image); the live site, the stack and the
+ * code come from PROJECTS; dateCreated is the first commit of its repository.
+ */
+function projectNode(site: string, path: string, title: string, description: string, image: string) {
   const project = PROJECTS.find((p) => p.path === stripLocale(path))
   if (!project) return null
+  const person = { '@id': `${site}/${PERSON_ID}` }
+  const created = firstCommitDay(project.stats)
+  const code = project.sourceCode
+  const codeCreated = code && firstCommitDay(code.stats)
+
   return {
-    '@type': 'CreativeWork',
+    '@type': project.type,
     '@id': `${site}${path}#project`,
     name: project.name,
-    headline: project.headline,
-    description: project.description,
+    headline: title,
+    description,
     url: `${site}${path}`,
-    image: `${site}${project.image}`,
+    mainEntityOfPage: { '@id': `${site}${path}#webpage` },
+    ...(project.liveUrl ? { sameAs: project.liveUrl } : {}),
+    image,
     keywords: project.tech.join(', '),
-    ...(project.sourceCode
-      ? {
-          hasPart: {
-            '@type': 'SoftwareSourceCode',
-            name: project.sourceCode.name,
-            description: project.sourceCode.description,
-            codeRepository: project.sourceCode.repository,
-            programmingLanguage: project.sourceCode.language,
-            runtimePlatform: project.sourceCode.platform,
-            author: { '@id': `${site}/${PERSON_ID}` },
-          },
-        }
+    ...(created ? { dateCreated: created } : {}),
+    ...(project.type === 'WebApplication'
+      ? { applicationCategory: project.applicationCategory, operatingSystem: 'Any' }
       : {}),
-    creator: { '@id': `${site}/${PERSON_ID}` },
-    author: { '@id': `${site}/${PERSON_ID}` },
-    isPartOf: { '@id': `${site}/${WEBSITE_ID}` },
+    // The code: programmingLanguage only exists on SoftwareSourceCode. The repositories
+    // are private, except the Drupal version of Stable Manager.
+    hasPart: [
+      {
+        '@type': 'SoftwareSourceCode',
+        name: `${project.name} source code`,
+        programmingLanguage: project.languages,
+        author: person,
+      },
+      ...(code
+        ? [
+            {
+              '@type': 'SoftwareSourceCode',
+              name: code.name,
+              description: code.description,
+              codeRepository: code.repository,
+              programmingLanguage: code.language,
+              runtimePlatform: code.platform,
+              ...(codeCreated ? { dateCreated: codeCreated } : {}),
+              author: person,
+            },
+          ]
+        : []),
+    ],
+    creator: person,
+    author: person,
   }
 }
 
@@ -122,7 +156,8 @@ function breadcrumbNode(site: string, path: string, title: string, lang: Locale)
 function pageNode(site: string, path: string, title: string, description: string, lang: Locale) {
   const isHome = stripLocale(path) === '/'
   const isAbout = stripLocale(path) === '/contact'
-  const type = isHome || isAbout ? 'ProfilePage' : 'WebPage'
+  const isProject = PROJECTS.some((p) => p.path === stripLocale(path))
+  const type = isHome || isAbout ? 'ProfilePage' : isProject ? 'ItemPage' : 'WebPage'
 
   return {
     '@type': type,
@@ -133,6 +168,7 @@ function pageNode(site: string, path: string, title: string, description: string
     isPartOf: { '@id': `${site}/${WEBSITE_ID}` },
     about: { '@id': `${site}/${PERSON_ID}` },
     ...(isHome || isAbout ? { mainEntity: { '@id': `${site}/${PERSON_ID}` } } : {}),
+    ...(isProject ? { mainEntity: { '@id': `${site}${path}#project` } } : {}),
     inLanguage: lang,
   }
 }
@@ -178,8 +214,18 @@ export function drupalCreditsJsonLd(
   }
 }
 
-/** Full @graph for a route, ready to be JSON.stringify'd into a script tag. */
-export function routeJsonLd(path: string, title: string, description: string, site: string, lang: Locale = 'en') {
+/**
+ * Full @graph for a route, ready to be JSON.stringify'd into a script tag. `image` is
+ * the page's og:image, as an absolute URL.
+ */
+export function routeJsonLd(
+  path: string,
+  title: string,
+  description: string,
+  site: string,
+  lang: Locale = 'en',
+  image = `${site}/pf2.jpg`,
+) {
   const graph: unknown[] = [personNode(site), websiteNode(site)]
 
   graph.push(pageNode(site, path, title, description, lang))
@@ -189,7 +235,7 @@ export function routeJsonLd(path: string, title: string, description: string, si
 
   if (stripLocale(path) === '/projects') graph.push(projectListNode(site))
 
-  const project = projectNode(site, path)
+  const project = projectNode(site, path, title, description, image)
   if (project) graph.push(project)
 
   return { '@context': 'https://schema.org', '@graph': graph }

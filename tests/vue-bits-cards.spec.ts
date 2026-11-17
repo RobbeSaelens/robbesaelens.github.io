@@ -2,8 +2,9 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 
 /**
  * The Vue Bits effects on cards and screenshots add an effect and change nothing else:
- * - GlowCard (SpotlightCard): a teal glow under the text of the project pages' feature
- *   cards, the Drupal panels and the about page's text cards, following the mouse;
+ * - GlowCard (SpotlightCard): a teal glow under the text of the project pages' features
+ *   (the numbered index), the Drupal panels and the about page's text cards, following
+ *   the mouse;
  * - ShotGlare (GlareHover): a glass sweep inside the project pages' screenshot buttons;
  * - PhotoRipple (RippleDistortion): water ripples under the mouse on the about photos.
  * The cards and buttons keep their tags, classes, text and clicks, the effects only
@@ -100,32 +101,33 @@ const style = (el: Locator, property: string) =>
 
 for (const route of DETAILS) {
   test.describe(`${route}`, () => {
-    test('feature cards keep their markup, with the glow layer under their text', async ({ page, request }) => {
+    test('the features index keeps its markup, with the glow layer under its text', async ({ page, request }) => {
       const errors = await guard(page)
       await open(page, route)
-      const cards = page.locator('.feature-card')
+      const cards = page.locator('.index-item')
       const count = await cards.count()
       expect(count).toBeGreaterThan(0)
       for (const card of await cards.all()) {
-        expect(await card.evaluate((e) => e.tagName)).toBe('ARTICLE')
+        expect(await card.evaluate((e) => e.tagName)).toBe('LI')
         await expect(card).toHaveClass(/\breveal\b/)
-        await expect(card.locator('.feature-title')).not.toBeEmpty()
-        await expect(card.locator('.feature-text')).not.toBeEmpty()
-        // The glow lies over the card's background and under its text
+        await expect(card.locator('.index-title')).not.toBeEmpty()
+        // In the HTML whether it shows or is folded (phones)
+        expect(await card.locator('.index-text').textContent()).toMatch(/\w{3,}/)
+        // The glow lies under its text
         expect(await style(card, 'isolation')).toBe('isolate')
         const glow = glowOf(card)
         expect(await style(glow, 'z-index')).toBe('-1')
         expect(await style(glow, 'pointer-events')).toBe('none')
         expect(await style(glow, 'opacity')).toBe('0')
       }
-      // The look comes from the page, not from SpotlightCard
+      // The look comes from the page, not from SpotlightCard: a hairline over each, no box
       const first = cards.first()
-      expect(await style(first, 'border-top-left-radius')).toBe('16px')
-      expect(await style(first, 'padding-top')).toBe('24px')
+      expect(await style(first, 'border-top-width')).toBe('1px')
+      expect(await style(first, 'background-color')).toBe('rgba(0, 0, 0, 0)')
 
-      // Prerendered: the same cards, as articles
+      // Prerendered: the same items, in an ordered list
       const html = await (await request.get(route)).text()
-      expect(html.match(/<article class="[^"]*\bfeature-card reveal\b[^"]*"/g) ?? []).toHaveLength(count)
+      expect(html.match(/<li class="[^"]*\bindex-item reveal\b[^"]*"/g) ?? []).toHaveLength(count)
       expect(errors).toEqual([])
     })
 
@@ -189,10 +191,10 @@ test.describe('with a mouse', () => {
   test.skip(({ isMobile }) => isMobile, 'mouse only')
 
   for (const theme of ['light', 'dark'] as const) {
-    test(`a feature card glows teal where the mouse is, and stops when it leaves (${theme})`, async ({ page }) => {
+    test(`a feature glows teal where the mouse is, and stops when it leaves (${theme})`, async ({ page }) => {
       const errors = await guard(page)
       await open(page, '/exultadetail', theme)
-      const card = page.locator('.feature-card').nth(1)
+      const card = page.locator('.index-item').nth(1)
       await settle(card)
       const glow = glowOf(card)
 
@@ -332,7 +334,7 @@ test.describe('with a mouse', () => {
     const page = await context.newPage()
     const errors = await guard(page)
     await open(page, '/exultadetail')
-    const card = page.locator('.feature-card').first()
+    const card = page.locator('.index-item').first()
     await card.scrollIntoViewIfNeeded()
     await card.hover()
     await page.waitForTimeout(300)
@@ -349,7 +351,7 @@ test.describe('on a touch screen', () => {
   test('a tap leaves no glow on a card and no glare on a screenshot', async ({ page }) => {
     const errors = await guard(page)
     await open(page, '/scan2talkdetail')
-    const card = page.locator('.feature-card').first()
+    const card = page.locator('.index-item').first()
     await settle(card)
     await card.tap()
     await page.waitForTimeout(700)

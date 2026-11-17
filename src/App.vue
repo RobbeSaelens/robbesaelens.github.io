@@ -90,7 +90,7 @@ export default defineComponent({
             ],
       script: () => {
         if (route.meta?.noindex) return []
-        const graph = routeJsonLd(route.path, title(), description(), SITE_URL, lang())
+        const graph = routeJsonLd(route.path, title(), description(), SITE_URL, lang(), image())
         return [{ type: 'application/ld+json', key: 'route-jsonld', innerHTML: JSON.stringify(graph) }]
       },
     })

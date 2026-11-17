@@ -8,9 +8,10 @@ prerendered to static HTML and deployed to GitHub Pages from `main`.
 | | |
 |---|---|
 | `npm run dev` | Dev server. Port 5173 can be taken by ddev's router (Exulta); the `.claude/launch.json` preview uses `127.0.0.1:5180` |
-| `npm run build` | Client build, SSR build, prerender, sitemap |
+| `npm run build` | Screenshot copies (`npm run images`), client build, SSR build, prerender, sitemap |
 | `npm test` | Smoke + accessibility tests (Playwright, desktop + mobile) against the production build |
 | `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
+| `npm run images` | AVIF and WebP copies of the project screenshots (Conventions); `build` and `dev` run it first |
 | `npm run stats` | Refresh the repository numbers on the project pages, from the GitHub API with `REPO_STATS_TOKEN` (below) |
 | `npm run drupal` | Refresh the Drupal contributions page from drupal.org (below) |
 
@@ -155,7 +156,7 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   | `CountUpNumber.vue` | `CountUp.vue` | the commit counts in `RepoActivity.vue` |
   | `ChatThinking.vue` | `LatticeLoader.vue` | the chat's thinking line, ending in a check with the time |
   | `ButtonMagnet.vue` | `Magnet.vue` | the chat button and "Say hello" |
-  | `GlowCard.vue` | `SpotlightCard.vue` | the project, Drupal and About cards |
+  | `GlowCard.vue` | `SpotlightCard.vue` | the project pages' features, the Drupal panels and the About cards |
   | `ShotGlare.vue` | `GlareHover.vue` | the screenshot buttons on the project pages |
   | `PhotoRipple.vue` | `RippleDistortion.vue` | water ripples under the mouse on the two About photos |
 
@@ -188,16 +189,38 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   toolbars and the responsive test's full-page screenshots all rely on the window
   scrolling. The one-screen pages are `100dvh` tall (`AppHolder.vue`), not a scroller.
 - Page content lines up with the header: `mx-auto max-w-screen-2xl px-6` (1536px), on
-  phones too (`px-6`, not `px-4`).
-- The one deliberate exception: the four project pages (`src/screens/details`) are a
-  centred 1280px column (`mx-auto max-w-screen-xl px-6`, the text in it a further
-  `md:mx-10` in), a reading width for long pages with a centred title and screenshots.
-  From 1328px wide their edge no longer meets the header logo, by design. Keep it in
-  step with the "Repository activity" side panel (`RepoActivity.vue`): from 1840 × 760
-  it moves into the free space right of that 1280px column (`right: calc((100vw -
-  1280px) / 2 - 256px)`), so widening the column means moving or dropping the panel.
-  What the four pages share is styled once, in `src/assets/project-page.css` (under
-  `.detail-page`); a page's scoped styles hold only what is its own.
+  phones too (`px-6`, not `px-4`). Long text keeps its own measure inside that (about
+  62 characters a line: `.project-text`), rather than the page getting narrower.
+- The four project pages are one template, `src/components/project/ProjectPage.vue`
+  (the "Showcase" layout Robbe picked from three prototypes). A page in
+  `src/screens/details` only hands it its data (`ProjectData` in `project.ts`: the texts
+  through its locale keys, links, screenshots, stack, repository) and, in a slot, a block
+  of its own: Scan2Talk's check-in (`after-hero`), Stable Manager's Drupal version
+  (`after-evidence`; the slot's `open(i)` opens the page's lightbox). The layout:
+  - The first screen is the whole pitch: title, `$ cat` line, tagline
+    (`projects.items.<id>.tagline`), status and links, the overview and a few tags on the
+    left, in line with the logo; the two screenshots as one picture on the right (5 : 7
+    from 1024px), the phone over the desktop capture's corner. Below 1024px the
+    screenshots come right after the status, then the overview.
+  - Then bands, far apart (`.project-band`): "What's in it" as a numbered index
+    (`ProjectIndex.vue`: hairlines, no boxes, three columns, two from 640px), "Built
+    with" beside the repository's activity, and at the end the next project with its
+    real screenshot, plus all projects. "Next" follows the order of the projects page
+    (`src/projects.ts`, which `Projects.vue` shows too) and wraps from the last to the
+    first.
+  - Phones: the index folds into titles that open their text (a `<details>`: closed in
+    the prerendered HTML, so phones get it folded before any script; from 640px CSS shows
+    the text of a closed one, and the app opens them). The text stays in the HTML.
+  - The "Repository activity" block (`RepoActivity.vue`) lays itself out by the width it
+    is given (a container query: numbers in one row from 600px of room, else two by two),
+    not by the screen. It stays in the page at every width: there is no side panel.
+  The template is styled in `src/assets/project-page.css` (under `.detail-page`), global
+  rather than scoped: the prerendered HTML links only the main stylesheet (a route's own
+  CSS comes with its JavaScript), so that is what lays the page out, and folds the
+  features on phones, before the app runs. A page's own block keeps its own styles
+  scoped and uses the shared ones there (band headings, labels, chips, the 5 : 7 split).
+  A new project page: an entry in `src/projects.ts` (and `src/seo/projects.ts`), a
+  tagline under `projects.items`, a page in `src/screens/details` with its route.
 - Touch screens:
   - Every `:hover` style sits in `@media (hover: hover) and (pointer: fine)`: on a
     touch screen a hover state sticks after the tap. Things you press get an `:active`
@@ -238,4 +261,27 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   slides show `public/<project>-home.jpg` (1600 × 1000) on a MacBook built in CSS 3D
   (`src/components/MacBook3D.vue`, posed by `Projects.vue`): a new screenshot is all it
   takes to update one.
+- The browser gets smaller copies of the screenshots, made at build time: `scripts/images.mjs`
+  (`npm run images`, with `sharp`; `build` and `dev` run it first) writes an AVIF and a
+  WebP of every `public/*-home.jpg`, `*-mobile.jpg` and `*-poster.jpg`, at full and at half
+  width, into `public/img/` (gitignored; Vite copies it into `dist/`). So a screenshot is
+  still one JPG: replace it and the copies follow. Pages show a screenshot through
+  `ShotPicture.vue` (a `<picture>`: the copies in a `srcset`, the JPG as the fallback),
+  never a bare `<img>`; the JPG stays the `og:image`. Give it the JPG's real `width` and
+  `height` (they hold its room while it loads and give the widths of the copies) and
+  `sizes` (`SHOT_SIZES` in `src/images.ts`, the MacBook's in `MacBook3D.vue`). A phone
+  screenshot of another size needs its new `width` and `height` on the page, or the smoke
+  tests fail. The
+  lightbox shows the full-size copy. The Scan2Talk video's poster is the WebP copy: a
+  poster takes one URL, and every browser this site supports shows WebP.
+- The two screenshots at the top of a project page are the largest thing above the fold
+  (the LCP): they load eagerly, the desktop one with `fetchpriority="high"`, so the browser
+  fetches them straight from the prerendered HTML. Every image further down stays
+  `loading="lazy"` (the smoke tests check both).
+- Each project page's JSON-LD (`src/seo/jsonld.ts`) describes the project itself: a
+  `WebSite` or a `WebApplication` with the page's own title, description and `og:image`,
+  in the page's language, plus what `src/seo/projects.ts` holds (live site, stack,
+  programming languages, and the `repo-stats.json` key whose first commit is its
+  `dateCreated`). A new project page needs an entry there; the smoke tests read the
+  JSON-LD back from the prerendered HTML in both languages.
 - No secrets or private tooling in this repo: it is public.

@@ -14,7 +14,7 @@ import { measureCurrentSlide, SLIDES } from './slides'
 // as "scan2talk.be" and "drupal.org" and file names like "privacy.md" look
 // similar, so those endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects?|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
 
 /** Pages without images. */
 const TEXT_ONLY = ['/privacy', '/drupal']
@@ -94,10 +94,19 @@ for (const route of ROUTES) {
     test('has every image resolving', async ({ page, request }) => {
       await guard(page)
       await open(page, route)
-      // Many images are lazy-loaded below the fold, so check each source directly.
-      const sources = await page.$$eval('#app img', (imgs) =>
-        [...new Set(imgs.map((i) => i.getAttribute('src')).filter(Boolean))],
-      )
+      // Many images are lazy-loaded below the fold, and a browser fetches only one
+      // candidate of a srcset, so check each source directly: every src, every srcset
+      // candidate (the AVIF and WebP copies of the screenshots) and video posters.
+      const sources = await page.$$eval('#app img, #app picture source, #app video[poster]', (els) => [
+        ...new Set(
+          els
+            .flatMap((el) => [
+              el.getAttribute(el.localName === 'video' ? 'poster' : 'src'),
+              ...(el.getAttribute('srcset') ?? '').split(',').map((candidate) => candidate.trim().split(/\s+/)[0]),
+            ])
+            .filter(Boolean),
+        ),
+      ])
       if (!TEXT_ONLY.includes(route)) expect(sources.length).toBeGreaterThan(0)
       for (const src of sources) {
         const res = await request.get(src!)
@@ -307,6 +316,169 @@ test('Stable Manager shows its Drupal version, with the public repository and it
   await expect(page.getByRole('region', { name: 'Ook in Drupal' }).getByRole('link', { name: 'Bekijk op GitHub' })).toHaveAttribute('href', repo)
   await expect(page.getByRole('region', { name: 'Repository-activiteit: Drupal-versie' })).toBeAttached()
   expect(errors).toEqual([])
+})
+
+// The four project pages are one template (src/components/project/ProjectPage.vue) with
+// each page's data: the same sections in the same order, a page's own block in its slot,
+// and at the end the next project in the order of the projects page.
+test.describe('project page template', () => {
+  const PAGES = [
+    { route: '/exultadetail', name: 'Exulta', next: ['Scan2Talk', '/scan2talkdetail'], own: null },
+    { route: '/scan2talkdetail', name: 'Scan2Talk', next: ['Stable Manager', '/stablemanagerdetail'], own: 'How a check-in works' },
+    { route: '/stablemanagerdetail', name: 'Stable Manager', next: ['VHS Service', '/vhsdetail'], own: 'Also in Drupal' },
+    // The last one wraps around to the first
+    { route: '/vhsdetail', name: 'VHS Service', next: ['Exulta', '/exultadetail'], own: null },
+  ] as const
+  const OWN = ['How a check-in works', 'Also in Drupal']
+
+  for (const { route, name, next, own } of PAGES) {
+    test(`${route} has the template's sections in order, and its own block`, async ({ page }) => {
+      const errors = await guard(page)
+      await open(page, route)
+      await expect(page.locator('h1')).toContainText(name)
+
+      // The first screen: tagline, status, overview, and the two screenshots
+      await expect(page.locator('.hero-tagline')).not.toBeEmpty()
+      await expect(page.locator('.hero-status')).not.toBeEmpty()
+      await expect(page.locator('.hero-more .project-text')).not.toBeEmpty()
+      await expect(page.locator('.hero-stage button.shot')).toHaveCount(2)
+
+      // What's in it: six numbered features, each with its text
+      const features = page.getByRole('region', { name: "What's in it" })
+      await expect(features.locator('.index-item')).toHaveCount(6)
+      await expect(features.locator('.index-n').first()).toHaveText('01')
+      for (const text of await features.locator('.index-text').all()) await expect(text).not.toBeEmpty()
+
+      // Built with, beside the repository's activity
+      const built = page.getByRole('region', { name: 'Built with' })
+      expect(await built.locator('.tag-pill').count()).toBeGreaterThan(5)
+      await expect(page.locator('.repo')).toHaveCount(own === 'Also in Drupal' ? 2 : 1)
+
+      // Its own block, if it has one, in its place: the check-in after the first screen,
+      // the Drupal version after the activity
+      for (const block of OWN) {
+        await expect(page.getByRole('region', { name: block, exact: true })).toHaveCount(block === own ? 1 : 0)
+      }
+      const top = async (locator: ReturnType<Page['locator']>) => (await locator.boundingBox())!.y
+      if (own === 'How a check-in works') {
+        const flow = page.getByRole('region', { name: own })
+        await expect(flow.locator('video')).toHaveCount(1)
+        expect(await top(flow)).toBeLessThan(await top(features))
+      }
+      if (own === 'Also in Drupal') {
+        const drupal = page.getByRole('region', { name: own })
+        await expect(drupal.locator('.index-item')).toHaveCount(4)
+        expect(await top(drupal)).toBeGreaterThan(await top(built))
+      }
+
+      // The way on: the next project, with its screenshot, and all projects
+      const end = page.getByRole('navigation', { name: 'Next project' })
+      const link = end.getByRole('link', { name: new RegExp(`Next project.*${next[0]}`) })
+      await expect(link).toHaveAttribute('href', next[1])
+      // Its picture comes only once the band is near (else it would load with the top ones)
+      await expect(link.locator('img')).toHaveCount(0)
+      await link.scrollIntoViewIfNeeded()
+      await expect(link.locator('img')).toHaveAttribute('loading', 'lazy')
+      await expect(end.getByRole('link', { name: 'All projects' })).toHaveAttribute('href', '/projects')
+      expect(await top(end)).toBeGreaterThan(await top(page.locator('.repo').last()))
+      expect(errors).toEqual([])
+    })
+  }
+
+  test('the next project wraps around, from the last to the first, in both languages', async ({ page }) => {
+    const errors = await guard(page)
+    for (const [from, to, label, title] of [
+      ['/vhsdetail', '/exultadetail', 'Next project', 'Exulta'],
+      ['/nl/vhsdetail', '/nl/exultadetail', 'Volgend project', 'Exulta'],
+    ]) {
+      await open(page, from)
+      const link = page.getByRole('navigation', { name: label }).getByRole('link', { name: new RegExp(title) })
+      await link.scrollIntoViewIfNeeded()
+      await link.click()
+      await expect(page).toHaveURL(new RegExp(`${to}$`))
+      await expect(page.locator('h1')).toContainText(title)
+      await expect(page.locator('html')).toHaveAttribute('lang', from.startsWith('/nl') ? 'nl' : 'en')
+    }
+    await expect(page.getByRole('navigation', { name: 'Volgend project' }).getByRole('link', { name: 'Alle projecten' })).toHaveAttribute(
+      'href',
+      '/nl/projects',
+    )
+    expect(errors).toEqual([])
+  })
+
+  // On phones the features fold into rows that open (ProjectIndex.vue): <details>, closed in
+  // the prerendered HTML, so a phone gets them folded before any script runs; from 640px CSS
+  // shows the text of a closed one. The text is in the HTML either way.
+  test('the features come folded on phones in the prerendered HTML, open from 640px', async ({ browser, request }) => {
+    const html = await (await request.get('/exultadetail')).text()
+    const folds = html.match(/<details[^>]*class="index-fold"[^>]*>/g) ?? []
+    expect(folds).toHaveLength(6)
+    for (const fold of folds) expect(fold).not.toMatch(/\sopen\b/)
+    expect(html).toContain('An interactive tool where visitors set a guest count')
+
+    for (const [width, shown] of [
+      [390, false],
+      [1280, true],
+    ] as const) {
+      // No JavaScript: the prerendered page as it arrives
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height: 800 } })
+      const page = await context.newPage()
+      await page.goto('/exultadetail')
+      const texts = page.locator('.index-text')
+      await expect(texts).toHaveCount(6)
+      for (const text of await texts.all()) {
+        if (shown) await expect(text).toBeVisible()
+        else await expect(text).toBeHidden()
+      }
+      await expect(page.locator('.index-title').first()).toBeVisible()
+      await context.close()
+    }
+  })
+
+  test('on a phone a feature opens and closes by keyboard and by tap', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
+    const page = await context.newPage()
+    const errors = await guard(page)
+    await open(page, '/exultadetail')
+    const folds = page.locator('.index-fold')
+    const first = folds.nth(0)
+    await expect(first.locator('.index-text')).toBeHidden()
+
+    // A disclosure: focusable, Enter and Space toggle it, Tab goes on to the next title
+    await first.locator('summary').focus()
+    await page.keyboard.press('Enter')
+    await expect(first).toHaveJSProperty('open', true)
+    await expect(first.locator('.index-text')).toBeVisible()
+    await page.keyboard.press('Space')
+    await expect(first).toHaveJSProperty('open', false)
+    await expect(first.locator('.index-text')).toBeHidden()
+    await page.keyboard.press('Tab')
+    await expect(folds.nth(1).locator('summary')).toBeFocused()
+
+    // And a tap
+    await folds.nth(2).locator('summary').tap()
+    await expect(folds.nth(2).locator('.index-text')).toBeVisible()
+    await expect(folds.nth(3).locator('.index-text')).toBeHidden()
+    expect(errors).toEqual([])
+    await context.close()
+  })
+
+  test('wider screens show every text, and the titles are no toggles', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    const errors = await guard(page)
+    await open(page, '/exultadetail')
+    const folds = page.locator('.index-fold')
+    for (const fold of await folds.all()) {
+      await expect(fold).toHaveJSProperty('open', true)
+      await expect(fold.locator('summary')).toHaveAttribute('tabindex', '-1')
+    }
+    const first = folds.first()
+    await first.scrollIntoViewIfNeeded()
+    await first.locator('summary').click()
+    await expect(first).toHaveJSProperty('open', true)
+    await expect(first.locator('.index-text')).toBeVisible()
+    expect(errors).toEqual([])
+  })
 })
 
 // Old URLs may be linked or indexed: they end up on the new page, in the same
@@ -538,7 +710,7 @@ test.describe('project page animations', () => {
       await open(page, route)
 
       // The header and the screenshots: the shared entrance (styles.css)
-      for (const el of [page.locator('h1'), page.locator('.shots')]) {
+      for (const el of [page.locator('h1'), page.locator('.stage-desktop'), page.locator('.stage-phone')]) {
         await expect(el).toHaveClass(/hero-in/)
         const names = await el.evaluate((e) => e.getAnimations().map((a) => (a as CSSAnimation).animationName))
         expect(names).toContain('hero-rise')
@@ -562,7 +734,7 @@ test.describe('project page animations', () => {
   test('things that come into view together follow each other', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await open(page, '/exultadetail')
-    const cards = page.locator('.feature-card')
+    const cards = page.locator('.index-item')
     await cards.first().scrollIntoViewIfNeeded()
     await expect(cards.nth(2)).toHaveClass(/is-visible/)
     const delays = await cards.evaluateAll((els) =>
@@ -585,6 +757,119 @@ test.describe('project page animations', () => {
   })
 })
 
+// In the prerendered HTML, where the browser's preload scanner finds them: the two
+// screenshots at the top load straight away, the desktop one (the largest paint) first.
+test.describe('project page screenshots', () => {
+  for (const route of ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail']) {
+    test(`${route} loads its hero screenshots first, and the rest lazily`, async ({ request }) => {
+      const html = await (await request.get(route)).text()
+      const [desktop, phone, ...rest] = html.match(/<img\b[^>]*>/g) ?? []
+      expect(desktop).toMatch(/src="\/[\w-]+-home\.jpg"/)
+      expect(desktop).toContain('fetchpriority="high"')
+      expect(desktop).not.toContain('loading="lazy"')
+      expect(phone).toMatch(/src="\/[\w-]+-mobile\.jpg"/)
+      expect(phone).not.toContain('loading="lazy"')
+      for (const img of rest) expect(img).toContain('loading="lazy"')
+    })
+  }
+
+  // Each screenshot is a <picture>: the AVIF and WebP copies at two widths that the build
+  // makes (scripts/images.mjs), with the JPG as the fallback. Its width and height are the
+  // JPG's own: they hold its room while it loads and give the widths in the srcset.
+  for (const route of ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail', '/projects']) {
+    test(`${route} shows its screenshots as AVIF or WebP, at their JPG's real size`, async ({ page }) => {
+      await open(page, route)
+      const shots = await page.locator('#app picture').evaluateAll((pictures) =>
+        Promise.all(
+          pictures.map(async (picture) => {
+            const img = picture.querySelector('img')!
+            const jpg = new Image()
+            jpg.src = img.getAttribute('src')!
+            await jpg.decode()
+            const sources = [...picture.querySelectorAll('source')]
+            return {
+              src: img.getAttribute('src')!,
+              size: [Number(img.getAttribute('width')), Number(img.getAttribute('height'))],
+              real: [jpg.naturalWidth, jpg.naturalHeight],
+              types: sources.map((s) => s.getAttribute('type')),
+              srcset: sources[0]?.getAttribute('srcset'),
+              sizes: sources[0]?.getAttribute('sizes'),
+            }
+          }),
+        ),
+      )
+      expect(shots.length).toBeGreaterThanOrEqual(route === '/projects' ? 4 : 2)
+      for (const { src, size, real, types, srcset, sizes } of shots) {
+        expect(size, src).toEqual(real)
+        expect(types, src).toEqual(['image/avif', 'image/webp'])
+        const name = src.slice(1, -'.jpg'.length)
+        expect(srcset, src).toBe(`/img/${name}-half.avif ${Math.round(size[0] / 2)}w, /img/${name}.avif ${size[0]}w`)
+        expect(sizes, src).toBeTruthy()
+      }
+    })
+  }
+})
+
+// The structured data of each project page, as crawlers read it from the prerendered
+// HTML: the site or app itself, with the page's own name, description and image.
+test.describe('project structured data', () => {
+  const stats = JSON.parse(readFileSync(new URL('../src/data/repo-stats.json', import.meta.url), 'utf8'))
+  const PROJECTS = [
+    { route: '/exultadetail', type: 'WebSite', name: 'Exulta', stats: 'exulta', live: 'https://exulta.be' },
+    { route: '/scan2talkdetail', type: 'WebApplication', name: 'Scan2Talk', stats: 'scan2talk', live: 'https://scan2talk.be' },
+    { route: '/stablemanagerdetail', type: 'WebApplication', name: 'Stable Manager', stats: 'stableManager' },
+    { route: '/vhsdetail', type: 'WebSite', name: 'VHS Service', stats: 'vhs' },
+  ]
+  const attr = (html: string, pattern: RegExp) => html.match(pattern)?.[1]?.replace(/&amp;/g, '&').replace(/&#39;/g, "'")
+
+  for (const { route, type, name, stats: key, live } of PROJECTS) {
+    for (const url of [route, nl(route)]) {
+      test(`${url} describes ${name} as a ${type}`, async ({ request }) => {
+        const html = await (await request.get(url)).text()
+        const json = attr(html, /<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)
+        const graph: Record<string, any>[] = JSON.parse(json!)['@graph']
+        const byId = new Map(graph.map((node) => [node['@id'], node]))
+        const canonical = attr(html, /<link rel="canonical" href="([^"]+)"/)
+
+        const project = byId.get(`${canonical}#project`)!
+        expect(project['@type']).toBe(type)
+        expect(project.name).toBe(name)
+        expect(project.description).toBe(attr(html, /<meta name="description" content="([^"]+)"/))
+        expect(project.headline).toBe(attr(html, /<title>([^<]+) \| Robbe Saelens<\/title>/))
+        expect(project.url).toBe(canonical)
+        expect(project.image).toBe(attr(html, /<meta property="og:image" content="([^"]+)"/))
+        expect(project.sameAs).toBe(live)
+        expect(project.dateCreated).toBe(stats.projects[key].firstCommit.slice(0, 10))
+        expect(project.keywords).toMatch(/\w+, \w+/)
+        expect(project.hasPart[0]['@type']).toBe('SoftwareSourceCode')
+        expect(project.hasPart[0].programmingLanguage.length).toBeGreaterThan(0)
+        if (type === 'WebApplication') expect(project.applicationCategory).toMatch(/Application$/)
+
+        // The page is about it; it and its code are Robbe's
+        const page = byId.get(`${canonical}#webpage`)!
+        expect(page['@type']).toBe('ItemPage')
+        expect(page.inLanguage).toBe(url.startsWith('/nl') ? 'nl' : 'en')
+        expect(page.mainEntity['@id']).toBe(project['@id'])
+        expect(project.mainEntityOfPage['@id']).toBe(page['@id'])
+        expect(byId.get(project.author['@id'])['@type']).toBe('Person')
+
+        // Every reference points at a node in the graph
+        const refs: string[] = []
+        const walk = (value: unknown) => {
+          if (Array.isArray(value)) value.forEach(walk)
+          else if (value && typeof value === 'object') {
+            const entries = Object.entries(value)
+            if (entries.length === 1 && entries[0][0] === '@id') refs.push(entries[0][1] as string)
+            else entries.forEach(([, v]) => walk(v))
+          }
+        }
+        graph.forEach((node) => Object.entries(node).forEach(([k, v]) => k !== '@id' && walk(v)))
+        for (const ref of refs) expect(byId.has(ref), ref).toBe(true)
+      })
+    }
+  }
+})
+
 test('lightbox opens, steps through the screenshots, and closes', async ({ page }) => {
   const errors = await guard(page)
   await open(page, '/exultadetail')
@@ -594,9 +879,13 @@ test('lightbox opens, steps through the screenshots, and closes', async ({ page 
   await expect(dialog).toBeVisible()
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
   await expect(dialog.locator('.lightbox-caption')).toContainText('1 / 2')
+  // The full-size copy, AVIF where the browser has it
+  const shown = () => dialog.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.currentSrc)
+  await expect.poll(shown).toMatch(/\/img\/exulta-home\.avif$/)
 
   await page.keyboard.press('ArrowRight')
   await expect(dialog.locator('.lightbox-caption')).toContainText('2 / 2')
+  await expect.poll(shown).toMatch(/\/img\/exulta-mobile\.avif$/)
   await page.keyboard.press('ArrowRight')
   await expect(dialog.locator('.lightbox-caption')).toContainText('1 / 2')
 
@@ -630,7 +919,7 @@ test.describe('repository activity', () => {
       const errors = await guard(page)
       const stats = data.projects[key]
       await open(page, route)
-      const section = page.locator(`.repo--inline:has(#repo-title-${key}-inline)`)
+      const section = page.locator(`.repo:has(#repo-title-${key})`)
       await section.scrollIntoViewIfNeeded()
       await expect(section).toBeVisible()
       // The count rises to its value (CountUp, 0.9 s however many commits).
@@ -642,37 +931,36 @@ test.describe('repository activity', () => {
     })
   }
 
-  test('on wide screens it floats beside the content instead', async ({ page }) => {
+  // One block in the page at every width, beside the stack (no panel fixed at the side):
+  // its numbers in one row where it has 600px of room, two by two where it hasn't.
+  test('stays in the page at every width, laid out by its own width', async ({ page }) => {
     await guard(page)
-    await page.setViewportSize({ width: 1920, height: 1080 })
-    await open(page, '/exultadetail')
-    const aside = page.getByRole('complementary', { name: 'Repository activity' })
-    await expect(aside).toBeVisible()
-    await expect(page.locator('.repo--inline')).toBeHidden()
-    // Right of the 1280px content, and it stays put while scrolling.
-    const content = (await page.locator('.detail-page > div').first().boundingBox())!
-    const before = (await aside.boundingBox())!
-    expect(before.x).toBeGreaterThanOrEqual(content.x + content.width)
-    expect(before.x + before.width).toBeLessThanOrEqual(1920)
-    await page.mouse.wheel(0, 1500)
-    await page.waitForTimeout(300)
-    expect((await aside.boundingBox())!.y).toBeCloseTo(before.y, 0)
-
-    await page.setViewportSize({ width: 1440, height: 900 })
-    await expect(aside).toBeHidden()
-    await expect(page.locator('.repo--inline')).toBeVisible()
-  })
-
-  test('with two repositories, only the first floats; the other stays on the page', async ({ page }) => {
-    await guard(page)
-    await page.setViewportSize({ width: 1920, height: 1080 })
-    await open(page, '/stablemanagerdetail')
-    await expect(page.getByRole('complementary')).toHaveCount(1)
-    await expect(page.getByRole('complementary', { name: 'Repository activity: Next.js app' })).toBeVisible()
-    await expect(page.locator('#repo-title-stableManager-inline')).toBeHidden()
-    const drupal = page.getByRole('region', { name: 'Repository activity: Drupal version' })
-    await drupal.scrollIntoViewIfNeeded()
-    await expect(drupal).toBeVisible()
+    const rows = async (repo: ReturnType<Page['locator']>) => {
+      const tops = await repo.locator('.repo-number').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)))
+      return new Set(tops).size
+    }
+    for (const [width, height, inRow] of [
+      [1920, 1080, true],
+      [1440, 900, true],
+      [1024, 768, false],
+      [390, 844, false],
+    ] as const) {
+      await page.setViewportSize({ width, height })
+      await open(page, '/stablemanagerdetail')
+      await expect(page.getByRole('complementary')).toHaveCount(0)
+      for (const name of ['Repository activity: Next.js app', 'Repository activity: Drupal version']) {
+        const repo = page.getByRole('region', { name })
+        await repo.scrollIntoViewIfNeeded()
+        await expect(repo).toBeVisible()
+        // Inside the page's column, in line with the header
+        const box = (await repo.boundingBox())!
+        const column = (await page.locator('.detail-page > .project-page').boundingBox())!
+        expect(box.x).toBeGreaterThanOrEqual(column.x)
+        expect(box.x + box.width).toBeLessThanOrEqual(column.x + column.width)
+        expect(await rows(repo), `${name} at ${width}px`).toBe(inRow ? 1 : 2)
+        expect(await repo.evaluate((e) => getComputedStyle(e).position)).toBe('static')
+      }
+    }
   })
 
   test('in Dutch on /nl', async ({ page }) => {
@@ -822,6 +1110,17 @@ test('hovering Geluwe shows a map, Escape hides it', async ({ page }) => {
   const place = page.getByRole('button', { name: 'Geluwe' })
   const card = page.getByRole('tooltip')
   await expect(card).toBeHidden()
+  // The word rises in with the hero text: hover it once it stands still, or it can
+  // slide out from under the mouse (a mouseleave) on a slow machine.
+  let last = ''
+  await expect
+    .poll(async () => {
+      const box = JSON.stringify(await place.boundingBox())
+      const still = box === last
+      last = box
+      return still
+    }, { intervals: [150] })
+    .toBe(true)
   await place.hover()
   await expect(card).toBeVisible()
   await expect(card.getByRole('img', { name: /Map of Geluwe/ })).toBeVisible()
@@ -829,9 +1128,16 @@ test('hovering Geluwe shows a map, Escape hides it', async ({ page }) => {
   await expect(card.locator('svg .m-label-main')).toHaveText('Geluwe')
   await page.keyboard.press('Escape')
   await expect(card).toBeHidden()
-  // Also reachable with the keyboard
+  // Also reachable with the keyboard, and it stays while the word has focus,
+  // also when the mouse leaves it (WCAG 1.4.13)
   await place.focus()
   await expect(card).toBeVisible()
+  await page.mouse.move(5, 5)
+  await expect(place).toHaveAttribute('aria-expanded', 'true') // the card fades, so check the state
+  await expect(card).toBeVisible()
+  // Focus leaving the word (back, out of it; Tab would go into the card's link) closes it
+  await page.keyboard.press('Shift+Tab')
+  await expect(card).toBeHidden()
   expect(errors).toEqual([])
 })
 
@@ -855,7 +1161,7 @@ test('the Scan2Talk check-in video has working sources', async ({ request }) => 
   for (const [file, type] of [
     ['/scan2talk-checkin.webm', 'video/webm'],
     ['/scan2talk-checkin.mp4', 'video/mp4'],
-    ['/scan2talk-checkin-poster.jpg', 'image/jpeg'],
+    ['/img/scan2talk-checkin-poster.webp', 'image/webp'],
   ]) {
     const res = await request.get(file, { headers: { Range: 'bytes=0-1023' } })
     expect([200, 206], file).toContain(res.status())

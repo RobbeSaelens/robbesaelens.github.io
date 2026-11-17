@@ -7,7 +7,7 @@
     class="place"
     :class="{ 'is-open': open }"
     @mouseenter="show"
-    @mouseleave="open = false"
+    @mouseleave="onMouseLeave"
     @focusin="show"
     @focusout="onFocusOut"
   >
@@ -70,6 +70,13 @@ async function show() {
 
 function close() {
   open.value = false
+}
+
+/** The mouse leaving closes it, unless the word has focus: it stays while hover or
+ *  focus remains (WCAG 1.4.13). The entrance animation can also move the word away
+ *  from a mouse that stands still. */
+function onMouseLeave() {
+  if (!root.value?.contains(document.activeElement)) open.value = false
 }
 
 function onFocusOut(e: FocusEvent) {

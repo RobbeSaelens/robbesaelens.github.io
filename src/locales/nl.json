@@ -77,15 +77,20 @@
     "shotMobile": "mobiel",
     "shotDashboard": "dashboard"
   },
+  "project": {
+    "overview": "Projectoverzicht",
+    "featuresTitle": "Wat erin zit",
+    "builtWith": "Gebouwd met",
+    "languages": "Talen & frameworks",
+    "tools": "Tools & diensten",
+    "live": "Live",
+    "allProjects": "Alle projecten"
+  },
   "exulta": {
     "title": "Exulta",
     "alt": "Website van Exulta voor de verhuur van stretchtenten",
-    "liveBadge": "Live",
     "visitSite": "Open exulta.be",
-    "overview": "Projectoverzicht",
-    "about": "Over",
     "aboutText": "Exulta verhuurt stretchtenten voor evenementen, en dit is de tweede versie van hun website, nu live op exulta.be. Een Laravel 13-backend met een React 19-frontend via Inertia, en een Filament 5-adminpaneel dat de klant zelf beheert. Het omvat de volledige publieke site — productcatalogus, tentcalculator, realisaties, blog en contact — plus de operationele kant: mediabibliotheek, rollen, back-ups, cookietoestemming en een geautomatiseerde deploypijplijn.",
-    "featuresTitle": "Wat erin zit",
     "featureCatalog": "Productcatalogus",
     "featureCatalogText": "Tenten per categorie met detailpagina's, afbeeldingen via Spatie Media Library, en realisaties die echte evenementen tonen.",
     "featureCalculator": "Tentcalculator",
@@ -98,18 +103,12 @@
     "featureSeo": "SEO & AI-vindbaarheid",
     "featureSeoText": "Server-side rendering, een gegenereerde sitemap en robots.txt, gestructureerde SEO-metadata, plus een llms.txt en een AI-productfeed zodat assistenten de catalogus kunnen lezen.",
     "featurePerf": "Gemeten prestaties",
-    "featurePerfText": "Response caching en Lighthouse-rapporten per pagina, bewaard in de repo, zodat elke achteruitgang als diff zichtbaar wordt.",
-    "languages": "Talen & frameworks",
-    "tools": "Tools & diensten",
-    "viewOther": "Bekijk andere projecten"
+    "featurePerfText": "Response caching en Lighthouse-rapporten per pagina, bewaard in de repo, zodat elke achteruitgang als diff zichtbaar wordt."
   },
   "vhs": {
     "title": "VHS Service",
     "alt": "Website van VHS Service voor de aanleg van paardenpistes",
-    "overview": "Projectoverzicht",
-    "about": "Over",
     "aboutText": "VHS Service legt paardenpistes aan en renoveert ze, in Geluwe (West-Vlaanderen), samen met de bijhorende nivelleer- en omgevingswerken. Ik bouwde hun nieuwe site van nul op Next.js 16: een redactioneel design rond grote foto's en scroll-gestuurde animatie, in het Nederlands, Frans en Engels, en afgestemd op lokale zoekresultaten.",
-    "featuresTitle": "Wat erin zit",
     "featureMotion": "Design in beweging",
     "featureMotionText": "GSAP en Motion sturen de scroll-animaties, Lenis zorgt voor vloeiend scrollen, en een fotoslider over het volledige scherm opent de homepage.",
     "featureI18n": "Drie talen",
@@ -122,21 +121,14 @@
     "featureFormsText": "Een offerteformulier via Resend, plus cookietoestemming: statistieken laden pas als de bezoeker akkoord gaat.",
     "featureGallery": "Realisatiegalerij",
     "featureGalleryText": "Een galerij met afgewerkte pistes, met een coverflow-showcase, een carrousel en een lightbox die je met het toetsenbord bedient.",
-    "languages": "Talen & frameworks",
-    "tools": "Tools & diensten",
-    "viewOther": "Bekijk andere projecten",
     "rebrandingBadge": "Rebranding",
     "notLiveYet": "Nog niet live"
   },
   "stableManager": {
     "title": "Stable Manager",
     "alt": "Dashboard van Stable Manager met de kosten van de paarden",
-    "privateBadge": "Live",
     "privateNote": "Privé-app, enkel met login",
-    "overview": "Projectoverzicht",
-    "about": "Over",
     "aboutText": "Stable Manager houdt bij wat twee paarden kosten: een eigen paard en een pensionpaard. Elke kost wordt geboekt met datum, categorie en hoeveelheid, en procentueel verdeeld over de paarden. Er is een desktopdashboard met maandgrafieken en overzichten, en een mobiele app om kosten meteen in de stal in te geven, ook zonder verbinding. Het is een privé-app: registreren kan niet, accounts worden via de command line aangemaakt.",
-    "featuresTitle": "Wat erin zit",
     "featureSplit": "Kosten verdelen",
     "featureSplitText": "Elke kost gaat naar één paard of wordt procentueel over beide verdeeld, zodat de totalen per paard kloppen, ook voor gedeeld hooi of de hoefsmid.",
     "featureQuick": "Snel toevoegen uit voorraad",
@@ -149,8 +141,6 @@
     "featureAuthText": "Better Auth met gebruikersnaam en wachtwoord, registreren uitgeschakeld, en sessies die een maand geldig blijven op de gsm. Elke pagina en server action controleert de sessie.",
     "featureQuality": "Getest & gemonitord",
     "featureQualityText": "Vitest-unittests plus databasetests tegen een echte Postgres, en een publiek health-endpoint voor uptimecontroles.",
-    "languages": "Talen & frameworks",
-    "tools": "Tools & diensten",
     "drupalTitle": "Ook in Drupal",
     "drupalName": "Shared Costs · Drupal 11-module",
     "drupalIntro": "Shared Costs is de Drupal-versie van Stable Manager, open source op GitHub: een Drupal 11-module, plus vier recipes en een thema die de app nabouwen met enkel configuratie. Offline werken, wat de Next.js-app als PWA doet, zit er niet in.",
@@ -168,16 +158,12 @@
     "drupalQualityText": "PHPUnit (Unit, Kernel, Functional en in de browser) met een axe-scan van elke pagina, visuele regressietests met Playwright, PHPStan level 8 en ongeveer 95 % dekking.",
     "drupalStack": "Drupal-stack",
     "repoApp": "Next.js-app",
-    "repoDrupal": "Drupal-versie",
-    "viewOther": "Bekijk andere projecten"
+    "repoDrupal": "Drupal-versie"
   },
   "scan2talk": {
     "title": "Scan2Talk",
     "alt": "Een Scan2Talk-check-in op een telefoon",
-    "liveBadge": "Live",
     "visitSite": "Open scan2talk.be",
-    "overview": "Projectoverzicht",
-    "about": "Over",
     "aboutText": "Scan2Talk is een check-intool voor het welbevinden van leerlingen, live op scan2talk.be. Leerlingen scannen een QR-poster in de gang en delen in minder dan een minuut hoe ze zich voelen — zonder account, zonder app. Leerkrachten krijgen een dashboard met trends doorheen de tijd en kunnen een privégesprek starten met een leerling die om hulp vraagt.",
     "flowTitle": "Zo verloopt een check-in",
     "flowStep1": "Scan de QR-code",
@@ -187,7 +173,6 @@
     "flowStep3": "Hulp krijgen",
     "flowStep3Text": "Als de leerling dat wil, neemt iemand contact op — op de manier en het moment die de leerling kiest.",
     "flowVideo": "Video: een leerling checkt in op Scan2Talk, van de stemmingsbarometer tot het bedankscherm",
-    "featuresTitle": "Wat erin zit",
     "featureQr": "Ondertekende QR-posters",
     "featureQrText": "Geprinte posters bevatten een ondertekende URL die nooit vervalt. Zonder scan kom je niet in de check-in, dus links kunnen niet gedeeld of geraden worden.",
     "featureChat": "Live chat met leerkracht",
@@ -199,10 +184,7 @@
     "featurePwa": "Installeerbare PWA",
     "featurePwaText": "Te installeren op het startscherm en mobile-first gebouwd: ingelogde medewerkers gaan op hun gsm meteen naar hun dashboard.",
     "featurePrivacy": "Privacy by design",
-    "featurePrivacyText": "Geen accounts voor leerlingen, een aparte privacypagina, en dashboard- en check-inroutes die zoekmachines niet indexeren.",
-    "languages": "Talen & frameworks",
-    "tools": "Tools & diensten",
-    "viewOther": "Bekijk andere projecten"
+    "featurePrivacyText": "Geen accounts voor leerlingen, een aparte privacypagina, en dashboard- en check-inroutes die zoekmachines niet indexeren."
   },
   "error": {
     "defaultTitle": "Er is iets fout gegaan",

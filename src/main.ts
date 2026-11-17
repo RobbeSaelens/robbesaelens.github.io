@@ -24,5 +24,8 @@ app.use(head)
 app.use(i18n)
 app.use(localeLinks)
 app.use(router)
-app.mount('#app')
+// Mount once the route's code has loaded: mounting replaces the prerendered page, and
+// mounting earlier left it blank until the lazy route chunk arrived (about 1.6 s on a
+// slow connection).
+router.isReady().then(() => app.mount('#app'))
 initAnalytics()

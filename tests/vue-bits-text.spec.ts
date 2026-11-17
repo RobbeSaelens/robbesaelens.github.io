@@ -203,14 +203,14 @@ test.describe('the commit counts (CountUp)', () => {
     test(`count up when they come into view, read out as the final number (${lang})`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
       const errors = await guard(page)
-      const frames = await record(page, '.repo--inline .repo-number dd')
+      const frames = await record(page, '.repo .repo-number dd')
       const final = (stats.exulta.commits as number).toLocaleString(LOCALE[lang])
       await page.goto(lang === 'nl' ? nl('/exultadetail') : '/exultadetail')
       await expect(page.locator('#main-content')).toBeVisible()
       await page.waitForTimeout(1000)
 
       // Below the fold: waiting at 0, the final number for screen readers
-      const dd = page.locator('.repo--inline .repo-number dd').first()
+      const dd = page.locator('.repo .repo-number dd').first()
       await expect(dd.locator('[aria-hidden="true"]')).toHaveText('0')
       await expect(dd.locator('.sr-only')).toHaveText(final)
 
@@ -230,11 +230,14 @@ test.describe('the commit counts (CountUp)', () => {
     })
   }
 
-  test('the side panel on wide screens counts too, after it has slid in', async ({ page }) => {
+  test('on a full HD screen they count in the page too (there is no side panel), once scrolled to', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 })
     const errors = await guard(page)
     await page.goto('/exultadetail')
-    const dd = page.locator('.repo--aside .repo-number dd')
+    await expect(page.locator('#main-content')).toBeVisible()
+    await expect(page.locator('.repo')).toHaveCount(1)
+    const dd = page.locator('.repo .repo-number dd')
+    await dd.first().scrollIntoViewIfNeeded()
     await expect(dd.first()).toHaveText(stats.exulta.commits.toLocaleString('en-GB'), { timeout: 5_000 })
     await expect(dd.nth(1)).toHaveText(stats.exulta.commitsLast30Days.toLocaleString('en-GB'), { timeout: 5_000 })
     await expect(dd.locator('.sr-only, [aria-hidden]')).toHaveCount(0)
@@ -251,7 +254,7 @@ test('with reduced motion nothing scrambles or counts: the final text at once', 
   await expect(page.locator('#main-content')).toBeVisible()
   await expect(page.locator('.terminal-command')).toHaveText('cat ./exulta-project.md')
   // The counts: final before they are ever scrolled to
-  const dd = page.locator('.repo--inline .repo-number dd')
+  const dd = page.locator('.repo .repo-number dd')
   await expect(dd.first()).toHaveText(stats.exulta.commits.toLocaleString('en-GB'))
   await expect(dd.nth(1)).toHaveText(stats.exulta.commitsLast30Days.toLocaleString('en-GB'))
   await page.waitForTimeout(1500)

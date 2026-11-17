@@ -28,7 +28,8 @@
         </button>
 
         <figure class="lightbox-figure" @click.stop>
-          <img :src="current.src" :alt="current.alt" class="lightbox-img" />
+          <!-- The full-size AVIF or WebP copy of the screenshot, or the JPG itself -->
+          <ShotPicture :key="current.src" :src="current.src" :alt="current.alt" class="lightbox-img" />
           <figcaption v-if="current.caption" class="lightbox-caption">
             {{ current.caption }}
             <span v-if="images.length > 1" class="lightbox-count">
@@ -54,6 +55,7 @@
 import { defineComponent, type PropType } from 'vue'
 import { X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { setCovering } from '../covered'
+import ShotPicture from './ShotPicture.vue'
 
 export interface LightboxImage {
   src: string
@@ -63,7 +65,7 @@ export interface LightboxImage {
 
 export default defineComponent({
   name: 'ImageLightbox',
-  components: { X, ChevronLeft, ChevronRight },
+  components: { X, ChevronLeft, ChevronRight, ShotPicture },
 
   props: {
     images: {
@@ -163,7 +165,8 @@ export default defineComponent({
   max-height: 100%;
 }
 
-.lightbox-img {
+/* :deep() because the <img> is inside ShotPicture */
+.lightbox-figure :deep(.lightbox-img) {
   max-width: 100%;
   max-height: calc(100vh - 8rem);
   max-height: calc(100dvh - 8rem);
