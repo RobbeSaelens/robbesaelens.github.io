@@ -1,20 +1,8 @@
 <template>
   <!-- Activity of the project's repository (private, unless `repository` links to it), from
-       src/data/repo-stats.json (npm run stats).
-       A section on the page; on screens with room beside the content, a panel there instead
-       (unless `float` is off: there is room for one panel per page). -->
-  <component
-    :is="variant === 'aside' ? 'aside' : 'section'"
-    v-if="stats"
-    class="repo"
-    :class="variant === 'aside' ? 'repo--aside' : ['repo--inline', 'reveal', { 'repo--floats': float }]"
-    :aria-labelledby="titleId"
-  >
-    <!-- In body: a transformed page ancestor would break position: fixed -->
-    <Teleport v-if="variant !== 'aside' && float" to="body">
-      <RepoActivity :project="project" :repository="repository" :label="label" variant="aside" />
-    </Teleport>
-
+       src/data/repo-stats.json (npm run stats). Laid out by the width it is given, not
+       the screen's: the numbers two by two, in one row from 600px of room. -->
+  <section v-if="stats" class="repo reveal" :aria-labelledby="titleId">
     <!-- Read out as "Repository activity: Next.js app" -->
     <h2 :id="titleId" class="repo-heading" :aria-label="label ? `${$t('repo.title')}: ${label}` : undefined">
       {{ $t('repo.title') }}
@@ -26,11 +14,11 @@
         <!-- The counts count up when they come into view (CountUpNumber.vue) -->
         <div class="repo-number">
           <dt>{{ $t('repo.commits') }}</dt>
-          <dd><CountUpNumber :value="stats.commits" :format="count" :delay="countDelay" /></dd>
+          <dd><CountUpNumber :value="stats.commits" :format="count" /></dd>
         </div>
         <div class="repo-number">
           <dt>{{ $t('repo.last30') }}</dt>
-          <dd><CountUpNumber :value="stats.commitsLast30Days" :format="count" :delay="countDelay" /></dd>
+          <dd><CountUpNumber :value="stats.commitsLast30Days" :format="count" /></dd>
         </div>
         <div class="repo-number repo-number--text">
           <dt>{{ $t('repo.since') }}</dt>
@@ -70,7 +58,7 @@
         {{ $t('repo.private', { date: day(data.generatedAt) }) }}
       </p>
     </div>
-  </component>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -88,27 +76,19 @@ interface RepoStats {
   commitsPerWeek: number[]
 }
 
-const props = withDefaults(
-  defineProps<{
-    project: 'exulta' | 'scan2talk' | 'stableManager' | 'vhs' | 'sharedCosts'
-    /** The repository's public URL, for an open-source project */
-    repository?: string
-    /** Which repository this is, on a page that shows more than one */
-    label?: string
-    variant?: 'inline' | 'aside'
-    /** Moves into the panel beside the content where there is room; one per page */
-    float?: boolean
-  }>(),
-  { variant: 'inline', float: true },
-)
-const titleId = computed(() => `repo-title-${props.project}-${props.variant}`)
+const props = defineProps<{
+  project: 'exulta' | 'scan2talk' | 'stableManager' | 'vhs' | 'sharedCosts'
+  /** The repository's public URL, for an open-source project */
+  repository?: string
+  /** Which repository this is, on a page that shows more than one */
+  label?: string
+}>()
+const titleId = computed(() => `repo-title-${props.project}`)
 
 const { locale } = useI18n({ useScope: 'global' })
 const stats = computed(() => (data.projects as Record<string, RepoStats | undefined>)[props.project])
 const weeklyTotal = computed(() => stats.value?.commitsPerWeek.reduce((a, b) => a + b, 0) ?? 0)
 const weeklyMax = computed(() => Math.max(1, ...(stats.value?.commitsPerWeek ?? [])))
-/** The side panel slides in first (repo-aside-in): count along with its bars. */
-const countDelay = computed(() => (props.variant === 'aside' ? 0.45 : 0))
 
 const tag = () => (locale.value === 'nl' ? 'nl-BE' : 'en-GB')
 const count = (n: number) => n.toLocaleString(tag())
@@ -135,109 +115,114 @@ function ago(iso: string) {
 </script>
 
 <style scoped>
+/* Sized by its container: a column beside the stack, or the page's width on a phone */
 .repo {
-  margin-bottom: 2.5rem;
+  container-type: inline-size;
+  min-width: 0;
 }
+/* A label over the card, like the "Built with" beside it */
 .repo-heading {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem 0.75rem;
+  gap: 0.4rem 0.6rem;
+  margin-bottom: 0.875rem;
   font-family: var(--font-mono);
-  font-size: 1.5rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--color-text-primary);
-  margin-bottom: 1.25rem;
-}
-@media (min-width: 768px) {
-  .repo-heading {
-    font-size: 2rem;
-  }
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
 }
 /* Which repository, when a page shows more than one */
 .repo-label {
-  padding: 0.25rem 0.7rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 9999px;
-  font-size: 0.7rem;
+  font-size: 0.625rem;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-accent);
   background: var(--color-accent-soft);
   border: 1px solid var(--color-border-glow);
 }
 
 .repo-card {
-  padding: 1.5rem;
+  padding: 1.25rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 1rem;
 }
-@media (min-width: 768px) {
-  .repo-card {
-    padding: 2rem;
-  }
-}
 
-/* ── Numbers: 2 × 2, one row with dividers from 1024px ── */
+/* ── Numbers: 2 × 2, one row with dividers from 600px of room ── */
 .repo-numbers {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem 1rem;
+  gap: 1rem;
   margin: 0;
-}
-@media (min-width: 1024px) {
-  .repo-numbers {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-  }
-  .repo-number + .repo-number {
-    padding-left: 1.5rem;
-    border-left: 1px solid var(--color-border);
-  }
 }
 .repo-number {
   display: flex;
   flex-direction: column-reverse;
   justify-content: flex-end;
-  gap: 0.3rem;
+  gap: 0.2rem;
   min-width: 0;
 }
 .repo-number dd {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.1;
   color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
 }
 /* Dates and "2 days ago" are longer than a count: smaller, so they stay on one or two lines. */
 .repo-number--text dd {
-  font-size: 1.25rem;
-  line-height: 1.25;
-}
-@media (min-width: 1024px) {
-  .repo-number dd {
-    font-size: 2.25rem;
-  }
-  .repo-number--text dd {
-    font-size: 1.5rem;
-  }
+  font-size: 1.05rem;
+  line-height: 1.3;
 }
 .repo-number dt {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
+}
+@container (min-width: 600px) {
+  .repo-card {
+    padding: 1.5rem 1.75rem;
+  }
+  .repo-numbers {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+  }
+  .repo-number + .repo-number {
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--color-border);
+  }
+  .repo-number dd {
+    font-size: 2rem;
+  }
+  .repo-number--text dd {
+    font-size: 1.3rem;
+  }
+  .repo-number dt {
+    font-size: 0.8125rem;
+  }
 }
 
 /* ── Commits per week ── */
 .repo-chart {
-  margin: 2rem 0 0;
+  margin: 1.25rem 0 0;
 }
 .repo-bars {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
-  height: 4.5rem;
+  gap: 2px;
+  height: 3rem;
   border-bottom: 1px solid var(--color-border);
+}
+@container (min-width: 600px) {
+  .repo-bars {
+    gap: 4px;
+    height: 4rem;
+  }
 }
 .repo-bar {
   flex: 1;
@@ -257,7 +242,7 @@ function ago(iso: string) {
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--d);
 }
 .repo-chart figcaption {
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
@@ -265,17 +250,19 @@ function ago(iso: string) {
 /* ── Where the numbers come from ── */
 .repo-note {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.4rem;
-  margin: 1.5rem 0 0;
-  padding-top: 1.25rem;
+  margin: 1rem 0 0;
+  padding-top: 0.875rem;
   border-top: 1px dashed var(--color-border);
   font-size: 0.75rem;
+  line-height: 1.5;
   color: var(--color-text-muted);
 }
 .repo-note-icon {
   width: 0.85rem;
   height: 0.85rem;
+  margin-top: 0.15rem;
   flex-shrink: 0;
 }
 .repo-note-link {
@@ -284,92 +271,11 @@ function ago(iso: string) {
   text-underline-offset: 2px;
 }
 
-/* ── Side panel: in the free space right of the 1280px content, fixed while
-   scrolling. Only where it fits; the section on the page makes way for it. ── */
-.repo--aside {
-  display: none;
-}
-@media (min-width: 1840px) and (min-height: 760px) {
-  .repo--floats {
-    display: none;
-  }
-  .repo--aside {
-    display: block;
-    position: fixed;
-    z-index: 30;
-    top: 7rem;
-    right: calc((100vw - 1280px) / 2 - 240px - 16px);
-    width: 240px;
-    margin: 0;
-    animation: repo-aside-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
-  }
-  .repo--aside .repo-heading {
-    margin-bottom: 0.6rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-  .repo--aside .repo-label {
-    padding: 0.1rem 0.5rem;
-    font-size: 0.625rem;
-  }
-  .repo--aside .repo-card {
-    padding: 1.25rem;
-  }
-  .repo--aside .repo-numbers {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-  .repo--aside .repo-number + .repo-number {
-    margin-top: 0.75rem;
-    padding: 0.75rem 0 0;
-    border-left: 0;
-    border-top: 1px solid var(--color-border);
-  }
-  .repo--aside .repo-number dd {
-    font-size: 1.5rem;
-  }
-  .repo--aside .repo-number--text dd {
-    font-size: 1.05rem;
-  }
-  .repo--aside .repo-chart {
-    margin-top: 1.25rem;
-  }
-  .repo--aside .repo-bars {
-    gap: 2px;
-    height: 3rem;
-  }
-  .repo--aside .repo-bar {
-    animation: repo-bar-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) calc(0.45s + var(--d)) both;
-  }
-  .repo--aside .repo-note {
-    align-items: flex-start;
-    margin-top: 1rem;
-    padding-top: 1rem;
-  }
-}
-@keyframes repo-aside-in {
-  from {
-    opacity: 0;
-    transform: translateX(16px);
-  }
-}
-@keyframes repo-bar-in {
-  from {
-    transform: scaleY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .repo.reveal-armed .repo-bar,
   .repo.is-visible .repo-bar {
     transform: none;
     transition: none;
-  }
-  .repo--aside,
-  .repo--aside .repo-bar {
-    animation: none;
   }
 }
 </style>
