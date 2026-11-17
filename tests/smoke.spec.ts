@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { baseCompile } from '@intlify/message-compiler'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
 import { MOVED, nl, ROUTES } from './routes'
 import { measureCurrentSlide, SLIDES } from './slides'
 
@@ -187,6 +187,98 @@ test('sitemap lists exactly the tested routes', async ({ request }) => {
   for (const [from] of MOVED) expect(xml).not.toContain(from)
   // every URL points at both language versions
   expect(xml.match(/hreflang="nl"/g)).toHaveLength(ROUTES.length * 2)
+})
+
+// What the AI chatbot answers from, written by the build (src/llms.ts): the hand-written
+// profile, then the site's own data. The status-worker reads the first 12,000 characters.
+test.describe('llms.txt', () => {
+  const read = (file: string) => readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8')
+  const en = JSON.parse(read('locales/en.json'))
+  const stats = JSON.parse(read('data/repo-stats.json'))
+  const drupal = JSON.parse(read('data/drupal.json'))
+  const llms = async (request: APIRequestContext) => {
+    const res = await request.get('/llms.txt')
+    expect(res.status()).toBe(200)
+    return res.text()
+  }
+
+  test('fits what the chatbot reads, in the llmstxt.org shape, as plain text', async ({ request }) => {
+    const text = await llms(request)
+    expect(text.trim().length).toBeLessThanOrEqual(12_000)
+    expect(text).toMatch(/^# Robbe Saelens\n\n> /)
+    const headings = [...text.matchAll(/^## (.+)$/gm)].map((m) => m[1])
+    expect(headings).toEqual(expect.arrayContaining(['Identity', 'Personal', 'Not to share', 'Pages', 'Projects', 'Drupal contributions']))
+    // Who he is and what not to share come before everything generated
+    expect(headings.indexOf('Not to share')).toBeLessThan(headings.indexOf('Pages'))
+    expect(text).not.toMatch(RAW_I18N_KEY)
+    expect(text).not.toMatch(/undefined|\[object Object\]|\bNaN\b|\bnull\b/)
+    expect(text, 'no HTML or comments').not.toMatch(/<\/?[a-z][^>]*>|<!--/i)
+  })
+
+  test('holds the hand-written profile, whole', async ({ request }) => {
+    const text = await llms(request)
+    const profile = read('data/llms-profile.md').replace(/<!--[\s\S]*?-->/g, '')
+    for (const line of profile.split('\n').filter((l) => l.trim())) expect(text).toContain(line)
+    for (const fact of [
+      '- Born: 2000',
+      '- Location: Geluwe, West Flanders, Belgium',
+      '- Languages: Dutch (native), English, a little French',
+      'Open to some side projects, not to\n  freelance work.',
+      '- Driving licence: B.',
+      'padel, which he has played for about a\n  year (since 2025)',
+      "Robbe doesn't share his exact address",
+    ]) {
+      expect(text).toContain(fact)
+    }
+  })
+
+  test('holds every project, with its pages, features, stack and repository numbers', async ({ request }) => {
+    const text = await llms(request)
+    for (const [ns, path] of [
+      ['exulta', '/exultadetail'],
+      ['scan2talk', '/scan2talkdetail'],
+      ['stableManager', '/stablemanagerdetail'],
+      ['vhs', '/vhsdetail'],
+    ]) {
+      expect(text).toContain(`### ${en[ns].title}\n`)
+      expect(text).toContain(`https://robbesaelens.github.io${path}`)
+      expect(text).toContain(en[ns].aboutText)
+      // Every title of its numbered lists: the features, Stable Manager's Drupal points, Scan2Talk's steps
+      const titles = Object.keys(en[ns]).filter((key) => /^(feature|drupal|flowStep)/.test(key) && `${key}Text` in en[ns])
+      expect(titles.length).toBeGreaterThan(0)
+      for (const key of titles) expect(text, `${ns}.${key}`).toContain(en[ns][key])
+    }
+    for (const tagline of Object.values(en.projects.items).map((item) => (item as { tagline: string }).tagline)) {
+      if (tagline !== en.projects.items['coming-soon'].tagline) expect(text).toContain(tagline)
+    }
+    expect(text).toContain('Built with: PHP 8.4, Laravel 13, React 19')
+    expect(text).toContain('Tools: Better Auth, shadcn/ui')
+    expect(text).toContain('https://github.com/RobbeSaelens/shared_costs')
+    for (const [key, repo] of Object.entries(stats.projects) as [string, { commits: number; commitsLast30Days: number }][]) {
+      expect(text, key).toContain(`${repo.commits} commits, ${repo.commitsLast30Days} in the last 30 days, active since`)
+    }
+    for (const page of ['/contact', '/drupal', '/privacy', '/projects']) {
+      expect(text).toContain(`](https://robbesaelens.github.io${page})`)
+    }
+  })
+
+  test('holds the Drupal contributions: the counts and every issue, or points to the rest', async ({ request }) => {
+    const text = await llms(request)
+    expect(text).toContain(`${drupal.issuesCreated.length} issues opened, ${drupal.credits.length} credits`)
+    // One line per issue, its credit and merge request with it; the latest first
+    const urls = new Map<number, { title: string; urls: string[] }>()
+    const add = (id: number, title: string, url: string) =>
+      urls.set(id, { title, urls: [...(urls.get(id)?.urls ?? []), url] })
+    for (const issue of [...drupal.issuesCreated, ...drupal.issuesJoined]) add(issue.id, issue.title, issue.url)
+    for (const credit of drupal.credits) add(credit.issue, credit.title, credit.url)
+    for (const mr of drupal.mergeRequests) add(mr.issue, mr.title, mr.url)
+    const listed = [...urls.values()].filter((issue) => issue.urls.some((url) => text.includes(`](${url})`)))
+    for (const issue of listed) expect(text).toContain(`[${issue.title}](`)
+    // What doesn't fit is on the Drupal page
+    const rest = Number(text.match(/^- (\d+) older ones: https:\/\/robbesaelens\.github\.io\/drupal$/m)?.[1] ?? 0)
+    expect(listed.length + rest).toBe(urls.size)
+    expect(listed.length).toBeGreaterThan(0)
+  })
 })
 
 test('Dutch pages have their own URL, title, lang and alternates', async ({ request }) => {

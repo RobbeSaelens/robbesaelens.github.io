@@ -1,7 +1,8 @@
 /**
  * What a project page (src/screens/details) hands the shared template, ProjectPage.vue:
  * its texts (from the locale files), links, screenshots, stack, repository and status.
- * The layout, the "next project" band and the lightbox are the template's.
+ * The layout, the "next project" band and the lightbox are the template's. The pages'
+ * data is in src/screens/details/data.ts, which /llms.txt is written from as well.
  */
 import type { ProjectEntry, ProjectStatus } from '../../projects'
 
@@ -56,9 +57,10 @@ export interface ProjectData {
   }
 }
 
-type T = (key: string) => string
+/** vue-i18n's `t`: the pages pass the page's, src/llms.ts an English one */
+export type Translate = (key: string) => string
 
 /** The items of an index from `<ns>.<prefix><Key>` and `<ns>.<prefix><Key>Text`. */
-export function indexItems(t: T, ns: string, prefix: string, keys: string[]): IndexItem[] {
+export function indexItems(t: Translate, ns: string, prefix: string, keys: string[]): IndexItem[] {
   return keys.map((key) => ({ title: t(`${ns}.${prefix}${key}`), text: t(`${ns}.${prefix}${key}Text`) }))
 }
