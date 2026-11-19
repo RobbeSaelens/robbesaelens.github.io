@@ -245,8 +245,13 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   update runs; `SiftStory.vue`: PhpStorm + Sublime Merge folding into Sift, by name only, no
   logos); what it's made with; the other tool as a card. New facts become a point, not a paragraph. The data is
   `src/tools.ts`, which `/llms.txt` and the page's JSON-LD (a `SoftwareApplication` each, with
-  its captures) are written from too; its `description` is only for those two. Bump `version`
-  with each release (their `CHANGELOG.md`). Both repositories are private for now, so the page
+  its captures) are written from too; its `description` is only for those two. Its `version`
+  follows each release by itself: `npm run stats` (before every deploy, the daily one too) reads
+  the tools' latest GitHub release into `repo-stats.json` (`tools`), with the same
+  `REPO_STATS_TOKEN`, which has read access to `Project-Updater` and `Sift`; the version written in
+  `src/tools.ts` is only the fallback. A release that changes what a tool does or how it looks
+  still needs its points, texts and captures updated here (both tools' AGENTS.md say so in
+  their release steps). Both repositories are private for now, so the page
   says so and links to neither; when one goes public, its `repository` is the one line to add
   (the page then links to it). The nav links it next to Projects, and each project page's end
   band links to it.

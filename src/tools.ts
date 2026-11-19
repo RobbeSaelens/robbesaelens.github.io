@@ -9,6 +9,17 @@
  * one line to add: the page then links to it ("View on GitHub"), and /llms.txt names it.
  */
 import type { ProjectShotData, Translate } from './components/project/project'
+import repoStats from './data/repo-stats.json'
+
+/**
+ * A tool's current version: its latest GitHub release, which `npm run stats` reads before
+ * every deploy (the daily one too) into repo-stats.json. The version given here is only the
+ * fallback, for a build without that data; it needn't be bumped by hand.
+ */
+function released(key: 'projectUpdater' | 'sift', fallback: string): string {
+  const tools = (repoStats as { tools?: Record<string, { version?: string }> }).tools
+  return tools?.[key]?.version || fallback
+}
 
 export type ToolId = 'project-updater' | 'sift'
 
@@ -60,7 +71,7 @@ export interface ToolData {
   description: string
   points: ToolPoint[]
   story: ToolStory
-  /** The current release; update with each one (its CHANGELOG.md) */
+  /** The current release: from its latest GitHub release (see `released`), not bumped by hand */
   version: string
   platform: string
   /** The public repository, once there is one. Private for now: no link. */
@@ -109,7 +120,7 @@ export function projectUpdater(t: Translate): ToolData {
       steps: steps(t, 'updater', ['stepScan', 'stepUpdate', 'stepChecks', 'stepReview', 'stepPublish']),
       or: t('tools.updater.stepDiscard'),
     },
-    version: '0.16.0',
+    version: released('projectUpdater', '0.16.0'),
     platform: 'macOS',
     stack: ['Electron', 'Node.js', 'TypeScript', 'Claude Code', 'npm', 'Composer', 'Sentry API', 'Vitest', 'esbuild', 'GitHub Actions'],
     shots: shots(t, 'Project Updater', 'updater', [
@@ -147,7 +158,7 @@ export function sift(t: Translate): ToolData {
       to: { title: 'Sift', text: t('tools.sift.toSift') },
       caption: t('tools.sift.storyCaption'),
     },
-    version: '0.9.1',
+    version: released('sift', '0.9.1'),
     platform: 'macOS',
     stack: ['Tauri 2', 'Rust', 'Svelte 5', 'TypeScript', 'Monaco Editor', 'libgit2', 'Vite', 'Vitest'],
     shots: shots(t, 'Sift', 'sift', [
