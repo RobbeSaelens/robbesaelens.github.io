@@ -9,7 +9,7 @@
  * - the router's meta: the pages, their URLs and descriptions
  * - src/projects.ts and the project pages' data (src/screens/details/data.ts), with their
  *   English texts from src/locales/en.json: every project, its status, stack and features
- * - src/tools.ts: the tools Robbe built to keep his projects up to date (the tools page)
+ * - src/tools.ts: the tools Robbe built to maintain his projects (the tools page)
  * - src/data/repo-stats.json and src/data/drupal.json: the numbers the daily deploy refreshes
  *
  * Most important first: the profile, the projects, the tools, then the Drupal contributions. To fit
@@ -152,31 +152,37 @@ function projects(): string {
   ].join('\n\n')
 }
 
-/** The tools page: each tool, what it is, why, and what it does by title. */
+/**
+ * The tools page: each tool, its headline, status and stack, what it does (its points),
+ * its story (how an update runs, or why Sift exists) and its description.
+ */
 function tools(): string {
   const route = pageRoutes.find((page) => page.name === 'Tools')
   if (!route) throw new Error('[llms] no English route named Tools')
   return [
-    `Two Mac apps Robbe built to keep his projects up to date, on the tools page: ${pageUrl(route)}. The texts are his own, in the first person.`,
-    ...toolData(t).map((tool) =>
-      [
+    `Two Mac apps Robbe built to maintain his projects, on the tools page: ${pageUrl(route)} (Sift: ${pageUrl(route)}#sift). The texts are his own, in the first person.`,
+    ...toolData(t).map((tool) => {
+      const { story } = tool
+      const told =
+        story.kind === 'pipeline'
+          ? `${story.title}: ${story.steps.map((step) => `${step.title} (${step.text})`).join(' → ')}, ${story.or}`
+          : `${story.title}: ${story.from.map((app) => `${app.title} (${app.text})`).join(' + ')} → ${story.to.title} (${story.to.text}). ${story.caption}`
+      return [
         [
           `### ${tool.name}`,
-          `${tool.tagline}.`,
+          tool.headline,
           list([
             `Status: ${tool.platform} app, version ${tool.version}, ${
               tool.repository ? `open source: ${tool.repository}` : 'private repository for now'
             }`,
             `Built with: ${tool.stack.join(', ')}`,
-            `${t('tools.featuresTitle')}: ${titles(tool.features)}`,
+            `What it does: ${tool.points.map((point) => point.text).join('; ')}`,
+            told,
           ]),
         ].join('\n'),
-        tool.about,
-        tool.why.length ? `${t('tools.whyTitle')}: ${tool.why.join(' ')}` : null,
-      ]
-        .filter(Boolean)
-        .join('\n\n'),
-    ),
+        tool.description,
+      ].join('\n\n')
+    }),
   ].join('\n\n')
 }
 

@@ -14,8 +14,8 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
  * how it behaves, not how it looks (AGENTS.md says how to see it).
  */
 
-// The project pages, and the tools page that shares their index and screenshots
-const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail', '/tools']
+// The project pages (the tools page's captures and switch: vue-bits-tools.spec.ts)
+const DETAILS = ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail']
 
 /** The glow colours (--color-spotlight in terminal-theme.css), as computed. */
 const GLOW = { light: 'rgba(13, 148, 136, 0.14)', dark: 'rgba(45, 212, 191, 0.2)' }

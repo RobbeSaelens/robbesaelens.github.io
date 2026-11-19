@@ -264,25 +264,32 @@ test.describe('llms.txt', () => {
     }
   })
 
-  test('holds the tools, with what they do, why, and that their code is private', async ({ request }) => {
+  test('holds the tools: what they are and do, their story, and that their code is private', async ({ request }) => {
     const text = await llms(request)
     const headings = [...text.matchAll(/^## (.+)$/gm)].map((m) => m[1])
     expect(headings.indexOf('Tools')).toBe(headings.indexOf('Projects') + 1)
     expect(text).toContain('https://robbesaelens.github.io/tools')
+    expect(text).toContain('https://robbesaelens.github.io/tools#sift')
     for (const [name, ns] of [
       ['Project Updater', 'updater'],
       ['Sift', 'sift'],
     ] as const) {
-      expect(text).toContain(`### ${name}\n${en.tools[ns].tagline}.`)
-      expect(text).toContain(en.tools[ns].about)
-      const titles = Object.keys(en.tools[ns]).filter((key) => key.startsWith('feature') && `${key}Text` in en.tools[ns])
-      expect(titles).toHaveLength(6)
-      for (const key of titles) expect(text, `${ns}.${key}`).toContain(en.tools[ns][key])
+      const tool = en.tools[ns] as Record<string, string>
+      expect(text).toContain(`### ${name}\n${tool.headline}\n`)
+      expect(text).toContain(tool.description)
+      for (const key of Object.keys(tool).filter((key) => key.startsWith('point'))) expect(text, `${ns}.${key}`).toContain(tool[key])
     }
     expect(text).toMatch(/Status: macOS app, version \d+\.\d+\.\d+, private repository for now/)
+    // How an update runs, step by step
+    const updater = en.tools.updater as Record<string, string>
+    expect(text).toContain(`${updater.storyTitle}: ${updater.stepScan} (${updater.stepScanText}) → ${updater.stepUpdate}`)
     // Sift's story, in Robbe's words
-    expect(text).toContain(en.tools.sift.why1)
-    expect(text).toContain(en.tools.sift.why2)
+    expect(text).toContain('PhpStorm (diffs & commits) + Sublime Merge (branches & history) → Sift')
+    expect(text).toContain(en.tools.sift.storyCaption)
+    // Its AI and Teamwork features, exactly
+    expect(text).toContain('Write with AI has Claude Code write the commit message')
+    expect(text).toContain('at most $0.25')
+    expect(text).toContain('Teamwork task')
     // Private: no link to either repository
     expect(text).not.toMatch(/github\.com\/RobbeSaelens\/(?:Project-Updater|project-updater|Sift|sift)\b/i)
   })
@@ -435,108 +442,222 @@ test('Stable Manager shows its Drupal version, with the public repository and it
   expect(errors).toEqual([])
 })
 
-// The tools page: the two Mac apps Robbe built to keep his projects up to date (src/tools.ts),
-// each with its status, a real capture of its window, what it is and does, and what it's
-// made with. Their repositories are private for now, so nothing links to them.
+// The tools page: the two Mac apps Robbe built to maintain his projects (src/tools.ts),
+// one at a time behind a switch whose hash picks the tool (/tools#sift). Each chapter: its
+// status, a headline and a sentence, four points, its captures as a deck, its story, what
+// it's made with and the other tool. Their repositories are private, so nothing links to them.
 test.describe('tools page', () => {
   const TOOLS = [
-    { id: 'project-updater', name: 'Project Updater', shot: '/project-updater-home.jpg' },
-    { id: 'sift', name: 'Sift', shot: '/sift-home.jpg' },
+    {
+      id: 'project-updater',
+      name: 'Project Updater',
+      shots: ['projects', 'updates', 'security', 'review'].map((view) => `/project-updater-${view}-home.jpg`),
+      points: 4,
+      story: 5,
+    },
+    {
+      id: 'sift',
+      name: 'Sift',
+      shots: ['diff', 'stage', 'branches', 'commit'].map((view) => `/sift-${view}-home.jpg`),
+      points: 6,
+      story: 3,
+    },
   ] as const
 
-  /** How far the top of `id`'s section is below the sticky header */
-  const belowHeader = (page: Page, id: string) =>
-    page.evaluate((id) => {
-      const header = document.querySelector('.site-header')!.getBoundingClientRect()
-      return Math.round(document.getElementById(id)!.getBoundingClientRect().top - header.bottom)
-    }, id)
+  /** The tool shown: its tab is selected, its chapter visible, the other's hidden */
+  async function shows(page: Page, id: string) {
+    await expect(page.locator(`[role="tab"][aria-selected="true"]`)).toHaveAttribute('id', id)
+    for (const tool of TOOLS) {
+      const panel = page.locator(`#${tool.id}-panel`)
+      if (tool.id === id) await expect(panel).toBeVisible()
+      else await expect(panel).toBeHidden()
+    }
+  }
 
-  for (const [route, privately, features, projects] of [
-    ['/tools', 'Private for now', 'What it does', '/projects'],
-    ['/nl/tools', 'Voorlopig privé', 'Wat het doet', '/nl/projects'],
+  for (const [route, privately, projects] of [
+    ['/tools', 'Private for now', '/projects'],
+    ['/nl/tools', 'Voorlopig privé', '/nl/projects'],
   ] as const) {
-    test(`${route} shows each tool with its status, window, texts, stack and features, and no repository link`, async ({ page }) => {
+    test(`${route} shows a tool at a time: status, headline, points, captures, story, stack, no repository link`, async ({ page }) => {
       const errors = await guard(page)
       await open(page, route)
       await expect(page.locator('h1')).toContainText('tools')
 
-      // The list at the top: a link to each tool's section
-      const list = page.locator('.tools-list a')
-      await expect(list).toHaveCount(TOOLS.length)
+      const tabs = page.getByRole('tab')
+      await expect(tabs).toHaveCount(TOOLS.length)
       for (const [i, tool] of TOOLS.entries()) {
-        await expect(list.nth(i)).toHaveAttribute('href', `#${tool.id}`)
-        await expect(list.nth(i)).toContainText(tool.name)
-
-        const section = page.getByRole('region', { name: tool.name, exact: true })
-        await expect(section).toHaveAttribute('id', tool.id)
-        await expect(section.locator('.tool-version')).toHaveText(/^v\d+\.\d+\.\d+$/)
-        await expect(section.locator('.tool-status')).toContainText('macOS')
-        await expect(section.locator('.tool-status')).toContainText(privately)
-        await expect(section.locator('.tool-body .project-text').first()).not.toBeEmpty()
-        expect(await section.locator('.tag-pill').count()).toBeGreaterThan(5)
-        await expect(section.getByRole('heading', { name: features, exact: true })).toHaveCount(1)
-        await expect(section.locator('.index-item')).toHaveCount(6)
-        for (const text of await section.locator('.index-text').all()) await expect(text).not.toBeEmpty()
-        await expect(section.locator('button.shot img')).toHaveAttribute('src', tool.shot)
-        await expect(section.locator('button.shot .shot-foot')).not.toBeEmpty()
+        await expect(tabs.nth(i)).toHaveAttribute('href', `#${tool.id}`)
+        await expect(tabs.nth(i)).toContainText(tool.name)
+        await expect(tabs.nth(i)).toHaveAttribute('aria-controls', `${tool.id}-panel`)
       }
-      // Sift's story: one light tool instead of PhpStorm and Sublime Merge
-      const why = page.locator('#sift .tool-why')
-      await expect(why).toHaveCount(2)
-      await expect(why.first()).toContainText('PhpStorm')
-      await expect(why.first()).toContainText('Sublime Merge')
+      // The first one, until another is picked
+      await shows(page, 'project-updater')
+
+      for (const tool of TOOLS) {
+        if (tool.id !== 'project-updater') await tabs.filter({ hasText: tool.name }).click()
+        await shows(page, tool.id)
+        const panel = page.getByRole('tabpanel', { name: tool.name, exact: true })
+        await expect(panel).toHaveAttribute('id', `${tool.id}-panel`)
+        await expect(panel.locator('.tool-version')).toHaveText(/^v\d+\.\d+\.\d+$/)
+        await expect(panel.locator('.tool-status')).toContainText('macOS')
+        await expect(panel.locator('.tool-status')).toContainText(privately)
+        await expect(panel.locator('.tool-headline')).not.toBeEmpty()
+        await expect(panel.locator('.tool-summary')).not.toBeEmpty()
+        // Short: one sentence, and a few points of a few words
+        expect((await panel.locator('.tool-summary').innerText()).split(/[.!?](?:\s|$)/).filter(Boolean)).toHaveLength(1)
+        const points = panel.locator('.tool-point')
+        await expect(points).toHaveCount(tool.points)
+        for (const point of await points.all()) {
+          expect((await point.innerText()).split(/\s+/).length).toBeLessThanOrEqual(9)
+          await expect(point.locator('svg')).toHaveCount(1)
+        }
+        // Its captures, as buttons with pictures, in their order
+        const shots = panel.locator('.tool-deck button.shot img')
+        await expect(shots).toHaveCount(tool.shots.length)
+        for (const [i, src] of tool.shots.entries()) await expect(shots.nth(i)).toHaveAttribute('src', src)
+        await expect(panel.locator('.deck-label')).not.toBeEmpty()
+        // Its story, step by step or card by card
+        await expect(panel.locator('.flow-step, .merge-card:not(.merge-ghost)')).toHaveCount(tool.story)
+        expect(await panel.locator('.tag-pill').count()).toBeGreaterThan(5)
+        // The other tool, as a card that picks it
+        const other = TOOLS.find((t) => t.id !== tool.id)!
+        await expect(panel.locator('.tool-next')).toHaveAttribute('href', `#${other.id}`)
+        await expect(panel.locator('.tool-next')).toContainText(other.name)
+        await expect(panel.locator('.project-all')).toHaveAttribute('href', projects)
+      }
+      // Sift's story: one light tool instead of PhpStorm and Sublime Merge, by name only
+      const story = page.locator('#sift-panel .merge')
+      await expect(story).toContainText('PhpStorm')
+      await expect(story).toContainText('Sublime Merge')
+      await expect(story.locator('img')).toHaveCount(0)
 
       // Private for now: no link to either repository, or to GitHub at all
       await expect(page.locator('#main-content a[href*="github.com"]')).toHaveCount(0)
-      // The way on: the projects
-      await expect(page.locator('.tools-end a')).toHaveAttribute('href', projects)
       expect(errors).toEqual([])
     })
   }
 
-  test('the list at the top jumps to a tool, just below the header', async ({ page }) => {
+  test('the switch: a click or the arrow keys pick a tool, the URL says which, the page stays put', async ({ page }) => {
     const errors = await guard(page)
     await open(page, '/tools')
-    await page.locator('.tools-list a[href="#sift"]').click()
+    await page.getByRole('tab', { name: /Sift/ }).click()
     await expect(page).toHaveURL(/\/tools#sift$/)
-    await expect.poll(() => belowHeader(page, 'sift')).toBeGreaterThanOrEqual(0)
-    expect(await belowHeader(page, 'sift')).toBeLessThanOrEqual(48)
+    await shows(page, 'sift')
+    expect(await page.evaluate(() => scrollY)).toBe(0)
+
+    // Tabs: the arrows move and pick, only the picked one is a tab stop
+    await page.getByRole('tab', { name: /Sift/ }).focus()
+    await page.keyboard.press('ArrowLeft')
+    await shows(page, 'project-updater')
+    await expect(page.getByRole('tab', { name: /Project Updater/ })).toBeFocused()
+    await expect(page).toHaveURL(/\/tools#project-updater$/)
+    await expect(page.getByRole('tab', { name: /Sift/ })).toHaveAttribute('tabindex', '-1')
+    await page.keyboard.press('End')
+    await shows(page, 'sift')
+    await page.keyboard.press('Home')
+    await shows(page, 'project-updater')
     expect(errors).toEqual([])
   })
 
-  test('a link to a tool opens the page at it', async ({ page }) => {
-    await guard(page)
-    await open(page, '/nl/tools#project-updater')
-    await expect.poll(() => belowHeader(page, 'project-updater')).toBeGreaterThanOrEqual(0)
-    expect(await belowHeader(page, 'project-updater')).toBeLessThanOrEqual(48)
+  test('a link to a tool opens the page at its top, with that tool shown; back and forward follow', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/nl/tools#sift')
+    await shows(page, 'sift')
+    expect(await page.evaluate(() => scrollY)).toBe(0)
+    await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Sift')
+
+    // From another page and back
+    await page.getByRole('tab', { name: /Project Updater/ }).click()
+    await shows(page, 'project-updater')
+    await page.locator('#project-updater-panel .project-all').click()
+    await expect(page).toHaveURL(/\/nl\/projects$/)
+    await page.goBack()
+    await shows(page, 'project-updater')
+    expect(errors).toEqual([])
   })
 
-  test("each window opens in the lightbox, in the page's order", async ({ page }) => {
+  test('before the app runs, the hash picks the tool too (the prerendered page)', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false })
+    const page = await context.newPage()
+    await page.goto('/tools#sift')
+    await expect(page.locator('#sift-panel')).toBeVisible()
+    await expect(page.locator('#project-updater-panel')).toBeHidden()
+    expect(await page.evaluate(() => scrollY)).toBe(0)
+    // The tabs are plain links then
+    await page.locator('a#project-updater').click()
+    await expect(page.locator('#project-updater-panel')).toBeVisible()
+    await expect(page.locator('#sift-panel')).toBeHidden()
+    await context.close()
+  })
+
+  test('the switch sticks under the header; picking from it starts the other tool at its top', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/tools')
+    await page.locator('#project-updater-panel .tool-story').scrollIntoViewIfNeeded()
+    const header = await page.locator('.site-header').boundingBox()
+    const bar = page.locator('.tool-switch')
+    await expect.poll(async () => (await bar.boundingBox())!.y).toBeGreaterThanOrEqual(header!.y + header!.height - 1)
+    expect((await bar.boundingBox())!.y).toBeLessThan(header!.y + header!.height + 24)
+    // Where it is on screen (a locator's click would first scroll the page to the tab's place in it)
+    const tab = (await page.getByRole('tab', { name: /Sift/ }).boundingBox())!
+    await page.mouse.click(tab.x + tab.width / 2, tab.y + tab.height / 2)
+    await shows(page, 'sift')
+    const top = await page.locator('#sift-panel').boundingBox()
+    const below = (await bar.boundingBox())!
+    expect(top!.y).toBeGreaterThanOrEqual(below.y + below.height)
+    expect(top!.y).toBeLessThanOrEqual(below.y + below.height + 48)
+    expect(errors).toEqual([])
+  })
+
+  test("the other tool's card picks it, from its top, with the focus on its name", async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/tools')
+    await page.locator('#project-updater-panel .tool-next').click()
+    await shows(page, 'sift')
+    await expect(page).toHaveURL(/\/tools#sift$/)
+    await expect(page.locator('#sift-title')).toBeFocused()
+    const top = (await page.locator('#sift-panel').boundingBox())!.y
+    expect(top).toBeGreaterThan(0)
+    expect(top).toBeLessThan(400)
+    expect(errors).toEqual([])
+  })
+
+  test("each capture opens in the lightbox, with the tool's others", async ({ page }) => {
     const errors = await guard(page)
     await open(page, '/tools')
     const dialog = page.getByRole('dialog')
     const shown = () => dialog.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.currentSrc)
-    for (const [i, tool] of TOOLS.entries()) {
-      await page.locator(`#${tool.id} button.shot`).click()
+    for (const tool of TOOLS) {
+      await page.getByRole('tab', { name: new RegExp(tool.name) }).click()
+      // The front card: a tab stop and a click; the others only for screen readers
+      const front = page.locator(`#${tool.id}-panel .deck-shot:not([tabindex="-1"])`)
+      await expect(front).toHaveCount(1)
+      await front.click()
       await expect(dialog.locator('.lightbox-caption')).toContainText(`${tool.name} — `)
-      await expect(dialog.locator('.lightbox-count')).toHaveText(`${i + 1} / ${TOOLS.length}`)
+      await expect(dialog.locator('.lightbox-count')).toHaveText(new RegExp(`^\\d / ${tool.shots.length}$`))
       // The full-size copy, AVIF where the browser has it
-      await expect.poll(shown).toMatch(new RegExp(`/img/${tool.id}-home\\.avif$`))
+      await expect.poll(shown).toMatch(new RegExp(`/img/${tool.id}-[a-z]+-home\\.avif$`))
+      await page.keyboard.press('ArrowRight')
+      await expect.poll(shown).toMatch(/-home\.avif$/)
       await page.keyboard.press('Escape')
       await expect(dialog).toBeHidden()
     }
     expect(errors).toEqual([])
   })
 
-  test('the first window loads first, the second lazily, both from the prerendered HTML', async ({ request }) => {
+  test('the first capture loads first, every other lazily, all from the prerendered HTML', async ({ request }) => {
     const html = await (await request.get('/tools')).text()
-    const [first, second, ...rest] = html.match(/<img\b[^>]*>/g) ?? []
-    expect(rest).toHaveLength(0)
-    expect(first).toContain('src="/project-updater-home.jpg"')
+    const [first, ...rest] = html.match(/<img\b[^>]*>/g) ?? []
+    expect(rest.length).toBeGreaterThanOrEqual(7)
+    expect(first).toContain('src="/project-updater-projects-home.jpg"')
     expect(first).toContain('fetchpriority="high"')
     expect(first).not.toContain('loading="lazy"')
-    expect(second).toContain('src="/sift-home.jpg"')
-    expect(second).toContain('loading="lazy"')
+    for (const img of rest) expect(img).toContain('loading="lazy"')
+    // Every capture of both tools, with its alt text, and the tabs as links
+    for (const tool of TOOLS) {
+      for (const src of tool.shots) expect(html).toMatch(new RegExp(`<img[^>]*src="${src}"[^>]*alt="[^"]{20,}"|<img[^>]*alt="[^"]{20,}"[^>]*src="${src}"`))
+      expect(html).toMatch(new RegExp(`<a[^>]*id="${tool.id}"[^>]*role="tab"|<a[^>]*role="tab"[^>]*id="${tool.id}"`))
+    }
   })
 
   test('the main navigation links to it, next to the projects', async ({ page, isMobile }) => {
@@ -1139,6 +1260,8 @@ test.describe('tools structured data', () => {
         expect(app.url).toBe(app['@id'])
         expect(app.url.startsWith(`${canonical}#`)).toBe(true)
         expect(app.image).toMatch(/^https:\/\/robbesaelens\.github\.io\/[\w-]+-home\.jpg$/)
+        expect(app.screenshot).toHaveLength(4)
+        expect(app.screenshot[0]).toBe(app.image)
         expect(app.description.length).toBeGreaterThan(80)
         expect(byId.get(app.author['@id'])!['@type']).toBe('Person')
         expect(JSON.stringify(app)).not.toContain('codeRepository')

@@ -1,58 +1,159 @@
 /* =============================================
-   The tools page (src/screens/Tools.vue). Its article is a .detail-page too, so it
-   shares the project pages' classes (project-page.css): bands, labels, text, chips,
-   status badges, screenshots and the numbered index. What is its own sits under
-   .tools-page.
+   The tools page (src/screens/Tools.vue and src/components/tools/). Its article is a
+   .detail-page too, so it shares the project pages' classes (project-page.css): bands,
+   labels, text, chips, status badges, screenshots and the "next" card. What is its own
+   sits under .tools-page.
 
    Global, not scoped, and imported in main.ts, for the same reason as project-page.css:
-   the prerendered HTML links only the main stylesheet. Spacing: 4px steps.
+   the prerendered HTML links only the main stylesheet. That HTML is laid out by this
+   file alone: the switch, the chapter shown (the one the URL's hash names, below), the
+   deck of captures in its places, every story at rest. Spacing: 4px steps.
+
+   Motion (the site's rules, AGENTS.md): enter and leave with the site's ease-out,
+   cubic-bezier(0.22, 1, 0.36, 1); colours with ease, 0.2s; a press is scale(0.97) at
+   0.12s; only transform and opacity move. The stories play once (usePlayOnce.ts), the
+   deck moves with gsap (CardSwap.vue); with reduced motion the global rule in
+   terminal-theme.css stops every animation here, and the scripts don't start theirs.
    ============================================= */
 
 /* =============================================
-   First screen: the intro on the left (7), the list of the tools beside it (5), level
-   with the intro's text; below 1024px the list comes after the intro
+   Each tool's colour, from its own app (Project Updater's indigo; Sift's amber, the
+   colour of a change in it). A chapter, its tab and its card take it as the site's accent,
+   so their labels, chips and badges are the tool's own. The accents pass contrast as
+   text on the page in both themes; the star and the glow are decoration.
    ============================================= */
-.tools-page .tools-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 2rem;
+.tools-page [data-tool='project-updater'] {
+  --tool-accent: #4f46e5;
+  --tool-soft: rgba(79, 70, 229, 0.07);
+  --tool-border: rgba(79, 70, 229, 0.3);
+  --tool-star: #6366f1;
+  --tool-glow: rgba(99, 102, 241, 0.28);
 }
-@media (min-width: 1024px) {
-  .tools-page .tools-hero {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    column-gap: clamp(2.5rem, 5vw, 5rem);
-    align-items: end;
-  }
+.tools-page [data-tool='sift'] {
+  --tool-accent: #92400e;
+  --tool-soft: rgba(217, 119, 6, 0.07);
+  --tool-border: rgba(217, 119, 6, 0.32);
+  --tool-star: #f59e0b;
+  --tool-glow: rgba(245, 158, 11, 0.28);
 }
-.tools-page .tools-hero-intro {
-  min-width: 0;
+.dark .tools-page [data-tool='project-updater'] {
+  --tool-accent: #a5b4fc;
+  --tool-soft: rgba(165, 180, 252, 0.09);
+  --tool-border: rgba(165, 180, 252, 0.3);
+  --tool-star: #a5b4fc;
+  --tool-glow: rgba(129, 140, 248, 0.32);
 }
+.dark .tools-page [data-tool='sift'] {
+  --tool-accent: #fbbf24;
+  --tool-soft: rgba(251, 191, 36, 0.08);
+  --tool-border: rgba(251, 191, 36, 0.28);
+  --tool-star: #fbbf24;
+  --tool-glow: rgba(251, 191, 36, 0.24);
+}
+.tools-page .tool-chapter,
+.tools-page .tool-tab,
+.tools-page .tool-next {
+  --color-accent: var(--tool-accent);
+  --color-accent-soft: var(--tool-soft);
+  --color-border-glow: var(--tool-border);
+  --color-tag-bg: var(--tool-soft);
+  --color-tag-text: var(--tool-accent);
+  --color-prompt: var(--tool-accent);
+}
+
+/* =============================================
+   First screen: the title and one line, the switch below them; from 1024px the switch
+   beside them on the right, level with the line. The page is then a grid of two columns:
+   the title and the switch, then the chapter across both. The switch's area runs down
+   beside the chapter too, so it can stick all the way (a sticky box stays in its area).
+   ============================================= */
 .tools-page .tools-hero .terminal-title {
   justify-content: flex-start;
 }
 .tools-page .tools-intro {
-  margin-top: 1.25rem;
+  margin-top: 0.5rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+@media (min-width: 1024px) {
+  .tools-page .project-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 3rem;
+    align-items: start;
+  }
+  .tools-page .tools-hero {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .tools-page .tool-chapter {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 
-/* The tools, between hairlines like the numbered index; each row a link to its section */
-.tools-page .tools-list ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.tools-page .tools-list li {
-  border-top: 1px solid var(--color-border-glow);
-}
-.tools-page .tools-list li:last-child {
-  border-bottom: 1px solid var(--color-border-glow);
-}
-.tools-page .tools-link {
+/* =============================================
+   The switch (ToolSwitch.vue): two tabs in a frosted pill, as wide as it needs (all of
+   the column on phones). It sticks just under the header while the page scrolls (the
+   header is about 5rem: AppHeader.vue); only the pill takes clicks.
+   ============================================= */
+.tools-page .tool-switch-bar {
+  position: sticky;
+  top: 5.25rem;
+  z-index: 30;
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  padding: 1rem 0.5rem;
-  margin: 0 -0.5rem;
-  border-radius: 0.5rem;
+  margin-top: 1.75rem;
+  pointer-events: none;
+}
+@media (min-width: 1024px) {
+  .tools-page .tool-switch-bar {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    justify-content: flex-end;
+    /* Level with the tagline and the line under it (the title is 2.25rem, 3rem from 1280px) */
+    margin-top: 4.25rem;
+  }
+}
+@media (min-width: 1280px) {
+  .tools-page .tool-switch-bar {
+    margin-top: 5rem;
+  }
+}
+/* Where a stuck bar would take too much of a short screen (a laptop at 200 % zoom) */
+@media (max-height: 480px) {
+  .tools-page .tool-switch-bar {
+    position: relative;
+    top: 0;
+  }
+}
+.tools-page .tool-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  width: min(100%, 40rem);
+  padding: 0.25rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  pointer-events: auto;
+}
+.dark .tools-page .tool-switch {
+  background: rgba(15, 23, 32, 0.78);
+}
+/* Tablets and a laptop at 200 % zoom: clear of the chat button in the corner */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .tools-page .tool-switch {
+    width: min(100%, 34rem);
+  }
+}
+/* A tab (StarBorder's box: the light runs in its 1px top and bottom edge) */
+.tools-page .tool-tab {
+  display: block;
+  min-width: 0;
   color: inherit;
   outline: none;
   /* A control, not text to copy: a long press doesn't select it */
@@ -60,155 +161,856 @@
   user-select: none;
   -webkit-touch-callout: none;
   touch-action: manipulation;
-  transition: background 0.2s ease;
+  /* Opening the page at /tools#sift: the browser's own jump to the tab lands at the top */
+  scroll-margin-top: 100vh;
 }
-.tools-page .tools-link-main {
+.tools-page .tool-tab-inner {
   display: flex;
-  flex: 1;
+  align-items: center;
+  gap: 0.75rem;
+  height: 100%;
+  padding: 0.5rem 0.875rem 0.5rem 0.5rem;
+  border-radius: 19px;
+  border: 1px solid transparent;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.12s ease-out;
+}
+.tools-page .tool-tab.is-active .tool-tab-inner {
+  background: var(--tool-soft);
+  border-color: var(--tool-border);
+}
+.tools-page .tool-tab-icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.tools-page .tool-tab-text {
+  display: flex;
   flex-direction: column;
-  gap: 0.25rem;
   min-width: 0;
 }
-.tools-page .tools-link-name {
+.tools-page .tool-tab-name {
   font-family: var(--font-mono);
-  font-size: 1.125rem;
+  font-size: 0.9375rem;
   font-weight: 700;
   line-height: 1.3;
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   transition: color 0.2s ease;
 }
-.tools-page .tools-link-role {
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--color-text-secondary);
+.tools-page .tool-tab.is-active .tool-tab-name {
+  color: var(--color-text-primary);
 }
-.tools-page .tools-link-meta {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+.tools-page .tool-tab-role {
+  overflow: hidden;
+  font-size: 0.8125rem;
+  line-height: 1.35;
   color: var(--color-text-muted);
-}
-.tools-page .tools-link-go {
-  flex-shrink: 0;
-  align-self: center;
-  width: 1.1rem;
-  height: 1.1rem;
-  color: var(--color-accent);
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 @media (hover: hover) and (pointer: fine) {
-  .tools-page .tools-link:hover .tools-link-name {
-    color: var(--color-accent);
+  .tools-page .tool-tab:not(.is-active):hover .tool-tab-inner {
+    background: var(--color-surface-hover);
   }
-  .tools-page .tools-link:hover .tools-link-go {
-    transform: translateY(3px);
+  .tools-page .tool-tab:not(.is-active):hover .tool-tab-name {
+    color: var(--color-text-primary);
   }
 }
-/* A wide row: on press it lights up rather than shrinks */
-.tools-page .tools-link:active {
-  background: var(--color-surface-hover);
+.tools-page .tool-tab:active .tool-tab-inner {
+  transform: scale(0.97);
 }
-.tools-page .tools-link:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--color-accent);
+.tools-page .tool-tab:focus-visible {
+  outline: 2px solid var(--tool-accent);
+  outline-offset: 2px;
+}
+/* Phones: the icon and the name; the few words would be cut */
+@media (max-width: 639px) {
+  .tools-page .tool-tab-inner {
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem 0.375rem 0.375rem;
+  }
+  .tools-page .tool-tab-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+  .tools-page .tool-tab-name {
+    font-size: 0.8125rem;
+  }
+  .tools-page .tool-tab-role {
+    display: none;
+  }
+}
+
+/* Before the app runs (the prerendered page), the URL's hash picks the tool: /tools#sift
+   shows Sift. Once it runs (.is-ready), the page itself does. */
+.tools-page:not(.is-ready):has(#sift:target) #sift-panel {
+  display: block;
+}
+.tools-page:not(.is-ready):has(#sift:target) #project-updater-panel {
+  display: none;
+}
+.tools-page:not(.is-ready):has(#sift:target) #sift .tool-tab-inner {
+  background: var(--tool-soft);
+  border-color: var(--tool-border);
+}
+.tools-page:not(.is-ready):has(#sift:target) #project-updater .tool-tab-inner {
+  background: none;
+  border-color: transparent;
 }
 
 /* =============================================
-   A tool: name, tagline and status, its window, then what it is and what it's made
-   with. From 1024px the window on the right (7), beside the text (5); below that it
-   comes right after the status. Then what it does, as a numbered index.
+   A chapter: name, status, headline, sentence and points on the left (5), its captures
+   on the right (7) from 1024px; below that the captures come after the sentence, then
+   the points. Then its story, then what it's made with and the way on.
    ============================================= */
-/* A link to it (/tools#sift) lands below the sticky header */
-.tools-page .tool {
-  scroll-margin-top: 6rem;
+.tools-page .tool-chapter {
+  margin-top: 2.5rem;
 }
-/* The first one closer to the intro that lists it */
 @media (min-width: 1024px) {
-  .tools-page .tools-hero + .tool {
-    margin-top: 5.5rem;
+  .tools-page .tool-chapter {
+    margin-top: 3.5rem;
   }
 }
-.tools-page .tool-grid {
+.tools-page .tool-intro {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: 'head' 'shot' 'body';
+  grid-template-areas: 'head' 'shots' 'points';
   gap: 2rem;
 }
 @media (min-width: 1024px) {
-  .tools-page .tool-grid {
+  .tools-page .tool-intro {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-template-rows: auto 1fr;
-    grid-template-areas: 'head shot' 'body shot';
+    grid-template-areas: 'head shots' 'points shots';
     column-gap: clamp(2.5rem, 5vw, 5rem);
-    row-gap: 1.75rem;
+    row-gap: 2.25rem;
   }
 }
 .tools-page .tool-head {
   grid-area: head;
   min-width: 0;
 }
-.tools-page .tool-shot {
-  grid-area: shot;
-  align-self: start;
+.tools-page .tool-shots {
+  grid-area: shots;
   min-width: 0;
 }
-/* Beside a longer text (Sift's story), the window stays in view while it is read: where
-   the screen is tall enough to hold all of it below the header */
-@media (min-width: 1024px) and (min-height: 760px) {
-  .tools-page .tool-shot {
-    position: sticky;
-    top: 6rem;
-  }
-}
-.tools-page .tool-body {
-  grid-area: body;
+.tools-page .tool-points {
+  grid-area: points;
   min-width: 0;
 }
 .tools-page .tool-name {
-  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--tool-accent);
+  outline: none;
 }
-.tools-page .tool-tagline {
-  max-width: 34rem;
-  text-wrap: balance;
-  margin-top: 0.75rem;
-  font-size: 1.1875rem;
-  font-weight: 500;
-  line-height: 1.45;
-  color: var(--color-text-primary);
+.tools-page .tool-name-icon {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
 }
 .tools-page .tool-status {
-  margin-top: 1.25rem;
+  margin-top: 1rem;
 }
 /* A version, as the apps show theirs: not in capitals like the other badges */
 .tools-page .tool-version {
   letter-spacing: 0.02em;
   text-transform: none;
 }
-.tools-page .tool-label {
-  margin-top: 2rem;
+.tools-page .tool-headline {
+  max-width: 20ch;
+  margin-top: 1.5rem;
+  font-size: clamp(1.75rem, 1.2rem + 1.9vw, 2.875rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  text-wrap: balance;
 }
-.tools-page .tool-why + .tool-why {
+.tools-page .tool-summary {
   margin-top: 1rem;
 }
-.tools-page .tool-features {
-  margin-top: 3.5rem;
+
+/* The points: an icon in the tool's colour and a few words each */
+.tools-page .tool-points {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-@media (min-width: 1024px) {
-  .tools-page .tool-features {
-    margin-top: 4.5rem;
+@media (min-width: 640px) and (max-width: 1023px) {
+  .tools-page .tool-points {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.5rem;
   }
 }
-.tools-page .tool-features > .project-label {
-  margin-bottom: 1.25rem;
+.tools-page .tool-point {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-primary);
 }
-
-/* The end: the way on to the projects */
-.tools-page .tools-end {
+.tools-page .tool-point-icon {
   display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  color: var(--tool-accent);
+  background: var(--tool-soft);
+  border: 1px solid var(--tool-border);
+}
+.tools-page .tool-point-icon svg {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
-/* Phones: the fixed chat button (3rem wide, 1.5rem from the right edge) sits over the
-   rows' arrows at the bottom of the first screen; keep them clear of it. */
-@media (max-width: 639px) {
-  .tools-page .tools-link {
-    padding-right: 3.75rem;
+/* =============================================
+   The captures as a deck (ToolShots.vue, CardSwap.vue). The stage holds the front card
+   and the room the cards behind it take, up and to the right (its padding: in % of its
+   width, like their offsets), and clips the front card only at its bottom edge, where it
+   drops out. The cards are placed here as CardSwap places them (--slot, in container
+   units: keep --deck-x and --deck-y in step with STEP_X and STEP_Y there), so the
+   prerendered page shows the deck before gsap takes over.
+   ============================================= */
+.tools-page .tool-deck {
+  margin: 0;
+}
+.tools-page .deck-stage {
+  position: relative;
+  padding: 9% 7% 4% 2%;
+  clip-path: inset(-3rem -3rem 0 -3rem);
+}
+/* Beside the text, the whole deck and the line under it stay on the first screen, its
+   cards clear of the chat button in the corner: no wider than the screen's height leaves
+   room for (the stage is 0.7 as tall as wide) */
+@media (min-width: 1024px) {
+  .tools-page .tool-deck {
+    max-width: max(26rem, calc((100vh - 28rem) / 0.7));
+    max-width: max(26rem, calc((100svh - 28rem) / 0.7));
+    margin-left: auto;
+  }
+}
+.tools-page .deck {
+  --deck-x: 4.5cqw;
+  --deck-y: 5cqw;
+  container-type: inline-size;
+  aspect-ratio: 1600 / 1000;
+  perspective: 900px;
+}
+.tools-page .deck-card {
+  width: 100%;
+  transform: translate(-50%, -50%) translate3d(calc(var(--slot) * var(--deck-x)), calc(var(--slot) * var(--deck-y) * -1), calc(var(--slot) * var(--deck-x) * -1.5)) skew(0deg, 4deg);
+  z-index: calc(10 - var(--slot));
+}
+.tools-page .deck-shot {
+  box-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.35);
+}
+.tools-page .deck-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-left: 2%;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.tools-page .deck-label {
+  flex: 1;
+  min-width: 0;
+}
+.tools-page .deck-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--tool-accent);
+}
+.tools-page .deck-next {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  color: var(--tool-accent);
+  border: 1px solid var(--color-border);
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.12s ease-out;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tools-page .deck-next:hover {
+    background: var(--tool-soft);
+    border-color: var(--tool-border);
+  }
+}
+.tools-page .deck-next:active {
+  transform: scale(0.97);
+}
+.tools-page .deck-next:focus-visible,
+.tools-page .deck-shot:focus-visible {
+  outline: 2px solid var(--tool-accent);
+  outline-offset: 3px;
+}
+@media (pointer: coarse) {
+  .tools-page .deck-next {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+/* =============================================
+   The story band
+   ============================================= */
+.tools-page .tool-story > .project-label {
+  margin-bottom: 1.75rem;
+}
+
+/* How an update runs (UpdatePipeline.vue): the steps one under the other on phones, in a
+   row from 768px, a line from each node to the next. Lit at rest; armed, the nodes are
+   out, the lines empty and the words hidden; playing, each step lights as its line
+   reaches it. */
+.tools-page .flow {
+  --flow-gap: 1.75rem;
+  --flow-node: 3rem;
+  --flow-step: 280ms;
+  display: grid;
+  gap: var(--flow-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) {
+  .tools-page .flow {
+    --flow-gap: 1.25rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.tools-page .flow-step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .tools-page .flow-step {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+/* The line to the next step: the track (::before) and its fill (::after) */
+.tools-page .flow-step:not(:last-child)::before,
+.tools-page .flow-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--flow-node) + 0.5rem);
+  bottom: calc(var(--flow-gap) * -1 + 0.5rem);
+  left: calc(var(--flow-node) / 2 - 1px);
+  width: 2px;
+  border-radius: 2px;
+  transform-origin: top;
+}
+.tools-page .flow-step:not(:last-child)::before {
+  background: var(--color-border);
+}
+.tools-page .flow-step:not(:last-child)::after {
+  background: var(--tool-accent);
+  opacity: 0.6;
+}
+@media (min-width: 768px) {
+  .tools-page .flow-step:not(:last-child)::before,
+  .tools-page .flow-step:not(:last-child)::after {
+    top: calc(var(--flow-node) / 2 - 1px);
+    bottom: auto;
+    left: calc(var(--flow-node) + 0.5rem);
+    right: calc(var(--flow-gap) * -1 + 0.5rem);
+    width: auto;
+    height: 2px;
+    transform-origin: left;
+  }
+}
+.tools-page .flow-node {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--flow-node);
+  height: var(--flow-node);
+  border-radius: 9999px;
+  color: var(--tool-accent);
+  background: var(--color-surface);
+  border: 1px solid var(--tool-border);
+}
+/* Lit: the tool's colour behind the icon, and a soft glow */
+.tools-page .flow-node::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--tool-soft);
+  box-shadow:
+    0 0 0 4px var(--tool-soft),
+    0 0 24px var(--tool-glow);
+}
+.tools-page .flow-icon {
+  position: relative;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.tools-page .flow-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding-top: 0.25rem;
+}
+@media (min-width: 768px) {
+  .tools-page .flow-body {
+    padding-top: 0;
+  }
+}
+.tools-page .flow-title {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.tools-page .flow-text {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+.tools-page .flow-or {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+/* Armed: the first frame, waiting to be seen */
+.tools-page .pipeline.is-armed .flow-node::before {
+  opacity: 0;
+}
+.tools-page .pipeline.is-armed .flow-node {
+  transform: scale(0.86);
+}
+.tools-page .pipeline.is-armed .flow-body {
+  opacity: 0;
+}
+.tools-page .pipeline.is-armed .flow-step::after {
+  transform: scaleY(0);
+}
+/* Playing: step i lights at i × 280 ms, its line fills on to the next, its words fade in
+   (from 0, not half: half-faded text has too little contrast) */
+.tools-page .pipeline.is-playing .flow-node {
+  animation: flow-node 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i) * var(--flow-step));
+}
+.tools-page .pipeline.is-playing .flow-node::before {
+  animation: flow-lit 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i) * var(--flow-step));
+}
+.tools-page .pipeline.is-playing .flow-body {
+  animation: flow-body 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i) * var(--flow-step) + 60ms);
+}
+.tools-page .pipeline.is-playing .flow-step::after {
+  animation: flow-fill-y 0.22s linear backwards;
+  animation-delay: calc(var(--i) * var(--flow-step) + 60ms);
+}
+@media (min-width: 768px) {
+  .tools-page .pipeline.is-armed .flow-step::after {
+    transform: scaleX(0);
+  }
+  .tools-page .pipeline.is-playing .flow-step::after {
+    animation-name: flow-fill-x;
+  }
+}
+@keyframes flow-node {
+  from {
+    transform: scale(0.86);
+  }
+}
+@keyframes flow-lit {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes flow-body {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes flow-fill-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes flow-fill-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Why Sift exists (SiftStory.vue): PhpStorm + Sublime Merge → Sift, three cards of one
+   size. A row from 768px; on phones the two side by side, an arrow down, Sift under them.
+   At rest the whole picture. Playing, a merge in about 1.2 s (choreograph):
+
+   | PhpStorm, Sublime Merge | lead    | 0, 40 ms   | 380 ms | slide in from their side   |
+   | plus                    | decor   | 260 ms     | 200 ms | fades up as they meet      |
+   | arrow                   | support | 340 ms     | 260 ms | fades in, a little travel  |
+   | their two copies        | support | 380, 420   | 480 ms | fold into Sift's place     |
+   | Sift                    | lead    | 620 ms     | 380 ms | lands as the copies arrive |
+   | its icon, its glow      | decor   | 680, 700   | 360/520| land with it, settle       |
+   | the line under it       | support | 860 ms     | 300 ms | fades and rises in         |
+
+   The copies' trip is the distance between the grid's cells: --merge-sym (the plus and
+   arrow columns), --merge-gap and their own size (translate's % is the copy's own). */
+.tools-page .merge {
+  --merge-sym: 1rem;
+  --merge-gap: 0.5rem;
+  --merge-row-gap: 0.75rem;
+  --merge-arrow: 1.5rem;
+  max-width: 60rem;
+  margin: 0;
+}
+.tools-page .merge-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--merge-sym) minmax(0, 1fr);
+  grid-template-rows: auto var(--merge-arrow) auto;
+  column-gap: var(--merge-gap);
+  row-gap: var(--merge-row-gap);
+  align-items: stretch;
+}
+.tools-page .merge-a,
+.tools-page .merge-ghost-a {
+  grid-area: 1 / 1;
+}
+.tools-page .merge-plus {
+  grid-area: 1 / 2;
+}
+.tools-page .merge-b,
+.tools-page .merge-ghost-b {
+  grid-area: 1 / 3;
+}
+.tools-page .merge-arrow {
+  grid-area: 2 / 1 / 3 / -1;
+}
+.tools-page .merge-to {
+  grid-area: 3 / 1 / 4 / -1;
+}
+@media (min-width: 768px) {
+  .tools-page .merge {
+    --merge-sym: 2rem;
+    --merge-gap: 1rem;
+  }
+  .tools-page .merge-row {
+    grid-template-columns: minmax(0, 1fr) var(--merge-sym) minmax(0, 1fr) var(--merge-sym) minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+  .tools-page .merge-arrow {
+    grid-area: 1 / 4;
+  }
+  .tools-page .merge-to {
+    grid-area: 1 / 5;
+  }
+}
+.tools-page .merge-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 0;
+  min-height: 5.25rem;
+  padding: 1rem 1.125rem;
+  border-radius: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.tools-page .merge-name {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+/* Phones: "Sublime Merge" on one line, down to 360px */
+@media (max-width: 767px) {
+  .tools-page .merge-card {
+    padding: 0.875rem;
+  }
+  .tools-page .merge-name {
+    font-size: 0.875rem;
+  }
+  .tools-page .merge-plus {
+    font-size: 1.125rem;
+  }
+}
+.tools-page .merge-does {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+.tools-page .merge-plus {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 1.375rem;
+  color: var(--color-text-muted);
+}
+.tools-page .merge-arrow {
+  display: grid;
+  place-items: center;
+  color: var(--tool-accent);
+}
+.tools-page .merge-arrow-icon {
+  width: 1.375rem;
+  height: 1.375rem;
+  transform: rotate(90deg);
+}
+@media (min-width: 768px) {
+  .tools-page .merge-arrow-icon {
+    transform: none;
+  }
+}
+/* Sift: its icon beside its name, its colour, a soft glow (a layer of its own, so only its
+   opacity moves) */
+.tools-page .merge-to {
+  position: relative;
+  isolation: isolate;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.875rem;
+  border-color: var(--tool-border);
+}
+.tools-page .merge-to::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--tool-soft);
+  box-shadow: 0 14px 44px -10px var(--tool-glow);
+  pointer-events: none;
+}
+.tools-page .merge-icon {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+.tools-page .merge-to-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.tools-page .merge-to .merge-name {
+  color: var(--tool-accent);
+}
+/* The copies: only seen while they fold into Sift, under the cards they pass (so their
+   text never crosses another's) and under Sift as it lands on them */
+.tools-page .merge-a,
+.tools-page .merge-b,
+.tools-page .merge-to {
+  position: relative;
+  z-index: 1;
+}
+.tools-page .merge-ghost {
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.tools-page .merge-caption {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+.tools-page .merge-caption::before {
+  content: '# ';
+  color: var(--color-text-muted);
+}
+/* Armed: nothing yet */
+.tools-page .merge.is-armed .merge-a,
+.tools-page .merge.is-armed .merge-b,
+.tools-page .merge.is-armed .merge-plus,
+.tools-page .merge.is-armed .merge-arrow,
+.tools-page .merge.is-armed .merge-to,
+.tools-page .merge.is-armed .merge-caption {
+  opacity: 0;
+}
+/* Playing */
+.tools-page .merge.is-playing .merge-a {
+  animation: merge-from-left 0.38s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.tools-page .merge.is-playing .merge-b {
+  animation: merge-from-right 0.38s cubic-bezier(0.22, 1, 0.36, 1) 40ms backwards;
+}
+.tools-page .merge.is-playing .merge-plus {
+  animation: merge-pop 0.2s cubic-bezier(0.22, 1, 0.36, 1) 260ms backwards;
+}
+.tools-page .merge.is-playing .merge-arrow {
+  animation: merge-arrow 0.26s cubic-bezier(0.22, 1, 0.36, 1) 340ms backwards;
+}
+.tools-page .merge.is-playing .merge-ghost-a {
+  animation: merge-fold-a 0.48s cubic-bezier(0.65, 0, 0.35, 1) 380ms;
+}
+.tools-page .merge.is-playing .merge-ghost-b {
+  animation: merge-fold-b 0.48s cubic-bezier(0.65, 0, 0.35, 1) 420ms;
+}
+.tools-page .merge.is-playing .merge-to {
+  animation: merge-land 0.38s cubic-bezier(0.22, 1, 0.36, 1) 620ms backwards;
+}
+.tools-page .merge.is-playing .merge-icon {
+  animation: merge-icon 0.36s cubic-bezier(0.22, 1, 0.36, 1) 680ms backwards;
+}
+.tools-page .merge.is-playing .merge-to::after {
+  animation: merge-glow 0.52s ease-out 700ms backwards;
+}
+.tools-page .merge.is-playing .merge-caption {
+  animation: merge-caption 0.3s cubic-bezier(0.22, 1, 0.36, 1) 860ms backwards;
+}
+@keyframes merge-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-3rem);
+  }
+}
+@keyframes merge-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(3rem);
+  }
+}
+@keyframes merge-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes merge-arrow {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+/* Phones: down into Sift, under the two; from 768px: along the row into it */
+@keyframes merge-fold-a {
+  from {
+    opacity: 0.9;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(calc(50% + var(--merge-sym) / 2 + var(--merge-gap)), calc(100% + var(--merge-arrow) + 2 * var(--merge-row-gap))) scale(0.9);
+  }
+}
+@keyframes merge-fold-b {
+  from {
+    opacity: 0.9;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(calc(-50% - var(--merge-sym) / 2 - var(--merge-gap)), calc(100% + var(--merge-arrow) + 2 * var(--merge-row-gap))) scale(0.9);
+  }
+}
+@keyframes merge-land {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+@keyframes merge-icon {
+  from {
+    transform: scale(0.7);
+  }
+}
+/* The glow comes up bright as Sift lands, then settles to its rest */
+@keyframes merge-glow {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+@keyframes merge-caption {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@media (min-width: 768px) {
+  @keyframes merge-arrow {
+    from {
+      opacity: 0;
+      transform: translateX(-0.5rem);
+    }
+  }
+  @keyframes merge-fold-a {
+    from {
+      opacity: 0.9;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateX(calc(200% + 2 * var(--merge-sym) + 4 * var(--merge-gap))) scale(0.9);
+    }
+  }
+  @keyframes merge-fold-b {
+    from {
+      opacity: 0.9;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateX(calc(100% + var(--merge-sym) + 2 * var(--merge-gap))) scale(0.9);
+    }
+  }
+}
+
+/* =============================================
+   The end: what it's made with, then the other tool as a card with its first capture
+   (the project pages' "next" card), and the projects
+   ============================================= */
+.tools-page .tool-end {
+  display: grid;
+  gap: 3rem;
+}
+.tools-page .tool-next .next-name {
+  align-items: center;
+}
+.tools-page .next-icon {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+@media (min-width: 768px) {
+  .tools-page .next-icon {
+    width: 2.75rem;
+    height: 2.75rem;
   }
 }

@@ -96,12 +96,14 @@ const pages: RouteRecordRaw[] = [
     meta: {
       title: 'Tools - Project Updater and Sift',
       description:
-        'Robbe Saelens keeps his projects up to date with tools he built: Project Updater, which updates them with Claude Code, and Sift, a light Git client for macOS.',
-      image: '/project-updater-home.jpg',
+        'How Robbe Saelens maintains his projects, with tools he built: Project Updater, which updates them with Claude Code, and Sift, a light Git client for macOS.',
+      image: '/project-updater-projects-home.jpg',
+      // The hash picks one of the two tools (/tools#sift): see scrollBehavior below
+      hashTabs: true,
       nl: {
         title: 'Tools - Project Updater en Sift',
         description:
-          'Hoe Robbe Saelens zijn projecten bijhoudt met zelfgebouwde tools: Project Updater, die ze bijwerkt met Claude Code, en Sift, een lichte Git-client voor macOS.',
+          'Hoe Robbe Saelens zijn projecten onderhoudt met zelfgebouwde tools: Project Updater, die ze bijwerkt met Claude Code, en Sift, een lichte Git-client voor macOS.',
       },
     },
   },
@@ -242,9 +244,12 @@ export function createAppRouter(history: RouterHistory): Router {
     history,
     routes,
     // A new page starts at the top; back and forward return to where you were. A link to
-    // a part of a page (/tools#sift) goes there, clear of the sticky header.
-    scrollBehavior(to, _from, savedPosition) {
+    // a part of a page goes there, clear of the sticky header. On a page whose hash picks
+    // what it shows (meta.hashTabs: the tools page's switch, /tools#sift) the page opens at
+    // its top, and stays where it is when the hash changes on it (the page scrolls itself).
+    scrollBehavior(to, from, savedPosition) {
       if (savedPosition) return savedPosition
+      if (to.meta.hashTabs) return to.path === from.path ? false : { top: 0 }
       if (to.hash && typeof document !== 'undefined' && document.getElementById(to.hash.slice(1))) {
         return { el: to.hash, top: HEADER_ROOM }
       }

@@ -15,6 +15,12 @@ export const ROUTES = [
   '/privacy',
 ]
 
+/**
+ * A page in another state than it opens in: its URL's hash picks what it shows (the tools
+ * page's switch). Not in the sitemap; the accessibility and responsive checks take them too.
+ */
+export const STATES = ['/tools#sift']
+
 /** The Dutch version of a page: /nl, /nl/contact, ... */
 export const nl = (route: string) => (route === '/' ? '/nl' : `/nl${route}`)
 

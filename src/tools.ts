@@ -1,60 +1,123 @@
 /**
  * The tools Robbe made to look after his projects, as the tools page shows them
- * (src/screens/Tools.vue), in its order. /llms.txt (src/llms.ts) and the page's JSON-LD
- * (src/seo/jsonld.ts) are written from the same data. Texts come through `t`, from
- * `tools.*` in the locale files, so one builder serves both languages.
+ * (src/screens/Tools.vue), in its order: one chapter each, behind a switch. /llms.txt
+ * (src/llms.ts) and the page's JSON-LD (src/seo/jsonld.ts) are written from the same data.
+ * Texts come through `t`, from `tools.*` in the locale files, so one builder serves both
+ * languages.
  *
  * Both repositories are private for now. When one goes public, its `repository` is the
  * one line to add: the page then links to it ("View on GitHub"), and /llms.txt names it.
  */
-import { indexItems, type IndexItem, type ProjectShotData, type Translate } from './components/project/project'
+import type { ProjectShotData, Translate } from './components/project/project'
+
+export type ToolId = 'project-updater' | 'sift'
+
+/** The icon in front of a point (Tools.vue picks the lucide icon for it) */
+export type ToolIcon = 'scan' | 'bot' | 'checks' | 'review' | 'diff' | 'stage' | 'branches' | 'ai' | 'teamwork' | 'terminal'
+
+/** A point under the chapter's sentence: an icon and a few words (four to six a tool) */
+export interface ToolPoint {
+  icon: ToolIcon
+  text: string
+}
+
+/** A step or a card of a chapter's story: a name and a few words */
+export interface ToolStep {
+  title: string
+  text: string
+}
+
+/**
+ * A chapter's story, told in motion under its first screen:
+ * - pipeline: how an update runs, step by step (Project Updater), ending in a choice
+ * - merge: the two apps it replaced, coming together as this one (Sift), and why
+ */
+export type ToolStory =
+  | { kind: 'pipeline'; title: string; steps: ToolStep[]; or: string }
+  | { kind: 'merge'; title: string; from: ToolStep[]; to: ToolStep; caption: string }
+
+/**
+ * A real capture of one of its windows (public/, 1600 × 1000, from a capture of the
+ * 1200 × 750 window): `label` says what it shows, under the cards; the caption, "Name —
+ * label", names it in the button and the lightbox. Never with a version number in it (the
+ * version is `version` here): recapture only when the interface visibly changes.
+ */
+export interface ToolShot extends ProjectShotData {
+  label: string
+}
 
 export interface ToolData {
-  /** Its section's id on the page (/tools#sift), and its key under `tools` in the locale files */
-  id: 'project-updater' | 'sift'
+  /** The URL's hash that selects it (/tools#sift), and its tab's id */
+  id: ToolId
   name: string
-  /** One line under the name */
-  tagline: string
-  /** What it is for, in the list at the top of the page */
+  /** A few words, in the switch */
   role: string
+  /** The chapter's headline */
+  headline: string
+  /** One sentence under it */
+  summary: string
+  /** What it is and does, in a few sentences: for /llms.txt and the JSON-LD, not the page */
+  description: string
+  points: ToolPoint[]
+  story: ToolStory
   /** The current release; update with each one (its CHANGELOG.md) */
   version: string
   platform: string
   /** The public repository, once there is one. Private for now: no link. */
   repository?: string
-  /** What it is and does, in a paragraph */
-  about: string
-  /** Why I built it, in paragraphs; none when the page's intro says it */
-  why: string[]
-  features: IndexItem[]
   /** What it's made with, the main parts first */
   stack: string[]
-  /**
-   * A real screenshot of its window (public/, 1600 × 1000, from a capture of a 1200 × 750
-   * window). Its caption, "Name — what it shows", is also the line under it on the page.
-   */
-  shot: ProjectShotData
+  /** Its captures, the first in front */
+  shots: ToolShot[]
 }
+
+/** Captures of `name`'s windows, from `tools.<ns>.shot<Key>` (label) and `tools.<ns>.alt<Key>` */
+function shots(t: Translate, name: string, ns: string, list: [key: string, file: string][]): ToolShot[] {
+  return list.map(([key, file]) => {
+    const label = t(`tools.${ns}.shot${key}`)
+    return {
+      src: `/${file}-home.jpg`,
+      width: 1600,
+      height: 1000,
+      alt: t(`tools.${ns}.alt${key}`),
+      label,
+      caption: `${name} — ${label}`,
+    }
+  })
+}
+
+const steps = (t: Translate, ns: string, keys: string[]): ToolStep[] =>
+  keys.map((key) => ({ title: t(`tools.${ns}.${key}`), text: t(`tools.${ns}.${key}Text`) }))
 
 export function projectUpdater(t: Translate): ToolData {
   return {
     id: 'project-updater',
     name: 'Project Updater',
-    tagline: t('tools.updater.tagline'),
     role: t('tools.updater.role'),
+    headline: t('tools.updater.headline'),
+    summary: t('tools.updater.summary'),
+    description: t('tools.updater.description'),
+    points: [
+      { icon: 'scan', text: t('tools.updater.pointScan') },
+      { icon: 'bot', text: t('tools.updater.pointClaude') },
+      { icon: 'checks', text: t('tools.updater.pointChecks') },
+      { icon: 'review', text: t('tools.updater.pointReview') },
+    ],
+    story: {
+      kind: 'pipeline',
+      title: t('tools.updater.storyTitle'),
+      steps: steps(t, 'updater', ['stepScan', 'stepUpdate', 'stepChecks', 'stepReview', 'stepPublish']),
+      or: t('tools.updater.stepDiscard'),
+    },
     version: '0.16.0',
     platform: 'macOS',
-    about: t('tools.updater.about'),
-    why: [],
-    features: indexItems(t, 'tools.updater', 'feature', ['Scan', 'Run', 'Review', 'Majors', 'Sentry', 'Guard']),
     stack: ['Electron', 'Node.js', 'TypeScript', 'Claude Code', 'npm', 'Composer', 'Sentry API', 'Vitest', 'esbuild', 'GitHub Actions'],
-    shot: {
-      src: '/project-updater-home.jpg',
-      width: 1600,
-      height: 1000,
-      alt: t('tools.updater.alt'),
-      caption: `Project Updater — ${t('tools.updater.shotLabel')}`,
-    },
+    shots: shots(t, 'Project Updater', 'updater', [
+      ['Projects', 'project-updater-projects'],
+      ['Updates', 'project-updater-updates'],
+      ['Security', 'project-updater-security'],
+      ['Review', 'project-updater-review'],
+    ]),
   }
 }
 
@@ -62,25 +125,46 @@ export function sift(t: Translate): ToolData {
   return {
     id: 'sift',
     name: 'Sift',
-    tagline: t('tools.sift.tagline'),
     role: t('tools.sift.role'),
+    headline: t('tools.sift.headline'),
+    summary: t('tools.sift.summary'),
+    description: t('tools.sift.description'),
+    points: [
+      { icon: 'diff', text: t('tools.sift.pointDiff') },
+      { icon: 'stage', text: t('tools.sift.pointStage') },
+      { icon: 'branches', text: t('tools.sift.pointBranches') },
+      { icon: 'ai', text: t('tools.sift.pointAi') },
+      { icon: 'teamwork', text: t('tools.sift.pointTeamwork') },
+      { icon: 'terminal', text: t('tools.sift.pointTerminal') },
+    ],
+    story: {
+      kind: 'merge',
+      title: t('tools.sift.storyTitle'),
+      from: [
+        { title: 'PhpStorm', text: t('tools.sift.fromPhpstorm') },
+        { title: 'Sublime Merge', text: t('tools.sift.fromMerge') },
+      ],
+      to: { title: 'Sift', text: t('tools.sift.toSift') },
+      caption: t('tools.sift.storyCaption'),
+    },
     version: '0.9.1',
     platform: 'macOS',
-    about: t('tools.sift.about'),
-    why: [t('tools.sift.why1'), t('tools.sift.why2')],
-    features: indexItems(t, 'tools.sift', 'feature', ['Diff', 'Edit', 'Stage', 'Commit', 'Branches', 'Terminal']),
     stack: ['Tauri 2', 'Rust', 'Svelte 5', 'TypeScript', 'Monaco Editor', 'libgit2', 'Vite', 'Vitest'],
-    shot: {
-      src: '/sift-home.jpg',
-      width: 1600,
-      height: 1000,
-      alt: t('tools.sift.alt'),
-      caption: `Sift — ${t('tools.sift.shotLabel')}`,
-    },
+    shots: shots(t, 'Sift', 'sift', [
+      ['Diff', 'sift-diff'],
+      ['Stage', 'sift-stage'],
+      ['Branches', 'sift-branches'],
+      ['Commit', 'sift-commit'],
+    ]),
   }
 }
 
 /** The tools, in the page's order. */
 export function tools(t: Translate): ToolData[] {
   return [projectUpdater(t), sift(t)]
+}
+
+/** The tool a URL's hash selects (/tools#sift); the first without one. */
+export function toolOfHash(hash: string): ToolId {
+  return hash === '#sift' ? 'sift' : 'project-updater'
 }
