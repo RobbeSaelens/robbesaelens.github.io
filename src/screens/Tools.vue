@@ -144,49 +144,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  ArrowRight,
-  Bot,
-  Columns2,
-  Eye,
-  ExternalLink,
-  GitBranch,
-  Github,
-  Laptop,
-  ListChecks,
-  Lock,
-  ScanSearch,
-  Sparkles,
-  SquarePlus,
-  SquareTerminal,
-  Timer,
-} from 'lucide-vue-next'
+import { ArrowRight, ExternalLink, Github, Laptop, Lock } from 'lucide-vue-next'
 import ImageLightbox, { type LightboxImage } from '../components/ImageLightbox.vue'
 import ShotPicture from '../components/ShotPicture.vue'
 import SiftStory from '../components/tools/SiftStory.vue'
+import { TOOL_ICONS as ICONS } from '../components/tools/icons'
 import ToolIcon from '../components/tools/ToolIcon.vue'
 import ToolShots from '../components/tools/ToolShots.vue'
 import ToolSwitch from '../components/tools/ToolSwitch.vue'
 import UpdatePipeline from '../components/tools/UpdatePipeline.vue'
 import { SHOT_SIZES } from '../images'
 import { watchReveal } from '../reveal'
-import { toolOfHash, tools, type ToolIcon as ToolIconName, type ToolId } from '../tools'
+import { toolOfHash, tools, type ToolId } from '../tools'
 
-const ICONS: Record<ToolIconName, Component> = {
-  scan: ScanSearch,
-  bot: Bot,
-  checks: ListChecks,
-  review: Eye,
-  diff: Columns2,
-  stage: SquarePlus,
-  branches: GitBranch,
-  ai: Sparkles,
-  teamwork: Timer,
-  terminal: SquareTerminal,
-}
 
 const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()

@@ -24,7 +24,7 @@ function released(key: 'projectUpdater' | 'sift', fallback: string): string {
 export type ToolId = 'project-updater' | 'sift'
 
 /** The icon in front of a point (Tools.vue picks the lucide icon for it) */
-export type ToolIcon = 'scan' | 'bot' | 'checks' | 'review' | 'diff' | 'stage' | 'branches' | 'ai' | 'teamwork' | 'terminal'
+export type ToolIcon = 'scan' | 'bot' | 'checks' | 'review' | 'diff' | 'stage' | 'branches' | 'ai' | 'teamwork' | 'terminal' | 'ide'
 
 /** A point under the chapter's sentence: an icon and a few words (four to six a tool) */
 export interface ToolPoint {
@@ -36,6 +36,10 @@ export interface ToolPoint {
 export interface ToolStep {
   title: string
   text: string
+  /** An icon for what it does (Sift's story: the two apps, by what they did, not their logos) */
+  icon?: ToolIcon
+  /** What it holds, as chips (Sift's card: what it took from both apps, and what's new) */
+  tags?: { text: string; isNew?: boolean }[]
 }
 
 /**
@@ -152,10 +156,22 @@ export function sift(t: Translate): ToolData {
       kind: 'merge',
       title: t('tools.sift.storyTitle'),
       from: [
-        { title: 'PhpStorm', text: t('tools.sift.fromPhpstorm') },
-        { title: 'Sublime Merge', text: t('tools.sift.fromMerge') },
+        { title: 'PhpStorm', text: t('tools.sift.fromPhpstorm'), icon: 'ide' },
+        { title: 'Sublime Merge', text: t('tools.sift.fromMerge'), icon: 'branches' },
       ],
-      to: { title: 'Sift', text: t('tools.sift.toSift') },
+      to: {
+        title: 'Sift',
+        text: t('tools.sift.toSift'),
+        tags: [
+          { text: t('tools.sift.tagDiffs') },
+          { text: t('tools.sift.tagStaging') },
+          { text: t('tools.sift.tagCommits') },
+          { text: t('tools.sift.tagBranches') },
+          { text: t('tools.sift.tagHistory') },
+          { text: t('tools.sift.tagAi'), isNew: true },
+          { text: t('tools.sift.tagTeamwork'), isNew: true },
+        ],
+      },
       caption: t('tools.sift.storyCaption'),
     },
     version: released('sift', '0.9.1'),
