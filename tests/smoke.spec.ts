@@ -740,7 +740,7 @@ test.describe('project page template', () => {
       await link.scrollIntoViewIfNeeded()
       await expect(link.locator('img')).toHaveAttribute('loading', 'lazy')
       await expect(end.getByRole('link', { name: 'All projects' })).toHaveAttribute('href', '/projects')
-      await expect(end.getByRole('link', { name: 'How I keep them up to date' })).toHaveAttribute('href', '/tools')
+      await expect(end.getByRole('link', { name: 'How I maintain them' })).toHaveAttribute('href', '/tools')
       expect(await top(end)).toBeGreaterThan(await top(page.locator('.repo').last()))
       expect(errors).toEqual([])
     })
