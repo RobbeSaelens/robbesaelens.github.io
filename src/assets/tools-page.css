@@ -690,10 +690,27 @@
   --merge-gap: 0.5rem;
   --merge-row-gap: 0.75rem;
   --merge-arrow: 1.5rem;
-  max-width: 60rem;
+  display: grid;
+  gap: 2rem;
   margin: 0;
 }
+@media (min-width: 640px) {
+  .tools-page .merge {
+    --merge-sym: 2rem;
+    --merge-gap: 1rem;
+  }
+}
+/* The why on the left, the picture on the right, like the page's other splits */
+@media (min-width: 1024px) {
+  .tools-page .merge {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    column-gap: 4rem;
+  }
+}
 .tools-page .merge-row {
+  width: 100%;
+  max-width: 46rem;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--merge-sym) minmax(0, 1fr);
   grid-template-rows: auto var(--merge-arrow) auto;
@@ -718,20 +735,9 @@
 .tools-page .merge-to {
   grid-area: 3 / 1 / 4 / -1;
 }
-@media (min-width: 768px) {
-  .tools-page .merge {
-    --merge-sym: 2rem;
-    --merge-gap: 1rem;
-  }
+@media (min-width: 1024px) {
   .tools-page .merge-row {
-    grid-template-columns: minmax(0, 1fr) var(--merge-sym) minmax(0, 1fr) var(--merge-sym) minmax(0, 1fr);
-    grid-template-rows: auto;
-  }
-  .tools-page .merge-arrow {
-    grid-area: 1 / 4;
-  }
-  .tools-page .merge-to {
-    grid-area: 1 / 5;
+    justify-self: end;
   }
 }
 .tools-page .merge-card {
@@ -787,11 +793,6 @@
   height: 1.375rem;
   transform: rotate(90deg);
 }
-@media (min-width: 768px) {
-  .tools-page .merge-arrow-icon {
-    transform: none;
-  }
-}
 /* Sift: its icon beside its name, its colour, a soft glow (a layer of its own, so only its
    opacity moves) */
 .tools-page .merge-to {
@@ -799,7 +800,7 @@
   isolation: isolate;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0.875rem;
   border-color: var(--tool-border);
 }
@@ -841,15 +842,20 @@
   pointer-events: none;
 }
 .tools-page .merge-caption {
-  margin-top: 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 30ch;
+  font-size: clamp(1.25rem, 1.05rem + 0.9vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  text-wrap: balance;
 }
 .tools-page .merge-caption::before {
   content: '# ';
-  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  color: var(--tool-accent);
 }
 /* Armed: nothing yet */
 .tools-page .merge.is-armed .merge-a,
@@ -862,34 +868,34 @@
 }
 /* Playing */
 .tools-page .merge.is-playing .merge-a {
-  animation: merge-from-left 0.38s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: merge-from-left 0.38s cubic-bezier(0.22, 1, 0.36, 1) 120ms backwards;
 }
 .tools-page .merge.is-playing .merge-b {
-  animation: merge-from-right 0.38s cubic-bezier(0.22, 1, 0.36, 1) 40ms backwards;
+  animation: merge-from-right 0.38s cubic-bezier(0.22, 1, 0.36, 1) 160ms backwards;
 }
 .tools-page .merge.is-playing .merge-plus {
-  animation: merge-pop 0.2s cubic-bezier(0.22, 1, 0.36, 1) 260ms backwards;
+  animation: merge-pop 0.2s cubic-bezier(0.22, 1, 0.36, 1) 380ms backwards;
 }
 .tools-page .merge.is-playing .merge-arrow {
-  animation: merge-arrow 0.26s cubic-bezier(0.22, 1, 0.36, 1) 340ms backwards;
+  animation: merge-arrow 0.26s cubic-bezier(0.22, 1, 0.36, 1) 460ms backwards;
 }
 .tools-page .merge.is-playing .merge-ghost-a {
-  animation: merge-fold-a 0.48s cubic-bezier(0.65, 0, 0.35, 1) 380ms;
+  animation: merge-fold-a 0.48s cubic-bezier(0.65, 0, 0.35, 1) 500ms;
 }
 .tools-page .merge.is-playing .merge-ghost-b {
-  animation: merge-fold-b 0.48s cubic-bezier(0.65, 0, 0.35, 1) 420ms;
+  animation: merge-fold-b 0.48s cubic-bezier(0.65, 0, 0.35, 1) 540ms;
 }
 .tools-page .merge.is-playing .merge-to {
-  animation: merge-land 0.38s cubic-bezier(0.22, 1, 0.36, 1) 620ms backwards;
+  animation: merge-land 0.38s cubic-bezier(0.22, 1, 0.36, 1) 740ms backwards;
 }
 .tools-page .merge.is-playing .merge-icon {
-  animation: merge-icon 0.36s cubic-bezier(0.22, 1, 0.36, 1) 680ms backwards;
+  animation: merge-icon 0.36s cubic-bezier(0.22, 1, 0.36, 1) 800ms backwards;
 }
 .tools-page .merge.is-playing .merge-to::after {
-  animation: merge-glow 0.52s ease-out 700ms backwards;
+  animation: merge-glow 0.52s ease-out 820ms backwards;
 }
 .tools-page .merge.is-playing .merge-caption {
-  animation: merge-caption 0.3s cubic-bezier(0.22, 1, 0.36, 1) 860ms backwards;
+  animation: merge-caption 0.3s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 @keyframes merge-from-left {
   from {
@@ -915,7 +921,7 @@
     transform: translateY(-0.5rem);
   }
 }
-/* Phones: down into Sift, under the two; from 768px: along the row into it */
+/* Down into Sift, under the two */
 @keyframes merge-fold-a {
   from {
     opacity: 0.9;
@@ -963,35 +969,6 @@
     transform: translateY(6px);
   }
 }
-@media (min-width: 768px) {
-  @keyframes merge-arrow {
-    from {
-      opacity: 0;
-      transform: translateX(-0.5rem);
-    }
-  }
-  @keyframes merge-fold-a {
-    from {
-      opacity: 0.9;
-      transform: none;
-    }
-    to {
-      opacity: 0;
-      transform: translateX(calc(200% + 2 * var(--merge-sym) + 4 * var(--merge-gap))) scale(0.9);
-    }
-  }
-  @keyframes merge-fold-b {
-    from {
-      opacity: 0.9;
-      transform: none;
-    }
-    to {
-      opacity: 0;
-      transform: translateX(calc(100% + var(--merge-sym) + 2 * var(--merge-gap))) scale(0.9);
-    }
-  }
-}
-
 /* =============================================
    The end: what it's made with, then the other tool as a card with its first capture
    (the project pages' "next" card), and the projects

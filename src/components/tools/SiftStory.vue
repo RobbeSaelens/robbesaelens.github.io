@@ -1,13 +1,14 @@
 <!--
   Why Sift exists, told as a picture rather than paragraphs: the two apps Robbe used
   (PhpStorm for diffs and commits, Sublime Merge for branches and history, by name only:
-  no logos), and Sift, which merged them: both in one, light. Under it one line says why.
-  Three cards of one size, in a row from 768px; on phones the two side by side above Sift.
+  no logos), and Sift, which merged them: both in one, light. The why comes first, as a
+  statement; the picture beside it from 1024px (5 : 7, like the page's other splits), under
+  it below that: the two side by side, an arrow down, Sift under both.
 
   Once, when it scrolls into view (usePlayOnce, about 1.2 s, transform and opacity only),
   as a real merge: the two cards slide in from the left and the right and meet at the plus;
   a copy of each (aria-hidden) then folds into Sift's place, and Sift lands there with its
-  icon and its colour, then the line under it. At rest, and with reduced motion, the whole
+  icon and its colour. The statement comes up first. At rest, and with reduced motion, the whole
   picture at once, without the copies. The text reads in order for screen readers: the
   plus, the arrow and the copies are decoration.
 
@@ -15,6 +16,7 @@
 -->
 <template>
   <figure ref="root" class="merge" :class="state">
+    <figcaption class="merge-caption">{{ caption }}</figcaption>
     <div class="merge-row">
       <div class="merge-card merge-a">
         <span class="merge-name">{{ from[0].title }}</span>
@@ -39,7 +41,6 @@
         <span class="merge-does">{{ app.text }}</span>
       </div>
     </div>
-    <figcaption class="merge-caption">{{ caption }}</figcaption>
   </figure>
 </template>
 
