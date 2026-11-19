@@ -1,6 +1,7 @@
 {
   "nav": {
     "projects": "Projects",
+    "tools": "Tools",
     "drupal": "Drupal contributions",
     "drupalShort": "Drupal",
     "aboutMe": "About me",
@@ -84,7 +85,8 @@
     "languages": "Languages & Frameworks",
     "tools": "Tools & Services",
     "live": "Live",
-    "allProjects": "All projects"
+    "allProjects": "All projects",
+    "maintained": "How I keep them up to date"
   },
   "exulta": {
     "title": "Exulta",
@@ -407,5 +409,56 @@
     "weekBar": "no commits | 1 commit | {n} commits",
     "private": "Private repository: numbers as of {date}",
     "public": "Public repository on {link}: numbers as of {date}"
+  },
+  "tools": {
+    "title": "Tools",
+    "tagline": "How I keep my projects up to date",
+    "intro": "A project isn't done the day it goes live. Packages get security fixes and new versions, and now and then an error turns up in production. I keep an eye on all of it with two tools I built for myself: Project Updater checks every project and updates it with Claude Code, and Sift is where I look at what changed before I commit it.",
+    "listLabel": "The tools on this page",
+    "private": "Private for now",
+    "whyTitle": "Why I built it",
+    "featuresTitle": "What it does",
+    "viewOnGithub": "View on GitHub",
+    "viewProjects": "View my projects",
+    "updater": {
+      "tagline": "Security fixes and updates for all my projects, done by Claude Code",
+      "role": "Checks every project and updates it with Claude Code",
+      "about": "Project Updater is a macOS app that watches over all my projects. It finds every repository in my projects folder and checks each one for security advisories and outdated npm and Composer packages, with the numbers per project side by side. When I ask, Claude Code does the update on a new branch, and I review the result before anything is pushed.",
+      "featureScan": "Every project at a glance",
+      "featureScanText": "Each git repository in my projects folder with a package-lock.json or composer.lock is picked up by itself. A check runs npm audit, npm outdated, composer audit and composer outdated, and shows per project how many security advisories, updates and major versions are waiting.",
+      "featureRun": "Updates by Claude Code",
+      "featureRunText": "An update run gives one project to Claude Code, on a new branch: the security fixes and the minor and patch updates. The project's own checks (tests, lint, build) run before and after, and a check that breaks fails the run.",
+      "featureReview": "Reviewed, then published",
+      "featureReviewText": "The changes wait uncommitted, with the diff, Claude's summary and the package changes. One click commits them and pushes to develop, or throws them away; either way the project goes back to the branch I was on.",
+      "featureMajors": "Major updates on request",
+      "featureMajorsText": "Major versions are never part of an ordinary update. On request, Claude takes them one at a time: it reads the migration guide, upgrades the package and changes the code, and puts back a major that breaks a check without a small fix.",
+      "featureSentry": "Errors from Sentry",
+      "featureSentryText": "A project's unresolved Sentry errors show on its row. Investigate has Claude look for the cause in a fix run, with a test that fails because of it; Resolve closes the issue in Sentry.",
+      "featureGuard": "On a short leash",
+      "featureGuardText": "Claude works with a fixed set of tools, and git is wrapped so it can't commit, push or switch branches. The app only listens on 127.0.0.1, and a new version installs itself only once its signature checks out.",
+      "alt": "Project Updater listing my projects with their security advisories, updates and major updates",
+      "shotLabel": "my projects, after a check"
+    },
+    "sift": {
+      "tagline": "My own light Git client: review, stage and commit",
+      "role": "Where I review, stage and commit what changed",
+      "why1": "I used PhpStorm for its diff view and for committing, and Sublime Merge for merging and for looking through branches and the latest commits: for diffs and the git log, I'd rather have a good interface than the terminal.",
+      "why2": "Since AI took off, I hardly open PhpStorm any more: I work in the terminal, with AI agents. Starting a whole IDE just to look at a diff, commit and push was way too much. So I merged the two into one light tool of my own: Sift.",
+      "about": "Sift opens on the repository I'm working in, straight from the terminal. It shows what changed, lets me fix things in place, stage exactly the lines that belong in the commit, and commit and push, with the branches and the history in the same window. Project Updater opens projects with uncommitted changes in it. It's built with Tauri, on the Mac's own WebKit, so it's small and opens fast.",
+      "featureDiff": "Diffs side by side",
+      "featureDiffText": "What's unstaged and what's staged, as git diff shows them, side by side or inline in Monaco's diff editor. Sift follows the repository on disk, so a commit made in the terminal shows up by itself.",
+      "featureEdit": "Edit in place",
+      "featureEditText": "The right side of an unstaged change is the file itself: fix what needs fixing and save with ⌘S. Saving never stages anything.",
+      "featureStage": "Stage a change, or a single line",
+      "featureStageText": "The + in the gutter stages one change, and selected lines stage just those, as git add -p does. A discard can be undone for ten seconds.",
+      "featureCommit": "Commit and push",
+      "featureCommitText": "Commits go through my own git, so hooks and signing run as in the terminal, and fetch, pull and push sit in the title bar. Claude Code can write the message, in the style of my recent commits.",
+      "featureBranches": "Branches and history",
+      "featureBranchesText": "Every branch and commit with its graph, as in Sublime Merge: check out, merge (it first says what comes in and what would conflict), cherry-pick, rebase and stash, and conflicts in three panes.",
+      "featureTerminal": "Opens from the terminal",
+      "featureTerminalText": "The sift command opens the repository I'm in, in a tab of the Sift that's already running. Open Recent finds every repository I opened before, by a few of its letters.",
+      "alt": "Sift showing the changes that add this page to my portfolio, side by side",
+      "shotLabel": "the changes that add this page"
+    }
   }
 }

@@ -1,0 +1,206 @@
+/* =============================================
+   The tools page (src/screens/Tools.vue). Its article is a .detail-page too, so it
+   shares the project pages' classes (project-page.css): bands, labels, text, chips,
+   status badges, screenshots and the numbered index. What is its own sits under
+   .tools-page.
+
+   Global, not scoped, and imported in main.ts, for the same reason as project-page.css:
+   the prerendered HTML links only the main stylesheet. Spacing: 4px steps.
+   ============================================= */
+
+/* =============================================
+   First screen: the intro on the left (7), the list of the tools beside it (5), level
+   with the intro's text; below 1024px the list comes after the intro
+   ============================================= */
+.tools-page .tools-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .tools-page .tools-hero {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: end;
+  }
+}
+.tools-page .tools-hero-intro {
+  min-width: 0;
+}
+.tools-page .tools-hero .terminal-title {
+  justify-content: flex-start;
+}
+.tools-page .tools-intro {
+  margin-top: 1.25rem;
+}
+
+/* The tools, between hairlines like the numbered index; each row a link to its section */
+.tools-page .tools-list ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tools-page .tools-list li {
+  border-top: 1px solid var(--color-border-glow);
+}
+.tools-page .tools-list li:last-child {
+  border-bottom: 1px solid var(--color-border-glow);
+}
+.tools-page .tools-link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 1rem 0.5rem;
+  margin: 0 -0.5rem;
+  border-radius: 0.5rem;
+  color: inherit;
+  outline: none;
+  /* A control, not text to copy: a long press doesn't select it */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  transition: background 0.2s ease;
+}
+.tools-page .tools-link-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.tools-page .tools-link-name {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  transition: color 0.2s ease;
+}
+.tools-page .tools-link-role {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+.tools-page .tools-link-meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.tools-page .tools-link-go {
+  flex-shrink: 0;
+  align-self: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--color-accent);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .tools-page .tools-link:hover .tools-link-name {
+    color: var(--color-accent);
+  }
+  .tools-page .tools-link:hover .tools-link-go {
+    transform: translateY(3px);
+  }
+}
+/* A wide row: on press it lights up rather than shrinks */
+.tools-page .tools-link:active {
+  background: var(--color-surface-hover);
+}
+.tools-page .tools-link:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+
+/* =============================================
+   A tool: name, tagline and status, its window, then what it is and what it's made
+   with. From 1024px the window on the right (7), beside the text (5); below that it
+   comes right after the status. Then what it does, as a numbered index.
+   ============================================= */
+/* A link to it (/tools#sift) lands below the sticky header */
+.tools-page .tool {
+  scroll-margin-top: 6rem;
+}
+/* The first one closer to the intro that lists it */
+@media (min-width: 1024px) {
+  .tools-page .tools-hero + .tool {
+    margin-top: 5.5rem;
+  }
+}
+.tools-page .tool-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'head' 'shot' 'body';
+  gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .tools-page .tool-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'head shot' 'body shot';
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    row-gap: 1.75rem;
+  }
+}
+.tools-page .tool-head {
+  grid-area: head;
+  min-width: 0;
+}
+.tools-page .tool-shot {
+  grid-area: shot;
+  align-self: start;
+  min-width: 0;
+}
+/* Beside a longer text (Sift's story), the window stays in view while it is read: where
+   the screen is tall enough to hold all of it below the header */
+@media (min-width: 1024px) and (min-height: 760px) {
+  .tools-page .tool-shot {
+    position: sticky;
+    top: 6rem;
+  }
+}
+.tools-page .tool-body {
+  grid-area: body;
+  min-width: 0;
+}
+.tools-page .tool-name {
+  margin-bottom: 0;
+}
+.tools-page .tool-tagline {
+  max-width: 34rem;
+  text-wrap: balance;
+  margin-top: 0.75rem;
+  font-size: 1.1875rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-text-primary);
+}
+.tools-page .tool-status {
+  margin-top: 1.25rem;
+}
+/* A version, as the apps show theirs: not in capitals like the other badges */
+.tools-page .tool-version {
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.tools-page .tool-label {
+  margin-top: 2rem;
+}
+.tools-page .tool-why + .tool-why {
+  margin-top: 1rem;
+}
+.tools-page .tool-features {
+  margin-top: 3.5rem;
+}
+@media (min-width: 1024px) {
+  .tools-page .tool-features {
+    margin-top: 4.5rem;
+  }
+}
+.tools-page .tool-features > .project-label {
+  margin-bottom: 1.25rem;
+}
+
+/* The end: the way on to the projects */
+.tools-page .tools-end {
+  display: grid;
+}

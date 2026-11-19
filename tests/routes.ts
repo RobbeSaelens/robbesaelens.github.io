@@ -11,6 +11,7 @@ export const ROUTES = [
   '/stablemanagerdetail',
   '/vhsdetail',
   '/drupal',
+  '/tools',
   '/privacy',
 ]
 

@@ -276,6 +276,26 @@
   color: var(--color-text-muted);
 }
 
+/* An app's own window (kind app, the tools page): the capture brings its own title bar,
+   so the frame is only its rounded corners; under it a line says what it shows, with the
+   "expand" mark (touch screens get no hover) */
+.detail-page .shot-app {
+  border-radius: 0.75rem;
+}
+.detail-page .shot-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-hover);
+}
+/* The whole line, on two lines where it must (phones), rather than cut short */
+.detail-page .shot-foot .shot-url {
+  margin-left: 0;
+  white-space: normal;
+}
+
 /* Phone frame (and Scan2Talk's video): the notch, the rounded screen */
 .detail-page .shot-notch {
   display: block;
@@ -568,6 +588,12 @@
 .detail-page .project-all:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
+}
+/* All projects, and the tools page: side by side where they fit */
+.detail-page .project-end-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 2rem;
 }
 .detail-page .project-all {
   display: inline-flex;

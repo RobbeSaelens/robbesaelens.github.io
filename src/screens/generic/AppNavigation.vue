@@ -174,6 +174,8 @@ interface NavLink {
 
 const LINKS: NavLink[] = [
   { to: '/projects', label: 'nav.projects', matches: (p) => p.endsWith('detail') },
+  // How the projects are kept up to date: next to them
+  { to: '/tools', label: 'nav.tools' },
   { to: '/contact', label: 'nav.aboutMe' },
 ]
 

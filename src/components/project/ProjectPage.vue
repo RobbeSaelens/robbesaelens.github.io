@@ -107,7 +107,8 @@
 
       <!-- The way on: the next project (in the order of the projects page), as a picture.
            The picture only once the band is near: on a short page the browser's own lazy
-           loading would fetch it with the screenshots at the top. -->
+           loading would fetch it with the screenshots at the top. Under it, all projects
+           and how they're kept up to date (the tools page). -->
       <nav ref="end" class="project-band project-end" :aria-label="$t('projects.next')">
         <router-link class="project-next reveal" :to="{ name: $ln(next.route) }">
           <span class="next-text">
@@ -131,11 +132,19 @@
             />
           </span>
         </router-link>
-        <router-link class="project-all group reveal" :to="$lp('/projects')">
-          <span class="project-all-dots" aria-hidden="true">./</span>
-          <span>{{ $t('project.allProjects') }}</span>
-          <ArrowRight class="link-arrow h-4 w-4" aria-hidden="true" />
-        </router-link>
+        <div class="project-end-links reveal">
+          <router-link class="project-all group" :to="$lp('/projects')">
+            <span class="project-all-dots" aria-hidden="true">./</span>
+            <span>{{ $t('project.allProjects') }}</span>
+            <ArrowRight class="link-arrow h-4 w-4" aria-hidden="true" />
+          </router-link>
+          <!-- How they're kept up to date: the tools page -->
+          <router-link class="project-all group" :to="$lp('/tools')">
+            <span class="project-all-dots" aria-hidden="true">./</span>
+            <span>{{ $t('project.maintained') }}</span>
+            <ArrowRight class="link-arrow h-4 w-4" aria-hidden="true" />
+          </router-link>
+        </div>
       </nav>
     </div>
 

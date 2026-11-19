@@ -17,7 +17,7 @@
       <details class="index-fold" :open="open[i] || undefined" @toggle="onToggle(i, $event)">
         <summary class="index-head" :tabindex="folds ? undefined : -1" @click="onSummary">
           <span class="index-n" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</span>
-          <h3 class="index-title">{{ item.title }}</h3>
+          <component :is="`h${level}`" class="index-title">{{ item.title }}</component>
           <Plus class="index-plus" aria-hidden="true" />
         </summary>
         <p class="index-text">{{ item.text }}</p>
@@ -32,7 +32,15 @@ import { Plus } from 'lucide-vue-next'
 import GlowCard from '../GlowCard.vue'
 import type { IndexItem } from './project'
 
-const props = withDefaults(defineProps<{ items: IndexItem[]; pairs?: boolean }>(), { pairs: false })
+const props = withDefaults(
+  defineProps<{
+    items: IndexItem[]
+    pairs?: boolean
+    /** The titles' heading level: 3 under a band's heading, 4 under a section's own h3 (the tools page) */
+    level?: 3 | 4
+  }>(),
+  { pairs: false, level: 3 },
+)
 
 /** Phone-only CSS is (max-width: 639px), the complement of UnoCSS sm: (AGENTS.md). */
 const PHONE = '(max-width: 639px)'

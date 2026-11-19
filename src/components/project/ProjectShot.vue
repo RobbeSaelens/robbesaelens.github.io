@@ -1,7 +1,9 @@
 <!--
   A screenshot on a project page: a button that opens it full screen (the page's
   lightbox: the parent listens to click), in a browser frame (desktop, with an "expand"
-  mark in the bar) or a phone frame. The picture is ShotPicture (AVIF/WebP copies), with
+  mark in the bar), a phone frame, or as an app's own window (app: a capture of a Mac
+  app with its own title bar, so no bar on top; under it a line that says what it shows,
+  with the "expand" mark). The picture is ShotPicture (AVIF/WebP copies), with
   ShotGlare's glass sweep under the mouse. Its size and place are the page's.
 
   Lazy unless `eager`: only the two at the top of the page load straight away, the
@@ -11,7 +13,7 @@
   <button
     type="button"
     class="shot"
-    :class="kind === 'phone' ? 'shot-phone' : 'shot-desktop'"
+    :class="`shot-${kind}`"
     :aria-label="$t('aria.openScreenshot', { name: caption })"
   >
     <ShotGlare :radius="kind === 'phone' ? '1.25rem' : '0'">
@@ -22,7 +24,7 @@
         <span class="shot-url">{{ url }}</span>
         <Maximize2 class="shot-expand" />
       </span>
-      <span v-else class="shot-notch" aria-hidden="true"></span>
+      <span v-else-if="kind === 'phone'" class="shot-notch" aria-hidden="true"></span>
       <ShotPicture
         :src="src"
         :alt="alt"
@@ -32,6 +34,10 @@
         :loading="eager ? 'eager' : 'lazy'"
         :fetchpriority="priority ? 'high' : undefined"
       />
+      <span v-if="kind === 'app'" class="shot-foot" aria-hidden="true">
+        <span class="shot-url">{{ url }}</span>
+        <Maximize2 class="shot-expand" />
+      </span>
     </ShotGlare>
   </button>
 </template>
@@ -51,8 +57,8 @@ withDefaults(
     alt: string
     /** Names it in the button's label and the lightbox ("exulta.be — mobile") */
     caption: string
-    kind?: 'desktop' | 'phone'
-    /** The text in the browser bar */
+    kind?: 'desktop' | 'phone' | 'app'
+    /** The text in the browser bar (desktop), or under the window (app) */
     url?: string
     /** How wide it is shown (SHOT_SIZES in src/images.ts) */
     sizes: string

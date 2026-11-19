@@ -1,6 +1,7 @@
 {
   "nav": {
     "projects": "Projecten",
+    "tools": "Tools",
     "drupal": "Drupal-bijdragen",
     "drupalShort": "Drupal",
     "aboutMe": "Over mij",
@@ -84,7 +85,8 @@
     "languages": "Talen & frameworks",
     "tools": "Tools & diensten",
     "live": "Live",
-    "allProjects": "Alle projecten"
+    "allProjects": "Alle projecten",
+    "maintained": "Hoe ik ze up-to-date houd"
   },
   "exulta": {
     "title": "Exulta",
@@ -407,5 +409,56 @@
     "weekBar": "geen commits | 1 commit | {n} commits",
     "private": "Privérepository: cijfers van {date}",
     "public": "Publieke repository op {link}: cijfers van {date}"
+  },
+  "tools": {
+    "title": "Tools",
+    "tagline": "Hoe ik mijn projecten up-to-date houd",
+    "intro": "Een project is niet af op de dag dat het live gaat. Packages krijgen beveiligingsfixes en nieuwe versies, en af en toe duikt er een fout op in productie. Ik hou dat allemaal in het oog met twee tools die ik voor mezelf bouwde: Project Updater controleert elk project en werkt het bij met Claude Code, en in Sift bekijk ik wat er veranderde voor ik het commit.",
+    "listLabel": "De tools op deze pagina",
+    "private": "Voorlopig privé",
+    "whyTitle": "Waarom ik het bouwde",
+    "featuresTitle": "Wat het doet",
+    "viewOnGithub": "Bekijk op GitHub",
+    "viewProjects": "Bekijk mijn projecten",
+    "updater": {
+      "tagline": "Beveiligingsfixes en updates voor al mijn projecten, uitgevoerd door Claude Code",
+      "role": "Controleert elk project en werkt het bij met Claude Code",
+      "about": "Project Updater is een macOS-app die over al mijn projecten waakt. Hij vindt elke repository in mijn projectenmap en controleert ze op beveiligingsadviezen en verouderde npm- en Composer-packages, met de cijfers per project naast elkaar. Als ik erom vraag, voert Claude Code de update uit op een nieuwe branch, en ik kijk het resultaat na voor er iets gepusht wordt.",
+      "featureScan": "Alle projecten in één oogopslag",
+      "featureScanText": "Elke git-repository in mijn projectenmap met een package-lock.json of composer.lock wordt vanzelf opgepikt. Een controle draait npm audit, npm outdated, composer audit en composer outdated, en toont per project hoeveel beveiligingsadviezen, updates en nieuwe hoofdversies er klaarstaan.",
+      "featureRun": "Updates door Claude Code",
+      "featureRunText": "Een update geeft één project aan Claude Code, op een nieuwe branch: de beveiligingsfixes en de minor- en patchupdates. De eigen checks van het project (tests, lint, build) draaien ervoor en erna, en een check die breekt, laat de update mislukken.",
+      "featureReview": "Eerst nakijken, dan publiceren",
+      "featureReviewText": "De wijzigingen wachten ongecommit, met de diff, de samenvatting van Claude en de gewijzigde packages. Eén klik commit ze en pusht naar develop, of gooit ze weg; hoe dan ook staat het project daarna weer op de branch waar ik was.",
+      "featureMajors": "Hoofdversies op vraag",
+      "featureMajorsText": "Nieuwe hoofdversies horen nooit bij een gewone update. Op vraag neemt Claude ze een voor een: hij leest de migratiegids, upgradet de package en past de code aan, en zet een hoofdversie terug als die een check breekt en er geen kleine fix is.",
+      "featureSentry": "Fouten uit Sentry",
+      "featureSentryText": "De openstaande Sentry-fouten van een project staan op zijn rij. Met Investigate zoekt Claude de oorzaak in een fixrun, met een test die faalt door die fout; Resolve sluit de issue in Sentry.",
+      "featureGuard": "Kort aan de leiband",
+      "featureGuardText": "Claude werkt met een vaste set tools, en git is zo afgeschermd dat hij niet kan committen, pushen of van branch wisselen. De app luistert enkel op 127.0.0.1, en een nieuwe versie installeert zichzelf pas als haar handtekening klopt.",
+      "alt": "Project Updater met mijn projecten en hun beveiligingsadviezen, updates en nieuwe hoofdversies",
+      "shotLabel": "mijn projecten, na een controle"
+    },
+    "sift": {
+      "tagline": "Mijn eigen lichte Git-client: nakijken, stagen en committen",
+      "role": "Waar ik nakijk, stage en commit wat er veranderde",
+      "why1": "Ik gebruikte PhpStorm voor de diffweergave en om te committen, en Sublime Merge om te mergen en om door branches en de laatste commits te bladeren: voor diffs en de git log heb ik liever een goede interface dan de terminal.",
+      "why2": "Sinds de opkomst van AI open ik PhpStorm amper nog: ik werk in de terminal, met AI-agents. Een hele IDE opstarten om alleen een diff te bekijken, te committen en te pushen, was veel te veel. Dus voegde ik die twee samen in één lichte tool van mezelf: Sift.",
+      "about": "Sift opent de repository waarin ik werk, rechtstreeks vanuit de terminal. Het toont wat er veranderde, laat me dingen meteen aanpassen, precies de regels stagen die in de commit horen, en committen en pushen, met de branches en de geschiedenis in hetzelfde venster. Project Updater opent er projecten met ongecommitte wijzigingen in. Het is gebouwd met Tauri, op de WebKit van de Mac zelf, dus het is klein en opent snel.",
+      "featureDiff": "Diffs naast elkaar",
+      "featureDiffText": "Wat nog niet en wat al gestaged is, zoals git diff het toont, naast elkaar of inline in de diff-editor van Monaco. Sift volgt de repository op schijf, dus een commit vanuit de terminal verschijnt vanzelf.",
+      "featureEdit": "Meteen aanpassen",
+      "featureEditText": "De rechterkant van een niet-gestagede wijziging is het bestand zelf: verbeter wat moet en bewaar met ⌘S. Bewaren staget nooit iets.",
+      "featureStage": "Een wijziging of één regel stagen",
+      "featureStageText": "De + in de marge staget één wijziging, en geselecteerde regels stagen alleen die regels, zoals git add -p. Weggooien kan je tien seconden lang ongedaan maken.",
+      "featureCommit": "Committen en pushen",
+      "featureCommitText": "Commits gaan via mijn eigen git, dus hooks en signing werken zoals in de terminal, en fetch, pull en push staan in de titelbalk. Claude Code kan het bericht schrijven, in de stijl van mijn recente commits.",
+      "featureBranches": "Branches en geschiedenis",
+      "featureBranchesText": "Elke branch en commit met zijn graph, zoals in Sublime Merge: uitchecken, mergen (het zegt eerst wat er binnenkomt en wat zou conflicteren), cherry-picken, rebasen en stashen, en conflicten in drie panelen.",
+      "featureTerminal": "Vanuit de terminal",
+      "featureTerminalText": "Het commando sift opent de repository waarin ik zit, in een tab van de Sift die al draait. Open Recent vindt elke repository die ik eerder opende, met een paar letters van de naam.",
+      "alt": "Sift met de wijzigingen die deze pagina aan mijn portfolio toevoegen, naast elkaar",
+      "shotLabel": "de wijzigingen die deze pagina toevoegen"
+    }
   }
 }

@@ -90,6 +90,22 @@ const pages: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'tools',
+    name: 'Tools',
+    component: () => import('../screens/Tools.vue'),
+    meta: {
+      title: 'Tools - Project Updater and Sift',
+      description:
+        'Robbe Saelens keeps his projects up to date with tools he built: Project Updater, which updates them with Claude Code, and Sift, a light Git client for macOS.',
+      image: '/project-updater-home.jpg',
+      nl: {
+        title: 'Tools - Project Updater en Sift',
+        description:
+          'Hoe Robbe Saelens zijn projecten bijhoudt met zelfgebouwde tools: Project Updater, die ze bijwerkt met Claude Code, en Sift, een lichte Git-client voor macOS.',
+      },
+    },
+  },
+  {
     path: 'exultadetail',
     name: 'ExultaDetail',
     component: () => import('../screens/details/Exulta.vue'),
@@ -214,6 +230,9 @@ export const routes: RouteRecordRaw[] = [
   ...redirects.map(({ from, to }): RouteRecordRaw => ({ path: from, redirect: to })),
 ]
 
+/** Room above a part of a page that a link scrolls to: the sticky header (AppHeader.vue) and some air. */
+const HEADER_ROOM = 96
+
 /**
  * Shared factory so the client entry and the prerenderer stay in sync. The
  * history is injected because the prerenderer must not touch `window`.
@@ -222,9 +241,14 @@ export function createAppRouter(history: RouterHistory): Router {
   const router = createRouter({
     history,
     routes,
-    // A new page starts at the top; back and forward return to where you were.
-    scrollBehavior(_to, _from, savedPosition) {
-      return savedPosition ?? { top: 0 }
+    // A new page starts at the top; back and forward return to where you were. A link to
+    // a part of a page (/tools#sift) goes there, clear of the sticky header.
+    scrollBehavior(to, _from, savedPosition) {
+      if (savedPosition) return savedPosition
+      if (to.hash && typeof document !== 'undefined' && document.getElementById(to.hash.slice(1))) {
+        return { el: to.hash, top: HEADER_ROOM }
+      }
+      return { top: 0 }
     },
   })
 
