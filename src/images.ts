@@ -24,12 +24,15 @@ export const FORMATS: { format: ImageFormat; type: string }[] = [
  * - phone: the phone capture over it, about a quarter of the stage, inside its frame
  * - wide: a capture as wide as its half of a split (Stable Manager's Drupal version)
  * - next: the next project's capture in the band at the end, cropped to its half
+ * - deck: the front card of a tool's captures on the tools page (ToolShots.vue): its 7/12,
+ *   less the room the cards behind it take on the right
  */
 export const SHOT_SIZES = {
   desktop: '(min-width: 1536px) 690px, (min-width: 1024px) 45vw, calc(84vw - 2.5rem)',
   phone: '(min-width: 1536px) 180px, (min-width: 1024px) 12vw, 25vw',
   wide: '(min-width: 1536px) 820px, (min-width: 1024px) 54vw, calc(100vw - 3rem)',
   next: '(min-width: 1536px) 820px, (min-width: 768px) 55vw, calc(100vw - 3rem)',
+  deck: '(min-width: 1536px) 760px, (min-width: 1024px) 50vw, calc(93vw - 3rem)',
 }
 
 /** A copy of a screenshot, or null when `src` is not one that gets copies. */

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { FIT_ROUTES, nl, ROUTES } from './routes'
+import { FIT_ROUTES, nl, ROUTES, STATES } from './routes'
 import { measureCurrentSlide } from './slides'
 
 /**
@@ -39,10 +39,10 @@ const cases = BREAKPOINTS.flatMap((bp) => [
   ...(DUTCH.includes(bp.name) ? [{ ...bp, theme: 'light' as const, dutch: true }] : []),
 ])
 
-for (const base of ROUTES) {
+for (const base of [...ROUTES, ...STATES]) {
   for (const { name, width, height, theme, dutch } of cases) {
     const route = dutch ? nl(base) : base
-    const slug = route === '/' ? 'home' : route.slice(1).replace('/', '-')
+    const slug = route === '/' ? 'home' : route.slice(1).replace('/', '-').replace('#', '-')
     test(`${slug} at ${name} ${width}x${height}${theme === 'dark' ? ' (dark)' : ''}`, async ({ browser }) => {
       const context = await browser.newContext({
         viewport: { width, height },

@@ -3,6 +3,9 @@
 // LLM crawlers get an explicit, unambiguous entity for "Robbe Saelens".
 import { localizedPath, stripLocale, type Locale } from '../localePath'
 import REPO_STATS from '../data/repo-stats.json'
+import en from '../locales/en.json'
+import nl from '../locales/nl.json'
+import { tools } from '../tools'
 import { PROJECTS, SKILLS } from './projects'
 
 const PERSON_ID = '#person'
@@ -132,6 +135,61 @@ function projectNode(site: string, path: string, title: string, description: str
   }
 }
 
+const TOOLS_PATH = '/tools'
+const MESSAGES = { en, nl }
+
+/** A text of the locale files in `lang`, as the page shows it (the tools' texts are plain, no placeholders). */
+function localeText(lang: Locale) {
+  return (key: string): string => {
+    const value = key
+      .split('.')
+      .reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], MESSAGES[lang])
+    if (typeof value !== 'string') throw new Error(`[jsonld] no ${lang} text for "${key}"`)
+    return value
+  }
+}
+
+/**
+ * The tools page (src/tools.ts): each tool as a SoftwareApplication, a macOS developer
+ * tool, in the page's language. Their repositories are private for now: a public one
+ * would go in as its code (codeRepository).
+ */
+function toolsNode(site: string, path: string, lang: Locale) {
+  if (stripLocale(path) !== TOOLS_PATH) return null
+  const person = { '@id': `${site}/${PERSON_ID}` }
+  const list = tools(localeText(lang))
+  return {
+    '@type': 'ItemList',
+    '@id': `${site}${path}#tools`,
+    name: lang === 'nl' ? 'Tools van Robbe Saelens' : 'Tools by Robbe Saelens',
+    numberOfItems: list.length,
+    itemListElement: list.map((tool, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'SoftwareApplication',
+        '@id': `${site}${path}#${tool.id}`,
+        name: tool.name,
+        headline: tool.headline,
+        description: tool.description,
+        url: `${site}${path}#${tool.id}`,
+        image: `${site}${tool.shots[0].src}`,
+        // Every capture of its windows on the page
+        screenshot: tool.shots.map((shot) => `${site}${shot.src}`),
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: tool.platform,
+        softwareVersion: tool.version,
+        keywords: tool.stack.join(', '),
+        ...(tool.repository
+          ? { hasPart: { '@type': 'SoftwareSourceCode', codeRepository: tool.repository, author: person } }
+          : {}),
+        author: person,
+        creator: person,
+      },
+    })),
+  }
+}
+
 function breadcrumbNode(site: string, path: string, title: string, lang: Locale) {
   const base = stripLocale(path)
   if (base === '/') return null
@@ -157,7 +215,8 @@ function pageNode(site: string, path: string, title: string, description: string
   const isHome = stripLocale(path) === '/'
   const isAbout = stripLocale(path) === '/contact'
   const isProject = PROJECTS.some((p) => p.path === stripLocale(path))
-  const type = isHome || isAbout ? 'ProfilePage' : isProject ? 'ItemPage' : 'WebPage'
+  const isTools = stripLocale(path) === TOOLS_PATH
+  const type = isHome || isAbout ? 'ProfilePage' : isProject ? 'ItemPage' : isTools ? 'CollectionPage' : 'WebPage'
 
   return {
     '@type': type,
@@ -169,6 +228,7 @@ function pageNode(site: string, path: string, title: string, description: string
     about: { '@id': `${site}/${PERSON_ID}` },
     ...(isHome || isAbout ? { mainEntity: { '@id': `${site}/${PERSON_ID}` } } : {}),
     ...(isProject ? { mainEntity: { '@id': `${site}${path}#project` } } : {}),
+    ...(isTools ? { mainEntity: { '@id': `${site}${path}#tools` } } : {}),
     inLanguage: lang,
   }
 }
@@ -237,6 +297,9 @@ export function routeJsonLd(
 
   const project = projectNode(site, path, title, description, image)
   if (project) graph.push(project)
+
+  const toolList = toolsNode(site, path, lang)
+  if (toolList) graph.push(toolList)
 
   return { '@context': 'https://schema.org', '@graph': graph }
 }

@@ -293,6 +293,27 @@ for (const [path, question, url] of [
   })
 }
 
+for (const [path, question, url] of [
+  ['/', 'What is Sift?', 'robbesaelens.github.io/tools'],
+  ['/nl', 'Wat is Sift?', 'robbesaelens.github.io/nl/tools'],
+]) {
+  test(`without the AI, the tools get their own answer, pointing at the page (${path})`, async ({ page }) => {
+    await setup(page)
+    await page.route('https://chat.invalid/chat', (r) => r.abort())
+    await openChat(page, path)
+    // Sift, and Project Updater: a tool, not the projects
+    for (const [i, q] of [question, 'project updater'].entries()) {
+      await page.locator('#chat-input').fill(q)
+      await page.locator('#chat-input').press('Enter')
+      await waitForAnswer(page, i + 2)
+      const answer = page.locator('.msg--bot').last()
+      await expect(answer).toContainText(url)
+      await expect(answer).toContainText('Project Updater')
+      await expect(answer).toContainText('Sift')
+    }
+  })
+}
+
 test('AI replies are shown as text, never as HTML', async ({ page }) => {
   await setup(page)
   await fakeAi(page, () => ({ status: 200, json: { reply: '<img src=x onerror="window.pwned=1">hi', suggestions: ['<b>x</b>'] } }))

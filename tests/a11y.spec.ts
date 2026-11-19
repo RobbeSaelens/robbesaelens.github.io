@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page } from '@playwright/test'
-import { ROUTES } from './routes'
+import { ROUTES, STATES } from './routes'
 
 /**
  * Accessibility: every page (light and dark) and the open chatbot, checked against WCAG 2.1 A and AA with axe-core. Runs with the smoke
@@ -27,7 +27,7 @@ function report(violations: Awaited<ReturnType<AxeBuilder['analyze']>>['violatio
   return violations.map((v) => `${v.impact} ${v.id}: ${v.help} (${v.nodes.length}x) ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`)
 }
 
-for (const route of ROUTES) {
+for (const route of [...ROUTES, ...STATES]) {
   for (const theme of ['light', 'dark'] as const) {
     test(`a11y ${route} (${theme})`, async ({ page }) => {
       await prepare(page, theme)

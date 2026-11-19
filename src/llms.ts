@@ -9,9 +9,10 @@
  * - the router's meta: the pages, their URLs and descriptions
  * - src/projects.ts and the project pages' data (src/screens/details/data.ts), with their
  *   English texts from src/locales/en.json: every project, its status, stack and features
+ * - src/tools.ts: the tools Robbe built to maintain his projects (the tools page)
  * - src/data/repo-stats.json and src/data/drupal.json: the numbers the daily deploy refreshes
  *
- * Most important first: the profile, the projects, then the Drupal contributions. To fit
+ * Most important first: the profile, the projects, the tools, then the Drupal contributions. To fit
  * the budget, numbered lists (a project's features, Stable Manager's Drupal points,
  * Scan2Talk's steps) go by title, their texts stay on the pages; and the Drupal issues,
  * which grow every day, fill what is left, latest first, pointing to /drupal for the rest.
@@ -28,6 +29,7 @@ import en from './locales/en.json'
 import { routes } from './bootstrap/router'
 import { PROJECT_PAGES, type ProjectEntry } from './projects'
 import { PROJECT_DATA, scan2talkCheckIn, stableManagerDrupal } from './screens/details/data'
+import { tools as toolData } from './tools'
 import type { IndexItem } from './components/project/project'
 import { absoluteUrl } from './site'
 
@@ -65,7 +67,8 @@ const pageUrl = (route: RouteRecordRaw) => absoluteUrl(`/${route.path}`)
 
 /**
  * The pages but the projects' (those are under Projects). The home page and a page with
- * a section of its own here (Projects, Drupal contributions) go without their description.
+ * a section of its own here (Projects, Tools, Drupal contributions: by title or by route
+ * name) go without their description.
  */
 function pages(sections: Set<string>): string {
   const projectRoutes = new Set(PROJECT_PAGES.map((project) => project.route))
@@ -73,7 +76,8 @@ function pages(sections: Set<string>): string {
     .filter((route) => !projectRoutes.has(String(route.name)))
     .map((route) => {
       const link = `[${route.path ? route.meta.title : String(route.name)}](${pageUrl(route)})`
-      return route.path && !sections.has(route.meta.title) ? `${link}: ${route.meta.description}` : link
+      const ownSection = sections.has(route.meta.title) || sections.has(String(route.name))
+      return route.path && !ownSection ? `${link}: ${route.meta.description}` : link
     })
   return `${list(rows)}\n\nEvery page is also in Dutch, under /nl (${absoluteUrl('/nl/projects')}).`
 }
@@ -145,6 +149,40 @@ function projects(): string {
     "In the order of the projects page. The texts are Robbe's own, in the first person; each page explains the features in full. " +
       `Repositories are private unless noted, numbers as of ${longDay(repoStats.generatedAt)}.`,
     ...PROJECT_PAGES.map(project),
+  ].join('\n\n')
+}
+
+/**
+ * The tools page: each tool, its headline, status and stack, what it does (its points),
+ * its story (how an update runs, or why Sift exists) and its description.
+ */
+function tools(): string {
+  const route = pageRoutes.find((page) => page.name === 'Tools')
+  if (!route) throw new Error('[llms] no English route named Tools')
+  return [
+    `Two Mac apps Robbe built to maintain his projects, on the tools page: ${pageUrl(route)} (Sift: ${pageUrl(route)}#sift). The texts are his own, in the first person.`,
+    ...toolData(t).map((tool) => {
+      const { story } = tool
+      const told =
+        story.kind === 'pipeline'
+          ? `${story.title}: ${story.steps.map((step) => `${step.title} (${step.text})`).join(' → ')}, ${story.or}`
+          : `${story.title}: ${story.from.map((app) => `${app.title} (${app.text})`).join(' + ')} → ${story.to.title} (${story.to.text}). ${story.caption}`
+      return [
+        [
+          `### ${tool.name}`,
+          tool.headline,
+          list([
+            `Status: ${tool.platform} app, version ${tool.version}, ${
+              tool.repository ? `open source: ${tool.repository}` : 'private repository for now'
+            }`,
+            `Built with: ${tool.stack.join(', ')}`,
+            `What it does: ${tool.points.map((point) => point.text).join('; ')}`,
+            told,
+          ]),
+        ].join('\n'),
+        tool.description,
+      ].join('\n\n')
+    }),
   ].join('\n\n')
 }
 
@@ -238,6 +276,21 @@ function drupalContributions(issues: string[], shown: number): string {
     .join('\n')
 }
 
+/**
+ * "Born: 2000" gets the age it means at build time ("25 or 26 years old as of November
+ * 2026"): the AI doesn't know today's date, so it can't work that out itself. Deploys run
+ * every morning, so it stays current.
+ */
+function withAge(text: string): string {
+  const now = new Date()
+  const year = Number(now.toLocaleDateString('en-GB', { year: 'numeric', timeZone: 'Europe/Brussels' }))
+  const asOf = now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'Europe/Brussels' })
+  return text.replace(/^- Born: (\d{4})$/m, (line, born) => {
+    const age = year - Number(born)
+    return `${line} (${age - 1} or ${age} years old as of ${asOf})`
+  })
+}
+
 /** The profile without its comments: the part before its first section, and its sections by heading. */
 function profileParts() {
   const [head, ...parts] = profile.replace(/<!--[\s\S]*?-->/g, '').split(/^(?=## )/m)
@@ -264,10 +317,11 @@ export interface Llms {
  */
 export function llms(): Llms {
   const { head, sections } = profileParts()
-  const headings = ['Pages', 'Projects', 'Drupal contributions']
+  const headings = ['Pages', 'Projects', 'Tools', 'Drupal contributions']
   const fixed = new Map([
     ['Pages', pages(new Set(headings))],
     ['Projects', projects()],
+    ['Tools', tools()],
   ])
   const issues = drupalIssues()
 
@@ -281,7 +335,7 @@ export function llms(): Llms {
       const body = [sections.get(heading), generated.get(heading)].filter(Boolean).join('\n\n')
       out.push(`## ${heading}\n\n${body}`)
     }
-    const text = `${out.join('\n\n')}\n`
+    const text = withAge(`${out.join('\n\n')}\n`)
     return { text, size: text.trim().length, issuesShown: shown, issues: issues.length }
   }
 

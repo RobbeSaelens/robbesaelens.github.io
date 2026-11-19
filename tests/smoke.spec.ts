@@ -14,7 +14,7 @@ import { measureCurrentSlide, SLIDES } from './slides'
 // as "scan2talk.be" and "drupal.org" and file names like "privacy.md" look
 // similar, so those endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects?|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects?|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal|tools)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
 
 /** Pages without images. */
 const TEXT_ONLY = ['/privacy', '/drupal']
@@ -230,6 +230,8 @@ test.describe('llms.txt', () => {
     ]) {
       expect(text).toContain(fact)
     }
+    // The age the year means, worked out at build time (the AI doesn't know the date)
+    expect(text).toMatch(/- Born: 2000 \(\d+ or \d+ years old as of [A-Z][a-z]+ \d{4}\)/)
   })
 
   test('holds every project, with its pages, features, stack and repository numbers', async ({ request }) => {
@@ -257,9 +259,39 @@ test.describe('llms.txt', () => {
     for (const [key, repo] of Object.entries(stats.projects) as [string, { commits: number; commitsLast30Days: number }][]) {
       expect(text, key).toContain(`${repo.commits} commits, ${repo.commitsLast30Days} in the last 30 days, active since`)
     }
-    for (const page of ['/contact', '/drupal', '/privacy', '/projects']) {
+    for (const page of ['/contact', '/drupal', '/privacy', '/projects', '/tools']) {
       expect(text).toContain(`](https://robbesaelens.github.io${page})`)
     }
+  })
+
+  test('holds the tools: what they are and do, their story, and that their code is private', async ({ request }) => {
+    const text = await llms(request)
+    const headings = [...text.matchAll(/^## (.+)$/gm)].map((m) => m[1])
+    expect(headings.indexOf('Tools')).toBe(headings.indexOf('Projects') + 1)
+    expect(text).toContain('https://robbesaelens.github.io/tools')
+    expect(text).toContain('https://robbesaelens.github.io/tools#sift')
+    for (const [name, ns] of [
+      ['Project Updater', 'updater'],
+      ['Sift', 'sift'],
+    ] as const) {
+      const tool = en.tools[ns] as Record<string, string>
+      expect(text).toContain(`### ${name}\n${tool.headline}\n`)
+      expect(text).toContain(tool.description)
+      for (const key of Object.keys(tool).filter((key) => key.startsWith('point'))) expect(text, `${ns}.${key}`).toContain(tool[key])
+    }
+    expect(text).toMatch(/Status: macOS app, version \d+\.\d+\.\d+, private repository for now/)
+    // How an update runs, step by step
+    const updater = en.tools.updater as Record<string, string>
+    expect(text).toContain(`${updater.storyTitle}: ${updater.stepScan} (${updater.stepScanText}) → ${updater.stepUpdate}`)
+    // Sift's story, in Robbe's words
+    expect(text).toContain('PhpStorm (diffs & commits) + Sublime Merge (branches & history) → Sift')
+    expect(text).toContain(en.tools.sift.storyCaption)
+    // Its AI and Teamwork features, exactly
+    expect(text).toContain('Write with AI has Claude Code write the commit message')
+    expect(text).toContain('at most $0.25')
+    expect(text).toContain('Teamwork task')
+    // Private: no link to either repository
+    expect(text).not.toMatch(/github\.com\/RobbeSaelens\/(?:Project-Updater|project-updater|Sift|sift)\b/i)
   })
 
   test('holds the Drupal contributions: the counts and every issue, or points to the rest', async ({ request }) => {
@@ -410,6 +442,242 @@ test('Stable Manager shows its Drupal version, with the public repository and it
   expect(errors).toEqual([])
 })
 
+// The tools page: the two Mac apps Robbe built to maintain his projects (src/tools.ts),
+// one at a time behind a switch whose hash picks the tool (/tools#sift). Each chapter: its
+// status, a headline and a sentence, four points, its captures as a deck, its story, what
+// it's made with and the other tool. Their repositories are private, so nothing links to them.
+test.describe('tools page', () => {
+  const TOOLS = [
+    {
+      id: 'project-updater',
+      name: 'Project Updater',
+      shots: ['projects', 'updates', 'security', 'review'].map((view) => `/project-updater-${view}-home.jpg`),
+      points: 4,
+      story: 5,
+    },
+    {
+      id: 'sift',
+      name: 'Sift',
+      shots: ['diff', 'stage', 'branches', 'commit'].map((view) => `/sift-${view}-home.jpg`),
+      points: 6,
+      story: 3,
+    },
+  ] as const
+
+  /** The tool shown: its tab is selected, its chapter visible, the other's hidden */
+  async function shows(page: Page, id: string) {
+    await expect(page.locator(`[role="tab"][aria-selected="true"]`)).toHaveAttribute('id', id)
+    for (const tool of TOOLS) {
+      const panel = page.locator(`#${tool.id}-panel`)
+      if (tool.id === id) await expect(panel).toBeVisible()
+      else await expect(panel).toBeHidden()
+    }
+  }
+
+  for (const [route, privately, projects] of [
+    ['/tools', 'Private for now', '/projects'],
+    ['/nl/tools', 'Voorlopig privé', '/nl/projects'],
+  ] as const) {
+    test(`${route} shows a tool at a time: status, headline, points, captures, story, stack, no repository link`, async ({ page }) => {
+      const errors = await guard(page)
+      await open(page, route)
+      await expect(page.locator('h1')).toContainText('tools')
+
+      const tabs = page.getByRole('tab')
+      await expect(tabs).toHaveCount(TOOLS.length)
+      for (const [i, tool] of TOOLS.entries()) {
+        await expect(tabs.nth(i)).toHaveAttribute('href', `#${tool.id}`)
+        await expect(tabs.nth(i)).toContainText(tool.name)
+        await expect(tabs.nth(i)).toHaveAttribute('aria-controls', `${tool.id}-panel`)
+      }
+      // The first one, until another is picked
+      await shows(page, 'project-updater')
+
+      for (const tool of TOOLS) {
+        if (tool.id !== 'project-updater') await tabs.filter({ hasText: tool.name }).click()
+        await shows(page, tool.id)
+        const panel = page.getByRole('tabpanel', { name: tool.name, exact: true })
+        await expect(panel).toHaveAttribute('id', `${tool.id}-panel`)
+        await expect(panel.locator('.tool-version')).toHaveText(/^v\d+\.\d+\.\d+$/)
+        await expect(panel.locator('.tool-status')).toContainText('macOS')
+        await expect(panel.locator('.tool-status')).toContainText(privately)
+        await expect(panel.locator('.tool-headline')).not.toBeEmpty()
+        await expect(panel.locator('.tool-summary')).not.toBeEmpty()
+        // Short: one sentence, and a few points of a few words
+        expect((await panel.locator('.tool-summary').innerText()).split(/[.!?](?:\s|$)/).filter(Boolean)).toHaveLength(1)
+        const points = panel.locator('.tool-point')
+        await expect(points).toHaveCount(tool.points)
+        for (const point of await points.all()) {
+          expect((await point.innerText()).split(/\s+/).length).toBeLessThanOrEqual(9)
+          await expect(point.locator('svg')).toHaveCount(1)
+        }
+        // Its captures, as buttons with pictures, in their order
+        const shots = panel.locator('.tool-deck button.shot img')
+        await expect(shots).toHaveCount(tool.shots.length)
+        for (const [i, src] of tool.shots.entries()) await expect(shots.nth(i)).toHaveAttribute('src', src)
+        await expect(panel.locator('.deck-label')).not.toBeEmpty()
+        // Its story, step by step or card by card
+        await expect(panel.locator('.flow-step, .merge-card:not(.merge-ghost)')).toHaveCount(tool.story)
+        expect(await panel.locator('.tag-pill').count()).toBeGreaterThan(5)
+        // The other tool, as a card that picks it
+        const other = TOOLS.find((t) => t.id !== tool.id)!
+        await expect(panel.locator('.tool-next')).toHaveAttribute('href', `#${other.id}`)
+        await expect(panel.locator('.tool-next')).toContainText(other.name)
+        await expect(panel.locator('.project-all')).toHaveAttribute('href', projects)
+      }
+      // Sift's story: one light tool instead of PhpStorm and Sublime Merge, by name only
+      const story = page.locator('#sift-panel .merge')
+      await expect(story).toContainText('PhpStorm')
+      await expect(story).toContainText('Sublime Merge')
+      await expect(story.locator('img')).toHaveCount(0)
+
+      // Private for now: no link to either repository, or to GitHub at all
+      await expect(page.locator('#main-content a[href*="github.com"]')).toHaveCount(0)
+      expect(errors).toEqual([])
+    })
+  }
+
+  test('the switch: a click or the arrow keys pick a tool, the URL says which, the page stays put', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/tools')
+    await page.getByRole('tab', { name: /Sift/ }).click()
+    await expect(page).toHaveURL(/\/tools#sift$/)
+    await shows(page, 'sift')
+    expect(await page.evaluate(() => scrollY)).toBe(0)
+
+    // Tabs: the arrows move and pick, only the picked one is a tab stop
+    await page.getByRole('tab', { name: /Sift/ }).focus()
+    await page.keyboard.press('ArrowLeft')
+    await shows(page, 'project-updater')
+    await expect(page.getByRole('tab', { name: /Project Updater/ })).toBeFocused()
+    await expect(page).toHaveURL(/\/tools#project-updater$/)
+    await expect(page.getByRole('tab', { name: /Sift/ })).toHaveAttribute('tabindex', '-1')
+    await page.keyboard.press('End')
+    await shows(page, 'sift')
+    await page.keyboard.press('Home')
+    await shows(page, 'project-updater')
+    expect(errors).toEqual([])
+  })
+
+  test('a link to a tool opens the page at its top, with that tool shown; back and forward follow', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/nl/tools#sift')
+    await shows(page, 'sift')
+    expect(await page.evaluate(() => scrollY)).toBe(0)
+    await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Sift')
+
+    // From another page and back
+    await page.getByRole('tab', { name: /Project Updater/ }).click()
+    await shows(page, 'project-updater')
+    await page.locator('#project-updater-panel .project-all').click()
+    await expect(page).toHaveURL(/\/nl\/projects$/)
+    await page.goBack()
+    await shows(page, 'project-updater')
+    expect(errors).toEqual([])
+  })
+
+  test('before the app runs, the hash picks the tool too (the prerendered page)', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false })
+    const page = await context.newPage()
+    await page.goto('/tools#sift')
+    await expect(page.locator('#sift-panel')).toBeVisible()
+    await expect(page.locator('#project-updater-panel')).toBeHidden()
+    expect(await page.evaluate(() => scrollY)).toBe(0)
+    // The tabs are plain links then
+    await page.locator('a#project-updater').click()
+    await expect(page.locator('#project-updater-panel')).toBeVisible()
+    await expect(page.locator('#sift-panel')).toBeHidden()
+    await context.close()
+  })
+
+  test('the switch sticks under the header; picking from it starts the other tool at its top', async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/tools')
+    await page.locator('#project-updater-panel .tool-story').scrollIntoViewIfNeeded()
+    const header = await page.locator('.site-header').boundingBox()
+    const bar = page.locator('.tool-switch')
+    await expect.poll(async () => (await bar.boundingBox())!.y).toBeGreaterThanOrEqual(header!.y + header!.height - 1)
+    expect((await bar.boundingBox())!.y).toBeLessThan(header!.y + header!.height + 24)
+    // Where it is on screen (a locator's click would first scroll the page to the tab's place in it)
+    const tab = (await page.getByRole('tab', { name: /Sift/ }).boundingBox())!
+    await page.mouse.click(tab.x + tab.width / 2, tab.y + tab.height / 2)
+    await shows(page, 'sift')
+    const top = await page.locator('#sift-panel').boundingBox()
+    const below = (await bar.boundingBox())!
+    expect(top!.y).toBeGreaterThanOrEqual(below.y + below.height)
+    expect(top!.y).toBeLessThanOrEqual(below.y + below.height + 48)
+    expect(errors).toEqual([])
+  })
+
+  test("the other tool's card picks it, from its top, with the focus on its name", async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/tools')
+    await page.locator('#project-updater-panel .tool-next').click()
+    await shows(page, 'sift')
+    await expect(page).toHaveURL(/\/tools#sift$/)
+    await expect(page.locator('#sift-title')).toBeFocused()
+    const top = (await page.locator('#sift-panel').boundingBox())!.y
+    expect(top).toBeGreaterThan(0)
+    expect(top).toBeLessThan(400)
+    expect(errors).toEqual([])
+  })
+
+  test("each capture opens in the lightbox, with the tool's others", async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/tools')
+    const dialog = page.getByRole('dialog')
+    const shown = () => dialog.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.currentSrc)
+    for (const tool of TOOLS) {
+      await page.getByRole('tab', { name: new RegExp(tool.name) }).click()
+      // The front card: a tab stop and a click; the others only for screen readers
+      const front = page.locator(`#${tool.id}-panel .deck-shot:not([tabindex="-1"])`)
+      await expect(front).toHaveCount(1)
+      await front.click()
+      await expect(dialog.locator('.lightbox-caption')).toContainText(`${tool.name} — `)
+      await expect(dialog.locator('.lightbox-count')).toHaveText(new RegExp(`^\\d / ${tool.shots.length}$`))
+      // The full-size copy, AVIF where the browser has it
+      await expect.poll(shown).toMatch(new RegExp(`/img/${tool.id}-[a-z]+-home\\.avif$`))
+      await page.keyboard.press('ArrowRight')
+      await expect.poll(shown).toMatch(/-home\.avif$/)
+      await page.keyboard.press('Escape')
+      await expect(dialog).toBeHidden()
+    }
+    expect(errors).toEqual([])
+  })
+
+  test('the first capture loads first, every other lazily, all from the prerendered HTML', async ({ request }) => {
+    const html = await (await request.get('/tools')).text()
+    const [first, ...rest] = html.match(/<img\b[^>]*>/g) ?? []
+    expect(rest.length).toBeGreaterThanOrEqual(7)
+    expect(first).toContain('src="/project-updater-projects-home.jpg"')
+    expect(first).toContain('fetchpriority="high"')
+    expect(first).not.toContain('loading="lazy"')
+    for (const img of rest) expect(img).toContain('loading="lazy"')
+    // Every capture of both tools, with its alt text, and the tabs as links
+    for (const tool of TOOLS) {
+      for (const src of tool.shots) expect(html).toMatch(new RegExp(`<img[^>]*src="${src}"[^>]*alt="[^"]{20,}"|<img[^>]*alt="[^"]{20,}"[^>]*src="${src}"`))
+      expect(html).toMatch(new RegExp(`<a[^>]*id="${tool.id}"[^>]*role="tab"|<a[^>]*role="tab"[^>]*id="${tool.id}"`))
+    }
+  })
+
+  test('the main navigation links to it, next to the projects', async ({ page, isMobile }) => {
+    await guard(page)
+    await open(page, '/tools')
+    if (isMobile) {
+      await openMenuIfCollapsed(page)
+      const links = page.locator('#mobile-menu .mobile-link')
+      await expect(links).toHaveText([/Home/, /Projects/, /Tools/, /About me/, /Drupal/])
+      await expect(links.nth(2)).toHaveAttribute('href', '/tools')
+      await expect(links.nth(2)).toHaveClass(/is-current/)
+    } else {
+      const links = page.locator('.nav-links .nav-link')
+      await expect(links).toHaveText([/Projects/, /Tools/, /About me/])
+      await expect(links.nth(1)).toHaveAttribute('href', '/tools')
+      await expect(links.nth(1)).toHaveClass(/is-current/)
+    }
+  })
+})
+
 // The four project pages are one template (src/components/project/ProjectPage.vue) with
 // each page's data: the same sections in the same order, a page's own block in its slot,
 // and at the end the next project in the order of the projects page.
@@ -472,6 +740,7 @@ test.describe('project page template', () => {
       await link.scrollIntoViewIfNeeded()
       await expect(link.locator('img')).toHaveAttribute('loading', 'lazy')
       await expect(end.getByRole('link', { name: 'All projects' })).toHaveAttribute('href', '/projects')
+      await expect(end.getByRole('link', { name: 'How I maintain them' })).toHaveAttribute('href', '/tools')
       expect(await top(end)).toBeGreaterThan(await top(page.locator('.repo').last()))
       expect(errors).toEqual([])
     })
@@ -868,7 +1137,7 @@ test.describe('project page screenshots', () => {
   // Each screenshot is a <picture>: the AVIF and WebP copies at two widths that the build
   // makes (scripts/images.mjs), with the JPG as the fallback. Its width and height are the
   // JPG's own: they hold its room while it loads and give the widths in the srcset.
-  for (const route of ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail', '/projects']) {
+  for (const route of ['/exultadetail', '/scan2talkdetail', '/stablemanagerdetail', '/vhsdetail', '/projects', '/tools']) {
     test(`${route} shows its screenshots as AVIF or WebP, at their JPG's real size`, async ({ page }) => {
       await open(page, route)
       const shots = await page.locator('#app picture').evaluateAll((pictures) =>
@@ -959,6 +1228,47 @@ test.describe('project structured data', () => {
         for (const ref of refs) expect(byId.has(ref), ref).toBe(true)
       })
     }
+  }
+})
+
+// The tools page's structured data: each tool a SoftwareApplication for macOS, in the
+// page's language, by Robbe; no code repository while they're private.
+test.describe('tools structured data', () => {
+  const unescape = (text: string) => text.replace(/&amp;/g, '&').replace(/&#39;/g, "'")
+  for (const url of ['/tools', '/nl/tools']) {
+    test(`${url} describes both tools as SoftwareApplications`, async ({ request }) => {
+      const html = await (await request.get(url)).text()
+      const json = unescape(html.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)![1])
+      const graph: Record<string, any>[] = JSON.parse(json)['@graph']
+      const byId = new Map(graph.map((node) => [node['@id'], node]))
+      const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)![1]
+
+      const page = byId.get(`${canonical}#webpage`)!
+      expect(page['@type']).toBe('CollectionPage')
+      expect(page.inLanguage).toBe(url.startsWith('/nl') ? 'nl' : 'en')
+      expect(page.mainEntity['@id']).toBe(`${canonical}#tools`)
+
+      const list = byId.get(`${canonical}#tools`)!
+      expect(list['@type']).toBe('ItemList')
+      const apps: Record<string, any>[] = list.itemListElement.map((entry: { item: unknown }) => entry.item)
+      expect(apps.map((app) => app.name)).toEqual(['Project Updater', 'Sift'])
+      for (const app of apps) {
+        expect(app['@type']).toBe('SoftwareApplication')
+        expect(app.operatingSystem).toBe('macOS')
+        expect(app.applicationCategory).toBe('DeveloperApplication')
+        expect(app.softwareVersion).toMatch(/^\d+\.\d+\.\d+$/)
+        expect(app.url).toBe(app['@id'])
+        expect(app.url.startsWith(`${canonical}#`)).toBe(true)
+        expect(app.image).toMatch(/^https:\/\/robbesaelens\.github\.io\/[\w-]+-home\.jpg$/)
+        expect(app.screenshot).toHaveLength(4)
+        expect(app.screenshot[0]).toBe(app.image)
+        expect(app.description.length).toBeGreaterThan(80)
+        expect(byId.get(app.author['@id'])!['@type']).toBe('Person')
+        expect(JSON.stringify(app)).not.toContain('codeRepository')
+      }
+      // In the page's language
+      expect(apps[1].description).toContain(url.startsWith('/nl') ? 'rechtstreeks vanuit de terminal' : 'straight from the terminal')
+    })
   }
 })
 
