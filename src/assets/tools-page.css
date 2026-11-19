@@ -204,3 +204,11 @@
 .tools-page .tools-end {
   display: grid;
 }
+
+/* Phones: the fixed chat button (3rem wide, 1.5rem from the right edge) sits over the
+   rows' arrows at the bottom of the first screen; keep them clear of it. */
+@media (max-width: 639px) {
+  .tools-page .tools-link {
+    padding-right: 3.75rem;
+  }
+}
