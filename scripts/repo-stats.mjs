@@ -15,7 +15,7 @@
 // output names projects by their page, never by repository, because a CI log
 // of this public repository is public too.
 
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -35,6 +35,12 @@ const PROJECTS = {
   stableManager: 'stal-manager',
   vhs: 'VHS',
   sharedCosts: 'shared_costs',
+}
+
+/** The tools on /tools (src/tools.ts) → repository: only their latest release is read. */
+const TOOLS = {
+  projectUpdater: 'Project-Updater',
+  sift: 'Sift',
 }
 
 const WEEKS = 26
@@ -137,6 +143,27 @@ for (const [page, repo] of Object.entries(PROJECTS)) {
   console.log(`${page}: ${projects[page].commits} commits, ${projects[page].commitsLast30Days} in the last 30 days`)
 }
 
+// The tools on /tools (src/tools.ts): their latest release, so the page's version follows
+// each release without an edit. On its own: when it fails, the versions from the
+// committed file stay and the numbers above are still written.
+const tools = {}
+let previousTools = {}
+try {
+  previousTools = JSON.parse(readFileSync(OUT, 'utf8')).tools ?? {}
+} catch {
+  // no committed file yet
+}
+for (const [page, repo] of Object.entries(TOOLS)) {
+  try {
+    const { json } = await api(`/repos/${OWNER}/${repo}/releases/latest`, token)
+    tools[page] = { version: String(json.tag_name).replace(/^v/, ''), released: json.published_at }
+    console.log(`${page}: release ${tools[page].version}`)
+  } catch (error) {
+    if (previousTools[page]) tools[page] = previousTools[page]
+    console.error(`::warning::Latest release not fetched (${page}: ${error.message}), keeping the committed one.`)
+  }
+}
+
 mkdirSync(dirname(OUT), { recursive: true })
-writeFileSync(OUT, `${JSON.stringify({ generatedAt: new Date().toISOString(), projects }, null, 2)}\n`)
+writeFileSync(OUT, `${JSON.stringify({ generatedAt: new Date().toISOString(), projects, tools }, null, 2)}\n`)
 console.log(`wrote ${OUT.replace(`${ROOT}/`, '')}`)
