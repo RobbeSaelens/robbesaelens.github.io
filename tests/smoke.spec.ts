@@ -259,9 +259,32 @@ test.describe('llms.txt', () => {
     for (const [key, repo] of Object.entries(stats.projects) as [string, { commits: number; commitsLast30Days: number }][]) {
       expect(text, key).toContain(`${repo.commits} commits, ${repo.commitsLast30Days} in the last 30 days, active since`)
     }
-    for (const page of ['/contact', '/drupal', '/privacy', '/projects']) {
+    for (const page of ['/contact', '/drupal', '/privacy', '/projects', '/tools']) {
       expect(text).toContain(`](https://robbesaelens.github.io${page})`)
     }
+  })
+
+  test('holds the tools, with what they do, why, and that their code is private', async ({ request }) => {
+    const text = await llms(request)
+    const headings = [...text.matchAll(/^## (.+)$/gm)].map((m) => m[1])
+    expect(headings.indexOf('Tools')).toBe(headings.indexOf('Projects') + 1)
+    expect(text).toContain('https://robbesaelens.github.io/tools')
+    for (const [name, ns] of [
+      ['Project Updater', 'updater'],
+      ['Sift', 'sift'],
+    ] as const) {
+      expect(text).toContain(`### ${name}\n${en.tools[ns].tagline}.`)
+      expect(text).toContain(en.tools[ns].about)
+      const titles = Object.keys(en.tools[ns]).filter((key) => key.startsWith('feature') && `${key}Text` in en.tools[ns])
+      expect(titles).toHaveLength(6)
+      for (const key of titles) expect(text, `${ns}.${key}`).toContain(en.tools[ns][key])
+    }
+    expect(text).toMatch(/Status: macOS app, version \d+\.\d+\.\d+, private repository for now/)
+    // Sift's story, in Robbe's words
+    expect(text).toContain(en.tools.sift.why1)
+    expect(text).toContain(en.tools.sift.why2)
+    // Private: no link to either repository
+    expect(text).not.toMatch(/github\.com\/RobbeSaelens\/(?:Project-Updater|project-updater|Sift|sift)\b/i)
   })
 
   test('holds the Drupal contributions: the counts and every issue, or points to the rest', async ({ request }) => {

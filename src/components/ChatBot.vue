@@ -139,6 +139,27 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
     ],
     responseKey: 'chat.skills',
   },
+  // The tools he built to keep his projects up to date (the tools page). Before the
+  // projects: "project updater" holds "project", and "scans" holds "scan" (Scan2Talk).
+  {
+    keys: [
+      'sift',
+      'project updater',
+      'project-updater',
+      'updater',
+      'tools',
+      'tool',
+      'git client',
+      'phpstorm',
+      'sublime',
+      'maintain',
+      'onderhou',
+      'up to date',
+      'up-to-date',
+      'bijhoud',
+    ],
+    responseKey: 'chat.tools',
+  },
   // Specific project names → dedicated responses
   { keys: ['exulta'], responseKey: 'chat.project-exulta' },
   { keys: ['scan2talk', 'scan', 'qr'], responseKey: 'chat.project-scan2talk' },

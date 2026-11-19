@@ -9,9 +9,10 @@
  * - the router's meta: the pages, their URLs and descriptions
  * - src/projects.ts and the project pages' data (src/screens/details/data.ts), with their
  *   English texts from src/locales/en.json: every project, its status, stack and features
+ * - src/tools.ts: the tools Robbe built to keep his projects up to date (the tools page)
  * - src/data/repo-stats.json and src/data/drupal.json: the numbers the daily deploy refreshes
  *
- * Most important first: the profile, the projects, then the Drupal contributions. To fit
+ * Most important first: the profile, the projects, the tools, then the Drupal contributions. To fit
  * the budget, numbered lists (a project's features, Stable Manager's Drupal points,
  * Scan2Talk's steps) go by title, their texts stay on the pages; and the Drupal issues,
  * which grow every day, fill what is left, latest first, pointing to /drupal for the rest.
@@ -28,6 +29,7 @@ import en from './locales/en.json'
 import { routes } from './bootstrap/router'
 import { PROJECT_PAGES, type ProjectEntry } from './projects'
 import { PROJECT_DATA, scan2talkCheckIn, stableManagerDrupal } from './screens/details/data'
+import { tools as toolData } from './tools'
 import type { IndexItem } from './components/project/project'
 import { absoluteUrl } from './site'
 
@@ -65,7 +67,8 @@ const pageUrl = (route: RouteRecordRaw) => absoluteUrl(`/${route.path}`)
 
 /**
  * The pages but the projects' (those are under Projects). The home page and a page with
- * a section of its own here (Projects, Drupal contributions) go without their description.
+ * a section of its own here (Projects, Tools, Drupal contributions: by title or by route
+ * name) go without their description.
  */
 function pages(sections: Set<string>): string {
   const projectRoutes = new Set(PROJECT_PAGES.map((project) => project.route))
@@ -73,7 +76,8 @@ function pages(sections: Set<string>): string {
     .filter((route) => !projectRoutes.has(String(route.name)))
     .map((route) => {
       const link = `[${route.path ? route.meta.title : String(route.name)}](${pageUrl(route)})`
-      return route.path && !sections.has(route.meta.title) ? `${link}: ${route.meta.description}` : link
+      const ownSection = sections.has(route.meta.title) || sections.has(String(route.name))
+      return route.path && !ownSection ? `${link}: ${route.meta.description}` : link
     })
   return `${list(rows)}\n\nEvery page is also in Dutch, under /nl (${absoluteUrl('/nl/projects')}).`
 }
@@ -145,6 +149,34 @@ function projects(): string {
     "In the order of the projects page. The texts are Robbe's own, in the first person; each page explains the features in full. " +
       `Repositories are private unless noted, numbers as of ${longDay(repoStats.generatedAt)}.`,
     ...PROJECT_PAGES.map(project),
+  ].join('\n\n')
+}
+
+/** The tools page: each tool, what it is, why, and what it does by title. */
+function tools(): string {
+  const route = pageRoutes.find((page) => page.name === 'Tools')
+  if (!route) throw new Error('[llms] no English route named Tools')
+  return [
+    `Two Mac apps Robbe built to keep his projects up to date, on the tools page: ${pageUrl(route)}. The texts are his own, in the first person.`,
+    ...toolData(t).map((tool) =>
+      [
+        [
+          `### ${tool.name}`,
+          `${tool.tagline}.`,
+          list([
+            `Status: ${tool.platform} app, version ${tool.version}, ${
+              tool.repository ? `open source: ${tool.repository}` : 'private repository for now'
+            }`,
+            `Built with: ${tool.stack.join(', ')}`,
+            `${t('tools.featuresTitle')}: ${titles(tool.features)}`,
+          ]),
+        ].join('\n'),
+        tool.about,
+        tool.why.length ? `${t('tools.whyTitle')}: ${tool.why.join(' ')}` : null,
+      ]
+        .filter(Boolean)
+        .join('\n\n'),
+    ),
   ].join('\n\n')
 }
 
@@ -279,10 +311,11 @@ export interface Llms {
  */
 export function llms(): Llms {
   const { head, sections } = profileParts()
-  const headings = ['Pages', 'Projects', 'Drupal contributions']
+  const headings = ['Pages', 'Projects', 'Tools', 'Drupal contributions']
   const fixed = new Map([
     ['Pages', pages(new Set(headings))],
     ['Projects', projects()],
+    ['Tools', tools()],
   ])
   const issues = drupalIssues()
 
