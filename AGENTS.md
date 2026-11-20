@@ -8,12 +8,13 @@ prerendered to static HTML and deployed to GitHub Pages from `main`.
 | | |
 |---|---|
 | `npm run dev` | Dev server. Port 5173 can be taken by ddev's router (Exulta); the `.claude/launch.json` preview uses `127.0.0.1:5180` |
-| `npm run build` | Screenshot copies (`npm run images`), client build, SSR build, prerender, sitemap, `llms.txt` (`npm run llms`, which prints its size) |
+| `npm run build` | Screenshot copies (`npm run images`), client build, SSR build, prerender, sitemap, `llms.txt` (`npm run llms`, which prints its size), share images (`npm run og`) |
 | `npm test` | Smoke + accessibility tests (Playwright, desktop + mobile) against the production build |
 | `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
 | `npm run images` | AVIF and WebP copies of the project screenshots (Conventions); `build` and `dev` run it first |
 | `npm run stats` | Refresh the repository numbers on the project pages, from the GitHub API with `REPO_STATS_TOKEN` (below) |
 | `npm run drupal` | Refresh the Drupal contributions page from drupal.org (below) |
+| `npm run og` | Draw the share images into `dist/og/` (Conventions); needs the SSR build, `build` runs it last |
 
 Run both test suites with `CI=1` so Playwright starts its own server instead of reusing
 a stale one. GitHub Actions runs both on every push to `develop` (`.github/workflows/test.yml`),
@@ -63,7 +64,9 @@ dark-mode contrast.
 When you add a page: add it to `tests/routes.ts` (the smoke test's sitemap check
 fails otherwise), and to `FIT_ROUTES` if its route has `meta.fit`. A page that shows
 something else by its hash (`/tools#sift`) has that state in `STATES` there, so the
-accessibility and responsive checks see it too.
+accessibility and responsive checks see it too. It gets a share image by itself; give it
+its header's title and `$ …` line in `PAGES` in `src/seo/shareCards.ts` (the smoke tests
+compare them with the page).
 
 When you change a page's URL, keep the old one working: add it to `REDIRECTS` in
 `src/bootstrap/router.ts` and to `MOVED` in `tests/routes.ts`.
@@ -322,7 +325,7 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   width, into `public/img/` (gitignored; Vite copies it into `dist/`). So a screenshot is
   still one JPG: replace it and the copies follow. Pages show a screenshot through
   `ShotPicture.vue` (a `<picture>`: the copies in a `srcset`, the JPG as the fallback),
-  never a bare `<img>`; the JPG stays the `og:image`. Give it the JPG's real `width` and
+  never a bare `<img>`. Give it the JPG's real `width` and
   `height` (they hold its room while it loads and give the widths of the copies) and
   `sizes` (`SHOT_SIZES` in `src/images.ts`, the MacBook's in `MacBook3D.vue`). A phone
   screenshot of another size needs its new `width` and `height` on the page, or the smoke
@@ -334,9 +337,46 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   fetches them straight from the prerendered HTML. Every image further down stays
   `loading="lazy"` (the smoke tests check both).
 - Each project page's JSON-LD (`src/seo/jsonld.ts`) describes the project itself: a
-  `WebSite` or a `WebApplication` with the page's own title, description and `og:image`,
-  in the page's language, plus what `src/seo/projects.ts` holds (live site, stack,
+  `WebSite` or a `WebApplication` with the page's own title and description, in the page's
+  language, its real screenshot as its `image` (the route's `meta.image`; not the share
+  image, which is about the page, not the work), plus what `src/seo/projects.ts` holds (live site, stack,
   programming languages, and the `repo-stats.json` key whose first commit is its
   `dateCreated`). A new project page needs an entry there; the smoke tests read the
   JSON-LD back from the prerendered HTML in both languages.
+- Share images (Open Graph): what a link to a page shows on LinkedIn, Teams, WhatsApp,
+  Slack and the like. Every page has its own in each language, `dist/og/<page>.png`
+  (`/og/index.png`, `/og/nl/tools.png`: `shareImagePath` in `src/seo/share.ts`), a
+  1200 × 630 PNG in the site's dark theme: the logo and the page's address on top, the
+  page's terminal title and `$ …` line, its tagline (a project) or a short line (projects,
+  tools) or its meta description, and real pictures beside them: a project's two
+  screenshots in a browser and on a phone (as at the top of its page), all projects'
+  screenshots, the tools' first captures as a deck, Robbe's photo (home), the about page's
+  two photos; any other page, also a new one, is text only.
+  - What is on each card is `src/seo/shareCards.ts`, from the site's own data (the router's
+    pages and meta, the project pages' data, `src/tools.ts`, the locale files), so new
+    pages, projects and texts need nothing there; only the title and `$` line of a page with
+    a header of its own are written in `PAGES` there, as in its template.
+  - How they look is `scripts/og.mjs` (`npm run og`, the last step of `build`): its
+    `COLOR` (the dark theme's tokens), the building blocks (title, `$` line, browser,
+    phone, app window, chip) and a layout per kind (`LAYOUTS`; `shareKind` in
+    `src/seo/share.ts` picks it). It lays them out with satori (flexbox, a subset of CSS:
+    every `div` is a flex box) into an SVG with the text as paths, and sharp draws that as a
+    PNG of 256 colours (a third of the size, no visible difference; keep each under
+    300 KB, the smoke tests check it: some previews skip large images). The fonts come
+    from npm (`@fontsource/jetbrains-mono` and `@fontsource/inter`, SIL Open Font
+    License), never fetched, so the build draws the same cards locally and on GitHub
+    Actions; the logo is `BrandLogo.vue`'s paths. A drawn card is kept in
+    `node_modules/.cache/og/` by a hash of all that goes into it: a build draws only what
+    changed (all 20 take about 3 s).
+  - After changing the design, run `npm run build:ssr && npm run og` and open the PNGs
+    in `dist/og/`, each language: text that wraps badly, runs into a picture or past the
+    margins; and at 300 px wide, as a feed shows them: the title and the picture must
+    still read.
+  - The head (`App.vue`) points `og:image` and `twitter:image` at the page's image, with
+    its size, type and alt text (the page's title and what the picture shows: `share.*`
+    in the locale files); the not-found page shares the home page's. The JSON-LD keeps
+    naming the real pictures (Robbe's photo, a project's screenshot, the tools' captures).
+  - Link previews are cached by the sites that show them: after a deploy, LinkedIn's Post
+    Inspector (linkedin.com/post-inspector) and Facebook's Sharing Debugger fetch a page
+    again; Slack and Teams refresh by themselves after a while.
 - No secrets or private tooling in this repo: it is public.

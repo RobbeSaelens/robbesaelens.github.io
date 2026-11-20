@@ -15,6 +15,10 @@ import TerminalCommand from './components/TerminalCommand.vue'
 /** /llms.txt, for the chatbot: scripts/llms.mjs writes it into dist/ */
 export { LLMS_MAX_CHARS, llms } from './llms'
 
+/** The share images' cards: scripts/og.mjs draws them into dist/og/ */
+export { SHARE_IMAGE } from './seo/share'
+export { shareCards, shareLogo } from './seo/shareCards'
+
 const staticRoutes = routes
   .flatMap((route) => route.children ?? [route])
   .filter((route) => !route.path.includes(':') && !route.redirect)

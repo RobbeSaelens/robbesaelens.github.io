@@ -484,5 +484,12 @@
       "shotCommit": "the commit box: Write with AI, a Teamwork task",
       "altCommit": "Sift with five files staged, one of them shown, and a commit message ready to commit, with the Teamwork task line and the Write with AI button above and beside it"
     }
+  },
+  "share": {
+    "photo": "With a photo of Robbe Saelens.",
+    "photos": "With two photos of Robbe: teaching equestrian sports, and show jumping.",
+    "project": "With screenshots of {name} in a browser and on a phone.",
+    "projects": "With screenshots of his projects.",
+    "tools": "With captures of Project Updater and Sift, the two Mac apps he built."
   }
 }
