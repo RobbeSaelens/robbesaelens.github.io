@@ -254,6 +254,18 @@
     "openBasic": "Open chat",
     "closeBasic": "Close chat",
     "suggestions": "Suggested questions",
+    "ask": {
+      "skills": "Which technologies does he know?",
+      "projects": "Which projects did he build?",
+      "tools": "Which tools did he build?",
+      "experience": "Where has he worked?",
+      "education": "What did he study?",
+      "contact": "How can I contact him?",
+      "drupal": "Does he contribute to Drupal?",
+      "about": "Who is Robbe?",
+      "location": "Where does he live?",
+      "hobbies": "What are his hobbies?"
+    },
     "thinking": "Thinking",
     "answered": "Answered in"
   },

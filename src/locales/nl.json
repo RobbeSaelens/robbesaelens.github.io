@@ -254,6 +254,18 @@
     "openBasic": "Chat openen",
     "closeBasic": "Chat sluiten",
     "suggestions": "Voorgestelde vragen",
+    "ask": {
+      "skills": "Welke technologieën kent hij?",
+      "projects": "Welke projecten maakte hij?",
+      "tools": "Welke tools maakte hij?",
+      "experience": "Waar heeft hij gewerkt?",
+      "education": "Wat heeft hij gestudeerd?",
+      "contact": "Hoe kan ik hem bereiken?",
+      "drupal": "Draagt hij bij aan Drupal?",
+      "about": "Wie is Robbe?",
+      "location": "Waar woont hij?",
+      "hobbies": "Wat zijn zijn hobby's?"
+    },
     "thinking": "Nadenken",
     "answered": "Beantwoord in"
   },
