@@ -456,6 +456,12 @@
 .detail-page .project-label + .stack-label {
   margin-top: 0;
 }
+/* "Built with", then the live site's Lighthouse scores under it (PageSpeedScores.vue) */
+.detail-page .project-evidence {
+  display: grid;
+  gap: 3rem;
+  min-width: 0;
+}
 
 /* =============================================
    The end: the next project as a picture, all projects under it

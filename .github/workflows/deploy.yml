@@ -3,10 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # Every morning, so the Drupal contributions and the repository numbers follow
-  # drupal.org and GitHub without a push (the build fetches them, see "Refresh
-  # Drupal contributions" and "Refresh repository activity"). Scheduled runs use
-  # the default branch.
+  # Every morning, so the Drupal contributions, the repository numbers and the
+  # Lighthouse scores follow drupal.org, GitHub and the live sites without a push (the
+  # build fetches them, see "Refresh Drupal contributions", "Refresh repository
+  # activity" and "Refresh Lighthouse scores"). Scheduled runs use the default branch.
   schedule:
     - cron: '17 5 * * *'
   # The "Run workflow" button on the Actions tab: deploy again, refreshing both.
@@ -47,16 +47,30 @@ jobs:
         timeout-minutes: 5
         continue-on-error: true
 
-      # The repository numbers on the project pages (src/data/repo-stats.json).
-      # Those repositories are private, so this asks the GitHub API with
-      # REPO_STATS_TOKEN: a repository secret holding a fine-grained token with
-      # read-only access (Contents) to them. Only this step gets it. Without the
-      # secret, or when the API fails, the committed file is used.
+      # The repository numbers on the project pages and the activity grid on /tools
+      # (src/data/repo-stats.json). Those repositories are private, so this asks the
+      # GitHub API with REPO_STATS_TOKEN: a repository secret holding a fine-grained
+      # token with read-only access to them (Contents, and Dependabot alerts for the
+      # open alerts). Only this step gets it. Without the secret, or when the API
+      # fails, the committed file is used; without the Dependabot permission, only
+      # the alerts are left out.
       - name: Refresh repository activity
         run: npm run stats
         env:
           REPO_STATS_TOKEN: ${{ secrets.REPO_STATS_TOKEN }}
         timeout-minutes: 5
+        continue-on-error: true
+
+      # The Lighthouse scores of the live sites on their project pages
+      # (src/data/pagespeed.json), from Google's PageSpeed Insights API. PAGESPEED_API_KEY
+      # is an optional repository secret (a Google Cloud API key for that API): without it
+      # the API's small keyless quota, shared by GitHub's runners, often answers 429. A
+      # site that isn't measured keeps its committed scores, and the deploy goes on.
+      - name: Refresh Lighthouse scores
+        run: npm run pagespeed || echo "::warning::Lighthouse scores not refreshed, deploying the committed src/data/pagespeed.json"
+        env:
+          PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+        timeout-minutes: 8
         continue-on-error: true
 
       - name: Build

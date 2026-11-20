@@ -1,6 +1,6 @@
 <!--
   A number that counts up with CountUp (Vue Bits) when it scrolls into view: the
-  commit counts in RepoActivity.vue.
+  commit counts in RepoActivity.vue, the Lighthouse scores in PageSpeedScores.vue.
 
   The final number is what the prerendered HTML, search engines and screen readers
   get, and what is left once it has counted. CountUp renders an empty span until it
@@ -44,6 +44,12 @@ const props = withDefaults(
   { delay: 0 },
 )
 
+/**
+ * For what moves with the number (the Lighthouse rings' arcs): `armed` once it will count
+ * (a browser, no reduced motion), so the arc can start empty; `start` when it starts.
+ */
+const emit = defineEmits<{ armed: []; start: [] }>()
+
 const rootRef = ref<HTMLElement | null>(null)
 const counting = ref(false)
 const inView = ref(false)
@@ -67,12 +73,14 @@ onMounted(() => {
   if (typeof IntersectionObserver === 'undefined') return
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
   counting.value = true
+  emit('armed')
   // Mostly in view and clear of the bottom edge: by then the section around it has
   // risen in (reveal.ts), so the count is seen from the start.
   observer = new IntersectionObserver(
     ([entry]) => {
       if (!entry.isIntersecting) return
       inView.value = true
+      emit('start')
       observer?.disconnect()
     },
     { threshold: 0.5, rootMargin: '0px 0px -10% 0px' },

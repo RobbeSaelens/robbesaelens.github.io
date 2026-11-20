@@ -16,7 +16,7 @@ import { measureCurrentSlide, SLIDES } from './slides'
 // as "scan2talk.be" and "drupal.org" and file names like "privacy.md" look
 // similar, so those endings are excluded.
 const RAW_I18N_KEY =
-  /\b(?:nav|home|about|projects?|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|drupal|tools)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
+  /\b(?:nav|home|about|projects?|exulta|vhs|scan2talk|stableManager|aria|chat|error|footer|privacy|repo|speed|activity|drupal|tools)\.(?!(?:be|com|dev|app|io|md|org)\b)[a-z][A-Za-z]+\b/
 
 /** Pages without images. */
 const TEXT_ONLY = ['/privacy', '/drupal']

@@ -40,6 +40,18 @@
   /* The glow that follows the mouse over cards (GlowCard.vue), at 60 % at its centre.
      It lies under the text: faint, so text on it keeps 4.5:1. */
   --color-spotlight: rgba(13, 148, 136, 0.14);
+  /* Lighthouse's bands (PageSpeedScores.vue): 90–100 good, 50–89 average, 0–49 poor. The
+     score is written in its band's colour inside the ring: each meets 4.5:1 on the surface. */
+  --color-score-good: #0f766e;
+  --color-score-average: #b45309;
+  --color-score-poor: #b91c1c;
+  /* The activity grid on /tools (ActivityHeatmap.vue): no commits, then four teal steps.
+     The numbers are in its text; the steps only have to read as more and less. */
+  --color-heat-0: rgba(13, 148, 136, 0.09);
+  --color-heat-1: #a7e3da;
+  --color-heat-2: #5cc4b4;
+  --color-heat-3: #149888;
+  --color-heat-4: #0b5f58;
   --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
 }
 
@@ -75,6 +87,14 @@
   --color-badge-closed-bg: rgba(148, 163, 184, 0.1);
   --color-badge-closed-border: rgba(148, 163, 184, 0.3);
   --color-spotlight: rgba(45, 212, 191, 0.2);
+  --color-score-good: #2dd4bf;
+  --color-score-average: #fbbf24;
+  --color-score-poor: #f87171;
+  --color-heat-0: rgba(45, 212, 191, 0.07);
+  --color-heat-1: #134e4a;
+  --color-heat-2: #0f766e;
+  --color-heat-3: #14b8a6;
+  --color-heat-4: #5eead4;
 }
 
 /* =============================================

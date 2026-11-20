@@ -15,6 +15,7 @@
     "og": "node scripts/og.mjs",
     "stats": "node scripts/repo-stats.mjs",
     "drupal": "node scripts/drupal-stats.mjs",
+    "pagespeed": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/pagespeed.mjs",
     "preview": "vite preview",
     "test": "playwright test --project=desktop --project=mobile",
     "test:responsive": "playwright test --project=responsive"

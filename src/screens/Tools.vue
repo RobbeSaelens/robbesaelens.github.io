@@ -5,8 +5,10 @@
   tool shown. The article is a .detail-page, so it speaks the project pages' vocabulary
   (bands, labels, chips, screenshots that open in the lightbox, the "next" card).
 
-  First screen: the title, one line, and the switch (ToolSwitch.vue), which sticks under
-  the header. A chapter, in the tool's own colour (tools-page.css):
+  First screen: the title, one line, what maintaining the projects amounts to (the activity
+  grid: every commit of the last year, ActivityHeatmap.vue), and the switch
+  (ToolSwitch.vue), which sticks under the header. A chapter, in the tool's own colour
+  (tools-page.css):
   - its name and icon, status chips, a headline and one sentence, then a few points with
     an icon each, beside its captures as a deck of cards (ToolShots.vue, CardSwap);
   - its story in motion: how an update runs (UpdatePipeline.vue), or why Sift exists
@@ -30,10 +32,12 @@
           <span class="opacity-50">$</span> <TerminalCommand text="cat ./tools.md" />
         </p>
         <p class="hero-in hero-tagline" style="--i: 2">{{ $t('tools.tagline') }}</p>
-        <p class="hero-in tools-intro" style="--i: 3">{{ $t('tools.intro') }}</p>
+        <!-- What maintaining them amounts to: every commit of the last year, per day -->
+        <ActivityHeatmap class="tools-activity" :step="3" />
+        <p class="hero-in tools-intro" style="--i: 4">{{ $t('tools.intro') }}</p>
       </header>
 
-      <ToolSwitch class="hero-in" style="--i: 4" :tools="list" :active="active" @select="pick" />
+      <ToolSwitch class="hero-in" style="--i: 5" :tools="list" :active="active" @select="pick" />
 
       <section
         v-for="tool in list"
@@ -150,6 +154,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowRight, ExternalLink, Github, Laptop, Lock } from 'lucide-vue-next'
 import ImageLightbox, { type LightboxImage } from '../components/ImageLightbox.vue'
 import ShotPicture from '../components/ShotPicture.vue'
+import ActivityHeatmap from '../components/tools/ActivityHeatmap.vue'
 import SiftStory from '../components/tools/SiftStory.vue'
 import { TOOL_ICONS as ICONS } from '../components/tools/icons'
 import ToolIcon from '../components/tools/ToolIcon.vue'

@@ -12,9 +12,10 @@ prerendered to static HTML and deployed to GitHub Pages from `main`.
 | `npm test` | Smoke + accessibility tests (Playwright, desktop + mobile) against the production build |
 | `npm run test:responsive` | Every page at every breakpoint, with screenshots (below) |
 | `npm run images` | AVIF and WebP copies of the project screenshots (Conventions); `build` and `dev` run it first |
-| `npm run stats` | Refresh the repository numbers on the project pages, from the GitHub API with `REPO_STATS_TOKEN` (below) |
+| `npm run stats` | Refresh the repository numbers on the project pages and the activity grid on /tools, from the GitHub API with `REPO_STATS_TOKEN` (below) |
 | `npm run drupal` | Refresh the Drupal contributions page from drupal.org (below) |
 | `npm run og` | Draw the share images into `dist/og/` (Conventions); needs the SSR build, `build` runs it last |
+| `npm run pagespeed` | Refresh the live sites' Lighthouse scores from PageSpeed Insights, with `PAGESPEED_API_KEY` when set (below) |
 
 Run both test suites with `CI=1` so Playwright starts its own server instead of reusing
 a stale one. GitHub Actions runs both on every push to `develop` (`.github/workflows/test.yml`),
@@ -127,14 +128,40 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   description in `meta.nl`.
 - The "Repository activity" block on each project page reads `src/data/repo-stats.json`.
   The project repos are private, so the browser can't fetch it. The deploy workflow
-  refreshes it before every build with `npm run stats`, which asks the GitHub API with
-  `REPO_STATS_TOKEN` (a repository secret: a fine-grained token with read-only Contents
-  access to those repos; it expires within a year, then the step only warns and the
-  committed JSON is used). Deploys also run every morning, so the numbers follow the repos
-  without a push. By hand: `REPO_STATS_TOKEN=$(gh auth token) npm run stats`. The committed
-  JSON is only the fallback when that fails, so it may lag. It holds counts and dates only,
-  never commit messages, names or e-mail addresses, and the script's log names pages, not
-  repositories (CI logs of this public repo are public).
+  refreshes it before every build with `npm run stats` (`scripts/repo-stats.mjs`), which
+  asks the GitHub API with `REPO_STATS_TOKEN` (a repository secret: a fine-grained token,
+  read-only, on the projects' repos and `Project-Updater` and `Sift`, with the permissions
+  Contents and Dependabot alerts; it expires within a year, then the step only warns and
+  the committed JSON is used). Deploys also run every morning, so the numbers follow the
+  repos without a push. By hand: `REPO_STATS_TOKEN=$(gh auth token) npm run stats`. The
+  committed JSON is only the fallback when that fails, so it may lag. Per project (its
+  page's key under `projects`): `commits`, `commitsLast30Days`, `firstCommit`,
+  `lastCommit`, `commitsPerWeek` (26 weeks), `dependenciesUpdated` (the date of the newest
+  commit on the default branch that touched a lockfile: `package-lock.json`,
+  `composer.lock`, `pnpm-lock.yaml` or `yarn.lock`; null without one), `openAlerts` and
+  `openAlertsBySeverity` (the open Dependabot alerts, a count and one per severity; both
+  null when they can't be read: without the token's Dependabot permission, or with
+  Dependabot alerts off for a repo, GitHub answers 403 and the page shows the dependencies
+  part only; that never fails the rest). Besides: `tools` (the tools' latest releases) and
+  `activity` (the grid on /tools: `from`, a Monday 52 weeks before this week's, and `days`,
+  the commits per Belgian day from then to today, oldest first, summed over the projects'
+  repos, the tools' and this site's; when one repo fails, the committed grid stays). It
+  holds counts, dates and severities only, never commit messages, names, e-mail addresses
+  or advisories, nothing per repository in the grid, and the script's log names pages,
+  not repositories (CI logs of this public repo are public).
+- The project pages of the live, public sites (those with a `liveUrl` in
+  `src/seo/projects.ts`: Exulta and Scan2Talk) show their Lighthouse scores
+  (`PageSpeedScores.vue`), from `src/data/pagespeed.json`: per site (its `stats` key) and
+  strategy (`mobile`), the four category scores, 0–100 (`performance`, `accessibility`,
+  `bestPractices`, `seo`), and `measuredAt`. Nothing else from the report. `npm run
+  pagespeed` (`scripts/pagespeed.mjs`) asks Google's PageSpeed Insights API v5 before every
+  deploy (the daily one too), with `PAGESPEED_API_KEY` when that optional repository secret
+  is set (a Google Cloud API key restricted to the PageSpeed Insights API). Without a key
+  the API's keyless quota is tiny and shared (GitHub's runners share IPs), so it mostly
+  answers 429: each page is asked twice at most, and a site that isn't measured keeps its
+  committed scores, like drupal.json. The script imports `src/seo/projects.ts` itself
+  (Node's `--experimental-strip-types`, in the npm script). To add desktop, add it to
+  `STRATEGIES` there; the page shows mobile.
 - The Drupal contributions page (`/drupal`) reads `src/data/drupal.json`, written by
   `npm run drupal` (`scripts/drupal-stats.mjs`) from the public drupal.org and
   git.drupalcode.org APIs. drupal.org asks API users for a descriptive User-Agent, one
@@ -159,7 +186,7 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   | `HeroWordmark.vue` | `TechText.vue` | the hero name |
   | `SiteBackground.vue` | `DarkVeil.vue` | the animated background behind every page (`App.vue`) |
   | `TerminalCommand.vue` (registered globally) | `DecryptedText.vue` | the `$ …` line under page titles |
-  | `CountUpNumber.vue` | `CountUp.vue` | the commit counts in `RepoActivity.vue` |
+  | `CountUpNumber.vue` | `CountUp.vue` | the commit counts in `RepoActivity.vue`, the Lighthouse scores in `PageSpeedScores.vue` (its `armed` and `start` events fill the rings' arcs with the count) |
   | `ChatThinking.vue` | `LatticeLoader.vue` | the chat's thinking line, ending in a check with the time |
   | `ButtonMagnet.vue` | `Magnet.vue` | the chat button and "Say hello" |
   | `GlowCard.vue` | `SpotlightCard.vue` | the project pages' features, the Drupal panels and the About cards |
@@ -215,9 +242,11 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
     from 1024px), the phone over the desktop capture's corner. Below 1024px the
     screenshots come right after the status, then the overview.
   - Then bands, far apart (`.project-band`): "What's in it" as a numbered index
-    (`ProjectIndex.vue`: hairlines, no boxes, three columns, two from 640px), "Built
-    with" beside the repository's activity, and at the end the next project with its
-    real screenshot, plus all projects. "Next" follows the order of the projects page
+    (`ProjectIndex.vue`: hairlines, no boxes, three columns, two from 640px), the evidence
+    ("Built with" and, for a live site, its Lighthouse scores under it, beside the
+    repository's activity, which ends with how it's kept up to date: "Dependencies updated
+    3 days ago" in a `<time>` with the exact moment as its title, and the open security
+    alerts), and at the end the next project with its real screenshot, plus all projects. "Next" follows the order of the projects page
     (`src/projects.ts`, which `Projects.vue` shows too) and wraps from the last to the
     first.
   - Phones: the index folds into titles that open their text (a `<details>`: closed in
@@ -225,7 +254,11 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
     the text of a closed one, and the app opens them). The text stays in the HTML.
   - The "Repository activity" block (`RepoActivity.vue`) lays itself out by the width it
     is given (a container query: numbers in one row from 600px of room, else two by two),
-    not by the screen. It stays in the page at every width: there is no side panel.
+    not by the screen. It stays in the page at every width: there is no side panel. The
+    Lighthouse scores do the same (four rings in a row from 26rem of room, else two by
+    two): Lighthouse's bands (90–100 good, 50–89 average, 0–49 poor) in the theme's
+    `--color-score-*`, each read out as "Performance, 98 of 100", with when and on what
+    they were measured and a link to PageSpeed Insights.
   The template is styled in `src/assets/project-page.css` (under `.detail-page`), global
   rather than scoped: the prerendered HTML links only the main stylesheet (a route's own
   CSS comes with its JavaScript), so that is what lays the page out, and folds the
@@ -247,7 +280,17 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   points with an icon (four to six), version, macOS and "Private for now" as chips; its
   captures as a deck (`ToolShots.vue`); its story in motion (`UpdatePipeline.vue`: how an
   update runs; `SiftStory.vue`: PhpStorm + Sublime Merge folding into Sift, by name only, no
-  logos); what it's made with; the other tool as a card. New facts become a point, not a paragraph. The data is
+  logos); what it's made with; the other tool as a card. New facts become a point, not a paragraph.
+  Above the switch, between the line "How I maintain my projects" and the intro, the
+  activity grid (`tools/ActivityHeatmap.vue`, from `repo-stats.json` `activity`): every
+  commit of the last year per day, in all the projects, both tools and this site, the
+  evidence for that line. It is here, not on the home page (a one-screen hero Robbe chose)
+  and never on the About page (one screen). A week a column, five teal steps
+  (`--color-heat-*`, the four above none by the quartiles of the busy days), month names, the
+  total and the legend; one picture to a screen reader (`role="img"`, the total, the busy
+  days and the busiest), each day's count in a title for a mouse. It fits its column at
+  every width (cells from about 5px on a phone to 13px, then it stops growing), so it never
+  scrolls; its styles are in `tools-page.css` (first screen). The data is
   `src/tools.ts`, which `/llms.txt` and the page's JSON-LD (a `SoftwareApplication` each, with
   its captures) are written from too; its `description` is only for those two. Its `version`
   follows each release by itself: `npm run stats` (before every deploy, the daily one too) reads
@@ -305,6 +348,12 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
     a round when they come into view, then they rest; Next moves them (from the keyboard at
     once). Its stories (the update pipeline, Sift's two apps) play once when scrolled to,
     about a second and a half, in CSS (`usePlayOnce.ts`); the picked tab's light runs once.
+    Its activity grid joins the header's entrance: its columns fade in left to right, the
+    last about 0.3 s after the first, each in 0.3 s (CSS only, like `.hero-in`), and that's all.
+  - Numbers that count (`CountUpNumber.vue`) count once, when mostly in view, in 0.9 s; the
+    Lighthouse rings' arcs fill with them, on CountUp's own quartic ease-out
+    (`cubic-bezier(0.25, 1, 0.5, 1)`), so number and arc land together. The arc is the one
+    `stroke-dashoffset` transition: an arc has no transform, and four small circles only repaint.
   - Name the properties: no `transition: all`. Animate `transform` and `opacity`, not
     `width`, `height`, `padding`, `top` or `left` (they lay the page out again every frame).
   - Reduced motion: the global rule in `terminal-theme.css` drops durations and delays;

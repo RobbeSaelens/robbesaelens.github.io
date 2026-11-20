@@ -4,8 +4,9 @@
   links, the overview and its tags on the left, in line with the header's logo, and the
   two screenshots as one picture on the right (the phone over the desktop capture).
   Below it, the proof in bands: what's in it as a numbered index, what it's built with
-  beside how active its repository is, and a closing band with the next project's real
-  screenshot, plus all projects. Phones: the screenshots right under the title, the
+  (and, for a live site, its Lighthouse scores) beside how active its repository is and how
+  it's kept up to date, and a closing band with the next project's real screenshot, plus
+  all projects. Phones: the screenshots right under the title, the
   index folded into rows that open (ProjectIndex.vue).
 
   A page's own block goes in a slot: `after-hero` (Scan2Talk's check-in) or
@@ -87,19 +88,24 @@
         <ProjectIndex :items="project.features" />
       </section>
 
-      <!-- The evidence: what it's built with, beside how active it is -->
+      <!-- The evidence: what it's built with and how the live site scores, beside how
+           active its repository is and how it's kept up to date -->
       <div class="project-band project-split project-split--top">
-        <section class="reveal" aria-labelledby="built-with-title">
-          <h2 id="built-with-title" class="project-label">{{ $t('project.builtWith') }}</h2>
-          <h3 class="stack-label">{{ $t('project.languages') }}</h3>
-          <ul class="project-chips">
-            <li v-for="t in project.languages" :key="t" class="tag-pill">{{ t }}</li>
-          </ul>
-          <h3 class="stack-label">{{ $t('project.tools') }}</h3>
-          <ul class="project-chips">
-            <li v-for="t in project.tools" :key="t" class="tag-pill">{{ t }}</li>
-          </ul>
-        </section>
+        <div class="project-evidence">
+          <section class="reveal" aria-labelledby="built-with-title">
+            <h2 id="built-with-title" class="project-label">{{ $t('project.builtWith') }}</h2>
+            <h3 class="stack-label">{{ $t('project.languages') }}</h3>
+            <ul class="project-chips">
+              <li v-for="t in project.languages" :key="t" class="tag-pill">{{ t }}</li>
+            </ul>
+            <h3 class="stack-label">{{ $t('project.tools') }}</h3>
+            <ul class="project-chips">
+              <li v-for="t in project.tools" :key="t" class="tag-pill">{{ t }}</li>
+            </ul>
+          </section>
+          <!-- Only for a live, public site (src/data/pagespeed.json) -->
+          <PageSpeedScores :site="project.repo.key" />
+        </div>
         <RepoActivity :project="project.repo.key" :label="project.repo.label" />
       </div>
 
@@ -156,6 +162,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ArrowRight, ExternalLink, Lock } from 'lucide-vue-next'
 import ImageLightbox, { type LightboxImage } from '../ImageLightbox.vue'
+import PageSpeedScores from '../PageSpeedScores.vue'
 import RepoActivity from '../RepoActivity.vue'
 import ShotPicture from '../ShotPicture.vue'
 import ProjectIndex from './ProjectIndex.vue'

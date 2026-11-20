@@ -1,0 +1,22 @@
+{
+  "sites": {
+    "exulta": {
+      "mobile": {
+        "performance": 90,
+        "accessibility": 96,
+        "bestPractices": 100,
+        "seo": 100,
+        "measuredAt": "2026-11-20T00:58:22.000Z"
+      }
+    },
+    "scan2talk": {
+      "mobile": {
+        "performance": 96,
+        "accessibility": 93,
+        "bestPractices": 100,
+        "seo": 100,
+        "measuredAt": "2026-11-20T02:57:54.000Z"
+      }
+    }
+  }
+}
