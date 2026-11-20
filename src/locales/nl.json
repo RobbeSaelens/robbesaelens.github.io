@@ -484,5 +484,12 @@
       "shotCommit": "het commitvak: Write with AI, een Teamwork-taak",
       "altCommit": "Sift met vijf gestagede bestanden, waarvan er één getoond wordt, en een commitbericht klaar om te committen, met de regel voor de Teamwork-taak en de knop Write with AI erboven en ernaast"
     }
+  },
+  "share": {
+    "photo": "Met een foto van Robbe Saelens.",
+    "photos": "Met twee foto's van Robbe: lesgeven in de paardensport, en springen op een wedstrijd.",
+    "project": "Met screenshots van {name} in een browser en op een gsm.",
+    "projects": "Met screenshots van zijn projecten.",
+    "tools": "Met schermafbeeldingen van Project Updater en Sift, de twee Mac-apps die hij bouwde."
   }
 }
