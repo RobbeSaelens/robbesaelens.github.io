@@ -18,13 +18,15 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useHead } from '@unhead/vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import CustomCursor from './components/CustomCursor.vue'
 import EasterEgg from './components/EasterEgg.vue'
 import SiteBackground from './components/SiteBackground.vue'
-import { SITE_NAME, SITE_TAGLINE, SITE_URL, absoluteUrl } from './site'
+import { SITE_NAME, SITE_URL, absoluteUrl } from './site'
 import { localeOfPath, localizedPath, stripLocale } from './localePath'
 import { routeJsonLd } from './seo/jsonld'
+import { SHARE_IMAGE, shareImageAlt, shareImagePath } from './seo/share'
 
 const DEFAULT_DESCRIPTION =
   'Portfolio of Robbe Saelens, a full-stack web developer from Geluwe, Belgium, building with Vue, TypeScript, React, Laravel and Next.js.'
@@ -38,15 +40,27 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute()
+    const { t } = useI18n({ useScope: 'global' })
 
     const title = () => (route.meta?.title as string) || 'Portfolio'
     const description = () => (route.meta?.description as string) || DEFAULT_DESCRIPTION
-    const image = () => absoluteUrl((route.meta?.image as string) || '/pf2.jpg')
+    /** The page's own picture (a project's screenshot, Robbe's photo): what its JSON-LD describes */
+    const picture = () => absoluteUrl((route.meta?.image as string) || '/pf2.jpg')
     const url = () => absoluteUrl(route.path)
     const lang = () => localeOfPath(route.path)
     /** The page without /nl, for logic that doesn't depend on the language. */
     const page = () => stripLocale(route.path)
     const fullTitle = () => `${title()} | ${SITE_NAME}`
+    /**
+     * Its share image, what a link preview shows (src/seo/share.ts, drawn by scripts/og.mjs);
+     * the not-found page, which has none, shares the home page's.
+     */
+    const shareImage = () =>
+      absoluteUrl(shareImagePath(route.meta?.noindex ? localizedPath('/', lang()) : route.path))
+    const shareAlt = () =>
+      route.meta?.noindex
+        ? fullTitle()
+        : shareImageAlt((key, named) => t(key, named, { locale: lang() }), route.path, String(route.name ?? ''), fullTitle())
 
     useHead({
       titleTemplate: `%s | ${SITE_NAME}`,
@@ -68,13 +82,17 @@ export default defineComponent({
         { property: 'og:title', content: fullTitle() },
         { property: 'og:description', content: description() },
         { property: 'og:url', content: url() },
-        { property: 'og:image', content: image() },
-        { property: 'og:image:alt', content: `${SITE_NAME} - ${SITE_TAGLINE}` },
+        { property: 'og:image', content: shareImage() },
+        { property: 'og:image:type', content: SHARE_IMAGE.type },
+        { property: 'og:image:width', content: String(SHARE_IMAGE.width) },
+        { property: 'og:image:height', content: String(SHARE_IMAGE.height) },
+        { property: 'og:image:alt', content: shareAlt() },
 
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: fullTitle() },
         { name: 'twitter:description', content: description() },
-        { name: 'twitter:image', content: image() },
+        { name: 'twitter:image', content: shareImage() },
+        { name: 'twitter:image:alt', content: shareAlt() },
       ],
       // Each language has its own URL (/nl/... is Dutch): canonical to itself,
       // plus hreflang alternates so search engines show the right language.
@@ -90,7 +108,7 @@ export default defineComponent({
             ],
       script: () => {
         if (route.meta?.noindex) return []
-        const graph = routeJsonLd(route.path, title(), description(), SITE_URL, lang(), image())
+        const graph = routeJsonLd(route.path, title(), description(), SITE_URL, lang(), picture())
         return [{ type: 'application/ld+json', key: 'route-jsonld', innerHTML: JSON.stringify(graph) }]
       },
     })

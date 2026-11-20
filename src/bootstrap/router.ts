@@ -5,6 +5,8 @@ import { localeOfPath, localizedPath, type Locale } from '../localePath'
 /**
  * Every page, once. Each is served in English at its path and in Dutch under
  * /nl (see localized() below); meta.nl holds the Dutch title and description.
+ * A project page's meta.image is its real screenshot, which its JSON-LD names; what
+ * a link to any page shows is its share image (src/seo/share.ts).
  */
 const pages: RouteRecordRaw[] = [
   {
@@ -15,7 +17,6 @@ const pages: RouteRecordRaw[] = [
       title: 'Full-Stack Web Developer',
       description:
         'Robbe Saelens is a full-stack web developer from Geluwe, Belgium, working at Dynamate. Portfolio of work in Vue, TypeScript, React, Next.js, Laravel and Drupal.',
-      image: '/pf2.jpg',
       nl: {
         title: 'Full-stack webontwikkelaar',
         description:
@@ -31,7 +32,6 @@ const pages: RouteRecordRaw[] = [
       title: 'About me',
       description:
         'About Robbe Saelens: education in Multimedia & Creative Technology, experience as PHP, Magento and Drupal backend developer, and how to get in touch.',
-      image: '/pf2.jpg',
       nl: {
         title: 'Over mij',
         description:
@@ -48,7 +48,6 @@ const pages: RouteRecordRaw[] = [
       title: 'Drupal contributions',
       description:
         'Drupal contributions by Robbe Saelens, backend developer at Dynamate: credited fixes, merge requests and issues he opened or took part in on drupal.org.',
-      image: '/pf2.jpg',
       nl: {
         title: 'Drupal-bijdragen',
         description:
@@ -64,7 +63,6 @@ const pages: RouteRecordRaw[] = [
       title: 'Privacy',
       description:
         'How robbesaelens.github.io handles personal data: hosting, cookieless statistics, the AI chatbot, and your rights under the GDPR. No cookies, no tracking.',
-      image: '/pf2.jpg',
       nl: {
         title: 'Privacy',
         description:
@@ -80,7 +78,6 @@ const pages: RouteRecordRaw[] = [
       title: 'Projects',
       description:
         'Projects by Robbe Saelens: Exulta tent rental, Scan2Talk student check-ins, Stable Manager horse costs and VHS Service arenas. Laravel, React, Vue, Next.js.',
-      image: '/exulta-home.jpg',
       nl: {
         title: 'Projecten',
         description:
@@ -97,7 +94,6 @@ const pages: RouteRecordRaw[] = [
       title: 'Tools - Project Updater and Sift',
       description:
         'How Robbe Saelens maintains his projects, with tools he built: Project Updater, which updates them with Claude Code, and Sift, a light Git client for macOS.',
-      image: '/project-updater-projects-home.jpg',
       // The hash picks one of the two tools (/tools#sift): see scrollBehavior below
       hashTabs: true,
       nl: {
