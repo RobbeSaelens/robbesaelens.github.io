@@ -38,6 +38,14 @@ async function open(page: Page, route: string) {
 
 const deckOf = (page: Page, tool: string) => page.locator(`#${tool}-panel .tool-deck`)
 const frontOf = (deck: Locator) => deck.getAttribute('data-front')
+/**
+ * Brings a deck into view: under the activity grid in the header, on a 1280 × 720 screen it
+ * starts below the fold, and it only moves once mostly in view.
+ */
+async function inView(deck: Locator) {
+  await deck.scrollIntoViewIfNeeded()
+  await expect(deck).toBeInViewport({ ratio: 0.9 })
+}
 
 test('the prerendered HTML has every capture in its deck, in its place, as a picture with alt text', async ({ request }) => {
   const html = await (await request.get('/tools')).text()
@@ -66,6 +74,7 @@ test.describe('the deck of captures (CardSwap)', () => {
     await page.clock.install()
     await open(page, '/tools')
     const deck = deckOf(page, 'project-updater')
+    await inView(deck)
     await expect(deck).toHaveAttribute('data-autoplay', 'on')
     expect(await frontOf(deck)).toBe('0')
 
@@ -89,6 +98,7 @@ test.describe('the deck of captures (CardSwap)', () => {
     const errors = await guard(page)
     await open(page, '/tools')
     const deck = deckOf(page, 'project-updater')
+    await inView(deck)
     await expect(deck).toHaveAttribute('data-autoplay', 'on')
     await deck.locator('.deck-stage').hover()
     await expect(deck).toHaveAttribute('data-autoplay', 'off')
@@ -120,13 +130,14 @@ test.describe('the deck of captures (CardSwap)', () => {
     const errors = await guard(page)
     await open(page, '/tools')
     const updater = deckOf(page, 'project-updater')
+    await inView(updater)
     await expect(updater).toHaveAttribute('data-autoplay', 'on')
     // The other tool's deck: not shown, so still
     await expect(deckOf(page, 'sift')).toHaveAttribute('data-autoplay', 'off')
     // Scrolled away
     await page.locator('#project-updater-panel .tool-end').scrollIntoViewIfNeeded()
     await expect(updater).toHaveAttribute('data-autoplay', 'off')
-    await page.evaluate(() => scrollTo(0, 0))
+    await inView(updater)
     await expect(updater).toHaveAttribute('data-autoplay', 'on')
     // A hidden tab
     await page.evaluate(() => {
