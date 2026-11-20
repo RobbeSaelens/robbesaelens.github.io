@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
 
 /**
@@ -91,6 +92,141 @@ test('follow-up chips ask the next question with the whole conversation', async 
   await expect(page.locator('.chat-chip')).toHaveText(['Follow-up 2a', 'Follow-up 2b'])
   expect(sent[1]!.messages.map((m) => m.role)).toEqual(['assistant', 'user', 'assistant', 'user'])
   expect(sent[1]!.messages.at(-1)!.content).toBe('Follow-up 1b')
+})
+
+for (const [path, lang, label, asked] of [
+  ['/', 'en', 'Suggested questions', 'What does he build?'],
+  ['/nl', 'nl', 'Voorgestelde vragen', 'Wat bouwt hij?'],
+] as const) {
+  test(`follow-ups: a labelled group under the answer, out of the log, sent by click or keyboard (${path})`, async ({ page }) => {
+    await setup(page)
+    const word = lang === 'nl' ? 'Vraag' : 'Question'
+    const sent = await fakeAi(page, (_body, n) => ({
+      status: 200,
+      json: { reply: `Answer ${n}`, suggestions: [`${word} ${n}a?`, `${word} ${n}b?`, `${word} ${n}c?`] },
+    }))
+    await openChat(page, path)
+    await page.locator('#chat-input').fill(asked)
+    await page.locator('#chat-input').press('Enter')
+    await waitForAnswer(page, 2)
+
+    // Three chips, in the page's language, as a labelled group after the conversation
+    const group = page.getByRole('group', { name: label })
+    await expect(group.getByRole('button')).toHaveText([`${word} 1a?`, `${word} 1b?`, `${word} 1c?`])
+    const log = page.getByRole('log')
+    await expect(log.locator('.msg--bot').last()).toContainText('Answer 1')
+    await expect(log.locator('.chat-chip')).toHaveCount(0)
+    await expect(page.locator('.chat-typing')).toHaveCount(0)
+
+    // A click sends its question, with the conversation, in the page's language
+    await group.getByRole('button', { name: `${word} 1b?` }).click()
+    await expect(page.locator('.msg--user').last()).toHaveText(`${word} 1b?`)
+    await waitForAnswer(page, 3)
+    expect(sent[1]!.messages.at(-1)).toEqual({ role: 'user', content: `${word} 1b?` })
+    expect(sent[1]!.lang).toBe(lang)
+    await expect(group.getByRole('button')).toHaveText([`${word} 2a?`, `${word} 2b?`, `${word} 2c?`])
+
+    // From the keyboard: Shift+Tab from the input reaches the last chip, Enter sends it
+    await page.locator('#chat-input').focus()
+    await page.keyboard.press('Shift+Tab')
+    await expect(group.getByRole('button').last()).toBeFocused()
+    await page.keyboard.press('Enter')
+    await waitForAnswer(page, 4)
+    expect(sent[2]!.messages.at(-1)!.content).toBe(`${word} 2c?`)
+    // ...and Space, on the first
+    await page.locator('#chat-input').focus()
+    await page.keyboard.press('Shift+Tab')
+    await page.keyboard.press('Shift+Tab')
+    await page.keyboard.press('Shift+Tab')
+    await expect(group.getByRole('button').first()).toBeFocused()
+    await page.keyboard.press('Space')
+    await waitForAnswer(page, 5)
+    expect(sent[3]!.messages.at(-1)!.content).toBe(`${word} 3a?`)
+    expect(sent).toHaveLength(4)
+  })
+}
+
+test('follow-ups leave out what was asked, each once, and make way while the visitor types', async ({ page }) => {
+  await setup(page)
+  await fakeAi(page, () => ({
+    status: 200,
+    json: { reply: 'Exulta, Scan2Talk and more.', suggestions: ['Which projects?', 'What is Sift?', 'what is  sift', 'which projects'] },
+  }))
+  await openChat(page)
+  await page.locator('#chat-input').fill('Which projects?')
+  await page.locator('#chat-input').press('Enter')
+  await waitForAnswer(page, 2)
+  await expect(page.locator('.chat-chip')).toHaveText(['What is Sift?'])
+
+  // Gone at the first key, back when the field is empty again
+  await page.locator('#chat-input').pressSequentially('Wh')
+  await expect(page.locator('.chat-chip')).toHaveCount(0)
+  await page.locator('#chat-input').fill('')
+  await expect(page.locator('.chat-chip')).toHaveText(['What is Sift?'])
+})
+
+for (const [path, starter, offered, next, answer] of [
+  [
+    '/',
+    'Skills',
+    ['Which projects did he build?', 'Which tools did he build?', 'Where has he worked?'],
+    ['Which tools did he build?', 'Which technologies does he know?', 'How can I contact him?'],
+    'Robbe has built 4 featured projects',
+  ],
+  [
+    '/nl',
+    'Vaardigheden',
+    ['Welke projecten maakte hij?', 'Welke tools maakte hij?', 'Waar heeft hij gewerkt?'],
+    ['Welke tools maakte hij?', 'Welke technologieën kent hij?', 'Hoe kan ik hem bereiken?'],
+    'Robbe bouwde onder meer deze 4 projecten',
+  ],
+] as const) {
+  test(`without the AI, built-in answers offer their own follow-ups (${path})`, async ({ page }) => {
+    await setup(page)
+    await page.route('https://chat.invalid/chat', (r) => r.abort())
+    await openChat(page, path)
+    await chip(page, starter).click()
+    await waitForAnswer(page, 2)
+    await expect(page.getByRole('group').getByRole('button')).toHaveText([...offered])
+
+    // A follow-up gets its built-in answer, and offers the next ones
+    await chip(page, offered[0]).click()
+    await waitForAnswer(page, 3)
+    await expect(page.locator('.msg--bot').last()).toContainText(answer)
+    await expect(page.locator('.chat-chip')).toHaveText([...next])
+  })
+}
+
+for (const lang of ['en', 'nl'] as const) {
+  test(`without the AI, every built-in follow-up question finds its own answer (${lang})`, async ({ page }) => {
+    const { chat } = JSON.parse(readFileSync(new URL(`../src/locales/${lang}.json`, import.meta.url), 'utf8'))
+    await setup(page)
+    await page.route('https://chat.invalid/chat', (r) => r.abort())
+    await openChat(page, lang === 'nl' ? '/nl' : '/')
+    // chat.ask.<topic> is answered by chat.<topic>: by the keywords, not the fallback
+    for (const [i, [topic, question]] of (Object.entries(chat.ask) as [string, string][]).entries()) {
+      await page.locator('#chat-input').fill(question)
+      await page.locator('#chat-input').press('Enter')
+      await waitForAnswer(page, i + 2)
+      await expect(page.locator('.msg--bot').last(), question).toContainText((chat[topic] as string).slice(0, 30))
+    }
+  })
+}
+
+test('without the AI, a keyword counts only at the start of a word ("which" is no greeting)', async ({ page }) => {
+  await setup(page)
+  await page.route('https://chat.invalid/chat', (r) => r.abort())
+  await openChat(page)
+  for (const [i, [question, answer]] of [
+    ['Which projects?', 'Robbe has built 4 featured projects'],
+    ['How many commits?', "I'm not sure about that"],
+    ['Hi!', 'Hi there!'],
+  ].entries()) {
+    await page.locator('#chat-input').fill(question)
+    await page.locator('#chat-input').press('Enter')
+    await waitForAnswer(page, i + 2)
+    await expect(page.locator('.msg--bot').last(), question).toContainText(answer)
+  }
 })
 
 test('an answer without follow-ups shows no chips', async ({ page }) => {

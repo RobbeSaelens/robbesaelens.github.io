@@ -46,20 +46,24 @@
           </button>
         </header>
 
-        <div ref="messagesContainer" class="chat-body" aria-live="polite">
+        <div ref="messagesContainer" class="chat-body">
           <!-- AI disclosure (EU AI Act, Art. 50) and a pointer to the privacy page -->
           <p v-if="aiEnabled" class="chat-notice">
             {{ $t('chat.aiNotice') }}
             <router-link :to="$lp('/privacy')" class="chat-notice-link" @click="close">{{ $t('footer.privacy') }}</router-link>
           </p>
 
-          <div v-for="(msg, i) in messages" :key="i" class="msg" :class="`msg--${msg.actor}`">
-            <span v-if="msg.actor === 'bot'" class="msg-avatar" aria-hidden="true"><LlamaIcon /></span>
-            <!-- AI replies are plain text (never v-html); the rest are translation keys.
-                 An answer to a question opens with the thinking line, done: a check and the time. -->
-            <p class="msg-text"><span v-if="msg.took != null" class="msg-status msg-status--done" aria-hidden="true"
-                ><ChatThinking :took="msg.took" :animate="i === messages.length - 1" :riddle="riddleStep > 0" /></span
-              >{{ msg.actor === 'user' ? msg.key : (msg.text ?? $t(msg.key)) }}</p>
+          <!-- The conversation: a log, so a screen reader reads each new line once, as it
+               comes. The thinking line and the chips stay out of it. -->
+          <div class="chat-log" role="log">
+            <div v-for="(msg, i) in messages" :key="i" class="msg" :class="`msg--${msg.actor}`">
+              <span v-if="msg.actor === 'bot'" class="msg-avatar" aria-hidden="true"><LlamaIcon /></span>
+              <!-- AI replies are plain text (never v-html); the rest are translation keys.
+                   An answer to a question opens with the thinking line, done: a check and the time. -->
+              <p class="msg-text"><span v-if="msg.took != null" class="msg-status msg-status--done" aria-hidden="true"
+                  ><ChatThinking :took="msg.took" :animate="i === messages.length - 1" :riddle="riddleStep > 0" /></span
+                >{{ msg.actor === 'user' ? msg.key : (msg.text ?? $t(msg.key)) }}</p>
+            </div>
           </div>
 
           <!-- Thinking: pulsing dots and a timer (ChatThinking.vue) -->
@@ -68,12 +72,18 @@
             <p class="msg-text"><span class="msg-status"><ChatThinking :riddle="riddleStep > 0" /></span></p>
           </div>
 
-          <!-- Follow-ups after an AI answer; the starter questions at the beginning -->
-          <ul v-if="!isTyping && chips.length" class="chat-chips" :aria-label="$t('chat.suggestions')">
-            <li v-for="(chip, i) in chips" :key="i">
-              <button type="button" class="chat-chip" @click="sendQuickReply(chip)">{{ chip }}</button>
-            </li>
-          </ul>
+          <!-- Under the last answer, what to ask next: its follow-ups (the AI's, or a built-in
+               answer's own); the starter questions at the beginning. Gone while the visitor types. -->
+          <div v-if="!isTyping && chips.length" class="chat-chips" role="group" :aria-label="$t('chat.suggestions')">
+            <button
+              v-for="(chip, i) in chips"
+              :key="chip"
+              type="button"
+              class="chat-chip"
+              :style="{ '--i': i }"
+              @click="sendChip(chip)"
+            >{{ chip }}</button>
+          </div>
         </div>
 
         <form class="chat-input" @submit.prevent="send">
@@ -116,14 +126,22 @@ interface Message {
   text?: string
   /** Follow-up questions offered with an AI reply. */
   suggestions?: string[]
+  /** What a built-in answer offers next: keys of `chat.ask` (NEXT), shown in the page's language. */
+  next?: string[]
   /** An answer to a question: the seconds it took, shown above it. */
   took?: number
 }
 
-const KEYWORDS: { keys: string[]; responseKey: string }[] = [
+/**
+ * The built-in answers. A key matches the start of a word, so "contribut" finds
+ * "contributes" but "hi" doesn't find "which"; a `whole` entry's keys match whole words
+ * only ("hi", not "his").
+ */
+const KEYWORDS: { keys: string[]; responseKey: string; whole?: boolean }[] = [
   {
     keys: ['hi', 'hello', 'hey', 'hoi', 'hallo', 'yo', 'good morning', 'good evening'],
     responseKey: 'chat.greeting',
+    whole: true,
   },
   {
     keys: [
@@ -254,6 +272,7 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
       'instructor',
       'instructeur',
       'hobby',
+      'hobbies',
       'teaching',
     ],
     responseKey: 'chat.hobbies',
@@ -267,15 +286,57 @@ const KEYWORDS: { keys: string[]; responseKey: string }[] = [
   { keys: ['bye', 'doei', 'ciao', 'later', 'see you'], responseKey: 'chat.bye' },
 ]
 
+const regexpEscape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/** `key` at the start of a word in `text` (or as a whole word) */
+const hasKey = (text: string, key: string, whole = false) =>
+  new RegExp(`(?:^|[^\\p{L}\\p{N}])${regexpEscape(key)}${whole ? '(?![\\p{L}\\p{N}])' : ''}`, 'u').test(text)
+
 function findResponse(input: string): string | null {
   const lower = input.toLowerCase().trim()
   for (const entry of KEYWORDS) {
-    if (entry.keys.some((k) => lower.includes(k))) {
+    if (entry.keys.some((k) => hasKey(lower, k, entry.whole))) {
       return entry.responseKey
     }
   }
   return null
 }
+
+/**
+ * What a built-in answer offers to ask next (keys of `chat.ask`): questions the keywords
+ * above answer, so they work without the AI too. Thanks, bye and the riddle offer nothing.
+ */
+const PROJECT_NEXT = ['projects', 'tools', 'contact']
+const NEXT: Record<string, string[]> = {
+  'chat.greeting': ['projects', 'skills', 'contact'],
+  'chat.skills': ['projects', 'tools', 'experience'],
+  'chat.tools': ['projects', 'skills', 'contact'],
+  'chat.project-exulta': PROJECT_NEXT,
+  'chat.project-scan2talk': PROJECT_NEXT,
+  'chat.project-vhs': PROJECT_NEXT,
+  'chat.project-stablemanager': ['projects', 'drupal', 'contact'],
+  'chat.drupal': ['experience', 'projects', 'contact'],
+  'chat.projects': ['tools', 'skills', 'contact'],
+  'chat.contact': ['about', 'projects'],
+  'chat.experience': ['education', 'skills', 'drupal'],
+  'chat.education': ['experience', 'skills', 'contact'],
+  'chat.location': ['about', 'hobbies', 'contact'],
+  'chat.hobbies': ['about', 'experience', 'contact'],
+  'chat.about': ['projects', 'experience', 'hobbies'],
+  'chat.help': ['skills', 'projects', 'contact'],
+  'chat.fallback': ['skills', 'projects', 'contact'],
+}
+
+/** A question as compared with another: case, spacing and the closing mark don't count. */
+const sameQuestion = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/[\s?!.]+$/, '')
+    .trim()
+
+/** At most this many chips under an answer. */
+const MAX_CHIPS = 3
 
 // Easter egg riddle constants
 const RIDDLE_TRIGGERS = [
@@ -324,11 +385,27 @@ export default {
 
     const aiOnline = computed(() => aiEnabled && aiAvailable.value)
 
-    /** Follow-ups of the last AI answer; the starter questions until the visitor has asked something. */
+    /**
+     * What to ask next, under the last answer: its follow-ups (the AI's, or a built-in
+     * answer's own), each once and none the visitor already asked; the starter questions
+     * until they have asked something. None while they type: they have their own question.
+     */
     const chips = computed(() => {
+      if (input.value.trim()) return []
+      const asked = messages.value.filter((m) => m.actor === 'user').map((m) => sameQuestion(m.key))
+      if (!asked.length) return quickReplies.value
       const last = messages.value.at(-1)
-      if (last?.actor === 'bot' && last.suggestions?.length) return last.suggestions
-      return messages.value.some((m) => m.actor === 'user') ? [] : quickReplies.value
+      if (last?.actor !== 'bot') return []
+      const offered = last.suggestions ?? last.next?.map((key) => t(`chat.ask.${key}`)) ?? []
+      const seen = new Set(asked)
+      return offered
+        .filter((q) => {
+          const same = sameQuestion(q)
+          if (seen.has(same)) return false
+          seen.add(same)
+          return true
+        })
+        .slice(0, MAX_CHIPS)
     })
 
     const scrollToBottom = () => {
@@ -350,7 +427,8 @@ export default {
     }
 
     const addMessage = (actor: 'bot' | 'user', keyOrText: string) => {
-      messages.value.push({ actor, key: keyOrText, took: took(actor) })
+      const next = actor === 'bot' ? NEXT[keyOrText] : undefined
+      messages.value.push({ actor, key: keyOrText, next, took: took(actor) })
       scrollToBottom()
     }
 
@@ -482,7 +560,15 @@ export default {
       ask(text, 600 + Math.random() * 800)
     }
 
-    const sendQuickReply = (text: string) => ask(text, 400 + Math.random() * 600)
+    /**
+     * A chip asks its question. The chips make way for the answer, so the input takes the
+     * focus (not on touch screens, where it would open the keyboard), and Shift+Tab leads
+     * back to the next chips.
+     */
+    const sendChip = (text: string) => {
+      ask(text, 400 + Math.random() * 600)
+      if (!('ontouchstart' in window)) nextTick(() => inputRef.value?.focus())
+    }
 
     const toggle = () => {
       if (isOpen.value) {
@@ -564,7 +650,8 @@ export default {
 
     // The chips appear only once the thinking line is gone, after the answer
     // itself was scrolled to: scroll again so they aren't cut off.
-    watch(() => [chips.value, isTyping.value], scrollToBottom)
+    // (By their text: typing would otherwise scroll down at every key.)
+    watch(() => [chips.value.join('\n'), isTyping.value], scrollToBottom)
 
     watch(shouldResetChatbot, (val) => {
       if (val) {
@@ -605,7 +692,7 @@ export default {
       fabRef,
       inputPlaceholder,
       send,
-      sendQuickReply,
+      sendChip,
       toggle,
       open,
       close,
@@ -918,6 +1005,11 @@ export default {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
 .msg {
   display: flex;
   align-items: flex-end;
@@ -971,27 +1063,35 @@ export default {
   margin-bottom: 0.3rem;
 }
 
-/* ── Suggested questions ── */
+/* ── Suggested questions: under the answer, in line with its bubble (avatar + gap) ── */
 .chat-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
   margin: 0.1rem 0 0 2.1rem;
-  padding: 0;
-  list-style: none;
 }
 .chat-chip {
-  padding: 0.35rem 0.7rem;
+  max-width: 100%;
+  padding: 0.35rem 0.75rem;
   font: inherit;
   font-size: 0.75rem;
+  line-height: 1.4;
   text-align: left;
+  text-wrap: pretty;
   color: #5eead4;
   background: rgba(45, 212, 191, 0.08);
   border: 1px solid rgba(45, 212, 191, 0.3);
-  border-radius: 999px;
+  /* A pill on one line; a question that wraps gets rounded corners, not a lozenge */
+  border-radius: 1rem;
   cursor: pointer;
-  animation: msg-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  /* After the answer has risen, one after another (80, 120, 160ms) */
+  animation: msg-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(80ms + var(--i, 0) * 40ms);
   transition:
+    transform 0.12s cubic-bezier(0.22, 1, 0.36, 1),
     background 0.2s ease,
     border-color 0.2s ease;
 }
@@ -1003,6 +1103,16 @@ export default {
 }
 .chat-chip:active {
   background: rgba(45, 212, 191, 0.16);
+  transform: scale(0.97);
+}
+/* Touch: a bigger target and text, still a row of pills */
+@media (pointer: coarse) {
+  .chat-chip {
+    min-height: 2.25rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+    border-radius: 1.125rem;
+  }
 }
 
 /* ── Input ── */

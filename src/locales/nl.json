@@ -254,6 +254,18 @@
     "openBasic": "Chat openen",
     "closeBasic": "Chat sluiten",
     "suggestions": "Voorgestelde vragen",
+    "ask": {
+      "skills": "Welke technologieën kent hij?",
+      "projects": "Welke projecten maakte hij?",
+      "tools": "Welke tools maakte hij?",
+      "experience": "Waar heeft hij gewerkt?",
+      "education": "Wat heeft hij gestudeerd?",
+      "contact": "Hoe kan ik hem bereiken?",
+      "drupal": "Draagt hij bij aan Drupal?",
+      "about": "Wie is Robbe?",
+      "location": "Waar woont hij?",
+      "hobbies": "Wat zijn zijn hobby's?"
+    },
     "thinking": "Nadenken",
     "answered": "Beantwoord in"
   },
@@ -409,7 +421,36 @@
     "weeklySummary": "Staafdiagram: {total} commits in de laatste 6 maanden, hoogstens {max} in één week",
     "weekBar": "geen commits | 1 commit | {n} commits",
     "private": "Privérepository: cijfers van {date}",
-    "public": "Publieke repository op {link}: cijfers van {date}"
+    "public": "Publieke repository op {link}: cijfers van {date}",
+    "dependencies": "Dependencies {ago} bijgewerkt",
+    "alerts": "Geen open beveiligingsmeldingen | 1 open beveiligingsmelding | {n} open beveiligingsmeldingen",
+    "severity": {
+      "critical": "{n} kritiek",
+      "high": "{n} hoog",
+      "medium": "{n} gemiddeld",
+      "low": "{n} laag"
+    }
+  },
+  "speed": {
+    "title": "Lighthouse-scores",
+    "performance": "Prestaties",
+    "accessibility": "Toegankelijkheid",
+    "bestPractices": "Praktische tips",
+    "seo": "SEO",
+    "score": "{n} van 100",
+    "measured": {
+      "mobile": "Gemeten op mobiel, {date}",
+      "desktop": "Gemeten op desktop, {date}"
+    },
+    "report": "PageSpeed-rapport"
+  },
+  "activity": {
+    "total": "Geen commits in het laatste jaar | 1 commit in het laatste jaar | {n} commits in het laatste jaar",
+    "note": "Per dag, in al mijn projecten, deze twee tools en deze site. Cijfers van {date}.",
+    "summary": "Commits per dag in het laatste jaar: {total} in totaal, op {days} dagen, hoogstens {max} op één dag.",
+    "day": "Geen commits op {date} | 1 commit op {date} | {n} commits op {date}",
+    "less": "Minder",
+    "more": "Meer"
   },
   "tools": {
     "title": "Tools",
@@ -484,5 +525,12 @@
       "shotCommit": "het commitvak: Write with AI, een Teamwork-taak",
       "altCommit": "Sift met vijf gestagede bestanden, waarvan er één getoond wordt, en een commitbericht klaar om te committen, met de regel voor de Teamwork-taak en de knop Write with AI erboven en ernaast"
     }
+  },
+  "share": {
+    "photo": "Met een foto van Robbe Saelens.",
+    "photos": "Met twee foto's van Robbe: lesgeven in de paardensport, en springen op een wedstrijd.",
+    "project": "Met screenshots van {name} in een browser en op een gsm.",
+    "projects": "Met screenshots van zijn projecten.",
+    "tools": "Met schermafbeeldingen van Project Updater en Sift, de twee Mac-apps die hij bouwde."
   }
 }

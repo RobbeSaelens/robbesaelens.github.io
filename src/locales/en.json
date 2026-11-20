@@ -254,6 +254,18 @@
     "openBasic": "Open chat",
     "closeBasic": "Close chat",
     "suggestions": "Suggested questions",
+    "ask": {
+      "skills": "Which technologies does he know?",
+      "projects": "Which projects did he build?",
+      "tools": "Which tools did he build?",
+      "experience": "Where has he worked?",
+      "education": "What did he study?",
+      "contact": "How can I contact him?",
+      "drupal": "Does he contribute to Drupal?",
+      "about": "Who is Robbe?",
+      "location": "Where does he live?",
+      "hobbies": "What are his hobbies?"
+    },
     "thinking": "Thinking",
     "answered": "Answered in"
   },
@@ -409,7 +421,36 @@
     "weeklySummary": "Bar chart: {total} commits in the last 6 months, at most {max} in one week",
     "weekBar": "no commits | 1 commit | {n} commits",
     "private": "Private repository: numbers as of {date}",
-    "public": "Public repository on {link}: numbers as of {date}"
+    "public": "Public repository on {link}: numbers as of {date}",
+    "dependencies": "Dependencies updated {ago}",
+    "alerts": "No open security alerts | 1 open security alert | {n} open security alerts",
+    "severity": {
+      "critical": "{n} critical",
+      "high": "{n} high",
+      "medium": "{n} medium",
+      "low": "{n} low"
+    }
+  },
+  "speed": {
+    "title": "Lighthouse scores",
+    "performance": "Performance",
+    "accessibility": "Accessibility",
+    "bestPractices": "Best practices",
+    "seo": "SEO",
+    "score": "{n} of 100",
+    "measured": {
+      "mobile": "Measured on mobile, {date}",
+      "desktop": "Measured on desktop, {date}"
+    },
+    "report": "PageSpeed report"
+  },
+  "activity": {
+    "total": "No commits in the last year | 1 commit in the last year | {n} commits in the last year",
+    "note": "Per day, in all my projects, these two tools and this site. Numbers as of {date}.",
+    "summary": "Commits per day over the last year: {total} in total, on {days} days, at most {max} in one day.",
+    "day": "No commits on {date} | 1 commit on {date} | {n} commits on {date}",
+    "less": "Less",
+    "more": "More"
   },
   "tools": {
     "title": "Tools",
@@ -484,5 +525,12 @@
       "shotCommit": "the commit box: Write with AI, a Teamwork task",
       "altCommit": "Sift with five files staged, one of them shown, and a commit message ready to commit, with the Teamwork task line and the Write with AI button above and beside it"
     }
+  },
+  "share": {
+    "photo": "With a photo of Robbe Saelens.",
+    "photos": "With two photos of Robbe: teaching equestrian sports, and show jumping.",
+    "project": "With screenshots of {name} in a browser and on a phone.",
+    "projects": "With screenshots of his projects.",
+    "tools": "With captures of Project Updater and Sift, the two Mac apps he built."
   }
 }

@@ -50,3 +50,26 @@ test('a11y: open chatbot', async ({ page }) => {
   const { violations } = await new AxeBuilder({ page }).withTags(TAGS).include('.chatbot-root').analyze()
   expect(report(violations)).toEqual([])
 })
+
+test('a11y: chatbot with an answer and its follow-up questions', async ({ page }) => {
+  await prepare(page, 'dark')
+  // The AI is faked (registered last, so it wins over the blocked hosts)
+  const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type' }
+  await page.route('https://chat.invalid/chat', (route) =>
+    route.request().method() === 'OPTIONS'
+      ? route.fulfill({ status: 204, headers: cors })
+      : route.fulfill({
+          headers: cors,
+          json: { reply: 'Robbe works at Dynamate.', suggestions: ['What does he do there?', 'Which projects did he build?'] },
+        }),
+  )
+  await page.goto('/')
+  await settle(page)
+  await page.getByRole('button', { name: 'Open AI chat' }).click()
+  await page.locator('#chat-input').fill('Where does he work?')
+  await page.locator('#chat-input').press('Enter')
+  await expect(page.getByRole('group', { name: 'Suggested questions' }).getByRole('button')).toHaveCount(2)
+  await page.waitForTimeout(600) // the chips' entrance
+  const { violations } = await new AxeBuilder({ page }).withTags(TAGS).include('.chatbot-root').analyze()
+  expect(report(violations)).toEqual([])
+})

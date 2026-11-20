@@ -76,6 +76,149 @@
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
+
+/* =============================================
+   The activity grid (ActivityHeatmap.vue), between the line and the intro: every commit of
+   the last year, a week a column. It fits its column, whatever the width: cells from about
+   5px on a phone to 13px, then it stops growing (54rem), so it never scrolls. Gaps of 1px
+   where cells are small, 3px where there is room.
+   ============================================= */
+.tools-page .heat {
+  container-type: inline-size;
+  max-width: 54rem;
+  margin: 1.5rem 0 1.25rem;
+}
+/* A short screen as wide as a tablet (a laptop at 200 % zoom, a phone on its side): there
+   the grid's right end, today, would lie under the chat button in the corner */
+@media (min-width: 640px) and (max-width: 1023px) and (max-height: 560px) {
+  .tools-page .heat {
+    max-width: 33rem;
+  }
+}
+.tools-page .heat-graph {
+  --gap: 1px;
+}
+@container (min-width: 36rem) {
+  .tools-page .heat-graph {
+    --gap: 2px;
+  }
+}
+@container (min-width: 48rem) {
+  .tools-page .heat-graph {
+    --gap: 3px;
+  }
+}
+.tools-page .heat-months,
+.tools-page .heat-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+/* A name runs on over the next columns: months are four or five apart */
+.tools-page .heat-months {
+  margin-bottom: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+.tools-page .heat-month {
+  grid-row: 1;
+  white-space: nowrap;
+}
+.tools-page .heat-col {
+  display: grid;
+  grid-template-rows: repeat(7, auto);
+  row-gap: var(--gap);
+  align-content: start;
+}
+.tools-page .heat-day {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--color-heat-0);
+}
+.tools-page .heat-day.l1 {
+  background: var(--color-heat-1);
+}
+.tools-page .heat-day.l2 {
+  background: var(--color-heat-2);
+}
+.tools-page .heat-day.l3 {
+  background: var(--color-heat-3);
+}
+.tools-page .heat-day.l4 {
+  background: var(--color-heat-4);
+}
+/* Under it: the total and where the numbers come from, the legend at the end */
+.tools-page .heat-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.75rem;
+}
+.tools-page .heat-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+.tools-page .heat-total {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.tools-page .heat-note {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+.tools-page .heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+}
+.tools-page .heat-legend .heat-day {
+  width: 0.625rem;
+}
+.tools-page .heat-legend .heat-day:first-of-type {
+  margin-left: 0.25rem;
+}
+.tools-page .heat-legend .heat-day:last-of-type {
+  margin-right: 0.25rem;
+}
+/* The entrance: the columns fade in left to right, the last (today) about 0.3s after the
+   first, each in 0.3s, once the header's labels have started rising (their --i). CSS only,
+   like .hero-in: hidden only when JavaScript runs, and until the intro is done. With
+   reduced motion they are simply there (and the global rule drops every delay). */
+html.js .tools-page .heat-col {
+  opacity: 0;
+}
+html.js.intro-done .tools-page .heat-col {
+  animation: heat-col-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 160ms + var(--d, 0ms));
+}
+@keyframes heat-col-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .tools-page .heat-col,
+  html.js.intro-done .tools-page .heat-col {
+    opacity: 1;
+    animation: none;
+  }
+}
 @media (min-width: 1024px) {
   .tools-page .project-page {
     display: grid;

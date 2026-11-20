@@ -79,9 +79,10 @@ function firstCommitDay(key: string): string | undefined {
 
 /**
  * The work a project page is about: the site (WebSite) or the app (WebApplication)
- * itself, in the page's language. Name, headline, description and image are the
- * page's own (title, meta description, og:image); the live site, the stack and the
- * code come from PROJECTS; dateCreated is the first commit of its repository.
+ * itself, in the page's language. Name, headline and description are the page's own
+ * (title, meta description), the image its real screenshot (the route's meta.image; the
+ * share image, og:image, is a card about the page, not the work); the live site, the
+ * stack and the code come from PROJECTS; dateCreated is the first commit of its repository.
  */
 function projectNode(site: string, path: string, title: string, description: string, image: string) {
   const project = PROJECTS.find((p) => p.path === stripLocale(path))
@@ -276,7 +277,9 @@ export function drupalCreditsJsonLd(
 
 /**
  * Full @graph for a route, ready to be JSON.stringify'd into a script tag. `image` is
- * the page's og:image, as an absolute URL.
+ * the page's own picture (its route's meta.image: a project's screenshot), as an absolute
+ * URL. Like the person's photo and the tools' captures, it is the thing itself; the share
+ * image (og:image, src/seo/share.ts) only goes in the head.
  */
 export function routeJsonLd(
   path: string,
