@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 import { baseCompile } from '@intlify/message-compiler'
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
+import type { ShareCard } from '../src/seo/shareCards'
 import { MOVED, nl, ROUTES } from './routes'
 import { measureCurrentSlide, SLIDES } from './slides'
 
@@ -127,6 +129,37 @@ for (const route of ROUTES) {
       expect(overflow).toBeLessThanOrEqual(1)
     })
 
+    // What a link preview shows (LinkedIn, Teams, WhatsApp, Slack): the page's own share
+    // image (scripts/og.mjs), from the prerendered HTML, which is all their crawlers read.
+    test('has a share image of its own in each language: a 1200 × 630 PNG, with its alt text', async ({ request }) => {
+      const images: string[] = []
+      for (const url of [route, nl(route)]) {
+        const html = await (await request.get(url)).text()
+        const meta = (key: string) => html.match(new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`))?.[1]
+        const image = meta('og:image')!
+        expect(image, url).toMatch(/^https:\/\/robbesaelens\.github\.io\/og\/[\w/-]+\.png$/)
+        expect(meta('twitter:image'), url).toBe(image)
+        expect(meta('og:image:type'), url).toBe('image/png')
+        expect([meta('og:image:width'), meta('og:image:height')], url).toEqual(['1200', '630'])
+        // The alt text names the page, in its language
+        const title = html.match(/<title>([^<]+)<\/title>/)![1]
+        expect(meta('og:image:alt')!.startsWith(title), url).toBe(true)
+        expect(meta('twitter:image:alt'), url).toBe(meta('og:image:alt'))
+
+        const res = await request.get(new URL(image).pathname)
+        expect(res.status(), image).toBe(200)
+        expect(res.headers()['content-type'], image).toBe('image/png')
+        const png = await res.body()
+        // The PNG's own size, from its header (IHDR)
+        expect(png.subarray(1, 4).toString(), image).toBe('PNG')
+        expect([png.readUInt32BE(16), png.readUInt32BE(20)], image).toEqual([1200, 630])
+        // Light enough for every preview (some skip large images, WhatsApp around 300 KB)
+        expect(png.length, image).toBeLessThan(300 * 1024)
+        images.push(image)
+      }
+      expect(images[0], 'each language has its own').not.toBe(images[1])
+    })
+
     test('ships SEO tags in the prerendered HTML, in both languages', async ({ request }) => {
       // Raw HTML, no JavaScript: what search engines and AI crawlers get.
       for (const url of [route, nl(route)]) {
@@ -187,6 +220,37 @@ test('sitemap lists exactly the tested routes', async ({ request }) => {
   for (const [from] of MOVED) expect(xml).not.toContain(from)
   // every URL points at both language versions
   expect(xml.match(/hreflang="nl"/g)).toHaveLength(ROUTES.length * 2)
+})
+
+// The share images' cards (src/seo/shareCards.ts), read back from the SSR bundle the build
+// drew them from (scripts/og.mjs), against the pages they are about.
+test.describe('share images', () => {
+  const cards = async (): Promise<ShareCard[]> =>
+    (await import(new URL('../dist-ssr/entry-server.js', import.meta.url).href)).shareCards()
+
+  test('there is one for every page, in both languages, where its head says', async ({ request }) => {
+    const all = await cards()
+    expect(all.map((card) => card.path).sort()).toEqual([...ROUTES, ...ROUTES.map(nl)].sort())
+    for (const card of all) {
+      const html = await (await request.get(card.path)).text()
+      expect(html, card.path).toContain(`<meta property="og:image" content="https://robbesaelens.github.io/${card.file}">`)
+    }
+  })
+
+  test('each says what its page says: the title, the "$" line, a project\'s tagline', async ({ browser }) => {
+    // The prerendered page, before the app (and the "$" line's effect) runs
+    const context = await browser.newContext({ javaScriptEnabled: false })
+    const page = await context.newPage()
+    for (const card of await cards()) {
+      await page.goto(card.path)
+      await expect(page.locator('h1 .terminal-text'), card.path).toHaveText(card.title)
+      // The "$" line: the pages' TerminalCommand, or the home page's role
+      const command = await page.locator('.terminal-subtitle .terminal-command, .hero-role').first().textContent()
+      expect(command!.trim().replace(/^\$\s*/, ''), card.path).toBe(card.command)
+      if (card.kind === 'project') await expect(page.locator('.hero-tagline'), card.path).toHaveText(card.text)
+    }
+    await context.close()
+  })
 })
 
 // What the AI chatbot answers from, written by the build (src/llms.ts): the hand-written
@@ -1172,18 +1236,19 @@ test.describe('project page screenshots', () => {
 })
 
 // The structured data of each project page, as crawlers read it from the prerendered
-// HTML: the site or app itself, with the page's own name, description and image.
+// HTML: the site or app itself, with the page's own name and description, and its real
+// screenshot (the share image, og:image, is about the page, not the work).
 test.describe('project structured data', () => {
   const stats = JSON.parse(readFileSync(new URL('../src/data/repo-stats.json', import.meta.url), 'utf8'))
   const PROJECTS = [
-    { route: '/exultadetail', type: 'WebSite', name: 'Exulta', stats: 'exulta', live: 'https://exulta.be' },
-    { route: '/scan2talkdetail', type: 'WebApplication', name: 'Scan2Talk', stats: 'scan2talk', live: 'https://scan2talk.be' },
-    { route: '/stablemanagerdetail', type: 'WebApplication', name: 'Stable Manager', stats: 'stableManager' },
-    { route: '/vhsdetail', type: 'WebSite', name: 'VHS Service', stats: 'vhs' },
+    { route: '/exultadetail', type: 'WebSite', name: 'Exulta', stats: 'exulta', shot: 'exulta', live: 'https://exulta.be' },
+    { route: '/scan2talkdetail', type: 'WebApplication', name: 'Scan2Talk', stats: 'scan2talk', shot: 'scan2talk', live: 'https://scan2talk.be' },
+    { route: '/stablemanagerdetail', type: 'WebApplication', name: 'Stable Manager', stats: 'stableManager', shot: 'stable-manager' },
+    { route: '/vhsdetail', type: 'WebSite', name: 'VHS Service', stats: 'vhs', shot: 'vhs' },
   ]
   const attr = (html: string, pattern: RegExp) => html.match(pattern)?.[1]?.replace(/&amp;/g, '&').replace(/&#39;/g, "'")
 
-  for (const { route, type, name, stats: key, live } of PROJECTS) {
+  for (const { route, type, name, stats: key, shot, live } of PROJECTS) {
     for (const url of [route, nl(route)]) {
       test(`${url} describes ${name} as a ${type}`, async ({ request }) => {
         const html = await (await request.get(url)).text()
@@ -1198,7 +1263,8 @@ test.describe('project structured data', () => {
         expect(project.description).toBe(attr(html, /<meta name="description" content="([^"]+)"/))
         expect(project.headline).toBe(attr(html, /<title>([^<]+) \| Robbe Saelens<\/title>/))
         expect(project.url).toBe(canonical)
-        expect(project.image).toBe(attr(html, /<meta property="og:image" content="([^"]+)"/))
+        expect(project.image).toBe(`https://robbesaelens.github.io/${shot}-home.jpg`)
+        expect(attr(html, /<meta property="og:image" content="([^"]+)"/)).toBe(`https://robbesaelens.github.io/og${url}.png`)
         expect(project.sameAs).toBe(live)
         expect(project.dateCreated).toBe(stats.projects[key].firstCommit.slice(0, 10))
         expect(project.keywords).toMatch(/\w+, \w+/)
