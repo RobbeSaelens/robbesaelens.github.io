@@ -12,11 +12,12 @@
  * - src/tools.ts: the tools Robbe built to maintain his projects (the tools page)
  * - src/data/repo-stats.json and src/data/drupal.json: the numbers the daily deploy refreshes
  *
- * Most important first: the profile, the projects, the tools, then the Drupal contributions. To fit
- * the budget, numbered lists (a project's features, Stable Manager's Drupal points,
- * Scan2Talk's steps) go by title, their texts stay on the pages; and the Drupal issues,
- * which grow every day, fill what is left, latest first, pointing to /drupal for the rest.
- * Anything else over the budget fails the build.
+ * Most important first: the profile, the projects, the tools, then the Drupal contributions.
+ * Everything the pages say goes in whole: every feature with its text, Stable Manager's
+ * Drupal points and Scan2Talk's steps with theirs, the tools' points and stories. Only the
+ * Drupal issues, which grow every day, fill what is left (all of them for now, latest
+ * first), pointing to /drupal for any that don't fit. Anything else over the budget fails
+ * the build.
  *
  * English only: the chatbot answers in the visitor's language.
  */
@@ -29,12 +30,16 @@ import en from './locales/en.json'
 import { routes } from './bootstrap/router'
 import { PROJECT_PAGES, type ProjectEntry } from './projects'
 import { PROJECT_DATA, scan2talkCheckIn, stableManagerDrupal } from './screens/details/data'
-import { tools as toolData } from './tools'
+import { tools as toolData, type ToolStep } from './tools'
 import type { IndexItem } from './components/project/project'
 import { absoluteUrl } from './site'
 
-/** What the status-worker reads (MAX_CHARS in its src/knowledge.ts); the build fails above it. */
-export const LLMS_MAX_CHARS = 12_000
+/**
+ * What the status-worker reads (MAX_CHARS in its src/knowledge.ts: the two must match);
+ * the build fails above it. Every chat request sends it to the AI, about 5,000 tokens at
+ * this size: raising it costs Workers AI allocation on every question (status-worker README).
+ */
+export const LLMS_MAX_CHARS = 20_000
 
 const english = createI18n({ legacy: false, locale: 'en', messages: { en } }).global as unknown as Composer
 
@@ -52,8 +57,9 @@ const longDay = (iso: string) => date(iso, { day: 'numeric', month: 'long', year
 const monthYear = (iso: string) => date(iso, { month: 'long', year: 'numeric' })
 
 const list = (items: string[]) => items.map((item) => `- ${item}`).join('\n')
-/** A numbered list by its titles (a title may hold a comma) */
-const titles = (items: IndexItem[]) => items.map((item) => item.title).join('; ')
+/** A numbered list as the page shows it (features, Drupal points, steps): each title with its text */
+const numbered = (heading: string, items: IndexItem[]) =>
+  `${heading}:\n${items.map((item, i) => `${i + 1}. ${item.title}: ${item.text}`).join('\n')}`
 const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1)
 
 /** The English pages, in the router's order. */
@@ -101,18 +107,17 @@ function activity(key: RepoKey): string {
 const EXTRA: Partial<Record<ProjectEntry['id'], () => string>> = {
   scan2talk() {
     const { title, steps } = scan2talkCheckIn(t)
-    return `${title}: ${steps.map((step, i) => `${i + 1}. ${step.title}`).join('; ')}.`
+    return numbered(title, steps)
   },
   'stable-manager'() {
     const block = stableManagerDrupal(t)
     return [
-      `${block.title}: ${block.name} (${block.repository}). ${block.intro}`,
-      list([
-        `${t('project.featuresTitle')}: ${titles(block.points)}`,
-        `Built with: ${block.stack.join(', ')}`,
-        `Repository (public): ${activity('sharedCosts')}`,
-      ]),
-    ].join('\n')
+      [
+        `${block.title}: ${block.name} (${block.repository}). ${block.intro}`,
+        list([`Built with: ${block.stack.join(', ')}`, `Repository (public): ${activity('sharedCosts')}`]),
+      ].join('\n'),
+      numbered(`${t('project.featuresTitle')} (the Drupal version)`, block.points),
+    ].join('\n\n')
   },
 }
 
@@ -134,10 +139,10 @@ function project(entry: ProjectEntry): string {
         `Built with: ${data.languages.join(', ')}`,
         `Tools: ${data.tools.join(', ')}`,
         `Repository${data.repo.label ? ` (${data.repo.label})` : ''}: ${activity(data.repo.key)}`,
-        `${t('project.featuresTitle')}: ${titles(data.features)}`,
       ]),
     ].join('\n'),
     data.about,
+    numbered(t('project.featuresTitle'), data.features),
     EXTRA[entry.id]?.(),
   ]
     .filter(Boolean)
@@ -146,15 +151,25 @@ function project(entry: ProjectEntry): string {
 
 function projects(): string {
   return [
-    "In the order of the projects page. The texts are Robbe's own, in the first person; each page explains the features in full. " +
+    "In the order of the projects page. The texts are Robbe's own, in the first person, as on each project's page. " +
       `Repositories are private unless noted, numbers as of ${longDay(repoStats.generatedAt)}.`,
     ...PROJECT_PAGES.map(project),
   ].join('\n\n')
 }
 
+/** A story's card with what it holds: "both in one, light: diffs, …; new: AI commits, Teamwork" */
+function holds(step: ToolStep): string {
+  const tags = step.tags ?? []
+  const old = tags.filter((tag) => !tag.isNew).map((tag) => tag.text)
+  const added = tags.filter((tag) => tag.isNew).map((tag) => tag.text)
+  return [step.text, old.length && `: ${old.join(', ')}`, added.length && `; new: ${added.join(', ')}`]
+    .filter(Boolean)
+    .join('')
+}
+
 /**
- * The tools page: each tool, its headline, status and stack, what it does (its points),
- * its story (how an update runs, or why Sift exists) and its description.
+ * The tools page: each tool, its headline and sentence, status and stack, what it does (its
+ * points), its story (how an update runs, or why Sift exists) and its description.
  */
 function tools(): string {
   const route = pageRoutes.find((page) => page.name === 'Tools')
@@ -166,11 +181,12 @@ function tools(): string {
       const told =
         story.kind === 'pipeline'
           ? `${story.title}: ${story.steps.map((step) => `${step.title} (${step.text})`).join(' → ')}, ${story.or}`
-          : `${story.title}: ${story.from.map((app) => `${app.title} (${app.text})`).join(' + ')} → ${story.to.title} (${story.to.text}). ${story.caption}`
+          : `${story.title}: ${story.from.map((app) => `${app.title} (${app.text})`).join(' + ')} → ${story.to.title} (${holds(story.to)}). ${story.caption}`
       return [
         [
           `### ${tool.name}`,
           tool.headline,
+          tool.summary,
           list([
             `Status: ${tool.platform} app, version ${tool.version}, ${
               tool.repository ? `open source: ${tool.repository}` : 'private repository for now'
