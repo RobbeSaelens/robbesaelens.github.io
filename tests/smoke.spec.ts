@@ -254,7 +254,10 @@ test.describe('share images', () => {
 })
 
 // What the AI chatbot answers from, written by the build (src/llms.ts): the hand-written
-// profile, then the site's own data. The status-worker reads the first 12,000 characters.
+// profile, then the site's own data. The status-worker reads the first 20,000 characters
+// (LLMS_MAX_CHARS in src/llms.ts, MAX_CHARS in its src/knowledge.ts).
+const LLMS_MAX_CHARS = 20_000
+
 test.describe('llms.txt', () => {
   const read = (file: string) => readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8')
   const en = JSON.parse(read('locales/en.json'))
@@ -268,7 +271,7 @@ test.describe('llms.txt', () => {
 
   test('fits what the chatbot reads, in the llmstxt.org shape, as plain text', async ({ request }) => {
     const text = await llms(request)
-    expect(text.trim().length).toBeLessThanOrEqual(12_000)
+    expect(text.trim().length).toBeLessThanOrEqual(LLMS_MAX_CHARS)
     expect(text).toMatch(/^# Robbe Saelens\n\n> /)
     const headings = [...text.matchAll(/^## (.+)$/gm)].map((m) => m[1])
     expect(headings).toEqual(expect.arrayContaining(['Identity', 'Personal', 'Not to share', 'Pages', 'Projects', 'Drupal contributions']))
@@ -309,11 +312,19 @@ test.describe('llms.txt', () => {
       expect(text).toContain(`### ${en[ns].title}\n`)
       expect(text).toContain(`https://robbesaelens.github.io${path}`)
       expect(text).toContain(en[ns].aboutText)
-      // Every title of its numbered lists: the features, Stable Manager's Drupal points, Scan2Talk's steps
-      const titles = Object.keys(en[ns]).filter((key) => /^(feature|drupal|flowStep)/.test(key) && `${key}Text` in en[ns])
-      expect(titles.length).toBeGreaterThan(0)
-      for (const key of titles) expect(text, `${ns}.${key}`).toContain(en[ns][key])
+      // Every item of its numbered lists, title and text as on the page: the features,
+      // Stable Manager's Drupal points, Scan2Talk's steps
+      const items = Object.keys(en[ns]).filter((key) => /^(feature|drupal|flowStep)/.test(key) && `${key}Text` in en[ns])
+      expect(items.length).toBeGreaterThan(0)
+      const lines = text.split('\n')
+      for (const key of items) {
+        const item = `${en[ns][key]}: ${en[ns][`${key}Text`]}`
+        expect(lines.some((line) => /^\d\. /.test(line) && line.slice(3) === item), `${ns}.${key}`).toBe(true)
+      }
     }
+    expect(text).toContain(`${en.project.featuresTitle}:\n1. ${en.exulta.featureCatalog}: `)
+    expect(text).toContain(`${en.scan2talk.flowTitle}:\n1. ${en.scan2talk.flowStep1}: ${en.scan2talk.flowStep1Text}\n`)
+    expect(text).toContain(`(the Drupal version):\n1. ${en.stableManager.drupalField}: `)
     for (const tagline of Object.values(en.projects.items).map((item) => (item as { tagline: string }).tagline)) {
       if (tagline !== en.projects.items['coming-soon'].tagline) expect(text).toContain(tagline)
     }
@@ -339,7 +350,7 @@ test.describe('llms.txt', () => {
       ['Sift', 'sift'],
     ] as const) {
       const tool = en.tools[ns] as Record<string, string>
-      expect(text).toContain(`### ${name}\n${tool.headline}\n`)
+      expect(text).toContain(`### ${name}\n${tool.headline}\n${tool.summary}\n`)
       expect(text).toContain(tool.description)
       for (const key of Object.keys(tool).filter((key) => key.startsWith('point'))) expect(text, `${ns}.${key}`).toContain(tool[key])
     }
@@ -349,6 +360,9 @@ test.describe('llms.txt', () => {
     expect(text).toContain(`${updater.storyTitle}: ${updater.stepScan} (${updater.stepScanText}) → ${updater.stepUpdate}`)
     // Sift's story, in Robbe's words
     expect(text).toContain('PhpStorm (diffs & commits) + Sublime Merge (branches & history) → Sift')
+    // ...and what Sift's card holds, what it took from both and what's new
+    expect(text).toContain(`→ Sift (${en.tools.sift.toSift}: ${en.tools.sift.tagDiffs}, `)
+    expect(text).toContain(`; new: ${en.tools.sift.tagAi}, ${en.tools.sift.tagTeamwork})`)
     expect(text).toContain(en.tools.sift.storyCaption)
     // Its AI and Teamwork features, exactly
     expect(text).toContain('Write with AI has Claude Code write the commit message')
@@ -358,7 +372,7 @@ test.describe('llms.txt', () => {
     expect(text).not.toMatch(/github\.com\/RobbeSaelens\/(?:Project-Updater|project-updater|Sift|sift)\b/i)
   })
 
-  test('holds the Drupal contributions: the counts and every issue, or points to the rest', async ({ request }) => {
+  test('holds the Drupal contributions: the counts and every issue that fits, the rest only when full', async ({ request }) => {
     const text = await llms(request)
     expect(text).toContain(`${drupal.issuesCreated.length} issues opened, ${drupal.credits.length} credits`)
     // One line per issue, its credit and merge request with it; the latest first
@@ -370,10 +384,12 @@ test.describe('llms.txt', () => {
     for (const mr of drupal.mergeRequests) add(mr.issue, mr.title, mr.url)
     const listed = [...urls.values()].filter((issue) => issue.urls.some((url) => text.includes(`](${url})`)))
     for (const issue of listed) expect(text).toContain(`[${issue.title}](`)
-    // What doesn't fit is on the Drupal page
+    // What doesn't fit is on the Drupal page; issues are only left out once the next one
+    // (a line of a few hundred characters) would go over the budget
     const rest = Number(text.match(/^- (\d+) older ones: https:\/\/robbesaelens\.github\.io\/drupal$/m)?.[1] ?? 0)
     expect(listed.length + rest).toBe(urls.size)
     expect(listed.length).toBeGreaterThan(0)
+    if (rest > 0) expect(text.trim().length, 'issues left out while there was room').toBeGreaterThan(LLMS_MAX_CHARS - 600)
   })
 })
 

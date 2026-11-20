@@ -112,13 +112,16 @@ test.describe('thinking line (LatticeLoader)', () => {
     await setup(page)
     const release = await heldAi(page)
     await openChat(page)
-    const body = page.locator('.chat-body')
-    // The chat body is the one live region: the loader adds no role="status" of its own.
-    await expect(body).toHaveAttribute('aria-live', 'polite')
+    // The conversation's log (role="log", polite) is the one live region: the loader sits
+    // outside it, aria-hidden, and adds no role="status" of its own; the chips too.
+    const body = page.getByRole('log')
+    await expect(page.locator('.chatbot-window [aria-live], .chatbot-window [role="log"]')).toHaveCount(1)
+    await expect(body).toHaveCount(1)
     await ask(page, 'What does Robbe build?')
     await expect(running(page)).toBeVisible()
     await expect(page.locator('.chatbot-window').getByRole('status')).toHaveCount(0)
     expect(await body.ariaSnapshot()).not.toMatch(/Thinking|in progress/)
+    expect(await page.locator('.chat-body').ariaSnapshot()).not.toMatch(/Thinking|in progress/)
     await page.waitForTimeout(400) // the row's own fade-in
     let { violations } = await new AxeBuilder({ page }).withTags(TAGS).include('.chatbot-root').analyze()
     expect(report(violations), 'while thinking').toEqual([])

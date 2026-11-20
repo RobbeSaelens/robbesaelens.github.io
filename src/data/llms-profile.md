@@ -1,14 +1,16 @@
 <!--
   The hand-written part of /llms.txt, the text the site's AI chatbot answers from: what
   the pages don't say. The build (scripts/llms.mjs, src/llms.ts) adds the rest from the
-  site's own data: the pages, every project with its features, stack and repository
-  numbers, and the Drupal contributions. The sections below come first, in this order,
-  except one whose heading matches a generated section ("Drupal contributions"): it
-  opens that section. Empty sections and these comments are left out.
+  site's own data: the pages, every project with its features (and their texts), stack
+  and repository numbers, the tools, and the Drupal contributions. The sections below
+  come first, in this order, except one whose heading matches a generated section
+  ("Drupal contributions"): it opens that section. Empty sections and these comments are
+  left out.
 
-  Budget: the chatbot reads the first 12,000 characters of the result. The Drupal issues
-  fill what is left (latest first, the others are on the Drupal page); beyond that the
-  build fails. `npm run build` prints the size. Write plain Markdown, no HTML.
+  Budget: the chatbot reads the first 20,000 characters of the result (LLMS_MAX_CHARS in
+  src/llms.ts). The Drupal issues fill what is left (latest first, any others are on the
+  Drupal page); beyond that the build fails. `npm run build` prints the size. Write plain
+  Markdown, no HTML.
 -->
 
 # Robbe Saelens
