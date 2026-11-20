@@ -409,7 +409,36 @@
     "weeklySummary": "Staafdiagram: {total} commits in de laatste 6 maanden, hoogstens {max} in één week",
     "weekBar": "geen commits | 1 commit | {n} commits",
     "private": "Privérepository: cijfers van {date}",
-    "public": "Publieke repository op {link}: cijfers van {date}"
+    "public": "Publieke repository op {link}: cijfers van {date}",
+    "dependencies": "Dependencies {ago} bijgewerkt",
+    "alerts": "Geen open beveiligingsmeldingen | 1 open beveiligingsmelding | {n} open beveiligingsmeldingen",
+    "severity": {
+      "critical": "{n} kritiek",
+      "high": "{n} hoog",
+      "medium": "{n} gemiddeld",
+      "low": "{n} laag"
+    }
+  },
+  "speed": {
+    "title": "Lighthouse-scores",
+    "performance": "Prestaties",
+    "accessibility": "Toegankelijkheid",
+    "bestPractices": "Praktische tips",
+    "seo": "SEO",
+    "score": "{n} van 100",
+    "measured": {
+      "mobile": "Gemeten op mobiel, {date}",
+      "desktop": "Gemeten op desktop, {date}"
+    },
+    "report": "PageSpeed-rapport"
+  },
+  "activity": {
+    "total": "Geen commits in het laatste jaar | 1 commit in het laatste jaar | {n} commits in het laatste jaar",
+    "note": "Per dag, in al mijn projecten, deze twee tools en deze site. Cijfers van {date}.",
+    "summary": "Commits per dag in het laatste jaar: {total} in totaal, op {days} dagen, hoogstens {max} op één dag.",
+    "day": "Geen commits op {date} | 1 commit op {date} | {n} commits op {date}",
+    "less": "Minder",
+    "more": "Meer"
   },
   "tools": {
     "title": "Tools",
