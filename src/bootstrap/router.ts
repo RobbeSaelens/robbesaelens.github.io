@@ -93,13 +93,13 @@ const pages: RouteRecordRaw[] = [
     meta: {
       title: 'Tools - Project Updater and Sift',
       description:
-        'How Robbe Saelens maintains his projects, with tools he built: Project Updater, which updates them with Claude Code, and Sift, a light Git client for macOS.',
+        'How Robbe Saelens maintains his projects, with tools he built: Project Updater, which updates them with AI, and Sift, a light Git client for macOS.',
       // The hash picks one of the two tools (/tools#sift): see scrollBehavior below
       hashTabs: true,
       nl: {
         title: 'Tools - Project Updater en Sift',
         description:
-          'Hoe Robbe Saelens zijn projecten onderhoudt met zelfgebouwde tools: Project Updater, die ze bijwerkt met Claude Code, en Sift, een lichte Git-client voor macOS.',
+          'Hoe Robbe Saelens zijn projecten onderhoudt met zelfgebouwde tools: Project Updater, die ze bijwerkt met AI, en Sift, een lichte Git-client voor macOS.',
       },
     },
   },

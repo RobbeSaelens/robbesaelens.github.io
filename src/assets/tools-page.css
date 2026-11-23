@@ -306,6 +306,8 @@ html.js.intro-done .tools-page .heat-col {
   touch-action: manipulation;
   /* Opening the page at /tools#sift: the browser's own jump to the tab lands at the top */
   scroll-margin-top: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease-out;
 }
 .tools-page .tool-tab-inner {
   display: flex;
@@ -317,8 +319,7 @@ html.js.intro-done .tools-page .heat-col {
   border: 1px solid transparent;
   transition:
     background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.12s ease-out;
+    border-color 0.2s ease;
 }
 .tools-page .tool-tab.is-active .tool-tab-inner {
   background: var(--tool-soft);
@@ -328,6 +329,7 @@ html.js.intro-done .tools-page .heat-col {
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tools-page .tool-tab-text {
   display: flex;
@@ -356,12 +358,16 @@ html.js.intro-done .tools-page .heat-col {
 @media (hover: hover) and (pointer: fine) {
   .tools-page .tool-tab:not(.is-active):hover .tool-tab-inner {
     background: var(--color-surface-hover);
+    border-color: var(--tool-border);
+  }
+  .tools-page .tool-tab:not(.is-active):hover .tool-tab-icon {
+    transform: scale(1.06);
   }
   .tools-page .tool-tab:not(.is-active):hover .tool-tab-name {
     color: var(--color-text-primary);
   }
 }
-.tools-page .tool-tab:active .tool-tab-inner {
+.tools-page .tool-tab:not(.is-active):active {
   transform: scale(0.97);
 }
 .tools-page .tool-tab:focus-visible {

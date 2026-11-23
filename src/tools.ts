@@ -126,7 +126,7 @@ export function projectUpdater(t: Translate): ToolData {
     },
     version: released('projectUpdater', '0.16.0'),
     platform: 'macOS',
-    stack: ['Electron', 'Node.js', 'TypeScript', 'Claude Code', 'npm', 'Composer', 'Sentry API', 'Vitest', 'esbuild', 'GitHub Actions'],
+    stack: ['Electron', 'Node.js', 'TypeScript', 'npm', 'Composer', 'Sentry API', 'Vitest', 'esbuild', 'GitHub Actions'],
     shots: shots(t, 'Project Updater', 'updater', [
       ['Projects', 'project-updater-projects'],
       ['Updates', 'project-updater-updates'],
@@ -149,7 +149,6 @@ export function sift(t: Translate): ToolData {
       { icon: 'stage', text: t('tools.sift.pointStage') },
       { icon: 'branches', text: t('tools.sift.pointBranches') },
       { icon: 'ai', text: t('tools.sift.pointAi') },
-      { icon: 'teamwork', text: t('tools.sift.pointTeamwork') },
       { icon: 'terminal', text: t('tools.sift.pointTerminal') },
     ],
     story: {
