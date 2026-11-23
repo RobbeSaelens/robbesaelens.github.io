@@ -306,6 +306,7 @@ html.js.intro-done .tools-page .heat-col {
   touch-action: manipulation;
   /* Opening the page at /tools#sift: the browser's own jump to the tab lands at the top */
   scroll-margin-top: 100vh;
+  -webkit-tap-highlight-color: transparent;
 }
 .tools-page .tool-tab-inner {
   display: flex;
@@ -317,8 +318,7 @@ html.js.intro-done .tools-page .heat-col {
   border: 1px solid transparent;
   transition:
     background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.12s ease-out;
+    border-color 0.2s ease;
 }
 .tools-page .tool-tab.is-active .tool-tab-inner {
   background: var(--tool-soft);
@@ -328,6 +328,16 @@ html.js.intro-done .tools-page .heat-col {
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+/* The tab not picked rests a step back: its icon greyed and dimmed. Hovering it brings
+   it forward (colour and full text), pressing it settles it a little darker; nothing
+   moves, so the switch stays still under the pointer. */
+.tools-page .tool-tab:not(.is-active) .tool-tab-icon {
+  opacity: 0.6;
+  filter: grayscale(1);
 }
 .tools-page .tool-tab-text {
   display: flex;
@@ -352,17 +362,27 @@ html.js.intro-done .tools-page .heat-col {
   color: var(--color-text-muted);
   white-space: nowrap;
   text-overflow: ellipsis;
+  transition: color 0.2s ease;
 }
 @media (hover: hover) and (pointer: fine) {
   .tools-page .tool-tab:not(.is-active):hover .tool-tab-inner {
     background: var(--color-surface-hover);
   }
+  .tools-page .tool-tab:not(.is-active):hover .tool-tab-icon {
+    opacity: 1;
+    filter: none;
+  }
   .tools-page .tool-tab:not(.is-active):hover .tool-tab-name {
     color: var(--color-text-primary);
   }
+  .tools-page .tool-tab:not(.is-active):hover .tool-tab-role {
+    color: var(--color-text-secondary);
+  }
 }
-.tools-page .tool-tab:active .tool-tab-inner {
-  transform: scale(0.97);
+.tools-page .tool-tab:not(.is-active):active .tool-tab-inner {
+  background: var(--tool-soft);
+  border-color: var(--tool-border);
+  transition-duration: 0.06s;
 }
 .tools-page .tool-tab:focus-visible {
   outline: 2px solid var(--tool-accent);

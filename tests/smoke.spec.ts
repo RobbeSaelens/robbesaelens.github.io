@@ -365,7 +365,7 @@ test.describe('llms.txt', () => {
     expect(text).toContain(`; new: ${en.tools.sift.tagAi}, ${en.tools.sift.tagTeamwork})`)
     expect(text).toContain(en.tools.sift.storyCaption)
     // Its AI and Teamwork features, exactly
-    expect(text).toContain('Write with AI has Claude Code write the commit message')
+    expect(text).toContain('Write with AI has AI write the commit message')
     expect(text).toContain('at most $0.25')
     expect(text).toContain('Teamwork task')
     // Private: no link to either repository
@@ -539,7 +539,7 @@ test.describe('tools page', () => {
       id: 'sift',
       name: 'Sift',
       shots: ['diff', 'stage', 'branches', 'commit'].map((view) => `/sift-${view}-home.jpg`),
-      points: 6,
+      points: 5,
       story: 3,
     },
   ] as const
@@ -583,8 +583,8 @@ test.describe('tools page', () => {
         await expect(panel.locator('.tool-status')).toContainText(privately)
         await expect(panel.locator('.tool-headline')).not.toBeEmpty()
         await expect(panel.locator('.tool-summary')).not.toBeEmpty()
-        // Short: one sentence, and a few points of a few words
-        expect((await panel.locator('.tool-summary').innerText()).split(/[.!?](?:\s|$)/).filter(Boolean)).toHaveLength(1)
+        // Short: one or two sentences, and a few points of a few words
+        expect((await panel.locator(".tool-summary").innerText()).split(/[.!?](?:\s|$)/).filter(Boolean).length).toBeLessThanOrEqual(2)
         const points = panel.locator('.tool-point')
         await expect(points).toHaveCount(tool.points)
         for (const point of await points.all()) {

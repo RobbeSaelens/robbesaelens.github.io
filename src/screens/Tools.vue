@@ -66,9 +66,9 @@
                 {{ $t('tools.viewOnGithub') }}
                 <ExternalLink class="h-3.5 w-3.5" aria-hidden="true" />
               </a>
-              <span v-else class="status-note">
+              <span v-else class="status-note" :title="$t('tools.private')">
                 <Lock class="h-3.5 w-3.5" aria-hidden="true" />
-                {{ $t('tools.private') }}
+                <span class="sr-only">{{ $t('tools.private') }}</span>
               </span>
             </div>
             <p class="tool-headline">{{ tool.headline }}</p>
