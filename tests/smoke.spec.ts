@@ -972,6 +972,30 @@ test.describe('old URLs', () => {
   })
 })
 
+// After a deploy an open tab still asks for the old route chunks, which are gone
+// (Safari: "Importing a module script failed."). The page then loads in full.
+test('a route chunk that fails to load opens the page in full instead', async ({ page }) => {
+  const errors = await guard(page)
+  await open(page, '/privacy')
+  // The tab's chunk is gone until the page loads anew (with the new build's chunks)
+  let stale = true
+  page.on('request', (req) => {
+    if (req.isNavigationRequest()) stale = false
+  })
+  await page.route(/\/assets\/Contact-[\w-]+\.js$/, (route) =>
+    stale ? route.fulfill({ status: 404, body: '' }) : route.continue(),
+  )
+  await page.evaluate(() => {
+    history.pushState(null, '', '/contact')
+    dispatchEvent(new PopStateEvent('popstate'))
+  })
+  await expect(page).toHaveURL(/\/contact$/)
+  await expect.poll(() => stale).toBe(false)
+  await expect(page.locator('#main-content')).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  expect(errors.filter((e) => !/Contact-|404/.test(e))).toEqual([])
+})
+
 test.describe('project slides', () => {
   /** The pose a slide gives its MacBook (custom properties read by MacBook3D.vue) */
   const poses = (page: Page) =>
