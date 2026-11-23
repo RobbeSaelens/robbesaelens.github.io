@@ -337,6 +337,8 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
     changes use `ease`, about 0.2s.
   - A press is `transform: scale(0.97)` at `0.12s ease-out`, on everything you press (it
     snaps; a hover may ease more slowly).
+    One exception, Robbe's pick: the tools page's switch doesn't move at all. The tab not
+    picked rests greyed; hover brings it forward (colour, background), press tints it.
   - Interface transitions stay at or under 300 ms; only panels and overlays (chat panel,
     mobile menu, lightbox) take a little longer.
   - Page entrances (`.hero-in`, `.reveal`, `styles.css`) rise in 0.5 s, 60 ms apart (`--i`),

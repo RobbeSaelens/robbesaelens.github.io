@@ -307,7 +307,6 @@ html.js.intro-done .tools-page .heat-col {
   /* Opening the page at /tools#sift: the browser's own jump to the tab lands at the top */
   scroll-margin-top: 100vh;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease-out;
 }
 .tools-page .tool-tab-inner {
   display: flex;
@@ -319,8 +318,7 @@ html.js.intro-done .tools-page .heat-col {
   border: 1px solid transparent;
   transition:
     background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.2s ease;
 }
 .tools-page .tool-tab.is-active .tool-tab-inner {
   background: var(--tool-soft);
@@ -330,7 +328,16 @@ html.js.intro-done .tools-page .heat-col {
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+/* The tab not picked rests a step back: its icon greyed and dimmed. Hovering it brings
+   it forward (colour and full text), pressing it settles it a little darker; nothing
+   moves, so the switch stays still under the pointer. */
+.tools-page .tool-tab:not(.is-active) .tool-tab-icon {
+  opacity: 0.6;
+  filter: grayscale(1);
 }
 .tools-page .tool-tab-text {
   display: flex;
@@ -359,26 +366,23 @@ html.js.intro-done .tools-page .heat-col {
 }
 @media (hover: hover) and (pointer: fine) {
   .tools-page .tool-tab:not(.is-active):hover .tool-tab-inner {
-    background: var(--tool-soft);
-    border-color: var(--tool-border);
-    box-shadow: 0 6px 20px -12px var(--tool-glow);
+    background: var(--color-surface-hover);
   }
   .tools-page .tool-tab:not(.is-active):hover .tool-tab-icon {
-    transform: translateY(-1px) scale(1.08) rotate(-4deg);
-  }
-  .tools-page .tool-tab:not(.is-active):hover .tool-tab-role {
-    color: var(--color-text-secondary);
+    opacity: 1;
+    filter: none;
   }
   .tools-page .tool-tab:not(.is-active):hover .tool-tab-name {
     color: var(--color-text-primary);
   }
-}
-.tools-page .tool-tab:not(.is-active):active {
-  transform: scale(0.96);
+  .tools-page .tool-tab:not(.is-active):hover .tool-tab-role {
+    color: var(--color-text-secondary);
+  }
 }
 .tools-page .tool-tab:not(.is-active):active .tool-tab-inner {
   background: var(--tool-soft);
   border-color: var(--tool-border);
+  transition-duration: 0.06s;
 }
 .tools-page .tool-tab:focus-visible {
   outline: 2px solid var(--tool-accent);
