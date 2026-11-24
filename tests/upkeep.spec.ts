@@ -133,7 +133,8 @@ test.describe('dependencies and security alerts', () => {
         await expect(time).toHaveAttribute('datetime', project.dependenciesUpdated)
         await expect(time).toHaveAttribute('title', /\d{4}/)
         await expect(upkeep).toContainText(lang === 'en' ? 'Dependencies updated' : 'Dependencies')
-        await expect(time).toHaveText(lang === 'en' ? /ago|yesterday|today/ : /geleden|gisteren|vandaag/)
+        // Intl's relative time: "3 days ago", but also "last week" / "vorige week"
+        await expect(time).toHaveText(lang === 'en' ? /ago|yesterday|today|last (week|month|year)/ : /geleden|gisteren|vandaag|vorige (week|maand)|vorig jaar/)
         if (alerts) {
           const detail = project.openAlerts ? ` (${severities(lang, project.openAlertsBySeverity)})` : ''
           await expect(upkeep.locator('li').nth(1)).toHaveText(`${alerts}${detail}`)
