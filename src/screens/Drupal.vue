@@ -26,8 +26,7 @@
         </div>
       </div>
 
-      <!-- The drop, then the numbers (like the repository activity on the project pages) -->
-      <div class="drupal-aside">
+      <!-- The drop beside the intro; the numbers in one row under them -->
       <DrupalDrop3D class="drupal-drop" />
       <section class="stats hero-in" style="--i: 3" aria-labelledby="drupal-stats-title">
         <h2 id="drupal-stats-title" class="sr-only">{{ $t('drupal.statsTitle') }}</h2>
@@ -49,9 +48,8 @@
           </i18n-t>
         </p>
       </section>
-      </div>
 
-      <!-- Where the contributions went: under the intro on wide screens -->
+      <!-- Where the contributions went, as a filter right above the lists it filters -->
       <section class="drupal-projects hero-in" style="--i: 4" aria-labelledby="drupal-projects-title">
         <h2 id="drupal-projects-title" class="drupal-projects-title">{{ $t('drupal.projectsTitle') }}</h2>
         <div role="group" aria-labelledby="drupal-projects-title">
@@ -371,63 +369,78 @@ onBeforeUnmount(() => stopReveal())
 /* =============================================
    Intro and numbers: side by side from 1024px
    ============================================= */
-/* One column below 1024px. Explicit, so a long project name in a chip wraps inside
-   it instead of widening the column (and the intro and numbers with it). */
+/* The intro with the drop beside it, then the numbers in one row, then the filter right
+   above the lists. Explicit columns, so a long project name in a chip wraps inside it
+   instead of widening the page. */
 .drupal-top {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 2rem;
-  margin-bottom: 3rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'intro drop'
+    'stats stats'
+    'projects projects';
+  align-items: center;
+  column-gap: 1.5rem;
+  row-gap: 2rem;
+  margin-bottom: 2rem;
 }
-/* Wide: the intro and the projects on the left, the card of numbers next to them. */
+.drupal-intro {
+  grid-area: intro;
+}
+.drupal-drop {
+  grid-area: drop;
+}
+.stats {
+  grid-area: stats;
+}
+.drupal-projects {
+  grid-area: projects;
+}
 @media (min-width: 1024px) {
   .drupal-top {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      'intro stats'
-      'projects stats';
-    align-items: start;
     column-gap: clamp(3rem, 6vw, 6rem);
-  }
-  .drupal-intro {
-    grid-area: intro;
-  }
-  .drupal-aside {
-    grid-area: stats;
-  }
-  .drupal-projects {
-    grid-area: projects;
+    row-gap: 2.5rem;
   }
 }
 
-/* ── The drop over the numbers ── */
-.drupal-aside {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 0;
-}
-.drupal-aside .stats {
-  align-self: stretch;
-}
+/* ── The drop: small beside the text on a phone, larger from a tablet ── */
 .drupal-drop {
-  --drop-size: 7rem;
-  margin-bottom: 1.25rem;
+  --drop-size: 4.5rem;
+  align-self: start;
+  margin: 0.25rem 0.5rem 0 0;
+}
+@media (min-width: 640px) {
+  .drupal-drop {
+    --drop-size: 7rem;
+    align-self: center;
+    margin: 0 1rem 0 0;
+  }
 }
 @media (min-width: 1024px) {
   .drupal-drop {
-    --drop-size: 10rem;
-    margin-bottom: 1.75rem;
+    --drop-size: 9rem;
+    margin-right: clamp(1rem, 4vw, 4rem);
   }
 }
 
 /* ── The projects he contributed to: a filter ── */
 .drupal-projects {
-  max-width: 70ch;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+.drupal-projects > [role='group'] {
+  flex: 1 1 32rem;
+  min-width: 0;
 }
 .drupal-projects-title {
-  margin: 0 0 0.75rem;
+  flex: 0 0 auto;
+  margin: 0;
+  /* in line with the first row of chips */
+  line-height: 2rem;
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -449,8 +462,8 @@ onBeforeUnmount(() => stopReveal())
   align-items: center;
   gap: 0.5rem;
   max-width: 100%;
-  min-height: 2.25rem;
-  padding: 0.25rem 0.4rem 0.25rem 0.85rem;
+  min-height: 2rem;
+  padding: 0.2rem 0.35rem 0.2rem 0.8rem;
   border-radius: 9999px;
   font-size: 0.8125rem;
   font-weight: 500;
@@ -494,8 +507,9 @@ onBeforeUnmount(() => stopReveal())
   color: var(--color-surface);
 }
 .drupal-filter-note {
-  min-height: 1.5rem;
-  margin: 0.85rem 0 0;
+  flex: 1 0 100%;
+  min-height: 1.25rem;
+  margin: 0;
   font-size: 0.8125rem;
   color: var(--color-text-muted);
 }
@@ -541,6 +555,7 @@ onBeforeUnmount(() => stopReveal())
 
 .drupal-intro {
   max-width: 70ch;
+  min-width: 0;
 }
 .drupal-lead {
   margin: 0 0 1rem;
