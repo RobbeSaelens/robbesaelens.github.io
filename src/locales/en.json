@@ -353,6 +353,11 @@
     "profile": "drupal.org profile",
     "gitlab": "git.drupalcode.org",
     "projectsTitle": "Projects I contributed to",
+    "allProjects": "All projects",
+    "filterHint": "Pick a project to see only its contributions.",
+    "onDrupalOrg": "{project} on drupal.org",
+    "emptyFor": "Nothing for {project} here.",
+    "filtered": "Showing {project}: {count} issues.",
     "projectIssues": "no issues | 1 issue | {n} issues",
     "statsTitle": "In numbers",
     "stats": {

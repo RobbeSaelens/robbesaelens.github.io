@@ -170,6 +170,12 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   also run every morning and from the "Run workflow" button, so the page follows
   drupal.org without a push), and the JSON is committed like repo-stats.json (the CI copy is fresh; the repo's lags). Public metadata only: titles, projects,
   statuses, dates, links. Never comment text or e-mail addresses.
+  The page takes Drupal's blue as its accent (tokens at the top of `Drupal.vue`) and shows
+  the drop in 3D (`DrupalDrop3D.vue`: the logo's face over a stack of its silhouette; it
+  turns in once with the entrance, then only leans towards a mouse, while in view). The
+  project chips are a filter (`aria-pressed` buttons, "All" first): they narrow the numbers
+  (which count again) and the four lists (whose rows slide in again), and the picked
+  project's drupal.org page is linked under them.
 - Errors go to Sentry (`src/sentry.ts`, project `portfolio`, EU region), only from the live
   site. Errors only: no tracing, session replay or session pings, and `dataCollection`
   keeps IP, headers, cookies, query strings and local variables out. Changing that means

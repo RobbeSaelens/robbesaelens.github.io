@@ -1520,7 +1520,8 @@ test.describe('Drupal contributions', () => {
     await expect(page.locator('.stats-number dd')).toHaveText(
       [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
     )
-    // The projects he contributed to: one chip per project in the lists, linking to its drupal.org page
+    // The projects he contributed to: "All" and one chip per project in the lists, as a
+    // filter. Picking one leaves only its rows and numbers, and links to its drupal.org page.
     const used = new Set<string>([
       ...data.credits.map((c) => c.project),
       ...data.mergeRequests.map((mr) => mr.project),
@@ -1528,10 +1529,18 @@ test.describe('Drupal contributions', () => {
       ...data.issuesJoined.map((i) => i.project),
     ])
     const chips = page.locator('.drupal-projects .chip')
-    await expect(chips).toHaveCount(used.size)
-    for (const [i, project] of (await chips.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).entries()) {
-      expect(project, `chip ${i}`).toMatch(/^https:\/\/www\.drupal\.org\/project\//)
-    }
+    await expect(chips).toHaveCount(used.size + 1)
+    await expect(chips.first()).toHaveAttribute('aria-pressed', 'true')
+    await chips.nth(1).click()
+    await expect(chips.nth(1)).toHaveAttribute('aria-pressed', 'true')
+    await expect(chips.first()).toHaveAttribute('aria-pressed', 'false')
+    const picked = (await chips.nth(1).locator('.chip-name').innerText()).trim()
+    await expect(page.locator('.drupal-filter-note a')).toHaveAttribute('href', /^https:\/\/www\.drupal\.org\/project\//)
+    for (const row of await page.locator('.row-meta').all()) await expect(row).toContainText(picked)
+    await chips.first().click()
+    await expect(page.locator('.stats-number dd')).toHaveText(
+      [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
+    )
     const asOf = new Date(data.generatedAt).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',

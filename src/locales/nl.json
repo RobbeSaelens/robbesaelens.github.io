@@ -353,6 +353,11 @@
     "profile": "Profiel op drupal.org",
     "gitlab": "git.drupalcode.org",
     "projectsTitle": "Projecten waaraan ik bijdroeg",
+    "allProjects": "Alle projecten",
+    "filterHint": "Kies een project om enkel die bijdragen te zien.",
+    "onDrupalOrg": "{project} op drupal.org",
+    "emptyFor": "Niets voor {project} hier.",
+    "filtered": "Toont {project}: {count} issues.",
     "projectIssues": "geen issues | 1 issue | {n} issues",
     "statsTitle": "In cijfers",
     "stats": {

@@ -26,7 +26,9 @@
         </div>
       </div>
 
-      <!-- The numbers, like the repository activity on the project pages -->
+      <!-- The drop, then the numbers (like the repository activity on the project pages) -->
+      <div class="drupal-aside">
+      <DrupalDrop3D class="drupal-drop" />
       <section class="stats hero-in" style="--i: 3" aria-labelledby="drupal-stats-title">
         <h2 id="drupal-stats-title" class="sr-only">{{ $t('drupal.statsTitle') }}</h2>
         <dl class="stats-numbers">
@@ -34,7 +36,7 @@
             <dt>{{ $t(`drupal.stats.${stat.key}`) }}</dt>
             <dd>
               <component :is="stat.icon" class="stats-icon" aria-hidden="true" />
-              {{ stat.value }}
+              <CountUpNumber :key="`${selected ?? 'all'}-${stat.key}`" :value="stat.value" :format="formatNumber" />
             </dd>
           </div>
         </dl>
@@ -47,26 +49,46 @@
           </i18n-t>
         </p>
       </section>
+      </div>
 
       <!-- Where the contributions went: under the intro on wide screens -->
       <section class="drupal-projects hero-in" style="--i: 4" aria-labelledby="drupal-projects-title">
         <h2 id="drupal-projects-title" class="drupal-projects-title">{{ $t('drupal.projectsTitle') }}</h2>
+        <div role="group" aria-labelledby="drupal-projects-title">
         <ul class="drupal-chips">
-          <li v-for="project in projectChips" :key="project.id">
-            <a
+          <li v-for="project in filterChips" :key="project.id ?? 'all'">
+            <button
+              type="button"
               class="chip"
-              :href="project.url"
-              target="_blank"
-              rel="noopener noreferrer"
+              :class="{ 'is-on': selected === project.id }"
+              :aria-pressed="selected === project.id ? 'true' : 'false'"
+              @click="pick(project.id)"
             >
+              <DrupalIcon v-if="project.id === null" class="chip-drop" />
               <span class="chip-name">{{ project.name }}</span>
               <span class="chip-count"
                 ><span aria-hidden="true">{{ project.count }}</span
                 ><span class="sr-only">, {{ $t('drupal.projectIssues', project.count) }}</span></span
               >
-            </a>
+            </button>
           </li>
         </ul>
+        </div>
+        <p class="drupal-filter-note">
+          <Transition name="note" mode="out-in">
+            <a
+              v-if="current"
+              :key="current.id"
+              class="text-link"
+              :href="current.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ $t('drupal.onDrupalOrg', { project: current.name }) }}</a
+            >
+            <span v-else key="all">{{ $t('drupal.filterHint') }}</span>
+          </Transition>
+        </p>
+        <p class="sr-only" aria-live="polite">{{ announcement }}</p>
       </section>
     </div>
 
@@ -82,12 +104,12 @@
           <header class="panel-head">
             <component :is="list.icon" class="panel-icon" aria-hidden="true" />
             <h2 :id="`drupal-${list.key}-title`" class="panel-title">{{ $t(`drupal.${list.key}`) }}</h2>
-            <span class="panel-count" aria-hidden="true">{{ list.rows.length }}</span>
+            <span :key="`${selected}-${list.rows.length}`" class="panel-count" aria-hidden="true">{{ list.rows.length }}</span>
           </header>
           <p class="panel-intro">{{ $t(`drupal.${list.key}Text`) }}</p>
 
-          <ul v-if="list.rows.length" class="rows">
-            <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${i * 50}ms` }">
+          <ul v-if="list.rows.length" :key="selected ?? 'all'" class="rows">
+            <li v-for="(row, i) in list.rows" :key="row.url" class="rows-item" :style="{ '--d': `${Math.min(i, 8) * 40}ms` }">
               <a class="row" :href="row.url" target="_blank" rel="noopener noreferrer">
                 <span class="badge" :class="`badge--${row.tone}`">{{ row.badge }}</span>
                 <span class="row-main">
@@ -98,7 +120,9 @@
               </a>
             </li>
           </ul>
-          <p v-else class="panel-empty">{{ $t('drupal.empty') }}</p>
+          <p v-else :key="selected ?? 'all'" class="panel-empty">
+            {{ current ? $t('drupal.emptyFor', { project: current.name }) : $t('drupal.empty') }}
+          </p>
         </GlowCard>
       </div>
     </div>
@@ -137,6 +161,8 @@ import { useHead } from '@unhead/vue'
 import { useRoute } from 'vue-router'
 import TerminalHeader from '../components/TerminalHeader.vue'
 import DrupalIcon from '../components/DrupalIcon.vue'
+import DrupalDrop3D from '../components/DrupalDrop3D.vue'
+import CountUpNumber from '../components/CountUpNumber.vue'
 import GlowCard from '../components/GlowCard.vue'
 import { watchReveal } from '../reveal'
 import { drupalCreditsJsonLd } from '../seo/jsonld'
@@ -195,6 +221,28 @@ const projectChips = (() => {
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
 })()
 
+// The chips filter the numbers and the lists to one project; "All" shows everything.
+const selected = ref<string | null>(null)
+const filterChips = computed(() => [
+  { id: null as string | null, name: t('drupal.allProjects'), url: PROFILE, count: allCount },
+  ...projectChips,
+])
+const current = computed(() => projectChips.find((p) => p.id === selected.value) ?? null)
+const pick = (id: string | null) => (selected.value = id)
+const only = <T extends { project: string }>(items: T[]) =>
+  selected.value ? items.filter((item) => item.project === selected.value) : items
+const allCount = new Set([
+  ...data.credits.map((c) => c.issue),
+  ...data.mergeRequests.map((m) => m.issue),
+  ...[...created, ...joined].map((i) => i.id),
+]).size
+const announcement = computed(() =>
+  current.value
+    ? t('drupal.filtered', { project: current.value.name, count: current.value.count })
+    : '',
+)
+const formatNumber = (n: number) => n.toLocaleString(locale.value === 'nl' ? 'nl-BE' : 'en-GB')
+
 // Dates as in Belgium, also when prerendered on a server elsewhere
 const tag = () => (locale.value === 'nl' ? 'nl-BE' : 'en-GB')
 const date = (iso: string, month: 'short' | 'long') =>
@@ -213,14 +261,14 @@ function tone(status: string): Tone {
 
 // In the order of the lists below, with their icons.
 const stats = computed(() => [
-  { key: 'opened', icon: markRaw(CircleDot) as Component, value: created.length },
-  { key: 'credits', icon: markRaw(Award) as Component, value: data.credits.length },
+  { key: 'opened', icon: markRaw(CircleDot) as Component, value: only(created).length },
+  { key: 'credits', icon: markRaw(Award) as Component, value: only(data.credits).length },
   {
     key: 'merged',
     icon: markRaw(GitMerge) as Component,
-    value: data.mergeRequests.filter((mr) => mr.state === 'merged').length,
+    value: only(data.mergeRequests).filter((mr) => mr.state === 'merged').length,
   },
-  { key: 'joined', icon: markRaw(MessageSquare) as Component, value: joined.length },
+  { key: 'joined', icon: markRaw(MessageSquare) as Component, value: only(joined).length },
 ])
 
 interface Row {
@@ -250,11 +298,11 @@ function issueRow(issue: Issue, when: 'opened' | 'updated'): Row {
 }
 
 const lists = computed(() => [
-  { key: 'issuesOpened', icon: markRaw(CircleDot) as Component, rows: created.map((i) => issueRow(i, 'opened')) },
+  { key: 'issuesOpened', icon: markRaw(CircleDot) as Component, rows: only(created).map((i) => issueRow(i, 'opened')) },
   {
     key: 'credits',
     icon: markRaw(Award) as Component,
-    rows: data.credits.map(
+    rows: only(data.credits).map(
       (credit): Row => ({
         url: credit.url,
         title: credit.title,
@@ -267,7 +315,7 @@ const lists = computed(() => [
   {
     key: 'mergeRequests',
     icon: markRaw(GitMerge) as Component,
-    rows: data.mergeRequests.map(
+    rows: only(data.mergeRequests).map(
       (mr): Row => ({
         url: mr.url,
         title: mr.title,
@@ -281,7 +329,7 @@ const lists = computed(() => [
       }),
     ),
   },
-  { key: 'issuesJoined', icon: markRaw(MessageSquare) as Component, rows: joined.map((i) => issueRow(i, 'updated')) },
+  { key: 'issuesJoined', icon: markRaw(MessageSquare) as Component, rows: only(joined).map((i) => issueRow(i, 'updated')) },
 ])
 
 // Two columns that stack on their own, so a short panel leaves no gap
@@ -298,6 +346,21 @@ onBeforeUnmount(() => stopReveal())
 </script>
 
 <style scoped>
+/* Drupal's own blue as the page's accent, in place of the site's teal: links, numbers,
+   icons, counts and the cards' glow. Both pass contrast as text on the page. */
+.drupal-page {
+  --color-accent: #0670b0;
+  --color-accent-soft: rgba(6, 120, 190, 0.08);
+  --color-border-glow: rgba(6, 120, 190, 0.35);
+  --color-spotlight: rgba(6, 120, 190, 0.13);
+}
+.dark .drupal-page {
+  --color-accent: #5ab4ee;
+  --color-accent-soft: rgba(90, 180, 238, 0.09);
+  --color-border-glow: rgba(90, 180, 238, 0.3);
+  --color-spotlight: rgba(90, 180, 238, 0.18);
+}
+
 /* The title stays on one line on phones */
 @media (max-width: 639px) {
   .drupal-page :deep(.terminal-title) {
@@ -330,7 +393,7 @@ onBeforeUnmount(() => stopReveal())
   .drupal-intro {
     grid-area: intro;
   }
-  .stats {
+  .drupal-aside {
     grid-area: stats;
   }
   .drupal-projects {
@@ -338,7 +401,28 @@ onBeforeUnmount(() => stopReveal())
   }
 }
 
-/* ── The projects he contributed to ── */
+/* ── The drop over the numbers ── */
+.drupal-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.drupal-aside .stats {
+  align-self: stretch;
+}
+.drupal-drop {
+  --drop-size: 7rem;
+  margin-bottom: 1.25rem;
+}
+@media (min-width: 1024px) {
+  .drupal-drop {
+    --drop-size: 10rem;
+    margin-bottom: 1.75rem;
+  }
+}
+
+/* ── The projects he contributed to: a filter ── */
 .drupal-projects {
   max-width: 70ch;
 }
@@ -359,6 +443,8 @@ onBeforeUnmount(() => stopReveal())
   list-style: none;
 }
 .chip {
+  font: inherit;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -374,18 +460,57 @@ onBeforeUnmount(() => stopReveal())
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
+    color 0.2s ease,
     transform 0.12s ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
-  .chip:hover {
+  .chip:not(.is-on):hover {
     border-color: var(--color-border-glow);
-    background: var(--color-surface-hover);
-    transform: translateY(-1px);
+    background: var(--color-accent-soft);
   }
 }
 .chip:active {
-  background: var(--color-surface-hover);
   transform: scale(0.97);
+}
+/* The picked project: filled with the accent, its count turned around */
+.chip.is-on {
+  color: var(--color-surface);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.chip.is-on .chip-count {
+  color: var(--color-accent);
+  background: var(--color-surface);
+}
+.chip-drop {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+  margin-left: -0.15rem;
+  color: var(--color-accent);
+  transition: color 0.2s ease;
+}
+.chip.is-on .chip-drop {
+  color: var(--color-surface);
+}
+.drupal-filter-note {
+  min-height: 1.5rem;
+  margin: 0.85rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+.note-enter-active,
+.note-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.note-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.note-leave-to {
+  opacity: 0;
 }
 .chip:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -397,6 +522,9 @@ onBeforeUnmount(() => stopReveal())
   overflow-wrap: anywhere;
 }
 .chip-count {
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
   flex-shrink: 0;
   display: inline-grid;
   place-items: center;
@@ -637,6 +765,19 @@ onBeforeUnmount(() => stopReveal())
   background: var(--color-accent-soft);
   border: 1px solid var(--color-border-glow);
 }
+/* A new count (another project picked) pops in */
+.panel-count {
+  animation: count-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes count-pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+}
+.panel-empty {
+  animation: row-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .panel-intro {
   margin: 0.4rem 0 0;
   padding: 0 1.25rem 1rem;
@@ -820,7 +961,12 @@ onBeforeUnmount(() => stopReveal())
     opacity: 1;
     animation: none;
   }
+  .panel-count,
+  .panel-empty {
+    animation: none;
+  }
   .pill-link,
+  .chip,
   .row,
   .row-arrow {
     transition: none;
