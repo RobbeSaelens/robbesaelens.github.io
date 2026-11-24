@@ -3,11 +3,12 @@
   Icons, CC0; Drupal is a registered trademark of Dries Buytaert) as a front face, with
   a stack of its silhouette behind it as the thickness. Decoration only: aria-hidden.
 
-  It turns in once when the page opens (with the page's entrance, about a second), then
-  rests. With a mouse it leans towards the pointer and a light moves over its face:
-  pointer moves set two numbers at most once a frame, the transform eases after them in
-  CSS. It listens only while it is in view, and not at all with reduced motion or on a
-  touch screen.
+  It turns in once when the page opens (with the page's entrance, about a second). Then
+  it follows the page: scrolling turns it (half a turn over a screen's height), and with
+  a mouse it also leans towards the pointer while a light moves over its face. Scroll and
+  pointer set a few numbers at most once a frame; the transform eases after them in CSS.
+  It listens only while it is in view, and not at all with reduced motion (then it rests
+  at its angle). The pointer only with a mouse.
 -->
 <template>
   <div ref="root" class="drop3d" :class="{ 'is-tilting': tilting }" aria-hidden="true">
@@ -19,10 +20,20 @@
           :key="n"
           class="drop3d-layer"
           viewBox="0 0 24 24"
-          :style="{ transform: `translateZ(${-n * STEP}px)` }"
+          :style="{ transform: `translateZ(calc(${-n * STEP} * 1cqw))` }"
           focusable="false"
         >
           <path :d="SILHOUETTE" :fill="n === DEPTH ? 'var(--drop-back)' : 'var(--drop-side)'" />
+        </svg>
+        <!-- The back: the logo again, so half a turn shows a drop, not a flat silhouette -->
+        <svg
+          class="drop3d-layer"
+          viewBox="0 0 24 24"
+          focusable="false"
+          :style="{ transform: `translateZ(calc(${-(DEPTH + 0.5) * STEP} * 1cqw)) rotateY(180deg)` }"
+        >
+          <path :d="SILHOUETTE" fill="#fff" />
+          <path :d="LOGO" fill="var(--drop-bottom)" />
         </svg>
         <svg class="drop3d-layer drop3d-face" viewBox="0 0 24 24" focusable="false">
           <defs>
@@ -59,22 +70,24 @@ const SILHOUETTE =
 const LOGO =
   'M15.78 5.113C14.09 3.425 12.48 1.815 11.998 0c-.48 1.815-2.09 3.425-3.778 5.113-2.534 2.53-5.405 5.4-5.405 9.702a9.184 9.185 0 1018.368 0c0-4.303-2.871-7.171-5.405-9.702M6.72 16.954c-.563-.019-2.64-3.6 1.215-7.416l2.55 2.788a.218.218 0 01-.016.325c-.61.625-3.204 3.227-3.527 4.126-.066.186-.164.18-.222.177M12 21.677a3.158 3.158 0 01-3.158-3.159 3.291 3.291 0 01.787-2.087c.57-.696 2.37-2.655 2.37-2.655s1.774 1.988 2.367 2.649a3.09 3.09 0 01.792 2.093A3.158 3.158 0 0112 21.677m6.046-5.123c-.068.15-.223.398-.431.405-.371.014-.411-.177-.686-.583-.604-.892-5.864-6.39-6.848-7.455-.866-.935-.122-1.595.223-1.94C10.736 6.547 12 5.285 12 5.285s3.766 3.574 5.336 6.016c1.57 2.443 1.029 4.556.71 5.253'
 
-/** Layers of thickness, and the gap between them in px */
-const DEPTH = 14
-const STEP = 1.4
+/** Layers of thickness, and the gap between them in % of the drop's width */
+const DEPTH = 20
+const STEP = 0.9
 /** How far it leans at most, in degrees */
 const MAX_TILT = 18
 
 const uid = `drop-${useId()}`
 const root = ref<HTMLElement | null>(null)
 const tilt = ref({ x: 0, y: 0 })
+/** -1 … 1: where the drop is on the screen, from below the middle to above it */
+const scroll = ref(0)
 const tilting = ref(false)
 
 const tiltStyle = computed(() => ({
-  '--rx': `${tilt.value.y * -MAX_TILT}deg`,
-  '--ry': `${tilt.value.x * MAX_TILT}deg`,
+  '--rx': `${tilt.value.y * -MAX_TILT + scroll.value * 10}deg`,
+  '--ry': `${tilt.value.x * MAX_TILT + scroll.value * 180}deg`,
   '--sx': `${tilt.value.x * -5}px`,
-  '--sy': `${tilt.value.y * -5}px`,
+  '--sy': `${tilt.value.y * -5 + scroll.value * 3}px`,
 }))
 
 let frame = 0
@@ -83,8 +96,11 @@ let observer: IntersectionObserver | undefined
 
 function apply() {
   frame = 0
-  if (!pointer || !root.value) return
+  if (!root.value) return
   const box = root.value.getBoundingClientRect()
+  const centre = box.top + box.height / 2
+  scroll.value = Math.max(-1, Math.min(1, (window.innerHeight / 2 - centre) / window.innerHeight))
+  if (!pointer) return
   // -1 … 1 from the drop's centre, reaching the edge about a screen-half away
   const reach = Math.max(window.innerWidth, window.innerHeight) / 2
   const clamp = (v: number) => Math.max(-1, Math.min(1, v))
@@ -100,16 +116,24 @@ function onMove(event: MouseEvent) {
   if (!frame) frame = requestAnimationFrame(apply)
 }
 
+function onScroll() {
+  if (!frame) frame = requestAnimationFrame(apply)
+}
+
 function onLeave() {
   pointer = null
   tilt.value = { x: 0, y: 0 }
 }
 
+let fine = false
 function listen(on: boolean) {
   if (on) {
-    window.addEventListener('mousemove', onMove, { passive: true })
-    document.documentElement.addEventListener('mouseleave', onLeave)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    if (fine) window.addEventListener('mousemove', onMove, { passive: true })
+    if (fine) document.documentElement.addEventListener('mouseleave', onLeave)
+    onScroll()
   } else {
+    window.removeEventListener('scroll', onScroll)
     window.removeEventListener('mousemove', onMove)
     document.documentElement.removeEventListener('mouseleave', onLeave)
     cancelAnimationFrame(frame)
@@ -118,9 +142,9 @@ function listen(on: boolean) {
 }
 
 onMounted(() => {
-  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (!fine || reduced || !root.value || typeof IntersectionObserver === 'undefined') return
+  if (reduced || !root.value || typeof IntersectionObserver === 'undefined') return
   observer = new IntersectionObserver(([entry]) => listen(entry.isIntersecting))
   observer.observe(root.value)
 })
@@ -138,9 +162,10 @@ onBeforeUnmount(() => {
   --drop-side: #055f97;
   --drop-back: #04476f;
   position: relative;
+  container-type: inline-size;
   width: var(--drop-size, 9rem);
   aspect-ratio: 1;
-  perspective: 700px;
+  perspective: 900px;
   pointer-events: none;
 }
 .drop3d-shadow {
@@ -150,7 +175,7 @@ onBeforeUnmount(() => {
   bottom: -6%;
   height: 12%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(6, 120, 190, 0.35), transparent);
+  background: radial-gradient(closest-side, rgba(6, 120, 190, 0.45), transparent);
 }
 .drop3d-turn {
   position: absolute;
@@ -162,8 +187,9 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  /* At rest it stands turned a little, so its thickness shows */
+  transform: rotateX(calc(var(--rx, 0deg) + 8deg)) rotateY(calc(var(--ry, 0deg) - 28deg));
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .drop3d-layer {
   position: absolute;
@@ -175,6 +201,7 @@ onBeforeUnmount(() => {
 .drop3d-face {
   transform: translateZ(0.5px);
 }
+
 .drop3d-shine {
   transform: translate(var(--sx, 0px), var(--sy, 0px)) translate(-3px, -4px);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);

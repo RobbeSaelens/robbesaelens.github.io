@@ -26,52 +26,39 @@
         </div>
       </div>
 
-      <!-- The drop beside the intro; the numbers in one row under them -->
-      <DrupalDrop3D class="drupal-drop" />
-      <section class="stats hero-in" style="--i: 3" aria-labelledby="drupal-stats-title">
-        <h2 id="drupal-stats-title" class="sr-only">{{ $t('drupal.statsTitle') }}</h2>
-        <dl class="stats-numbers">
-          <div v-for="stat in stats" :key="stat.key" class="stats-number">
-            <dt>{{ $t(`drupal.stats.${stat.key}`) }}</dt>
-            <dd>
-              <component :is="stat.icon" class="stats-icon" aria-hidden="true" />
-              <CountUpNumber :key="`${selected ?? 'all'}-${stat.key}`" :value="stat.value" :format="formatNumber" />
-            </dd>
-          </div>
-        </dl>
-        <p class="stats-note">
-          <RefreshCw class="stats-note-icon" aria-hidden="true" />
-          <i18n-t keypath="drupal.asOf" tag="span">
-            <template #date>
-              <time class="whitespace-nowrap" :datetime="data.generatedAt">{{ longDay(data.generatedAt) }}</time>
-            </template>
-          </i18n-t>
-        </p>
-      </section>
+      <!-- The drop on its own stage beside the intro: it turns as the page scrolls -->
+      <div class="drupal-stage hero-in" style="--i: 2" aria-hidden="true">
+        <DrupalDrop3D class="drupal-drop" />
+      </div>
+    </div>
 
-      <!-- Where the contributions went, as a filter right above the lists it filters -->
-      <section class="drupal-projects hero-in" style="--i: 4" aria-labelledby="drupal-projects-title">
-        <h2 id="drupal-projects-title" class="drupal-projects-title">{{ $t('drupal.projectsTitle') }}</h2>
-        <div role="group" aria-labelledby="drupal-projects-title">
-        <ul class="drupal-chips">
-          <li v-for="project in filterChips" :key="project.id ?? 'all'">
-            <button
-              type="button"
-              class="chip"
-              :class="{ 'is-on': selected === project.id }"
-              :aria-pressed="selected === project.id ? 'true' : 'false'"
-              @click="pick(project.id)"
-            >
-              <DrupalIcon v-if="project.id === null" class="chip-drop" />
-              <span class="chip-name">{{ project.name }}</span>
-              <span class="chip-count"
-                ><span aria-hidden="true">{{ project.count }}</span
-                ><span class="sr-only">, {{ $t('drupal.projectIssues', project.count) }}</span></span
-              >
-            </button>
-          </li>
-        </ul>
+    <!-- The numbers: one tile each, in the order of the lists below -->
+    <section class="stats hero-in" style="--i: 3" aria-labelledby="drupal-stats-title">
+      <h2 id="drupal-stats-title" class="sr-only">{{ $t('drupal.statsTitle') }}</h2>
+      <dl class="stats-numbers">
+        <div v-for="stat in stats" :key="stat.key" class="stats-number">
+          <span class="stats-badge" aria-hidden="true"><component :is="stat.icon" class="stats-icon" /></span>
+          <component :is="stat.icon" class="stats-watermark" aria-hidden="true" />
+          <dt>{{ $t(`drupal.stats.${stat.key}`) }}</dt>
+          <dd>
+            <CountUpNumber :key="`${selected ?? 'all'}-${stat.key}`" :value="stat.value" :format="formatNumber" />
+          </dd>
         </div>
+      </dl>
+      <p class="stats-note">
+        <RefreshCw class="stats-note-icon" aria-hidden="true" />
+        <i18n-t keypath="drupal.asOf" tag="span">
+          <template #date>
+            <time class="whitespace-nowrap" :datetime="data.generatedAt">{{ longDay(data.generatedAt) }}</time>
+          </template>
+        </i18n-t>
+      </p>
+    </section>
+
+    <!-- Where the contributions went: a small bar chart that filters the lists under it -->
+    <section class="drupal-projects hero-in" style="--i: 4" aria-labelledby="drupal-projects-title">
+      <div class="filter-head">
+        <h2 id="drupal-projects-title" class="drupal-projects-title">{{ $t('drupal.projectsTitle') }}</h2>
         <p class="drupal-filter-note">
           <Transition name="note" mode="out-in">
             <a
@@ -86,9 +73,31 @@
             <span v-else key="all">{{ $t('drupal.filterHint') }}</span>
           </Transition>
         </p>
-        <p class="sr-only" aria-live="polite">{{ announcement }}</p>
-      </section>
-    </div>
+      </div>
+      <div role="group" aria-labelledby="drupal-projects-title">
+        <ul class="drupal-chips">
+          <li v-for="(project, i) in filterChips" :key="project.id ?? 'all'" :style="{ '--i': i }">
+            <button
+              type="button"
+              class="chip"
+              :class="{ 'is-on': selected === project.id, 'is-all': project.id === null }"
+              :aria-pressed="selected === project.id ? 'true' : 'false'"
+              :style="{ '--share': project.count / allCount }"
+              @click="pick(project.id)"
+            >
+              <DrupalIcon v-if="project.id === null" class="chip-drop" />
+              <span class="chip-name">{{ project.name }}</span>
+              <span class="chip-count"
+                ><span aria-hidden="true">{{ project.count }}</span
+                ><span class="sr-only">, {{ $t('drupal.projectIssues', project.count) }}</span></span
+              >
+              <span class="chip-bar" aria-hidden="true"></span>
+            </button>
+          </li>
+        </ul>
+      </div>
+      <p class="sr-only" aria-live="polite">{{ announcement }}</p>
+    </section>
 
     <div class="drupal-lists">
       <div v-for="(column, c) in columns" :key="c" class="drupal-column">
@@ -369,193 +378,28 @@ onBeforeUnmount(() => stopReveal())
 /* =============================================
    Intro and numbers: side by side from 1024px
    ============================================= */
-/* The intro with the drop beside it, then the numbers in one row, then the filter right
-   above the lists. Explicit columns, so a long project name in a chip wraps inside it
-   instead of widening the page. */
+/* =============================================
+   Top: the intro beside the drop's stage; under them the four number tiles, then the
+   projects as a bar chart that filters the lists. Explicit columns, so a long project
+   name wraps inside its bar instead of widening the page.
+   ============================================= */
 .drupal-top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'intro drop'
-    'stats stats'
-    'projects projects';
   align-items: center;
-  column-gap: 1.5rem;
-  row-gap: 2rem;
+  gap: 1.5rem;
   margin-bottom: 2rem;
-}
-.drupal-intro {
-  grid-area: intro;
-}
-.drupal-drop {
-  grid-area: drop;
-}
-.stats {
-  grid-area: stats;
-}
-.drupal-projects {
-  grid-area: projects;
 }
 @media (min-width: 1024px) {
   .drupal-top {
-    column-gap: clamp(3rem, 6vw, 6rem);
-    row-gap: 2.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    gap: clamp(3rem, 6vw, 6rem);
+    margin-bottom: 2.5rem;
   }
 }
-
-/* ── The drop: small beside the text on a phone, larger from a tablet ── */
-.drupal-drop {
-  --drop-size: 4.5rem;
-  align-self: start;
-  margin: 0.25rem 0.5rem 0 0;
-}
-@media (min-width: 640px) {
-  .drupal-drop {
-    --drop-size: 7rem;
-    align-self: center;
-    margin: 0 1rem 0 0;
-  }
-}
-@media (min-width: 1024px) {
-  .drupal-drop {
-    --drop-size: 9rem;
-    margin-right: clamp(1rem, 4vw, 4rem);
-  }
-}
-
-/* ── The projects he contributed to: a filter ── */
-.drupal-projects {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 0.75rem 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-border);
-}
-.drupal-projects > [role='group'] {
-  flex: 1 1 32rem;
-  min-width: 0;
-}
-.drupal-projects-title {
-  flex: 0 0 auto;
-  margin: 0;
-  /* in line with the first row of chips */
-  line-height: 2rem;
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--color-text-muted);
-}
-.drupal-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.chip {
-  font: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  max-width: 100%;
-  min-height: 2rem;
-  padding: 0.2rem 0.35rem 0.2rem 0.8rem;
-  border-radius: 9999px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.12s ease-out;
-}
-@media (hover: hover) and (pointer: fine) {
-  .chip:not(.is-on):hover {
-    border-color: var(--color-border-glow);
-    background: var(--color-accent-soft);
-  }
-}
-.chip:active {
-  transform: scale(0.97);
-}
-/* The picked project: filled with the accent, its count turned around */
-.chip.is-on {
-  color: var(--color-surface);
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-}
-.chip.is-on .chip-count {
-  color: var(--color-accent);
-  background: var(--color-surface);
-}
-.chip-drop {
-  width: 0.875rem;
-  height: 0.875rem;
-  flex-shrink: 0;
-  margin-left: -0.15rem;
-  color: var(--color-accent);
-  transition: color 0.2s ease;
-}
-.chip.is-on .chip-drop {
-  color: var(--color-surface);
-}
-.drupal-filter-note {
-  flex: 1 0 100%;
-  min-height: 1.25rem;
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-}
-.note-enter-active,
-.note-leave-active {
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.note-enter-from {
-  opacity: 0;
-  transform: translateY(4px);
-}
-.note-leave-to {
-  opacity: 0;
-}
-.chip:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-}
-/* A project without a name in drupal.json shows its machine name: long, no spaces */
-.chip-name {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.chip-count {
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
-  flex-shrink: 0;
-  display: inline-grid;
-  place-items: center;
-  min-width: 1.5rem;
-  height: 1.5rem;
-  padding: 0 0.35rem;
-  border-radius: 9999px;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  color: var(--color-accent);
-  background: var(--color-accent-soft);
-}
-
 .drupal-intro {
-  max-width: 70ch;
   min-width: 0;
+  max-width: 70ch;
 }
 .drupal-lead {
   margin: 0 0 1rem;
@@ -563,6 +407,47 @@ onBeforeUnmount(() => stopReveal())
   line-height: 1.7;
   color: var(--color-text-primary);
 }
+@media (min-width: 1024px) {
+  .drupal-lead {
+    font-size: 1.25rem;
+  }
+}
+
+/* The drop's stage: a soft blue light behind it, so it stands out in both themes */
+.drupal-stage {
+  position: relative;
+  /* Its own layer under the sticky header: the 3D drop must never paint over it */
+  z-index: 0;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  align-self: start;
+  width: 6.5rem;
+  aspect-ratio: 1;
+}
+.drupal-stage::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(6, 120, 190, 0.22), rgba(6, 120, 190, 0.06) 60%, transparent);
+}
+.drupal-drop {
+  --drop-size: 80%;
+}
+@media (min-width: 640px) {
+  .drupal-stage {
+    width: 10rem;
+    align-self: center;
+  }
+}
+@media (min-width: 1024px) {
+  .drupal-stage {
+    width: min(100%, 16rem);
+    justify-self: center;
+  }
+}
+
 .text-link {
   color: var(--color-accent);
   font-weight: 600;
@@ -611,11 +496,9 @@ onBeforeUnmount(() => stopReveal())
   .pill-link:hover {
     border-color: var(--color-border-glow);
     background: var(--color-surface-hover);
-    transform: translateY(-1px);
   }
 }
 .pill-link:active {
-  background: var(--color-surface-hover);
   transform: scale(0.97);
 }
 .pill-link:focus-visible {
@@ -628,65 +511,86 @@ onBeforeUnmount(() => stopReveal())
   flex-shrink: 0;
 }
 
-/* ── Numbers: 2 × 2, one row with dividers where the card is wide enough ── */
+/* =============================================
+   The numbers: four tiles, 2 × 2 on a phone
+   ============================================= */
 .stats {
-  container-type: inline-size;
-  padding: 1.5rem;
-  border: 1px solid var(--color-border-glow);
-  border-radius: 1rem;
-  background:
-    radial-gradient(120% 80% at 100% 0%, var(--color-accent-soft), transparent 60%),
-    var(--color-surface);
-}
-@media (min-width: 768px) {
-  .stats {
-    padding: 1.75rem 2rem;
-  }
+  margin-bottom: 3rem;
 }
 .stats-numbers {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem 1rem;
+  gap: 0.75rem;
   margin: 0;
 }
-@container (min-width: 40rem) {
+@media (min-width: 768px) {
   .stats-numbers {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-  }
-  .stats-number + .stats-number {
-    padding-left: 2rem;
-    border-left: 1px solid var(--color-border);
+    gap: 1rem;
   }
 }
 .stats-number {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  gap: 0.3rem;
+  flex-direction: column;
+  gap: 0.25rem;
   min-width: 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  background:
+    linear-gradient(160deg, var(--color-accent-soft), transparent 70%),
+    var(--color-surface);
 }
+@media (min-width: 768px) {
+  .stats-number {
+    padding: 1.25rem 1.25rem 1.1rem;
+  }
+}
+/* The icon twice: in a badge on top, and large and faint in the corner */
+.stats-badge {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.65rem;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border-glow);
+}
+.stats-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.stats-watermark {
+  position: absolute;
+  right: -0.9rem;
+  bottom: -0.9rem;
+  width: 5.5rem;
+  height: 5.5rem;
+  color: var(--color-accent);
+  opacity: 0.07;
+  pointer-events: none;
+}
+/* The number above its label */
 .stats-number dd {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+  order: -1;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1;
   color: var(--color-accent);
+}
+.stats-badge {
+  order: -2;
 }
 @media (min-width: 1024px) {
   .stats-number dd {
-    font-size: 2.25rem;
+    font-size: 3rem;
   }
-}
-.stats-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex-shrink: 0;
-  color: var(--color-text-muted);
 }
 .stats-number dt {
   font-size: 0.8125rem;
@@ -697,9 +601,7 @@ onBeforeUnmount(() => stopReveal())
   display: flex;
   align-items: flex-start;
   gap: 0.4rem;
-  margin: 1.5rem 0 0;
-  padding-top: 1.25rem;
-  border-top: 1px dashed var(--color-border);
+  margin: 0.85rem 0 0;
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--color-text-muted);
@@ -709,6 +611,155 @@ onBeforeUnmount(() => stopReveal())
   height: 0.85rem;
   margin-top: 0.15rem;
   flex-shrink: 0;
+}
+
+/* =============================================
+   The projects: a bar chart you pick from
+   ============================================= */
+.drupal-projects {
+  margin-bottom: 2.5rem;
+}
+.filter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  margin-bottom: 0.85rem;
+}
+.drupal-projects-title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.drupal-filter-note {
+  min-height: 1.25rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+.note-enter-active,
+.note-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.note-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.note-leave-to {
+  opacity: 0;
+}
+.drupal-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: left;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.12s ease-out;
+}
+@media (min-width: 640px) {
+  .drupal-chips {
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .chip:not(.is-on):hover {
+    border-color: var(--color-border-glow);
+    background: var(--color-accent-soft);
+  }
+}
+.chip:active {
+  transform: scale(0.97);
+}
+.chip:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.chip.is-on {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+.chip-drop {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--color-accent);
+}
+/* A project without a name in drupal.json shows its machine name: long, no spaces */
+.chip-name {
+  grid-column: 2;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chip:not(.is-all) .chip-name {
+  grid-column: 1 / 3;
+}
+.chip-count {
+  grid-column: 3;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+/* Its share of all the issues, as a bar along the bottom; it grows in with the entrance */
+.chip-bar {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.45rem;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+.chip-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-accent);
+  opacity: 0.55;
+  transform-origin: left;
+  transform: scaleX(var(--share));
+  animation: bar-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(0.35s + var(--i, 0) * 50ms);
+  transition: opacity 0.2s ease;
+}
+.chip.is-on .chip-bar::after {
+  opacity: 1;
+}
+@keyframes bar-in {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 /* =============================================
@@ -977,11 +1028,13 @@ onBeforeUnmount(() => stopReveal())
     animation: none;
   }
   .panel-count,
-  .panel-empty {
+  .panel-empty,
+  .chip-bar::after {
     animation: none;
   }
   .pill-link,
   .chip,
+  .chip-bar::after,
   .row,
   .row-arrow {
     transition: none;

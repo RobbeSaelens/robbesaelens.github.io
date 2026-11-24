@@ -1516,7 +1516,8 @@ test.describe('Drupal contributions', () => {
         await expect(links.nth(i).locator('.badge')).not.toBeEmpty()
       }
     }
-    // The numbers are the lists' lengths, in the lists' order
+    // The numbers are the lists' lengths, in the lists' order (they count once in view)
+    await page.locator('.stats').scrollIntoViewIfNeeded()
     await expect(page.locator('.stats-number dd')).toHaveText(
       [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
     )
@@ -1538,6 +1539,7 @@ test.describe('Drupal contributions', () => {
     await expect(page.locator('.drupal-filter-note a')).toHaveAttribute('href', /^https:\/\/www\.drupal\.org\/project\//)
     for (const row of await page.locator('.row-meta').all()) await expect(row).toContainText(picked)
     await chips.first().click()
+    await page.locator('.stats').scrollIntoViewIfNeeded()
     await expect(page.locator('.stats-number dd')).toHaveText(
       [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
     )
