@@ -228,6 +228,10 @@ export const routes: RouteRecordRaw[] = [
   ...redirects.map(({ from, to }): RouteRecordRaw => ({ path: from, redirect: to })),
 ]
 
+/** A dynamic import that failed, as Chrome, Safari and Firefox word it, or a chunk's CSS Vite couldn't preload. */
+const CHUNK_FAILED =
+  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Unable to preload CSS/i
+
 /** Room above a part of a page that a link scrolls to: the sticky header (AppHeader.vue) and some air. */
 const HEADER_ROOM = 96
 
@@ -269,6 +273,17 @@ export function createAppRouter(history: RouterHistory): Router {
       }
     }
     applyLocale(locale)
+  })
+
+  // A page's lazy chunk that no longer loads, mostly in a tab opened before a deploy
+  // (its hashed chunks are gone): load that page in full, which fetches the new build.
+  // Once per URL, so a chunk that stays missing doesn't reload the page forever.
+  router.onError((error, to) => {
+    if (typeof window === 'undefined' || !CHUNK_FAILED.test(String((error as Error)?.message))) return
+    const key = `chunk-reload:${to.fullPath}`
+    if (sessionStorage.getItem(key)) return
+    sessionStorage.setItem(key, '1')
+    location.assign(to.fullPath)
   })
   return router
 }

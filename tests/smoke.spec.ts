@@ -972,6 +972,30 @@ test.describe('old URLs', () => {
   })
 })
 
+// After a deploy an open tab still asks for the old route chunks, which are gone
+// (Safari: "Importing a module script failed."). The page then loads in full.
+test('a route chunk that fails to load opens the page in full instead', async ({ page }) => {
+  const errors = await guard(page)
+  await open(page, '/privacy')
+  // The tab's chunk is gone until the page loads anew (with the new build's chunks)
+  let stale = true
+  page.on('request', (req) => {
+    if (req.isNavigationRequest()) stale = false
+  })
+  await page.route(/\/assets\/Contact-[\w-]+\.js$/, (route) =>
+    stale ? route.fulfill({ status: 404, body: '' }) : route.continue(),
+  )
+  await page.evaluate(() => {
+    history.pushState(null, '', '/contact')
+    dispatchEvent(new PopStateEvent('popstate'))
+  })
+  await expect(page).toHaveURL(/\/contact$/)
+  await expect.poll(() => stale).toBe(false)
+  await expect(page.locator('#main-content')).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  expect(errors.filter((e) => !/Contact-|404/.test(e))).toEqual([])
+})
+
 test.describe('project slides', () => {
   /** The pose a slide gives its MacBook (custom properties read by MacBook3D.vue) */
   const poses = (page: Page) =>
@@ -1492,11 +1516,13 @@ test.describe('Drupal contributions', () => {
         await expect(links.nth(i).locator('.badge')).not.toBeEmpty()
       }
     }
-    // The numbers are the lists' lengths, in the lists' order
+    // The numbers are the lists' lengths, in the lists' order (they count once in view)
+    await page.locator('.stats').scrollIntoViewIfNeeded()
     await expect(page.locator('.stats-number dd')).toHaveText(
       [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
     )
-    // The projects he contributed to: one chip per project in the lists, linking to its drupal.org page
+    // The projects he contributed to: "All" and one chip per project in the lists, as a
+    // filter. Picking one leaves only its rows and numbers, and links to its drupal.org page.
     const used = new Set<string>([
       ...data.credits.map((c) => c.project),
       ...data.mergeRequests.map((mr) => mr.project),
@@ -1504,10 +1530,19 @@ test.describe('Drupal contributions', () => {
       ...data.issuesJoined.map((i) => i.project),
     ])
     const chips = page.locator('.drupal-projects .chip')
-    await expect(chips).toHaveCount(used.size)
-    for (const [i, project] of (await chips.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).entries()) {
-      expect(project, `chip ${i}`).toMatch(/^https:\/\/www\.drupal\.org\/project\//)
-    }
+    await expect(chips).toHaveCount(used.size + 1)
+    await expect(chips.first()).toHaveAttribute('aria-pressed', 'true')
+    await chips.nth(1).click()
+    await expect(chips.nth(1)).toHaveAttribute('aria-pressed', 'true')
+    await expect(chips.first()).toHaveAttribute('aria-pressed', 'false')
+    const picked = (await chips.nth(1).locator('.chip-name').innerText()).trim()
+    await expect(page.locator('.drupal-filter-note a')).toHaveAttribute('href', /^https:\/\/www\.drupal\.org\/project\//)
+    for (const row of await page.locator('.row-meta').all()) await expect(row).toContainText(picked)
+    await chips.first().click()
+    await page.locator('.stats').scrollIntoViewIfNeeded()
+    await expect(page.locator('.stats-number dd')).toHaveText(
+      [data.issuesCreated.length, data.credits.length, merged, data.issuesJoined.length].map(String),
+    )
     const asOf = new Date(data.generatedAt).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',

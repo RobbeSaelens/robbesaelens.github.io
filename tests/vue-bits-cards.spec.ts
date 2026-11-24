@@ -245,7 +245,8 @@ test.describe('with a mouse', () => {
     await settle(panel)
     await panel.hover({ position: { x: 100, y: 30 } })
     await expect.poll(() => style(glowOf(panel), 'opacity')).toBe('0.6')
-    expect(await style(glowOf(panel), 'background-image')).toContain(GLOW.light)
+    // In Drupal's blue, the page's own accent
+    expect(await style(glowOf(panel), 'background-image')).toContain('rgba(6, 120, 190, 0.13)')
     expect(errors).toEqual([])
   })
 
