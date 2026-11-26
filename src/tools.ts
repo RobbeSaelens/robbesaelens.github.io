@@ -64,7 +64,7 @@ export interface ToolShot extends ProjectShotData {
 /**
  * A short film of the tool at work, in place of its deck of captures (ToolVideo.vue):
  * public/<tool>-tour.mp4 (1280 × 720) and public/<tool>-tour-480.mp4 (854 × 480, for phones),
- * H.264 with AAC music, `+faststart`; 20 s. Its poster is public/<tool>-tour-poster.jpg, whose
+ * H.264 with AAC music, `+faststart`; about 20 s. Its poster is public/<tool>-tour-poster.jpg, whose
  * WebP copy the page shows (`npm run images`). It plays muted while in view, with a button
  * for the sound. It follows the captures' rules: the real interface, only Robbe's own projects
  * that are on the site, no version number or dates.
@@ -220,6 +220,17 @@ export function sift(t: Translate): ToolData {
       ['Branches', 'sift-branches'],
       ['Commit', 'sift-commit'],
     ]),
+    video: {
+      src: '/sift-tour.mp4',
+      small: '/sift-tour-480.mp4',
+      poster: '/img/sift-tour-poster.webp',
+      width: 1280,
+      height: 720,
+      title: t('tools.sift.videoTitle'),
+      caption: t('tools.sift.videoCaption'),
+      duration: 'PT22S',
+      published: '2026-11-26',
+    },
   }
 }
 

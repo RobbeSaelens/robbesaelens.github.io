@@ -534,7 +534,9 @@
       "shotBranches": "the branches and history",
       "altBranches": "Sift's branches view of my portfolio: its branches, the commits with their graph, and the latest commit with its change",
       "shotCommit": "the commit box: Write with AI, a Teamwork task",
-      "altCommit": "Sift with five files staged, one of them shown, and a commit message ready to commit, with the Teamwork task line and the Write with AI button above and beside it"
+      "altCommit": "Sift with five files staged, one of them shown, and a commit message ready to commit, with the Teamwork task line and the Write with AI button above and beside it",
+      "videoTitle": "Sift at work: opened from the terminal, it shows the diff side by side, stages a single change, writes the commit message with AI and, after the commit, offers the next step: merge into develop or deploy",
+      "videoCaption": "Twenty-two seconds, from the terminal to the next step."
     }
   },
   "share": {

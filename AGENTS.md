@@ -328,21 +328,23 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   `~/Library/{Caches,WebKit}/<bundle id>` and the temp folders afterwards. Like every
   screenshot here, they may only show Robbe's own projects that are on the site, or the tools
   themselves: no client projects, no Sentry error texts, no tokens, no other people's names.
-- Project Updater's chapter shows its film in place of a deck of captures (`ToolVideo.vue`,
-  `video` in `src/tools.ts`, a `VideoObject` in the JSON-LD): `public/project-updater-tour.mp4`
+- Each tool's chapter shows its film in place of a deck of captures (`ToolVideo.vue`,
+  `video` in `src/tools.ts`, a `VideoObject` in the JSON-LD): `public/<tool>-tour.mp4`
   (1280 × 720) and `-480.mp4` (854 × 480, phones, by a `<source media>`), H.264 with AAC music,
-  `+faststart`, about 0.8 and 0.5 MB; WebM came out larger, so there is none. Re-encode a new
+  `+faststart`: Project Updater's about 0.8 and 0.5 MB; Sift's, full of code, 1.3 and 0.8 MB at
+  `-crf 28`. WebM came out larger, so there is none. Re-encode a new
   master with `ffmpeg -vf scale=1280:720 -c:v libx264 -preset slow -crf 25 -pix_fmt yuv420p
   -movflags +faststart -c:a aac -b:a 96k` (and 854:480, 80k). Poster
-  `public/project-updater-tour-poster.jpg` (its WebP copy from `npm run images`), preloaded with
-  `fetchpriority="high"` as the first screen's LCP. It plays muted and looping while half of it is
+  `public/<tool>-tour-poster.jpg` (its WebP copy from `npm run images`); the first tool's is preloaded
+  with `fetchpriority="high"` as the first screen's LCP. It plays muted and looping while half of it is
   in view and its tool is shown, pauses off screen, in a hidden tab and under an overlay, and
   never by itself with reduced motion or once the visitor paused it; `preload="none"`, so nothing
   of it loads before. Two buttons over its corner: play / pause and Sound (`aria-pressed`;
   turning the sound on also plays it). Its captures stay in the data (share image, JSON-LD, the
   other tool's card). It keeps the captures' rules: the app's real interface, only Robbe's own
-  projects that are on the site, no version number or dates. It was made from the app's own page
-  with `/brag-slim` in the Project Updater repository; remake it when the interface visibly changes.
+  projects that are on the site, no version number or dates. Each was made with `/brag-slim` in
+  the tool's own repository (Project Updater from its page, Sift from its browser mock, with the
+  commit dates hidden and every author Robbe); remake it when the interface visibly changes.
 - Touch screens:
   - Every `:hover` style sits in `@media (hover: hover) and (pointer: fine)`: on a
     touch screen a hover state sticks after the tap. Things you press get an `:active`
