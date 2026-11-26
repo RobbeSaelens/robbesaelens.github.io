@@ -534,7 +534,9 @@
       "shotBranches": "de branches en de geschiedenis",
       "altBranches": "De branches van mijn portfolio in Sift: de branches, de commits met hun graph, en de laatste commit met zijn wijziging",
       "shotCommit": "het commitvak: Write with AI, een Teamwork-taak",
-      "altCommit": "Sift met vijf gestagede bestanden, waarvan er één getoond wordt, en een commitbericht klaar om te committen, met de regel voor de Teamwork-taak en de knop Write with AI erboven en ernaast"
+      "altCommit": "Sift met vijf gestagede bestanden, waarvan er één getoond wordt, en een commitbericht klaar om te committen, met de regel voor de Teamwork-taak en de knop Write with AI erboven en ernaast",
+      "videoTitle": "Sift aan het werk: geopend vanuit de terminal toont het de diff naast elkaar, staget het één wijziging, schrijft AI het commitbericht en stelt het na de commit de volgende stap voor: mergen in develop of deployen",
+      "videoCaption": "Tweeëntwintig seconden, van de terminal tot de volgende stap."
     }
   },
   "share": {

@@ -542,7 +542,7 @@ test.describe('tools page', () => {
       shots: ['diff', 'stage', 'branches', 'commit'].map((view) => `/sift-${view}-home.jpg`),
       points: 5,
       story: 3,
-      film: false,
+      film: true,
     },
   ] as const
 
@@ -593,7 +593,7 @@ test.describe('tools page', () => {
           expect((await point.innerText()).split(/\s+/).length).toBeLessThanOrEqual(9)
           await expect(point.locator('svg')).toHaveCount(1)
         }
-        // Its film (Project Updater), or its captures as buttons with pictures, in their order
+        // Its film, or (a tool without one) its captures as buttons with pictures, in their order
         if (tool.film) {
           await expect(panel.locator('.tool-shots .tool-film video')).toHaveCount(1)
           await expect(panel.locator('.tool-deck')).toHaveCount(0)
@@ -624,15 +624,23 @@ test.describe('tools page', () => {
     })
   }
 
-  // Project Updater's tour: its film in place of the deck of captures. Muted, it plays by
+  // The tours: each tool's film in place of the deck of captures. Muted, it plays by
   // itself once in view; a button turns the sound on, another pauses it. Nothing of it loads
   // before (preload none, the poster first), phones get the 480p file, the JSON-LD names it.
   test('the tour: a muted film in place of the captures, with a button for the sound', async ({ page, request }) => {
     const errors = await guard(page)
     await open(page, '/tools')
     const panel = page.locator('#project-updater-panel')
-    await expect(panel.locator('.tool-deck')).toHaveCount(0)
-    await expect(page.locator('#sift-panel .tool-deck')).toHaveCount(1)
+    await expect(page.locator('.tool-deck')).toHaveCount(0)
+    // Sift's film: its own files and name, every file there
+    const sift = page.locator('#sift-panel .tool-shots video')
+    await expect(sift).toHaveAttribute('aria-label', /^Sift at work: /) // its panel is hidden, so no accessible name yet
+    const siftFiles = [
+      (await sift.getAttribute('poster'))!,
+      ...(await sift.locator('source').evaluateAll((list) => list.map((s) => s.getAttribute('src')!))),
+    ]
+    expect(siftFiles).toEqual(['/img/sift-tour-poster.webp', '/sift-tour-480.mp4', '/sift-tour.mp4'])
+    for (const file of siftFiles) expect((await request.get(file)).status(), file).toBe(200)
     const video = panel.locator('.tool-shots video')
     await expect(video).toHaveAttribute('preload', 'none')
     await expect(video).toHaveAttribute('playsinline', '')
@@ -666,6 +674,7 @@ test.describe('tools page', () => {
     const ld = await page.locator('script[type="application/ld+json"]').allTextContents()
     expect(ld.join('')).toContain('"@type":"VideoObject"')
     expect(ld.join('')).toContain('/project-updater-tour.mp4')
+    expect(ld.join('')).toContain('/sift-tour.mp4')
     expect(errors).toEqual([])
   })
 
@@ -782,8 +791,9 @@ test.describe('tools page', () => {
     // The first tool shows its film: its poster is preloaded, every <img> waits
     expect(html).toMatch(/<link[^>]+rel="preload"[^>]+as="image"[^>]+fetchpriority="high"|<link[^>]+fetchpriority="high"[^>]+rel="preload"/)
     const imgs = html.match(/<img\b[^>]*>/g) ?? []
-    expect(imgs.length).toBeGreaterThanOrEqual(4)
     for (const img of imgs) expect(img).toContain('loading="lazy"')
+    // Each film's poster is in the HTML, on its <video>
+    for (const tool of TOOLS) if (tool.film) expect(html).toContain(`poster="/img/${tool.id}-tour-poster.webp"`)
     // Every capture of the deck, with its alt text, and the tabs as links
     for (const tool of TOOLS) {
       if (!tool.film) for (const src of tool.shots) expect(html).toMatch(new RegExp(`<img[^>]*src="${src}"[^>]*alt="[^"]{20,}"|<img[^>]*alt="[^"]{20,}"[^>]*src="${src}"`))
