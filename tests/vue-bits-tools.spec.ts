@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 /**
  * The tools page's motion (AGENTS.md: the Vue Bits rules, "a page at rest comes to rest"):
@@ -37,29 +37,13 @@ async function open(page: Page, route: string) {
   await page.waitForLoadState('networkidle')
 }
 
-const deckOf = (page: Page, tool: string) => page.locator(`#${tool}-panel .tool-deck`)
-const frontOf = (deck: Locator) => deck.getAttribute('data-front')
-/**
- * Brings a deck into view: under the activity grid in the header, on a 1280 × 720 screen it
- * starts below the fold, and it only moves once mostly in view.
- */
-async function inView(deck: Locator) {
-  await deck.scrollIntoViewIfNeeded()
-  await expect(deck).toBeInViewport({ ratio: 0.9 })
-}
-
-test('the prerendered HTML has every capture in its deck, in its place, as a picture with alt text', async ({ request }) => {
+test("the prerendered HTML has each tool's film in place of a deck, and the stories at rest", async ({ request }) => {
   const html = await (await request.get('/tools')).text()
-  const cards = [...html.matchAll(/<div[^>]*class="[^"]*\bdeck-card\b[^"]*"[^>]*style="--slot:(\d)[^"]*"[^>]*>([\s\S]*?)<\/button>/g)]
-  expect(cards).toHaveLength(4)
-  expect(cards.map((m) => Number(m[1]))).toEqual([0, 1, 2, 3])
-  for (const [, , card] of cards) {
-    expect(card).toMatch(/<button[^>]*class="[^"]*\bshot\b/)
-    expect(card).toMatch(/aria-label="Open .+ screenshot full screen"/)
-    expect(card).toMatch(/<img[^>]*alt="[^"]{20,}"/)
-    expect(card).toMatch(/<source type="image\/avif"/)
-    // No <div> inside a <button>, which may only hold phrasing content
-    expect(card.slice(card.indexOf('<button'))).not.toContain('<div')
+  // Both tools show a film: no deck of captures (CardSwap) on the page
+  expect(html).not.toMatch(/\bdeck-card\b/)
+  for (const tool of ['project-updater', 'sift']) {
+    expect(html).toMatch(new RegExp(`<video[^>]*poster="/img/${tool}-tour-poster\\.webp"`))
+    expect(html).toContain(`src="/${tool}-tour.mp4"`)
   }
   // The stories' text is there too, at rest
   expect(html.match(/class="flow-step"/g) ?? []).toHaveLength(5)
@@ -67,115 +51,21 @@ test('the prerendered HTML has every capture in its deck, in its place, as a pic
   expect(html).not.toMatch(/is-armed|is-playing/)
 })
 
-test.describe('the deck of captures (CardSwap)', () => {
-  test.skip(({ isMobile }) => isMobile, 'with a mouse; the phones are in the responsive check')
-
-  test('comes forward by itself once in view: one round, then it rests', async ({ page }) => {
-    const errors = await guard(page)
-    await page.clock.install()
-    await open(page, '/tools#sift')
-    const deck = deckOf(page, 'sift')
-    await inView(deck)
-    await expect(deck).toHaveAttribute('data-autoplay', 'on')
-    expect(await frontOf(deck)).toBe('0')
-
-    // The first swap a moment after it comes into view, then one every few seconds
-    await page.clock.runFor(1500)
-    expect(await frontOf(deck)).toBe('0')
-    await page.clock.runFor(1500)
-    await expect(deck).toHaveAttribute('data-front', '1')
-    for (const next of ['2', '3', '0']) {
-      await page.clock.runFor(3800)
-      await expect(deck).toHaveAttribute('data-front', next)
-    }
-    // Back at the first: it rests, and stays at rest
-    await expect(deck).toHaveAttribute('data-autoplay', 'off')
-    await page.clock.runFor(20_000)
-    await expect(deck).toHaveAttribute('data-front', '0')
-    expect(errors).toEqual([])
-  })
-
-  test('waits under the mouse and with the lightbox open; after Next it never moves by itself', async ({ page }) => {
-    const errors = await guard(page)
-    await open(page, '/tools#sift')
-    const deck = deckOf(page, 'sift')
-    await inView(deck)
-    await expect(deck).toHaveAttribute('data-autoplay', 'on')
-    await deck.locator('.deck-stage').hover()
-    await expect(deck).toHaveAttribute('data-autoplay', 'off')
-    await page.waitForTimeout(3000)
-    expect(await frontOf(deck)).toBe('0')
-    await page.mouse.move(5, 300)
-    await expect(deck).toHaveAttribute('data-autoplay', 'on')
-
-    // Under the lightbox
-    await deck.locator('.deck-shot:not([tabindex="-1"])').click()
-    await expect(page.getByRole('dialog')).toBeVisible()
-    await expect(deck).toHaveAttribute('data-autoplay', 'off')
-    await page.keyboard.press('Escape')
-
-    // Next: the visitor takes over, for good
-    await page.mouse.move(5, 300)
-    await deck.getByRole('button', { name: 'Next screenshot' }).click()
-    await expect(deck).toHaveAttribute('data-front', '1')
-    await expect(deck).toHaveAttribute('data-autoplay', 'off')
-    await page.mouse.move(5, 300)
-    await page.waitForTimeout(4500)
-    expect(await frontOf(deck)).toBe('1')
-    // The new front card is the tab stop, and opens its own capture
-    await expect(deck.locator('.deck-shot:not([tabindex="-1"])')).toHaveAccessibleName(/a few lines, about to be staged/)
-    expect(errors).toEqual([])
-  })
-
-  test('nothing moves off screen: a deck scrolled away, the hidden tool, a hidden tab', async ({ page }) => {
-    const errors = await guard(page)
-    await open(page, '/tools#sift')
-    const updater = deckOf(page, 'sift')
-    await inView(updater)
-    await expect(updater).toHaveAttribute('data-autoplay', 'on')
-    // Scrolled away
-    await page.locator('#sift-panel .tool-end').scrollIntoViewIfNeeded()
-    await expect(updater).toHaveAttribute('data-autoplay', 'off')
-    await inView(updater)
-    await expect(updater).toHaveAttribute('data-autoplay', 'on')
-    // A hidden tab
-    await page.evaluate(() => {
-      Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true })
-      document.dispatchEvent(new Event('visibilitychange'))
-    })
-    await expect(updater).toHaveAttribute('data-autoplay', 'off')
-    expect(errors).toEqual([])
-  })
-
-  test('Next from the keyboard puts the cards in their places at once', async ({ page }) => {
-    await guard(page)
-    await open(page, '/tools#sift')
-    const deck = deckOf(page, 'sift')
-    await deck.getByRole('button', { name: 'Next screenshot' }).focus()
-    await page.keyboard.press('Enter')
-    // No timeline: already the next in front (CardSwap's swap(true))
-    expect(await frontOf(deck)).toBe('1')
-    await expect(deck.locator('.deck-label')).toHaveText('a few lines, about to be staged')
-  })
-})
-
-test('with reduced motion: no deck moves by itself, Next is at once, the stories and the tab are at rest', async ({ browser }) => {
+test('with reduced motion: no film plays by itself, the stories and the tab are at rest', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce' })
   const page = await context.newPage()
   const errors = await guard(page)
   await open(page, '/tools')
-  // Project Updater's film: never plays by itself
+  // The films: never play by themselves
   const film = page.locator('#project-updater-panel .tool-film video')
   await film.scrollIntoViewIfNeeded()
   await page.waitForTimeout(1000)
   expect(await film.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true)
   await page.getByRole('tab', { name: /Sift/ }).click()
-  const deck = deckOf(page, 'sift')
-  await expect(deck).toHaveAttribute('data-autoplay', 'off')
-  await page.waitForTimeout(3000)
-  expect(await frontOf(deck)).toBe('0')
-  await deck.getByRole('button', { name: 'Next screenshot' }).click()
-  expect(await frontOf(deck)).toBe('1')
+  const siftFilm = page.locator('#sift-panel .tool-film video')
+  await siftFilm.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1000)
+  expect(await siftFilm.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true)
 
   // The stories: their whole picture, scrolled to or not
   for (const tool of ['project-updater', 'sift']) {
@@ -249,7 +139,7 @@ test('the stories play once when they scroll into view; before, their first fram
   expect(errors).toEqual([])
 })
 
-test.describe("Project Updater's film (ToolVideo)", () => {
+test.describe("The tools' films (ToolVideo)", () => {
   test.skip(({ isMobile }) => isMobile, 'the phones are in the responsive check')
 
   test('plays muted only while in view and shown, and waits once the visitor pauses it', async ({ page }) => {
@@ -278,6 +168,19 @@ test.describe("Project Updater's film (ToolVideo)", () => {
     await film.scrollIntoViewIfNeeded()
     await page.waitForTimeout(800)
     expect(await paused()).toBe(true)
+    expect(errors).toEqual([])
+  })
+
+  test("Sift's plays muted once its tool is picked and in view, and pauses when the other is", async ({ page }) => {
+    const errors = await guard(page)
+    await open(page, '/tools#sift')
+    const film = page.locator('#sift-panel .tool-film video')
+    const paused = () => film.evaluate((v: HTMLVideoElement) => v.paused)
+    await film.scrollIntoViewIfNeeded()
+    await expect.poll(paused).toBe(false)
+    expect(await film.evaluate((v: HTMLVideoElement) => v.muted)).toBe(true)
+    await page.getByRole('tab', { name: /Project Updater/ }).click()
+    await expect.poll(paused).toBe(true)
     expect(errors).toEqual([])
   })
 })

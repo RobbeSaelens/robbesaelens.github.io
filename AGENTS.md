@@ -201,7 +201,7 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   | `GlowCard.vue` | `SpotlightCard.vue` | the project pages' features, the Drupal panels and the About cards |
   | `ShotGlare.vue` | `GlareHover.vue` | the screenshot buttons on the project and tools pages |
   | `PhotoRipple.vue` | `RippleDistortion.vue` | water ripples under the mouse on the two About photos |
-  | `tools/ToolShots.vue` | `CardSwap.vue` | Sift's captures on the tools page, as a deck of cards (Project Updater shows its film) |
+  | `tools/ToolShots.vue` | `CardSwap.vue` | a tool's captures as a deck of cards, for a tool without a film (both tools show their film now, so no deck is on the page) |
   | `tools/ToolSwitch.vue` | `StarBorder.vue` | the light along the picked tab of the tools page's switch |
 
   CardSwap needs gsap, the site's one animation library: only the tools page's chunk loads
@@ -287,7 +287,7 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   (`--tool-*` there: Project Updater's indigo, Sift's amber, handed to the site's accent
   tokens). A chapter is visual and short, as Robbe asked: a headline, one sentence, a few
   points with an icon (four to six), version, macOS and "Private for now" as chips; its
-  captures as a deck (`ToolShots.vue`), or its film (Project Updater, below); its story in motion (`UpdatePipeline.vue`: how an
+  film (both tools, below), or for a tool without one its captures as a deck (`ToolShots.vue`); its story in motion (`UpdatePipeline.vue`: how an
   update runs; `SiftStory.vue`: PhpStorm + Sublime Merge folding into Sift, by name only, no
   logos); what it's made with; the other tool as a card. New facts become a point, not a paragraph.
   Above the switch, between the line "How I maintain my projects" and the intro, the
