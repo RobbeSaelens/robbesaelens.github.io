@@ -76,7 +76,9 @@
           </div>
 
           <div class="tool-shots reveal">
-            <ToolShots :name="tool.name" :shots="tool.shots" :eager="tool.id === list[0].id" @open="openShot" />
+            <!-- Its film when it has one (Project Updater's tour), else its captures as a deck -->
+            <ToolVideo v-if="tool.video" :video="tool.video" />
+            <ToolShots v-else :name="tool.name" :shots="tool.shots" :eager="tool.id === list[0].id" @open="openShot" />
           </div>
 
           <ul class="tool-points">
@@ -150,6 +152,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useHead } from '@unhead/vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowRight, ExternalLink, Github, Laptop, Lock } from 'lucide-vue-next'
 import ImageLightbox, { type LightboxImage } from '../components/ImageLightbox.vue'
@@ -159,6 +162,7 @@ import SiftStory from '../components/tools/SiftStory.vue'
 import { TOOL_ICONS as ICONS } from '../components/tools/icons'
 import ToolIcon from '../components/tools/ToolIcon.vue'
 import ToolShots from '../components/tools/ToolShots.vue'
+import ToolVideo from '../components/tools/ToolVideo.vue'
 import ToolSwitch from '../components/tools/ToolSwitch.vue'
 import UpdatePipeline from '../components/tools/UpdatePipeline.vue'
 import { SHOT_SIZES } from '../images'
@@ -171,6 +175,15 @@ const route = useRoute()
 const router = useRouter()
 
 const list = computed(() => tools(t))
+
+// The first tool's film poster is the largest thing on the first screen (the LCP): fetch
+// it from the prerendered HTML at once, as the decks' first capture is.
+useHead({
+  link: () =>
+    list.value[0].video
+      ? [{ rel: 'preload', as: 'image', href: list.value[0].video.poster, fetchpriority: 'high', key: 'tool-film-poster' }]
+      : [],
+})
 
 /** The tool shown: the URL's hash picks it (none: the first) */
 const active = ref<ToolId>(toolOfHash(route.hash))

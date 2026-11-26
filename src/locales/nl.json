@@ -468,6 +468,11 @@
     "nextTool": "De andere tool",
     "shotsLabel": "Screenshots van {name}",
     "nextShot": "Volgende screenshot",
+    "video": {
+      "play": "Speel de film af",
+      "pause": "Pauzeer de film",
+      "sound": "Geluid"
+    },
     "updater": {
       "role": "Houdt elk project up-to-date",
       "headline": "Al mijn projecten up‑to‑date, zonder het gedoe.",
@@ -489,6 +494,8 @@
       "stepPublish": "Publiceren",
       "stepPublishText": "committen en pushen naar develop",
       "stepDiscard": "of alles weggooien",
+      "videoTitle": "Project Updater aan het werk: het controleert elk project, AI werkt er één bij op een eigen branch met de tests ervoor en erna, en niets wordt gepusht voor ik het valideer",
+      "videoCaption": "Twintig seconden, van de controle tot de push.",
       "shotProjects": "mijn projecten, na een controle",
       "altProjects": "Project Updater met zeven van mijn projecten en hun beveiligingsfixes, updates en nieuwe hoofdversies",
       "shotUpdates": "de updates die klaarstaan voor mijn portfolio",

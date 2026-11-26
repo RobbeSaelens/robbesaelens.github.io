@@ -468,6 +468,11 @@
     "nextTool": "The other tool",
     "shotsLabel": "Screenshots of {name}",
     "nextShot": "Next screenshot",
+    "video": {
+      "play": "Play the film",
+      "pause": "Pause the film",
+      "sound": "Sound"
+    },
     "updater": {
       "role": "Keeps every project up to date",
       "headline": "All my projects up to date, without the chores.",
@@ -489,6 +494,8 @@
       "stepPublish": "Publish",
       "stepPublishText": "commit and push to develop",
       "stepDiscard": "or throw it away",
+      "videoTitle": "Project Updater at work: it checks every project, AI updates one on its own branch with the tests before and after, and nothing is pushed until I validate it",
+      "videoCaption": "Twenty seconds, from the check to the push.",
       "shotProjects": "my projects, after a check",
       "altProjects": "Project Updater listing seven of my projects with their security fixes, updates and major updates",
       "shotUpdates": "the updates waiting in my portfolio",
