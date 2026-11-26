@@ -534,6 +534,7 @@ test.describe('tools page', () => {
       shots: ['projects', 'updates', 'security', 'review'].map((view) => `/project-updater-${view}-home.jpg`),
       points: 4,
       story: 5,
+      film: true,
     },
     {
       id: 'sift',
@@ -541,6 +542,7 @@ test.describe('tools page', () => {
       shots: ['diff', 'stage', 'branches', 'commit'].map((view) => `/sift-${view}-home.jpg`),
       points: 5,
       story: 3,
+      film: false,
     },
   ] as const
 
@@ -591,11 +593,16 @@ test.describe('tools page', () => {
           expect((await point.innerText()).split(/\s+/).length).toBeLessThanOrEqual(9)
           await expect(point.locator('svg')).toHaveCount(1)
         }
-        // Its captures, as buttons with pictures, in their order
-        const shots = panel.locator('.tool-deck button.shot img')
-        await expect(shots).toHaveCount(tool.shots.length)
-        for (const [i, src] of tool.shots.entries()) await expect(shots.nth(i)).toHaveAttribute('src', src)
-        await expect(panel.locator('.deck-label')).not.toBeEmpty()
+        // Its film (Project Updater), or its captures as buttons with pictures, in their order
+        if (tool.film) {
+          await expect(panel.locator('.tool-shots .tool-film video')).toHaveCount(1)
+          await expect(panel.locator('.tool-deck')).toHaveCount(0)
+        } else {
+          const shots = panel.locator('.tool-deck button.shot img')
+          await expect(shots).toHaveCount(tool.shots.length)
+          for (const [i, src] of tool.shots.entries()) await expect(shots.nth(i)).toHaveAttribute('src', src)
+          await expect(panel.locator('.deck-label')).not.toBeEmpty()
+        }
         // Its story, step by step or card by card
         await expect(panel.locator('.flow-step, .merge-card:not(.merge-ghost)')).toHaveCount(tool.story)
         expect(await panel.locator('.tag-pill').count()).toBeGreaterThan(5)
@@ -616,6 +623,51 @@ test.describe('tools page', () => {
       expect(errors).toEqual([])
     })
   }
+
+  // Project Updater's tour: its film in place of the deck of captures. Muted, it plays by
+  // itself once in view; a button turns the sound on, another pauses it. Nothing of it loads
+  // before (preload none, the poster first), phones get the 480p file, the JSON-LD names it.
+  test('the tour: a muted film in place of the captures, with a button for the sound', async ({ page, request }) => {
+    const errors = await guard(page)
+    await open(page, '/tools')
+    const panel = page.locator('#project-updater-panel')
+    await expect(panel.locator('.tool-deck')).toHaveCount(0)
+    await expect(page.locator('#sift-panel .tool-deck')).toHaveCount(1)
+    const video = panel.locator('.tool-shots video')
+    await expect(video).toHaveAttribute('preload', 'none')
+    await expect(video).toHaveAttribute('playsinline', '')
+    await expect(video).toHaveAccessibleName(/^Project Updater at work: /)
+    expect(await video.evaluate((v: HTMLVideoElement) => v.muted && v.loop)).toBe(true)
+    await expect(panel.locator('.film-caption')).not.toBeEmpty()
+    const files = [
+      (await video.getAttribute('poster'))!,
+      ...(await video.locator('source').evaluateAll((list) => list.map((s) => s.getAttribute('src')!))),
+    ]
+    expect(files).toEqual(['/img/project-updater-tour-poster.webp', '/project-updater-tour-480.mp4', '/project-updater-tour.mp4'])
+    for (const file of files) expect((await request.get(file)).status(), file).toBe(200)
+    // The prerendered HTML fetches the poster first, as the LCP
+    const html = await (await request.get('/tools')).text()
+    expect(html).toMatch(/<link[^>]+rel="preload"[^>]+href="\/img\/project-updater-tour-poster\.webp"/)
+
+    // In view, it plays by itself, muted
+    await video.scrollIntoViewIfNeeded()
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => !v.paused)).toBe(true)
+    // The sound button turns the sound on and says so
+    const sound = panel.getByRole('button', { name: 'Sound' })
+    await expect(sound).toHaveAttribute('aria-pressed', 'false')
+    await sound.click()
+    await expect(sound).toHaveAttribute('aria-pressed', 'true')
+    expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(false)
+    // Pause, and it stays paused
+    await panel.getByRole('button', { name: 'Pause the film' }).click()
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true)
+    await expect(panel.getByRole('button', { name: 'Play the film' })).toBeVisible()
+
+    const ld = await page.locator('script[type="application/ld+json"]').allTextContents()
+    expect(ld.join('')).toContain('"@type":"VideoObject"')
+    expect(ld.join('')).toContain('/project-updater-tour.mp4')
+    expect(errors).toEqual([])
+  })
 
   test('the switch: a click or the arrow keys pick a tool, the URL says which, the page stays put', async ({ page }) => {
     const errors = await guard(page)
@@ -707,7 +759,7 @@ test.describe('tools page', () => {
     await open(page, '/tools')
     const dialog = page.getByRole('dialog')
     const shown = () => dialog.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.currentSrc)
-    for (const tool of TOOLS) {
+    for (const tool of TOOLS.filter((t) => !t.film)) {
       await page.getByRole('tab', { name: new RegExp(tool.name) }).click()
       // The front card: a tab stop and a click; the others only for screen readers
       const front = page.locator(`#${tool.id}-panel .deck-shot:not([tabindex="-1"])`)
@@ -725,17 +777,16 @@ test.describe('tools page', () => {
     expect(errors).toEqual([])
   })
 
-  test('the first capture loads first, every other lazily, all from the prerendered HTML', async ({ request }) => {
+  test("the film's poster loads first, every capture lazily, all from the prerendered HTML", async ({ request }) => {
     const html = await (await request.get('/tools')).text()
-    const [first, ...rest] = html.match(/<img\b[^>]*>/g) ?? []
-    expect(rest.length).toBeGreaterThanOrEqual(7)
-    expect(first).toContain('src="/project-updater-projects-home.jpg"')
-    expect(first).toContain('fetchpriority="high"')
-    expect(first).not.toContain('loading="lazy"')
-    for (const img of rest) expect(img).toContain('loading="lazy"')
-    // Every capture of both tools, with its alt text, and the tabs as links
+    // The first tool shows its film: its poster is preloaded, every <img> waits
+    expect(html).toMatch(/<link[^>]+rel="preload"[^>]+as="image"[^>]+fetchpriority="high"|<link[^>]+fetchpriority="high"[^>]+rel="preload"/)
+    const imgs = html.match(/<img\b[^>]*>/g) ?? []
+    expect(imgs.length).toBeGreaterThanOrEqual(4)
+    for (const img of imgs) expect(img).toContain('loading="lazy"')
+    // Every capture of the deck, with its alt text, and the tabs as links
     for (const tool of TOOLS) {
-      for (const src of tool.shots) expect(html).toMatch(new RegExp(`<img[^>]*src="${src}"[^>]*alt="[^"]{20,}"|<img[^>]*alt="[^"]{20,}"[^>]*src="${src}"`))
+      if (!tool.film) for (const src of tool.shots) expect(html).toMatch(new RegExp(`<img[^>]*src="${src}"[^>]*alt="[^"]{20,}"|<img[^>]*alt="[^"]{20,}"[^>]*src="${src}"`))
       expect(html).toMatch(new RegExp(`<a[^>]*id="${tool.id}"[^>]*role="tab"|<a[^>]*role="tab"[^>]*id="${tool.id}"`))
     }
   })

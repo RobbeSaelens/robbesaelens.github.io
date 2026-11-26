@@ -181,6 +181,23 @@ function toolsNode(site: string, path: string, lang: Locale) {
         operatingSystem: tool.platform,
         softwareVersion: tool.version,
         keywords: tool.stack.join(', '),
+        // Its film, when it has one (the page shows it in place of the captures)
+        ...(tool.video
+          ? {
+              video: {
+                '@type': 'VideoObject',
+                name: `${tool.name}: ${tool.video.caption}`,
+                description: tool.video.title,
+                thumbnailUrl: `${site}${tool.video.poster}`,
+                contentUrl: `${site}${tool.video.src}`,
+                embedUrl: `${site}${path}#${tool.id}`,
+                uploadDate: tool.video.published,
+                duration: tool.video.duration,
+                width: tool.video.width,
+                height: tool.video.height,
+              },
+            }
+          : {}),
         ...(tool.repository
           ? { hasPart: { '@type': 'SoftwareSourceCode', codeRepository: tool.repository, author: person } }
           : {}),

@@ -61,6 +61,31 @@ export interface ToolShot extends ProjectShotData {
   label: string
 }
 
+/**
+ * A short film of the tool at work, in place of its deck of captures (ToolVideo.vue):
+ * public/<tool>-tour.mp4 (1280 × 720) and public/<tool>-tour-480.mp4 (854 × 480, for phones),
+ * H.264 with AAC music, `+faststart`; 20 s. Its poster is public/<tool>-tour-poster.jpg, whose
+ * WebP copy the page shows (`npm run images`). It plays muted while in view, with a button
+ * for the sound. It follows the captures' rules: the real interface, only Robbe's own projects
+ * that are on the site, no version number or dates.
+ */
+export interface ToolVideo {
+  /** 720p, for tablets and up, and the file search engines get */
+  src: string
+  /** 480p, for phones */
+  small: string
+  poster: string
+  width: number
+  height: number
+  /** What it shows, in a sentence: its accessible name, and its JSON-LD description */
+  title: string
+  /** A line under it */
+  caption: string
+  /** For the JSON-LD: its length (ISO 8601) and the day it was published */
+  duration: string
+  published: string
+}
+
 export interface ToolData {
   /** The URL's hash that selects it (/tools#sift), and its tab's id */
   id: ToolId
@@ -84,6 +109,8 @@ export interface ToolData {
   stack: string[]
   /** Its captures, the first in front */
   shots: ToolShot[]
+  /** A short film of it at work, in place of its deck of captures */
+  video?: ToolVideo
 }
 
 /** Captures of `name`'s windows, from `tools.<ns>.shot<Key>` (label) and `tools.<ns>.alt<Key>` */
@@ -133,6 +160,17 @@ export function projectUpdater(t: Translate): ToolData {
       ['Security', 'project-updater-security'],
       ['Review', 'project-updater-review'],
     ]),
+    video: {
+      src: '/project-updater-tour.mp4',
+      small: '/project-updater-tour-480.mp4',
+      poster: '/img/project-updater-tour-poster.webp',
+      width: 1280,
+      height: 720,
+      title: t('tools.updater.videoTitle'),
+      caption: t('tools.updater.videoCaption'),
+      duration: 'PT20S',
+      published: '2026-11-26',
+    },
   }
 }
 
