@@ -142,3 +142,118 @@ onBeforeUnmount(() => {
   player.value?.pause()
 })
 </script>
+
+<style scoped>
+/* 16 : 9 in a frame like the captures', its poster until it plays. Two round buttons over
+   its bottom left corner: play / pause and the sound. The tools page sets --tool-accent and
+   --tool-star per tool; elsewhere the site's accent stands in. */
+.tool-film {
+  margin: 0;
+}
+.film-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.875rem;
+  background: #0e1320;
+  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.45);
+}
+.film-frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  cursor: pointer;
+}
+.film-controls {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}
+/* With a mouse the buttons stay out of the picture until it is wanted: they fade in
+   under the pointer, and whenever one of them has the keyboard's focus. A touch screen
+   has no hover, so there they are simply always there. */
+@media (hover: hover) and (pointer: fine) {
+  .film-controls {
+    opacity: 0;
+    transform: translateY(0.375rem);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .tool-film:hover .film-controls,
+  .tool-film:focus-within .film-controls {
+    opacity: 1;
+    transform: none;
+  }
+}
+.film-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 19, 32, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.12s ease-out;
+}
+.film-button svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .film-button:hover {
+    background: rgba(14, 19, 32, 0.9);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+}
+.film-button:active {
+  transform: scale(0.97);
+}
+.film-button:focus-visible {
+  outline: 2px solid var(--tool-accent, var(--color-accent));
+  outline-offset: 2px;
+}
+/* Sound on: the button takes the tool's light colour */
+.film-sound[aria-pressed='true'] {
+  background: var(--tool-star, var(--color-accent));
+  border-color: var(--tool-star, var(--color-accent));
+  color: #0e1320;
+}
+@media (pointer: coarse) {
+  .film-button {
+    min-width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+.film-caption {
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-controls {
+    transition: none;
+    transform: none;
+  }
+}
+</style>

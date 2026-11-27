@@ -84,7 +84,7 @@
           <ul class="tool-points">
             <li v-for="point in tool.points" :key="point.text" class="tool-point reveal">
               <span class="tool-point-icon" aria-hidden="true"><component :is="ICONS[point.icon]" /></span>
-              {{ point.text }}
+              <span class="tool-point-text">{{ point.text }}</span>
             </li>
           </ul>
         </div>

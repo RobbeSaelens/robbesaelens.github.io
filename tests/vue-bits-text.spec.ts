@@ -24,11 +24,11 @@ const COMMANDS: [route: string, command: string][] = [
 ]
 
 const stats = JSON.parse(readFileSync(new URL('../src/data/repo-stats.json', import.meta.url), 'utf8')).projects
-/** The project pages and the repositories on them (two on Stable Manager). */
+/** The project pages and the repository on each. */
 const REPOS: [route: string, keys: string[]][] = [
   ['/exultadetail', ['exulta']],
   ['/scan2talkdetail', ['scan2talk']],
-  ['/stablemanagerdetail', ['stableManager', 'sharedCosts']],
+  ['/stablemanagerdetail', ['stableManager']],
   ['/vhsdetail', ['vhs']],
 ]
 /** How the site writes numbers in each language (RepoActivity.vue). */

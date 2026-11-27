@@ -84,17 +84,6 @@ export function scan2talkCheckIn(t: Translate): { title: string; steps: IndexIte
   return { title: t('scan2talk.flowTitle'), steps: indexItems(t, 'scan2talk', 'flowStep', ['1', '2', '3']) }
 }
 
-/** Stable Manager's Drupal version: its screenshot is the third in the page's lightbox. */
-function sharedCostsShot(t: Translate): ProjectShotData {
-  return {
-    src: '/shared-costs-home.jpg',
-    width: 1600,
-    height: 1000,
-    alt: t('stableManager.drupalAlt'),
-    caption: `Stable Manager in Drupal — ${t('projects.shotDashboard')}`,
-  }
-}
-
 export function stableManager(t: Translate): ProjectData {
   return {
     id: 'stable-manager',
@@ -121,38 +110,8 @@ export function stableManager(t: Translate): ProjectData {
       alt: t('stableManager.alt'),
       caption: `Stable Manager — ${t('projects.shotMobile')}`,
     },
-    // The Drupal screenshot is the third in the lightbox: open(2)
-    more: [sharedCostsShot(t)],
     features: indexItems(t, 'stableManager', 'feature', ['Split', 'Quick', 'Offline', 'Insights', 'Auth', 'Quality']),
-    repo: { key: 'stableManager', label: t('stableManager.repoApp') },
-  }
-}
-
-/** Stable Manager's own block: the Drupal version, an open-source module and recipes. */
-export function stableManagerDrupal(t: Translate) {
-  return {
-    title: t('stableManager.drupalTitle'),
-    name: t('stableManager.drupalName'),
-    badge: t('stableManager.openSourceBadge'),
-    intro: t('stableManager.drupalIntro'),
-    repository: 'https://github.com/RobbeSaelens/shared_costs',
-    repoLabel: t('stableManager.repoDrupal'),
-    shot: sharedCostsShot(t),
-    points: indexItems(t, 'stableManager', 'drupal', ['Field', 'Recipes', 'App', 'Quality']),
-    stack: [
-      'Drupal 11',
-      'PHP 8.3+',
-      'HTMX',
-      'Views',
-      'Recipes',
-      'Twig/SDC',
-      'Chart.js',
-      'PHPUnit',
-      'axe-core',
-      'Playwright',
-      'PHPStan',
-      'GitHub Actions',
-    ],
+    repo: { key: 'stableManager' },
   }
 }
 

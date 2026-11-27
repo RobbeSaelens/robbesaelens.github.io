@@ -424,9 +424,14 @@ html.js.intro-done .tools-page .heat-col {
 }
 
 /* =============================================
-   A chapter: name, status, headline, sentence and points on the left (5), its captures
-   on the right (7) from 1024px; below that the captures come after the sentence, then
-   the points. Then its story, then what it's made with and the way on.
+   A chapter: name, status, headline and sentence on the left (5), its film on the right
+   (7) from 1024px, both starting on the same line; the points are a row under them, as
+   wide as the page. Below 1024px: the film after the sentence, then the points. Then its
+   story, then what it's made with and the way on.
+
+   The points sit under both columns rather than beside the film: a film is 16 : 9, so it
+   can never be as tall as the text column, and the points under it left a ragged bottom
+   edge that grew as the screen narrowed (263px of air at 1024px).
    ============================================= */
 .tools-page .tool-chapter {
   margin-top: 2.5rem;
@@ -445,10 +450,12 @@ html.js.intro-done .tools-page .heat-col {
 @media (min-width: 1024px) {
   .tools-page .tool-intro {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: auto 1fr;
-    grid-template-areas: 'head shots' 'points shots';
+    grid-template-areas: 'head shots' 'points points';
+    /* The pitch and the film are each as tall as they are: whichever is shorter sits in
+       the middle of the row, so the pair reads as one block however the text wraps. */
+    align-items: center;
     column-gap: clamp(2.5rem, 5vw, 5rem);
-    row-gap: 2.25rem;
+    row-gap: clamp(2.25rem, 3vw, 3.25rem);
   }
 }
 .tools-page .tool-head {
@@ -509,27 +516,46 @@ html.js.intro-done .tools-page .heat-col {
   padding: 0;
   list-style: none;
 }
+/* Two abreast where the points still sit under the film, so four or five of them fill
+   both columns evenly; one row of them under the whole page from 1024px. */
 @media (min-width: 640px) and (max-width: 1023px) {
   .tools-page .tool-points {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 1.5rem;
+    gap: 1rem;
   }
 }
+@media (min-width: 1024px) {
+  .tools-page .tool-points {
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 1rem;
+  }
+}
+/* A point is a tile: the icon on its first line (so a row of them lines up when one
+   wraps), the text beside it. The tiles are one size, which gives the row a straight
+   bottom edge however long the words are. */
 .tools-page .tool-point {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.875rem;
-  font-size: 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.4;
   color: var(--color-text-primary);
+}
+.tools-page .tool-point-text {
+  /* Half the icon's height, less half a line: the first line centres on the icon */
+  padding-top: 0.375rem;
 }
 .tools-page .tool-point-icon {
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 0.75rem;
   color: var(--tool-accent);
   background: var(--tool-soft);
@@ -644,94 +670,7 @@ html.js.intro-done .tools-page .heat-col {
   margin-bottom: 1.75rem;
 }
 
-/* A tool's film in place of its deck (ToolVideo.vue, Project Updater's tour): 16 : 9 in a
-   frame like the captures', its poster until it plays. Two round buttons over its bottom
-   left corner: play / pause and the sound. */
-.tools-page .tool-film {
-  margin: 0;
-}
-.tools-page .film-frame {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: 0.875rem;
-  background: #0e1320;
-  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.45);
-}
-.tools-page .film-frame video {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  cursor: pointer;
-}
-.tools-page .film-controls {
-  position: absolute;
-  left: 0.75rem;
-  bottom: 0.75rem;
-  display: flex;
-  gap: 0.5rem;
-}
-.tools-page .film-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  min-width: 2.5rem;
-  height: 2.5rem;
-  padding: 0 0.7rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(14, 19, 32, 0.72);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.12s ease-out;
-}
-.tools-page .film-button svg {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-}
-@media (hover: hover) and (pointer: fine) {
-  .tools-page .film-button:hover {
-    background: rgba(14, 19, 32, 0.9);
-    border-color: rgba(255, 255, 255, 0.35);
-  }
-}
-.tools-page .film-button:active {
-  transform: scale(0.97);
-}
-.tools-page .film-button:focus-visible {
-  outline: 2px solid var(--tool-accent);
-  outline-offset: 2px;
-}
-/* Sound on: the button takes the tool's light colour */
-.tools-page .film-sound[aria-pressed='true'] {
-  background: var(--tool-star);
-  border-color: var(--tool-star);
-  color: #0e1320;
-}
-@media (pointer: coarse) {
-  .tools-page .film-button {
-    min-width: 2.75rem;
-    height: 2.75rem;
-  }
-}
-.tools-page .film-caption {
-  margin-top: 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-}
+/* A tool's film (ToolVideo.vue) carries its own styles, so the Scan2Talk page can show one too. */
 
 /* How an update runs (UpdatePipeline.vue): the steps one under the other on phones, in a
    row from 768px, a line from each node to the next. Lit at rest; armed, the nodes are
