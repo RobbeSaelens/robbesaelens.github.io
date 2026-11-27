@@ -162,9 +162,10 @@ async function dependenciesUpdated(repo, sha, token) {
 }
 
 /**
- * The open Dependabot alerts, counted by severity. Null when they can't be read: the token
- * lacks "Dependabot alerts: Read-only", or the repository has them off (GitHub answers 403
- * or 404). That never fails the numbers around it.
+ * The open Dependabot alerts that count against a project, by severity: an advisory in a
+ * development dependency only counts when it is high or critical, as Project Updater counts
+ * them. Null when they can't be read: the token lacks "Dependabot alerts: Read-only", or the
+ * repository has them off (GitHub answers 403 or 404). That never fails the numbers around it.
  */
 async function openAlerts(repo, token) {
   const bySeverity = Object.fromEntries(SEVERITIES.map((s) => [s, 0]))
@@ -172,6 +173,10 @@ async function openAlerts(repo, token) {
     for await (const list of pages(`/repos/${OWNER}/${repo}/dependabot/alerts`, token, { state: 'open', per_page: '100' }, 20)) {
       for (const alert of list) {
         const severity = alert.security_advisory?.severity ?? alert.security_vulnerability?.severity
+        // The same rule as Project Updater's status (advisories.ts, isQuiet): an advisory in a
+        // development dependency only counts when it is high or critical. The rest never reach
+        // what the project ships.
+        if (alert.dependency?.scope === 'development' && severity !== 'high' && severity !== 'critical') continue
         if (severity in bySeverity) bySeverity[severity]++
       }
     }

@@ -139,7 +139,10 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   `lastCommit`, `commitsPerWeek` (26 weeks), `dependenciesUpdated` (the date of the newest
   commit on the default branch that touched a lockfile: `package-lock.json`,
   `composer.lock`, `pnpm-lock.yaml` or `yarn.lock`; null without one), `openAlerts` and
-  `openAlertsBySeverity` (the open Dependabot alerts, a count and one per severity; both
+  `openAlertsBySeverity` (the open Dependabot alerts that count against the project, a count
+  and one per severity: an advisory in a development dependency counts only when it is high
+  or critical, the rule Project Updater's status uses (`isQuiet` in its `advisories.ts`), so
+  the page and the tool agree; both
   null when they can't be read: without the token's Dependabot permission, or with
   Dependabot alerts off for a repo, GitHub answers 403 and the page shows the dependencies
   part only; that never fails the rest). Besides: `tools` (the tools' latest releases) and
