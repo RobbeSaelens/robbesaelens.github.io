@@ -12,6 +12,11 @@
 // works on a small quota per IP address, which GitHub's runners share, so it often answers
 // 429. Each page is asked twice at most; a site that fails keeps its committed scores.
 //
+// One Lighthouse run varies a lot, the performance score most (one morning 78, an hour later
+// 95, for the same page): its mobile run simulates a slow phone and network, and a page whose
+// LCP sits near a threshold falls either side of it. So each page is measured RUNS times and
+// each score is the median of those runs, as Lighthouse's own docs advise.
+//
 // Public on the site: the four category scores (0–100), when they were measured and on
 // what (the strategy). Nothing else from the report is kept.
 
@@ -30,6 +35,8 @@ const STRATEGIES = ['mobile']
 const CATEGORIES = { performance: 'performance', accessibility: 'accessibility', 'best-practices': 'bestPractices', seo: 'seo' }
 const TIMEOUT_MS = 120_000
 const RETRY_AFTER_MS = 15_000
+/** Runs per page; each score is their median (odd, so the median is one of the runs) */
+const RUNS = 3
 
 const key = process.env.PAGESPEED_API_KEY || undefined
 
@@ -65,6 +72,25 @@ async function measureTwice(url, strategy) {
   }
 }
 
+/** RUNS runs one after the other (PageSpeed Insights runs one page at a time anyway); the median of each score. */
+async function measureMedian(url, strategy) {
+  const runs = []
+  for (let i = 0; i < RUNS; i++) {
+    try {
+      runs.push(await measureTwice(url, strategy))
+    } catch (error) {
+      console.log(`${url} (${strategy}): run ${i + 1} failed (${error.message})`)
+    }
+  }
+  if (!runs.length) throw new Error('every run failed')
+  const median = (values) => values.sort((a, b) => a - b)[Math.floor((values.length - 1) / 2)]
+  const result = {}
+  for (const name of Object.values(CATEGORIES)) result[name] = median(runs.map((run) => run[name]))
+  result.measuredAt = runs.map((run) => run.measuredAt).sort().at(-1)
+  console.log(`${url} (${strategy}): performance per run ${runs.map((run) => run.performance).join(', ')}`)
+  return result
+}
+
 let previous = { sites: {} }
 try {
   previous = JSON.parse(readFileSync(OUT, 'utf8'))
@@ -79,7 +105,7 @@ for (const project of PROJECTS.filter((p) => p.liveUrl)) {
   sites[project.stats] = {}
   for (const strategy of STRATEGIES) {
     try {
-      const result = await measureTwice(url, strategy)
+      const result = await measureMedian(url, strategy)
       sites[project.stats][strategy] = result
       measured++
       const { measuredAt, ...scores } = result
