@@ -159,7 +159,9 @@ deployed (a plain `POST /chat`, see the `status-worker` README) to check the ans
   is set (a Google Cloud API key restricted to the PageSpeed Insights API). Without a key
   the API's keyless quota is tiny and shared (GitHub's runners share IPs), so it mostly
   answers 429: each page is asked twice at most, and a site that isn't measured keeps its
-  committed scores, like drupal.json. The script imports `src/seo/projects.ts` itself
+  committed scores, like drupal.json. One Lighthouse run varies a lot (mobile performance
+  moved from 78 to 95 between two runs of the same page), so each page is measured three times
+  and each score is the median (`RUNS` in the script). The script imports `src/seo/projects.ts` itself
   (Node's `--experimental-strip-types`, in the npm script). To add desktop, add it to
   `STRATEGIES` there; the page shows mobile.
 - The Drupal contributions page (`/drupal`) reads `src/data/drupal.json`, written by
