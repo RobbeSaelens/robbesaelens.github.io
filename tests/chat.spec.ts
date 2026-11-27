@@ -409,11 +409,6 @@ for (const [path, question, url] of [
     await page.locator('#chat-input').press('Enter')
     await waitForAnswer(page, 2)
     await expect(page.locator('.msg--bot').last()).toContainText(url)
-    // "drupal module" still means Shared Costs
-    await page.locator('#chat-input').fill('drupal module')
-    await page.locator('#chat-input').press('Enter')
-    await waitForAnswer(page, 3)
-    await expect(page.locator('.msg--bot').last()).toContainText('Shared Costs')
   })
 
   test(`without the AI, Stable Manager is found by its name and its old one (${path})`, async ({ page }) => {

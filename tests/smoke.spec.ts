@@ -313,8 +313,8 @@ test.describe('llms.txt', () => {
       expect(text).toContain(`https://robbesaelens.github.io${path}`)
       expect(text).toContain(en[ns].aboutText)
       // Every item of its numbered lists, title and text as on the page: the features,
-      // Stable Manager's Drupal points, Scan2Talk's steps
-      const items = Object.keys(en[ns]).filter((key) => /^(feature|drupal|flowStep)/.test(key) && `${key}Text` in en[ns])
+      // Scan2Talk's steps
+      const items = Object.keys(en[ns]).filter((key) => /^(feature|flowStep)/.test(key) && `${key}Text` in en[ns])
       expect(items.length).toBeGreaterThan(0)
       const lines = text.split('\n')
       for (const key of items) {
@@ -324,13 +324,11 @@ test.describe('llms.txt', () => {
     }
     expect(text).toContain(`${en.project.featuresTitle}:\n1. ${en.exulta.featureCatalog}: `)
     expect(text).toContain(`${en.scan2talk.flowTitle}:\n1. ${en.scan2talk.flowStep1}: ${en.scan2talk.flowStep1Text}\n`)
-    expect(text).toContain(`(the Drupal version):\n1. ${en.stableManager.drupalField}: `)
     for (const tagline of Object.values(en.projects.items).map((item) => (item as { tagline: string }).tagline)) {
       if (tagline !== en.projects.items['coming-soon'].tagline) expect(text).toContain(tagline)
     }
     expect(text).toContain('Built with: PHP 8.4, Laravel 13, React 19')
     expect(text).toContain('Tools: Better Auth, shadcn/ui')
-    expect(text).toContain('https://github.com/RobbeSaelens/shared_costs')
     for (const [key, repo] of Object.entries(stats.projects) as [string, { commits: number; commitsLast30Days: number }][]) {
       expect(text, key).toContain(`${repo.commits} commits, ${repo.commitsLast30Days} in the last 30 days, active since`)
     }
@@ -500,26 +498,6 @@ test('projects page links to each project', async ({ page }) => {
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await expect(page.locator('h1')).toContainText(name)
   }
-})
-
-test('Stable Manager shows its Drupal version, with the public repository and its screenshot', async ({ page }) => {
-  const errors = await guard(page)
-  const repo = 'https://github.com/RobbeSaelens/shared_costs'
-  await open(page, '/stablemanagerdetail')
-  const drupal = page.getByRole('region', { name: 'Also in Drupal' })
-  await expect(drupal.getByRole('link', { name: 'View on GitHub' })).toHaveAttribute('href', repo)
-  // Each repository is labelled; only the public one links to GitHub
-  await expect(page.getByRole('region', { name: 'Repository activity: Next.js app' }).locator('.repo-note-link')).toHaveCount(0)
-  await expect(page.getByRole('region', { name: 'Repository activity: Drupal version' }).locator('.repo-note-link')).toHaveAttribute('href', repo)
-  // The Drupal screenshot is the third one in the lightbox
-  await drupal.locator('button.shot').click()
-  await expect(page.getByRole('dialog').locator('.lightbox-caption')).toContainText('3 / 3')
-  await page.keyboard.press('Escape')
-
-  await open(page, nl('/stablemanagerdetail'))
-  await expect(page.getByRole('region', { name: 'Ook in Drupal' }).getByRole('link', { name: 'Bekijk op GitHub' })).toHaveAttribute('href', repo)
-  await expect(page.getByRole('region', { name: 'Repository-activiteit: Drupal-versie' })).toBeAttached()
-  expect(errors).toEqual([])
 })
 
 // The tools page: the two Mac apps Robbe built to maintain his projects (src/tools.ts),
@@ -825,12 +803,12 @@ test.describe('tools page', () => {
 test.describe('project page template', () => {
   const PAGES = [
     { route: '/exultadetail', name: 'Exulta', next: ['Scan2Talk', '/scan2talkdetail'], own: null },
-    { route: '/scan2talkdetail', name: 'Scan2Talk', next: ['Stable Manager', '/stablemanagerdetail'], own: 'How a check-in works' },
-    { route: '/stablemanagerdetail', name: 'Stable Manager', next: ['VHS Service', '/vhsdetail'], own: 'Also in Drupal' },
+    { route: '/scan2talkdetail', name: 'Scan2Talk', next: ['Stable Manager', '/stablemanagerdetail'], own: 'Scan2Talk in one minute' },
+    { route: '/stablemanagerdetail', name: 'Stable Manager', next: ['VHS Service', '/vhsdetail'], own: null },
     // The last one wraps around to the first
     { route: '/vhsdetail', name: 'VHS Service', next: ['Exulta', '/exultadetail'], own: null },
   ] as const
-  const OWN = ['How a check-in works', 'Also in Drupal']
+  const OWN = ['Scan2Talk in one minute']
 
   for (const { route, name, next, own } of PAGES) {
     test(`${route} has the template's sections in order, and its own block`, async ({ page }) => {
@@ -853,23 +831,17 @@ test.describe('project page template', () => {
       // Built with, beside the repository's activity
       const built = page.getByRole('region', { name: 'Built with' })
       expect(await built.locator('.tag-pill').count()).toBeGreaterThan(5)
-      await expect(page.locator('.repo')).toHaveCount(own === 'Also in Drupal' ? 2 : 1)
+      await expect(page.locator('.repo')).toHaveCount(1)
 
-      // Its own block, if it has one, in its place: the check-in after the first screen,
-      // the Drupal version after the activity
+      // Its own block, if it has one, in its place: Scan2Talk's film after the first screen
       for (const block of OWN) {
         await expect(page.getByRole('region', { name: block, exact: true })).toHaveCount(block === own ? 1 : 0)
       }
       const top = async (locator: ReturnType<Page['locator']>) => (await locator.boundingBox())!.y
-      if (own === 'How a check-in works') {
-        const flow = page.getByRole('region', { name: own })
-        await expect(flow.locator('video')).toHaveCount(1)
-        expect(await top(flow)).toBeLessThan(await top(features))
-      }
-      if (own === 'Also in Drupal') {
-        const drupal = page.getByRole('region', { name: own })
-        await expect(drupal.locator('.index-item')).toHaveCount(4)
-        expect(await top(drupal)).toBeGreaterThan(await top(built))
+      if (own === 'Scan2Talk in one minute') {
+        const film = page.getByRole('region', { name: own })
+        await expect(film.locator('video')).toHaveCount(1)
+        expect(await top(film)).toBeLessThan(await top(features))
       }
 
       // The way on: the next project, with its screenshot, and all projects
@@ -1471,8 +1443,6 @@ test.describe('repository activity', () => {
     ['/scan2talkdetail', 'scan2talk'],
     ['/stablemanagerdetail', 'stableManager'],
     ['/vhsdetail', 'vhs'],
-    // The Drupal version, on the Stable Manager page
-    ['/stablemanagerdetail', 'sharedCosts'],
   ] as const
 
   // Most repos are private: counts and dates only.
@@ -1517,7 +1487,7 @@ test.describe('repository activity', () => {
       await page.setViewportSize({ width, height })
       await open(page, '/stablemanagerdetail')
       await expect(page.getByRole('complementary')).toHaveCount(0)
-      for (const name of ['Repository activity: Next.js app', 'Repository activity: Drupal version']) {
+      for (const name of ['Repository activity']) {
         const repo = page.getByRole('region', { name })
         await repo.scrollIntoViewIfNeeded()
         await expect(repo).toBeVisible()
@@ -1665,7 +1635,7 @@ test.describe('Drupal contributions', () => {
     expect(errors).toEqual([])
   })
 
-  test('is linked from the about page and the Stable Manager page, in both languages', async ({ page }) => {
+  test('is linked from the about page, in both languages', async ({ page }) => {
     const errors = await guard(page)
     for (const [about, label, target] of [
       ['/contact', 'My Drupal contributions', '/drupal'],
@@ -1676,10 +1646,6 @@ test.describe('Drupal contributions', () => {
       await expect(page).toHaveURL(new RegExp(`${target}$`))
       await expect(page.locator('h1')).toContainText(target.startsWith('/nl') ? 'drupal-bijdragen' : 'drupal contributions')
     }
-    await open(page, '/stablemanagerdetail')
-    await expect(
-      page.getByRole('region', { name: 'Also in Drupal' }).getByRole('link', { name: 'My Drupal contributions' }),
-    ).toHaveAttribute('href', '/drupal')
     expect(errors).toEqual([])
   })
 })
@@ -1737,11 +1703,11 @@ test('dark mode uses the dark map palette and no filters', async ({ page }) => {
   await expect(page.locator('.place-map .m-bg')).toHaveCSS('fill', 'rgb(17, 26, 34)')
 })
 
-test('the Scan2Talk check-in video has working sources', async ({ request }) => {
+test('the Scan2Talk film has working sources', async ({ request }) => {
   for (const [file, type] of [
-    ['/scan2talk-checkin.webm', 'video/webm'],
-    ['/scan2talk-checkin.mp4', 'video/mp4'],
-    ['/img/scan2talk-checkin-poster.webp', 'image/webp'],
+    ['/scan2talk-tour.mp4', 'video/mp4'],
+    ['/scan2talk-tour-480.mp4', 'video/mp4'],
+    ['/img/scan2talk-tour-poster.webp', 'image/webp'],
   ]) {
     const res = await request.get(file, { headers: { Range: 'bytes=0-1023' } })
     expect([200, 206], file).toContain(res.status())

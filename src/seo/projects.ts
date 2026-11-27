@@ -41,17 +41,8 @@ export const PROJECTS: SeoProject[] = [
     type: 'WebApplication',
     applicationCategory: 'FinanceApplication',
     stats: 'stableManager',
-    tech: ['Next.js', 'React', 'TypeScript', 'Prisma', 'PostgreSQL', 'PWA', 'Drupal', 'PHP', 'HTMX'],
+    tech: ['Next.js', 'React', 'TypeScript', 'Prisma', 'PostgreSQL', 'PWA'],
     languages: ['TypeScript'],
-    sourceCode: {
-      name: 'Shared Costs',
-      description:
-        'Open-source Drupal 11 module: a field type that splits an amount over other entities, equally or by percentage, stored to the cent, with Views integration. Four recipes and a Starterkit theme rebuild Stable Manager in Drupal.',
-      repository: 'https://github.com/RobbeSaelens/shared_costs',
-      language: 'PHP',
-      platform: 'Drupal 11',
-      stats: 'sharedCosts',
-    },
   },
   {
     path: '/vhsdetail',

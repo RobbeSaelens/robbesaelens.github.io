@@ -29,7 +29,7 @@ import drupal from './data/drupal.json'
 import en from './locales/en.json'
 import { routes } from './bootstrap/router'
 import { PROJECT_PAGES, type ProjectEntry } from './projects'
-import { PROJECT_DATA, scan2talkCheckIn, stableManagerDrupal } from './screens/details/data'
+import { PROJECT_DATA, scan2talkCheckIn } from './screens/details/data'
 import { tools as toolData, type ToolStep } from './tools'
 import type { IndexItem } from './components/project/project'
 import { absoluteUrl } from './site'
@@ -108,16 +108,6 @@ const EXTRA: Partial<Record<ProjectEntry['id'], () => string>> = {
   scan2talk() {
     const { title, steps } = scan2talkCheckIn(t)
     return numbered(title, steps)
-  },
-  'stable-manager'() {
-    const block = stableManagerDrupal(t)
-    return [
-      [
-        `${block.title}: ${block.name} (${block.repository}). ${block.intro}`,
-        list([`Built with: ${block.stack.join(', ')}`, `Repository (public): ${activity('sharedCosts')}`]),
-      ].join('\n'),
-      numbered(`${t('project.featuresTitle')} (the Drupal version)`, block.points),
-    ].join('\n\n')
   },
 }
 

@@ -36,16 +36,12 @@ const OUT = resolve(ROOT, process.env.REPO_STATS_OUT ?? 'src/data/repo-stats.jso
 /** The GitHub account that owns the repositories. */
 const OWNER = 'RobbeSaelens'
 
-/**
- * Page → repository. sharedCosts is the public Drupal version of Stable
- * Manager, shown on the Stable Manager page.
- */
+/** Page → repository. */
 const PROJECTS = {
   exulta: 'exulta-v2.0',
   scan2talk: 'scan2talk',
   stableManager: 'stal-manager',
   vhs: 'VHS',
-  sharedCosts: 'shared_costs',
 }
 
 /** The tools on /tools (src/tools.ts) → repository: their latest release, and their commits in the grid. */

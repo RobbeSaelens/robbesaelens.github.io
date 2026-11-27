@@ -144,15 +144,6 @@ test.describe('dependencies and security alerts', () => {
     }
   }
 
-  test('a repository without a lockfile or readable alerts gets no line (the Drupal version)', async ({ page }) => {
-    expect(stats.projects.sharedCosts.dependenciesUpdated).toBeNull()
-    expect(stats.projects.sharedCosts.openAlerts).toBeNull()
-    await open(page, '/stablemanagerdetail')
-    const card = page.locator('.repo:has(#repo-title-sharedCosts)')
-    await card.scrollIntoViewIfNeeded()
-    await expect(card.locator('.repo-note')).toBeVisible()
-    await expect(card.locator('.repo-upkeep')).toHaveCount(0)
-  })
 })
 
 test.describe('Lighthouse scores', () => {
